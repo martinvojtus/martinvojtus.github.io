@@ -6,133 +6,165 @@
     <title>Martin Vojtus — Všetky práva vyhradené</title>
     
     <style>
-        /* Globálne nastavenia */
-        :root {
-            --gradient: linear-gradient(45deg, #00FFA3, #DC1FFF);
-            --bg-color: #000;
-            --text-color: #fff;
-        }
-
+        /* ZACHOVANIE PÔVODNÉHO DIZAJNU */
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Inter', sans-serif; /* Všetky fonty sú Regular */
-            font-weight: 400;
+            background-color: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400; /* Všetky fonty Regular */
             margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             height: 100vh;
-            padding: 40px 20px;
-            box-sizing: border-box;
-        }
-
-        /* Horná časť: MagPulsor & Martin Vojtus */
-        header {
             text-align: center;
-            width: 100%;
         }
 
-        .brand-name {
+        /* HLAVIČKA S LOGOM */
+        .header-section {
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            width: 40px; /* Pôvodná veľkosť */
+            margin-bottom: 10px;
+        }
+
+        .brand-title {
             font-size: 1.2rem;
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin-bottom: 5px;
         }
 
-        .sub-name {
-            font-size: 0.85rem; /* Zväčšené z 0.55rem */
-            opacity: 0.6;
+        .author-name {
+            font-size: 0.85rem; /* Upravené na 0.85rem pre viditeľnosť */
+            opacity: 0.7;
+            margin-top: 5px;
         }
 
-        /* Hlavná časť: Enter Portfolio (namiesto Documentation) */
-        .main-action {
+        /* PILL-SHAPED TLAČIDLÁ */
+        .btn-container {
             display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .btn {
+            text-decoration: none;
+            color: #fff;
+            padding: 14px 45px;
+            border-radius: 50px; /* Pill-shaped */
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            display: inline-block;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+        }
+
+        /* ŠPECIFICKÝ SOLANA BUTTON (Gradient Frame) */
+        .solana-btn {
+            border: 2px solid transparent;
+            background-image: linear-gradient(#000, #000), linear-gradient(45deg, #00FFA3, #DC1FFF);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+        }
+
+        .solana-btn:active {
+            transform: scale(0.95);
+            filter: brightness(1.2);
+        }
+
+        /* LOADING BAR (SKRYTÝ NA ZAČIATKU) */
+        #loader-overlay {
+            display: none; /* Zobrazí sa až po kliknutí */
             flex-direction: column;
             align-items: center;
             gap: 20px;
         }
 
-        .enter-btn {
-            background: none;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            padding: 15px 40px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            text-decoration: none;
+        .loader-bar-bg {
+            width: 180px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
         }
 
-        .enter-btn:hover {
-            border-color: #fff;
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateY(-2px);
+        .loader-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #00FFA3, #DC1FFF);
+            box-shadow: 0 0 10px rgba(0, 255, 163, 0.5);
         }
 
-        /* Solana Donate Button (tvoja verzia s gradientom) */
-        .solana-btn {
-            position: relative;
-            padding: 12px 28px;
-            background: #111;
-            color: #fff;
-            font-size: 0.85rem;
-            text-decoration: none;
-            border-radius: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            
-            /* Gradientný rám */
-            border: 2px solid transparent;
-            background-image: linear-gradient(#111, #111), var(--gradient);
-            background-origin: border-box;
-            background-clip: padding-box, border-box;
-            
-            transition: transform 0.1s ease;
+        @keyframes loadProgress {
+            from { width: 0%; }
+            to { width: 100%; }
         }
 
-        .solana-btn:active {
-            transform: scale(0.96); /* Pressed verzia */
-            filter: brightness(1.2);
-        }
-
-        /* Päta */
+        /* PÄTA */
         footer {
+            position: absolute;
+            bottom: 30px;
             font-size: 0.85rem;
-            opacity: 0.4;
-            text-align: center;
+            opacity: 0.5;
         }
 
-        /* Responzivita pre logo v titulku */
-        @media (max-width: 600px) {
-            .brand-name { font-size: 1rem; }
+        /* SCHOVANIE HLAVNÉHO OBSAHU */
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="brand-name">MagPulsor</div>
-        <div class="sub-name">Martin Vojtus</div>
-    </header>
+    <div id="main-content">
+        <div class="header-section">
+            <img src="logo.svg" alt="Logo" class="logo">
+            <div class="brand-title">MagPulsor</div>
+            <div class="author-name">Martin Vojtus</div>
+        </div>
 
-    <main class="main-action">
-        <a href="https://www.cosmos.so/martinvojtus" class="enter-btn">
-            ENTER PORTFOLIO 🎨
-        </a>
+        <div class="btn-container">
+            <button class="btn" onclick="startLoading()">ENTER PORTFOLIO 🎨</button>
+            
+            <a href="#" class="btn solana-btn">DONATE SOLANA ⚡</a>
+        </div>
+    </div>
 
-        <a href="#" class="solana-btn">
-            <span>DONATE SOLANA</span>
-            <span style="font-size: 1.1rem;">⚡</span>
-        </a>
-    </main>
+    <div id="loader-overlay">
+        <div class="author-name">Načítavam Martin Vojtus...</div>
+        <div class="loader-bar-bg">
+            <div id="fill" class="loader-bar-fill"></div>
+        </div>
+    </div>
 
     <footer>
         Martin Vojtus — Všetky práva vyhradené
     </footer>
+
+    <script>
+        function startLoading() {
+            // 1. Skryjeme hlavné menu
+            document.getElementById('main-content').classList.add('hidden');
+            
+            // 2. Zobrazíme loading bar
+            const overlay = document.getElementById('loader-overlay');
+            overlay.style.display = 'flex';
+            
+            // 3. Spustíme animáciu plnenia
+            const fill = document.getElementById('fill');
+            fill.style.animation = 'loadProgress 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+
+            // 4. Po dokončení animácie presmerujeme
+            setTimeout(() => {
+                window.location.replace("https://www.cosmos.so/martinvojtus");
+            }, 2700);
+        }
+    </script>
 
 </body>
 </html>
