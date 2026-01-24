@@ -5,62 +5,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>Martin Vojtus — Všetky práva vyhradené</title>
-    
-    <meta http-equiv="refresh" content="0; url=https://www.cosmos.so/martinvojtus">
 
     <style>
-        /* Nastavenie fontov na REGULAR podľa tvojej požiadavky */
+        /* Základný reset a tmavý režim */
         body {
             background-color: #000;
             color: #fff;
-            font-family: 'Inter', sans-serif; /* Príklad regular fontu */
-            font-weight: 400;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 400; /* Regular font */
             margin: 0;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            overflow: hidden;
         }
 
-        /* Kontajner pre titulok s logom pre menšie zobrazenia */
-        .title-container {
+        /* Kontajner pre logo a text */
+        .brand-wrapper {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
         .logo {
-            width: 24px; /* Uprav podľa veľkosti tvojho loga */
+            width: 28px;
             height: auto;
-            display: none; /* Štandardne skryté */
+            /* Logo je viditeľné vždy na mobile, na desktope podľa tvojej preferencie */
         }
 
-        .main-title {
-            font-size: 0.85rem; /* Zvýšené z 0.55rem pre lepšiu viditeľnosť */
-            letter-spacing: 0.05em;
+        .text {
+            font-size: 0.85rem; /* Zvýšená čitateľnosť */
+            letter-spacing: 0.07em;
             text-transform: uppercase;
+            opacity: 0.8;
         }
 
-        /* Responzivita: Zobrazenie loga na malých obrazovkách */
+        /* Tenký Loading Bar Container */
+        .loader-container {
+            width: 200px;
+            height: 2px; /* Tenký profil */
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animovaná časť loading baru */
+        .loader-fill {
+            width: 0%;
+            height: 100%;
+            /* Gradient prepojený s tvojím dizajnom */
+            background: linear-gradient(90deg, #00FFA3, #DC1FFF);
+            box-shadow: 0 0 10px rgba(0, 255, 163, 0.5);
+            animation: loadProgress 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        /* Animácia plynulého plnenia */
+        @keyframes loadProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* Responzivita pre logo v titulku na mobile */
         @media (max-width: 600px) {
-            .logo {
-                display: block;
+            .brand-wrapper {
+                flex-direction: row;
             }
         }
     </style>
-
-    <script>
-        // Bleskové presmerovanie
-        window.location.replace("https://www.cosmos.so/martinvojtus");
-    </script>
 </head>
 <body>
 
-    <div class="title-container">
-        <img src="logo.svg" alt="Logo" class="logo">
-        <h1 class="main-title">Martin Vojtus — Všetky práva vyhradené</h1>
+    <div class="brand-wrapper">
+        <img src="logo.svg" alt="" class="logo">
+        <div class="text">Martin Vojtus</div>
     </div>
+
+    <div class="loader-container">
+        <div class="loader-fill"></div>
+    </div>
+
+    <script>
+        // Presmerovanie nastavené presne na čas animácie (2.5 sekundy)
+        setTimeout(function() {
+            window.location.replace("https://www.cosmos.so/martinvojtus");
+        }, 2800); // 2800ms aby tam bola malá rezerva po dokončení animácie
+    </script>
 
 </body>
 </html>
