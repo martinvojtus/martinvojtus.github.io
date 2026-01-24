@@ -33,8 +33,13 @@
             gap: var(--gap); width: 100%; max-width: 380px; padding: 20px;
         }
 
-        /* Branding */
-        .logo-svg { width: 120px; height: 78px; fill: none; stroke: var(--text); stroke-width: 1.2; display: block; }
+        /* Branding - Upravené pre nové logo */
+        .logo-svg { 
+            width: 80px; 
+            height: 80px; 
+            fill: var(--text); 
+            display: block; 
+        }
         
         .logo-text { 
             font-size: var(--f-small); 
@@ -91,10 +96,10 @@
     </div>
 
     <div class="center-core" id="main-ui">
-        <svg class="logo-svg" viewBox="0 0 100 100">
-            <path d="M35 25 Q45 50 35 75"></path>
-            <line x1="50" y1="20" x2="50" y2="80"></line>
-            <path d="M65 25 Q55 50 65 75"></path>
+        <svg class="logo-svg" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            <g transform="translate(540, 540)">
+                <path d="M 0,0 L 233.827, -135 L 233.827, 135 L 0, 270 L -233.827, 135 L -233.827, -135 Z" />
+            </g>
         </svg>
 
         <div class="logo-text">MARTINVOJTUS</div>
