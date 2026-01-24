@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
+    <title>MagPulsor | Martin Vojtuš v3.6.3</title>
+    <style>
+        :root {
+            --bg: #ffffff; --text: #000000;
+            --sol-neon: linear-gradient(90deg, #9945FF, #14F195);
+            --radius-pill: 100px; 
+            --f-big: 1.85rem; 
+            --f-small: 0.65rem; 
+            --gap: 15px;
+        }
+        body.dark { --bg: #000000; --text: #ffffff; }
+
+        /* Core reset: Strictly 100% Solid & Regular [2025-12-24] */
+        * { 
+            box-sizing: border-box; 
+            font-weight: 400 !important; 
+            -webkit-tap-highlight-color: transparent; 
+            transition: none !important; 
+            animation: none !important; 
+            opacity: 1 !important; /* No transparency allowed */
+        }
+        
+        html, body { 
+            height: 100%; width: 100%; margin: 0; background: var(--bg); color: var(--text); 
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Unified flow for absolute vertical symmetry */
+        .center-core { 
+            display: flex; flex-direction: column; align-items: center; 
+            gap: var(--gap); width: 100%; max-width: 380px; padding: 20px;
+        }
+
+        /* Branding */
+        .logo-svg { width: 120px; height: 78px; fill: none; stroke: var(--text); stroke-width: 1.2; display: block; }
+        
+        .logo-text { 
+            font-size: var(--f-small); 
+            text-transform: uppercase; 
+            letter-spacing: 0.4em; 
+            display: inline-flex;
+            white-space: nowrap;
+        }
+
+        /* Action Buttons */
+        .pill { 
+            width: 100%; height: 80px; border-radius: var(--radius-pill); border: 1px solid var(--text); 
+            display: flex; align-items: center; justify-content: center; 
+            text-transform: uppercase; background: var(--bg); text-decoration: none; color: inherit; position: relative;
+        }
+        .doc-btn { background: var(--text); color: var(--bg); border: none; cursor: pointer; }
+        .pill h1 { font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; line-height: 1; text-align: center; }
+
+        /* Support Button: Minimalist Solid [2025-12-30] */
+        .don-btn { 
+            width: 240px; height: 40px; border-radius: var(--radius-pill); 
+            background-image: linear-gradient(var(--bg), var(--bg)), var(--sol-neon); 
+            background-clip: padding-box, border-box; background-origin: border-box; 
+            border: 1px solid transparent; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center;
+            text-transform: uppercase; color: var(--text); position: relative;
+        }
+        .don-btn .sub, #addr-w { 
+            font-size: var(--f-small); letter-spacing: 0.12em; text-align: center;
+            position: absolute; top: 50%; transform: translateY(-50%); width: 100%;
+        }
+
+        #addr-w { display: none; align-items: center; justify-content: center; }
+        .copy { width: 12px; height: 12px; margin-left: 8px; fill: var(--text); cursor: pointer; }
+
+        /* Footer Build Info: No opacity [2025-12-30] */
+        footer { font-size: var(--f-small); text-transform: uppercase; letter-spacing: 0.18em; }
+    </style>
+</head>
+<body>
+
+    <div class="center-core">
+        <svg class="logo-svg" viewBox="0 0 100 100">
+            <path d="M35 25 Q45 50 35 75"></path>
+            <line x1="50" y1="20" x2="50" y2="80"></line>
+            <path d="M65 25 Q55 50 65 75"></path>
+        </svg>
+
+        <div class="logo-text">MagPulsor</div>
+
+        <a href="MAGPULSOR 0.1.pdf" target="_blank" class="pill doc-btn">
+            <h1>Documentation</h1>
+        </a>
+
+        <div class="don-btn" onclick="don()">
+            <span class="sub" id="dS">Support via Solana</span>
+            <div id="addr-w">
+                <span id="addr"></span>
+                <svg class="copy" id="cI" onclick="cpy(event)" viewBox="0 0 24 24"><path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"/></svg>
+            </div>
+        </div>
+
+        <footer>MagPulsor • Build v3.6.3 • 2025</footer>
+    </div>
+
+    <script>
+        const ADDR = "eKBBQ7cPqupa9wUAYHPPyhKFDQJrTJiRkn1fWbNFreG";
+
+        // Intelligent Theme Engine
+        function applyAutoTheme() {
+            const hour = new Date().getHours();
+            if (hour >= 18 || hour < 6 || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark');
+            } else {
+                document.body.classList.remove('dark');
+            }
+        }
+
+        function don() { 
+            const s = document.getElementById('dS'), w = document.getElementById('addr-w'), a = document.getElementById('addr');
+            s.style.display = "none"; w.style.display = "flex"; 
+            a.innerText = ADDR.slice(0,6)+"..."+ADDR.slice(-6); 
+        }
+
+        function cpy(e) { 
+            e.stopPropagation(); 
+            const el = document.createElement('textarea'); el.value = ADDR; document.body.appendChild(el); el.select();
+            document.execCommand('copy'); document.body.removeChild(el);
+            const a = document.getElementById('addr'), i = document.getElementById('cI');
+            a.innerText = "ADDRESS COPIED!"; i.style.display = "none";
+            setTimeout(() => { a.innerText = ADDR.slice(0,6)+"..."+ADDR.slice(-6); i.style.display = "block"; }, 2000);
+        }
+
+        applyAutoTheme();
+    </script>
+</body>
+</html>
