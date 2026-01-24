@@ -3,97 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Martin Vojtus — Všetky práva vyhradené</title>
-
     <style>
-        /* Celkový reset */
-        body {
-            background-color: #000;
-            color: #fff;
-            font-family: 'Inter', sans-serif; /* Regular font */
-            font-weight: 400;
+        /* Celkový reset na čiernu plochu */
+        html, body {
+            background-color: #000 !important;
             margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
             overflow: hidden;
+            color: #fff;
+            /* Tvoje preferované písmo - Regular */
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-weight: 400; 
         }
 
-        /* Sekcia s logom a textom */
-        .brand-container {
+        .content-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Logo a text */
+        .brand {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 25px;
         }
 
-        .logo {
-            width: 26px; /* Jemné logo */
+        .logo-img {
+            width: 30px;
             height: auto;
         }
 
-        .footer-text {
-            font-size: 0.85rem; /* Lepšia viditeľnosť podľa tvojej požiadavky */
-            letter-spacing: 0.05em;
+        .title-text {
+            font-size: 0.85rem; /* Zvýšená čitateľnosť */
             text-transform: uppercase;
+            letter-spacing: 0.1em;
             opacity: 0.9;
         }
 
         /* Tenký Loading Bar */
-        .progress-wrapper {
+        .loader-bg {
             width: 180px;
             height: 2px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            position: relative;
+            border-radius: 4px;
             overflow: hidden;
         }
 
-        .progress-bar {
+        .loader-fill {
             width: 0%;
             height: 100%;
+            /* Gradient z tvojho Solana tlačidla */
             background: linear-gradient(90deg, #00FFA3, #DC1FFF);
-            box-shadow: 0 0 8px rgba(0, 255, 163, 0.4);
-            /* Animácia trvá 2.5 sekundy */
-            animation: grow 2.5s cubic-bezier(0.65, 0.05, 0.36, 1) forwards;
+            box-shadow: 0 0 10px rgba(0, 255, 163, 0.6);
+            /* Animácia na 3 sekundy pre istotu, aby si ju videl */
+            animation: progressRun 3s cubic-bezier(0.5, 0, 0.5, 1) forwards;
         }
 
-        @keyframes grow {
+        @keyframes progressRun {
             0% { width: 0%; }
             100% { width: 100%; }
         }
 
-        /* Jemné zmiznutie celého obsahu na konci */
+        /* Efekt zmiznutia na konci */
         .fade-out {
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.8s ease;
         }
     </style>
 </head>
-<body id="content">
+<body>
 
-    <div class="brand-container">
-        <img src="logo.svg" alt="MV" class="logo">
-        <div class="footer-text">Martin Vojtus</div>
-    </div>
+    <div id="main-ui" class="content-box">
+        <div class="brand">
+            <img src="logo.svg" alt="Logo" class="logo-img">
+            <span class="title-text">Martin Vojtus</span>
+        </div>
 
-    <div class="progress-wrapper">
-        <div class="progress-bar"></div>
+        <div class="loader-bg">
+            <div class="loader-fill"></div>
+        </div>
     </div>
 
     <script>
-        // Počkáme 2.5s (dĺžka animácie) + malá rezerva na plynulý prechod
-        setTimeout(() => {
-            document.getElementById('content').classList.add('fade-out');
-            
-            // Po krátkom fade-out efekte presmerujeme
-            setTimeout(() => {
-                window.location.replace("https://www.cosmos.so/martinvojtus");
-            }, 500);
-        }, 2600);
+        // Spustíme skript až po načítaní celého okna
+        window.onload = function() {
+            console.log("Animácia začala...");
+
+            // Počkáme 3.2 sekundy (3s animácia + 0.2s rezerva)
+            setTimeout(function() {
+                // Pridáme fade-out efekt
+                document.getElementById('main-ui').style.opacity = '0';
+                
+                // Počkáme na dobehnutie fade-outu a presmerujeme
+                setTimeout(function() {
+                    window.location.replace("https://www.cosmos.so/martinvojtus");
+                }, 800);
+            }, 3200);
+        };
     </script>
 
 </body>
