@@ -10,12 +10,12 @@
             --sol-neon: linear-gradient(90deg, #9945FF, #14F195);
             --radius-pill: 100px; 
             --f-big: 1.85rem; 
-            --f-small: 0.85rem; /* Zvýšené z 0.65rem pre lepšiu viditeľnosť [2026] */
+            --f-small: 0.65rem; /* Vrátené na pôvodnú veľkosť */
             --gap: 15px;
         }
         body.dark { --bg: #000000; --text: #ffffff; }
 
-        /* Core reset: Strictly Regular [2025-12-24] */
+        /* Core reset: Strictly 100% Solid & Regular */
         * { 
             box-sizing: border-box; 
             font-weight: 400 !important; 
@@ -38,7 +38,7 @@
         
         .logo-text { 
             font-size: var(--f-small); 
-            text-transform: uppercase; 
+            text-transform: lowercase; /* Malé písmo podľa požiadavky */
             letter-spacing: 0.4em; 
             display: inline-flex;
             white-space: nowrap;
@@ -54,7 +54,7 @@
         .doc-btn { background: var(--text); color: var(--bg); border: none; }
         .pill h1 { font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; line-height: 1; text-align: center; }
 
-        /* Support Button: Minimalist Solid */
+        /* Support Button */
         .don-btn { 
             width: 240px; height: 40px; border-radius: var(--radius-pill); 
             background-image: linear-gradient(var(--bg), var(--bg)), var(--sol-neon); 
@@ -71,12 +71,12 @@
         #addr-w { display: none; align-items: center; justify-content: center; }
         .copy { width: 12px; height: 12px; margin-left: 8px; fill: var(--text); cursor: pointer; }
 
-        /* Loading Bar Overlay */
+        /* Loading Overlay */
         #l-ov { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: var(--bg); z-index: 99; flex-direction: column; align-items: center; justify-content: center; 
         }
-        .l-bar-bg { width: 200px; height: 2px; background: rgba(128,128,128,0.2); border-radius: 2px; overflow: hidden; }
+        .l-bar-bg { width: 180px; height: 2px; background: rgba(128,128,128,0.2); border-radius: 2px; overflow: hidden; }
         .l-bar-fill { height: 100%; width: 0%; background: var(--sol-neon); }
 
         @keyframes load { to { width: 100%; } }
@@ -97,10 +97,10 @@
             <path d="M65 25 Q55 50 65 75"></path>
         </svg>
 
-        <div class="logo-text">MagPulsor</div>
+        <div class="logo-text">martinvojtus</div>
 
-        <div class="pill doc-btn" onclick="goToCosmos()">
-            <h1>Enter Portfolio</h1>
+        <div class="pill doc-btn" onclick="startLoading()">
+            <h1>Portfolio</h1>
         </div>
 
         <div class="don-btn" onclick="don()">
@@ -124,14 +124,17 @@
             }
         }
 
-        function goToCosmos() {
-            document.getElementById('main-ui').style.display = 'none';
-            document.getElementById('l-ov').style.display = 'flex';
-            const bar = document.getElementById('l-f');
-            bar.style.animation = "load 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards";
+        function startLoading() {
+            document.getElementById('main-ui').style.opacity = '0';
             setTimeout(() => {
-                window.location.replace("https://www.cosmos.so/martinvojtus");
-            }, 2800);
+                document.getElementById('main-ui').style.display = 'none';
+                document.getElementById('l-ov').style.display = 'flex';
+                const bar = document.getElementById('l-f');
+                bar.style.animation = "load 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards";
+                setTimeout(() => {
+                    window.location.replace("https://www.cosmos.so/martinvojtus");
+                }, 2500);
+            }, 100);
         }
 
         function don() { 
