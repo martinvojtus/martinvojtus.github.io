@@ -10,7 +10,7 @@
             --sol-neon: linear-gradient(90deg, #9945FF, #14F195);
             --radius-pill: 100px; 
             --f-big: 1.85rem; 
-            --f-small: 0.65rem; /* Vrátené na pôvodnú veľkosť */
+            --f-small: 0.65rem; 
             --gap: 15px;
         }
         body.dark { --bg: #000000; --text: #ffffff; }
@@ -38,7 +38,7 @@
         
         .logo-text { 
             font-size: var(--f-small); 
-            text-transform: lowercase; /* Malé písmo podľa požiadavky */
+            text-transform: uppercase; /* Zmena na veľké písma */
             letter-spacing: 0.4em; 
             display: inline-flex;
             white-space: nowrap;
@@ -81,6 +81,7 @@
 
         @keyframes load { to { width: 100%; } }
 
+        /* Footer s novou verziou */
         footer { font-size: var(--f-small); text-transform: uppercase; letter-spacing: 0.18em; }
     </style>
 </head>
@@ -97,7 +98,7 @@
             <path d="M65 25 Q55 50 65 75"></path>
         </svg>
 
-        <div class="logo-text">martinvojtus</div>
+        <div class="logo-text">MARTINVOJTUS</div>
 
         <div class="pill doc-btn" onclick="startLoading()">
             <h1>Portfolio</h1>
@@ -111,7 +112,7 @@
             </div>
         </div>
 
-        <footer>Martin Vojtuš • 2026</footer>
+        <footer>Martin Vojtuš • Build v1.0.0 • 2026</footer>
     </div>
 
     <script>
