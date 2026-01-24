@@ -3,33 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Martin Vojtus | Cosmos</title>
+    
+    <title>Martin Vojtus — Všetky práva vyhradené</title>
     
     <meta http-equiv="refresh" content="0; url=https://www.cosmos.so/martinvojtus">
 
     <style>
+        /* Nastavenie fontov na REGULAR podľa tvojej požiadavky */
         body {
             background-color: #000;
             color: #fff;
-            font-family: sans-serif; /* Použije systémový regular font */
+            font-family: 'Inter', sans-serif; /* Príklad regular fontu */
+            font-weight: 400;
+            margin: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
         }
-        .loading-text {
-            font-size: 0.85rem; /* Podľa tvojej požiadavky na lepšiu čitateľnosť */
-            letter-spacing: 1px;
+
+        /* Kontajner pre titulok s logom pre menšie zobrazenia */
+        .title-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 24px; /* Uprav podľa veľkosti tvojho loga */
+            height: auto;
+            display: none; /* Štandardne skryté */
+        }
+
+        .main-title {
+            font-size: 0.85rem; /* Zvýšené z 0.55rem pre lepšiu viditeľnosť */
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        /* Responzivita: Zobrazenie loga na malých obrazovkách */
+        @media (max-width: 600px) {
+            .logo {
+                display: block;
+            }
         }
     </style>
 
     <script>
-        // Okamžité presmerovanie cez JavaScript
+        // Bleskové presmerovanie
         window.location.replace("https://www.cosmos.so/martinvojtus");
     </script>
 </head>
 <body>
-    <div class="loading-text">Presmerúvam na Cosmos... 🎨</div>
+
+    <div class="title-container">
+        <img src="logo.svg" alt="Logo" class="logo">
+        <h1 class="main-title">Martin Vojtus — Všetky práva vyhradené</h1>
+    </div>
+
 </body>
 </html>
