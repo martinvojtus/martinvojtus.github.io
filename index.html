@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Martin Vojtus — Všetky práva vyhradené</title>
+
     <style>
-        /* Celkový reset na čiernu plochu */
+        /* Minimalistický čierny základ */
         html, body {
             background-color: #000 !important;
             margin: 0;
@@ -13,58 +14,27 @@
             width: 100%;
             height: 100%;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            color: #fff;
-            /* Tvoje preferované písmo - Regular */
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            font-weight: 400; 
-        }
-
-        .content-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-
-        /* Logo a text */
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-img {
-            width: 30px;
-            height: auto;
-        }
-
-        .title-text {
-            font-size: 0.85rem; /* Zvýšená čitateľnosť */
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            opacity: 0.9;
         }
 
         /* Tenký Loading Bar */
         .loader-bg {
             width: 180px;
-            height: 2px;
+            height: 2px; /* Extra tenký profil */
             background: rgba(255, 255, 255, 0.1);
             border-radius: 4px;
             overflow: hidden;
+            position: relative;
         }
 
         .loader-fill {
             width: 0%;
             height: 100%;
-            /* Gradient z tvojho Solana tlačidla */
+            /* Tvoj charakteristický gradient */
             background: linear-gradient(90deg, #00FFA3, #DC1FFF);
             box-shadow: 0 0 10px rgba(0, 255, 163, 0.6);
-            /* Animácia na 3 sekundy pre istotu, aby si ju videl */
             animation: progressRun 3s cubic-bezier(0.5, 0, 0.5, 1) forwards;
         }
 
@@ -73,7 +43,7 @@
             100% { width: 100%; }
         }
 
-        /* Efekt zmiznutia na konci */
+        /* Jemné zmiznutie pred skokom */
         .fade-out {
             opacity: 0;
             transition: opacity 0.8s ease;
@@ -82,32 +52,22 @@
 </head>
 <body>
 
-    <div id="main-ui" class="content-box">
-        <div class="brand">
-            <img src="logo.svg" alt="Logo" class="logo-img">
-            <span class="title-text">Martin Vojtus</span>
-        </div>
-
-        <div class="loader-bg">
-            <div class="loader-fill"></div>
-        </div>
+    <div id="main-ui" class="loader-bg">
+        <div class="loader-fill"></div>
     </div>
 
     <script>
-        // Spustíme skript až po načítaní celého okna
         window.onload = function() {
-            console.log("Animácia začala...");
-
-            // Počkáme 3.2 sekundy (3s animácia + 0.2s rezerva)
+            // Počkáme na dokončenie animácie (3 sekundy)
             setTimeout(function() {
-                // Pridáme fade-out efekt
-                document.getElementById('main-ui').style.opacity = '0';
+                // Spustíme fade-out efekt baru
+                document.getElementById('main-ui').classList.add('fade-out');
                 
-                // Počkáme na dobehnutie fade-outu a presmerujeme
+                // Finálne presmerovanie po doznení efektu
                 setTimeout(function() {
                     window.location.replace("https://www.cosmos.so/martinvojtus");
                 }, 800);
-            }, 3200);
+            }, 3000);
         };
     </script>
 
