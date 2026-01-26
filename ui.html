@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iPhone Mockup - 1/2 Šírky</title>
+    <title>iPhone Mockup - Výrazný tieň</title>
     <style>
-        /* 🎨 Vycentrovanie na stred */
+        /* 🎨 Vycentrovanie na stred (nezmenené) */
         body {
             margin: 0;
             display: flex;
@@ -13,28 +13,30 @@
             align-items: center;
             min-height: 100vh;
             background-color: #ffffff;
-            overflow: hidden; /* Zabráni skrolovaniu, ak je objekt príliš vysoký */
+            overflow: hidden;
         }
 
         /* 📐 Geometria obdĺžnika */
         .iphone-container {
-            width: 50vw; /* Presne 1/2 šírky displeja */
-            max-height: 95vh; /* Poistka, aby nevyčnieval vertikálne z obrazovky */
-            aspect-ratio: 1170 / 2532;
-            background-color: #e0e0e0;
+            width: 50vw; /* 1/2 šírky displeja (nezmenené) */
+            max-height: 95vh;
+            aspect-ratio: 1170 / 2532; /* Pomer strán (nezmenené) */
+            background-color: #e0e0e0; /* Farba (nezmenené) */
             
-            /* 🌀 Zaoblenie rohov */
-            /* Pre reálny vzhľad iPhonu používame 18% šírky objektu (cca 50-60px na reálnom zariadení) */
+            /* 🌀 Zaoblenie rohov (nezmenené - vizuálna aproximácia) */
             border-radius: 8vw; 
             
-            box-shadow: 0 15px 50px rgba(0,0,0,0.08);
+            /* 🌑 NOVÝ, VÝRAZNEJŠÍ TIEŇ */
+            /* Zvýšil som rozostrenie (60px) a opacitu farby (0.25) */
+            box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+            
             transition: all 0.3s ease;
         }
 
-        /* Prispôsobenie pre veľmi úzke okná */
+        /* Prispôsobenie pre veľmi úzke okná (nezmenené) */
         @media (max-aspect-ratio: 1170/2532) {
             .iphone-container {
-                width: 40vw; /* O niečo menší na extrémne vysokých monitoroch */
+                width: 40vw;
             }
         }
     </style>
