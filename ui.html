@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iPhone Mockup - Výrazný tieň</title>
+    <title>iPhone Mockup - Jemný tieň</title>
     <style>
-        /* 🎨 Vycentrovanie na stred (nezmenené) */
+        /* 🎨 Vycentrovanie */
         body {
             margin: 0;
             display: flex;
@@ -18,25 +18,25 @@
 
         /* 📐 Geometria obdĺžnika */
         .iphone-container {
-            width: 50vw; /* 1/2 šírky displeja (nezmenené) */
-            max-height: 95vh;
-            aspect-ratio: 1170 / 2532; /* Pomer strán (nezmenené) */
-            background-color: #e0e0e0; /* Farba (nezmenené) */
+            width: 50vw; /* 1/2 šírky displeja */
+            max-height: 90vh; /* Ochrana pred pretečením */
+            aspect-ratio: 1170 / 2532;
+            background-color: #e0e0e0; /* Pôvodná svetlosivá */
             
-            /* 🌀 Zaoblenie rohov (nezmenené - vizuálna aproximácia) */
+            /* 🌀 Zaoblenie rohov (Aproximácia iPhone 14/16e) */
             border-radius: 8vw; 
             
-            /* 🌑 NOVÝ, VÝRAZNEJŠÍ TIEŇ */
-            /* Zvýšil som rozostrenie (60px) a opacitu farby (0.25) */
-            box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+            /* 🌑 REDUKOVANÝ TIEŇ */
+            /* Znížená opacita na 0.1 pre čistý vzhľad */
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
             
             transition: all 0.3s ease;
         }
 
-        /* Prispôsobenie pre veľmi úzke okná (nezmenené) */
+        /* Responzivita pre úzke zobrazenia */
         @media (max-aspect-ratio: 1170/2532) {
             .iphone-container {
-                width: 40vw;
+                width: 45vw;
             }
         }
     </style>
