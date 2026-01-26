@@ -3,45 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iPhone Frame</title>
+    <title>iPhone Mockup - 1/2 Šírky</title>
     <style>
-        /* 🎨 Základné nastavenie pozadia */
+        /* 🎨 Vycentrovanie na stred */
         body {
             margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: #ffffff; /* Biele pozadie */
+            background-color: #ffffff;
+            overflow: hidden; /* Zabráni skrolovaniu, ak je objekt príliš vysoký */
         }
 
-        /* 📐 Obdĺžnik s pomerom strán iPhone */
-        .iphone-mockup {
-            width: 300px; /* Šírka sa dá meniť, výška sa dopočíta */
+        /* 📐 Geometria obdĺžnika */
+        .iphone-container {
+            width: 50vw; /* Presne 1/2 šírky displeja */
+            max-height: 95vh; /* Poistka, aby nevyčnieval vertikálne z obrazovky */
             aspect-ratio: 1170 / 2532;
-            background-color: #e0e0e0; /* Svetlosivá farba */
+            background-color: #e0e0e0;
             
             /* 🌀 Zaoblenie rohov */
-            /* Poznámka: 47% vytvorí takmer elipsu, 
-               pre reálny vzhľad iPhonu sa zvyčajne používa cca 18-20% */
-            border-radius: 47px; 
+            /* Pre reálny vzhľad iPhonu používame 18% šírky objektu (cca 50-60px na reálnom zariadení) */
+            border-radius: 8vw; 
             
-            /* Tieň pre lepší vizuál (voliteľné) */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
         }
 
-        /* Responzivita pre malé displeje */
-        @media (max-height: 700px) {
-            .iphone-mockup {
-                width: 200px;
+        /* Prispôsobenie pre veľmi úzke okná */
+        @media (max-aspect-ratio: 1170/2532) {
+            .iphone-container {
+                width: 40vw; /* O niečo menší na extrémne vysokých monitoroch */
             }
         }
     </style>
 </head>
 <body>
 
-    <div class="iphone-mockup"></div>
+    <div class="iphone-container"></div>
 
 </body>
 </html>
