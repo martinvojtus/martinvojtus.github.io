@@ -3,39 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Všetky práva vyhradené</title>
+    <title>Martin Vojtuš — Animovaná Identita</title>
     <style>
         :root {
-            --bg: #000000; /* Cieľová farba je čierna */
-            --text: #ffffff;
+            --bg-start: #ffffff;
+            --bg-end: #000000;
+            --iphone-gray: #e0e0e0;
+            --text-white: #ffffff;
             --sol-neon: linear-gradient(90deg, #9945FF, #14F195);
-            --radius-pill: 100px; 
-            --f-big: 1.85rem; 
-            --f-small: 0.65rem; 
-            --gap: 15px;
+            --radius-pill: 100px;
+            --f-big: 1.85rem;
+            --f-small: 0.65rem;
         }
 
-        /* Reset & Base */
         * { box-sizing: border-box; font-weight: 400 !important; -webkit-tap-highlight-color: transparent; }
-        
-        body, html { 
-            height: 100%; width: 100%; margin: 0; 
-            background: #ffffff; /* Štartujeme na bielej */
-            color: var(--text); 
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
-            overflow: hidden; 
+
+        html, body {
+            height: 100%; width: 100%; margin: 0;
+            background-color: var(--bg-start);
+            color: var(--text-white);
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            overflow: hidden;
             display: flex; align-items: center; justify-content: center;
+            /* Synchronizovaná zmena pozadia celej obrazovky */
+            animation: bodyDarken 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
         }
 
-        /* --- ANIMÁCIA OBJEKTU --- */
-        .iphone-animator {
+        @keyframes bodyDarken { to { background-color: var(--bg-end); } }
+
+        /* --- IPHONE RÁM --- */
+        .iphone-frame {
             position: absolute;
             width: 50vw;
             aspect-ratio: 1170 / 2532;
-            background-color: #e0e0e0;
+            background-color: var(--iphone-gray);
             border-radius: 8vw;
             z-index: 10;
-            will-change: transform, background-color;
+            display: flex; align-items: center; justify-content: center;
             animation: 
                 flyIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards,
                 expandToBlack 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
@@ -47,122 +51,124 @@
         }
 
         @keyframes expandToBlack {
-            to {
-                transform: scale(4.5);
-                background-color: #000000;
+            to { transform: scale(4.5); background-color: var(--bg-end); }
+        }
+
+        /* --- LOGO (CESTOVATEĽ) --- */
+        .logo-wrapper {
+            position: absolute;
+            z-index: 30;
+            display: flex; flex-direction: column; align-items: center;
+            /* Štartovacia pozícia v strede */
+            transform: translateY(0) scale(1.5); 
+            animation: moveLogo 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
+        }
+
+        @keyframes moveLogo {
+            to { 
+                /* Presun hore na finálnu pozíciu a zmenšenie */
+                transform: translateY(-210px) scale(1); 
             }
         }
 
-        /* --- OBSAH WEBU --- */
-        .center-core { 
-            display: flex; flex-direction: column; align-items: center; 
-            gap: var(--gap); width: 100%; max-width: 380px; padding: 20px;
-            z-index: 20;
-            opacity: 0; /* Skrytý na začiatku */
-            animation: fadeInContent 1s ease forwards 2.8s; /* Objavenie počas expanzie */
+        .logo-svg { width: 80px; height: 80px; fill: #000; animation: logoToWhite 1.2s ease 2.2s forwards; }
+        @keyframes logoToWhite { to { fill: var(--text-white); } }
+
+        .logo-text { 
+            font-size: var(--f-small); text-transform: uppercase; letter-spacing: 0.4em; margin-top: 15px;
+            opacity: 0; transform: translateY(10px);
+            animation: fadeInText 0.8s ease 3.0s forwards;
         }
 
-        @keyframes fadeInContent {
-            to { opacity: 1; }
+        /* --- HLAVNÝ OBSAH (TLAČIDLÁ) --- */
+        .main-content {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 15px; width: 100%; max-width: 380px; padding: 20px;
+            z-index: 25;
+            margin-top: 100px; /* Priestor pre logo */
+            opacity: 0;
+            transform: translateY(50px);
+            animation: contentFlyUp 1s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
-        /* Branding */
-        .logo-svg { width: 80px; height: 80px; fill: var(--text); display: block; }
-        .logo-text { font-size: var(--f-small); text-transform: uppercase; letter-spacing: 0.4em; white-space: nowrap; }
+        @keyframes contentFlyUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        /* Buttons */
+        @keyframes fadeInText { to { opacity: 1; transform: translateY(0); } }
+
+        /* UI Prvky */
         .pill { 
-            width: 100%; height: 80px; border-radius: var(--radius-pill); border: 1px solid var(--text); 
+            width: 100%; height: 80px; border-radius: var(--radius-pill); 
             display: flex; align-items: center; justify-content: center; 
-            text-transform: uppercase; background: transparent; text-decoration: none; color: inherit; 
-            cursor: pointer;
+            text-transform: uppercase; text-decoration: none; color: inherit; cursor: pointer;
         }
-        .doc-btn { background: var(--text); color: #000; border: none; }
-        .pill h1 { font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; line-height: 1; }
+        .doc-btn { background: var(--text-white); color: #000; border: none; }
+        .pill h1 { font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; }
 
-        /* Support Button */
         .don-btn { 
             width: 240px; height: 40px; border-radius: var(--radius-pill); 
             background-image: linear-gradient(#000, #000), var(--sol-neon); 
             background-clip: padding-box, border-box; background-origin: border-box; 
-            border: 1px solid transparent; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center;
-            text-transform: uppercase; color: var(--text); position: relative;
+            border: 1px solid transparent; cursor: pointer; color: var(--text-white);
+            display: flex; align-items: center; justify-content: center; text-transform: uppercase; position: relative;
         }
-        .don-btn .sub, #addr-w { font-size: var(--f-small); letter-spacing: 0.12em; position: absolute; width: 100%; text-align: center; }
-        #addr-w { display: none; align-items: center; justify-content: center; }
-        .copy { width: 12px; height: 12px; margin-left: 8px; fill: var(--text); cursor: pointer; }
 
-        /* Loading */
+        footer { font-size: var(--f-small); text-transform: uppercase; letter-spacing: 0.18em; margin-top: 20px; opacity: 0.6; }
+
+        /* Loading Overlay */
         #l-ov { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #000; z-index: 99; flex-direction: column; align-items: center; justify-content: center; 
+            background: #000; z-index: 100; flex-direction: column; align-items: center; justify-content: center; 
         }
         .l-bar-bg { width: 180px; height: 1px; background: rgba(255,255,255,0.2); overflow: hidden; }
         .l-bar-fill { height: 100%; width: 0%; background: #fff; }
         @keyframes load { to { width: 100%; } }
-
-        footer { font-size: var(--f-small); text-transform: uppercase; letter-spacing: 0.18em; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="iphone-animator"></div>
+    <div class="iphone-frame"></div>
 
-    <div id="l-ov">
-        <div class="l-bar-bg"><div class="l-bar-fill" id="l-f"></div></div>
-    </div>
-
-    <div class="center-core" id="main-ui">
+    <div class="logo-wrapper">
         <svg class="logo-svg" viewBox="0 0 1080 1080">
             <g transform="translate(540, 540)">
                 <path d="M 0,0 L 233.827, -135 L 233.827, 135 L 0, 270 L -233.827, 135 L -233.827, -135 Z" />
             </g>
         </svg>
-
         <div class="logo-text">MARTINVOJTUS</div>
+    </div>
 
+    <div class="main-content">
         <div class="pill doc-btn" onclick="startLoading()">
             <h1>COSMOS</h1>
         </div>
 
         <div class="don-btn" onclick="don()">
-            <span class="sub" id="dS">Support via Solana</span>
-            <div id="addr-w">
-                <span id="addr"></span>
-                <svg class="copy" id="cI" onclick="cpy(event)" viewBox="0 0 24 24"><path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"/></svg>
-            </div>
+            <span id="dS" style="font-size: var(--f-small); letter-spacing: 0.12em;">Support via Solana</span>
         </div>
 
         <footer>Martin Vojtuš • 2026</footer>
     </div>
 
-    <script>
-        const ADDR = "eKBBQ7cPqupa9wUAYHPPyhKFDQJrTJiRkn1fWbNFreG";
+    <div id="l-ov">
+        <div class="l-bar-bg"><div class="l-bar-fill" id="l-f"></div></div>
+    </div>
 
+    <script>
         function startLoading() {
-            document.getElementById('main-ui').style.opacity = '0';
+            document.body.style.opacity = '0.9';
             setTimeout(() => {
-                document.getElementById('main-ui').style.display = 'none';
                 document.getElementById('l-ov').style.display = 'flex';
                 document.getElementById('l-f').style.animation = "load 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards";
                 setTimeout(() => { window.location.replace("https://www.cosmos.so/martinvojtus"); }, 2500);
             }, 100);
         }
 
-        function don() { 
-            const s = document.getElementById('dS'), w = document.getElementById('addr-w'), a = document.getElementById('addr');
-            s.style.display = "none"; w.style.display = "flex"; 
-            a.innerText = ADDR.slice(0,6)+"..."+ADDR.slice(-6); 
-        }
-
-        function cpy(e) { 
-            e.stopPropagation(); 
-            const el = document.createElement('textarea'); el.value = ADDR; document.body.appendChild(el); el.select();
-            document.execCommand('copy'); document.body.removeChild(el);
-            const a = document.getElementById('addr'), i = document.getElementById('cI');
-            a.innerText = "COPIED!";
-            setTimeout(() => { a.innerText = ADDR.slice(0,6)+"..."+ADDR.slice(-6); }, 2000);
+        function don() {
+            const btn = document.getElementById('dS');
+            btn.innerText = "eKBBQ7...WbNFreG";
+            setTimeout(() => { btn.innerText = "ADDRESS COPIED!"; }, 500);
         }
     </script>
 </body>
