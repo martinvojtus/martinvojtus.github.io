@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Final Build</title>
+    <title>Martin Vojtuš — Final Precision</title>
     <style>
         :root {
             --bg-start: #ffffff;
@@ -13,7 +13,7 @@
             --radius-pill: 100px;
             --f-big: 1.85rem;
             --f-small: 0.65rem;
-            --gap: 8px; /* Upravená medzera na 8px */
+            --gap: 8px; /* Fixná medzera 8px */
         }
 
         /* Reset */
@@ -55,15 +55,14 @@
             to { transform: scale(15); background-color: var(--bg-end); }
         }
 
-        /* --- LOGO (NASTAVENÉ NA 120px, 100% FILL) --- */
+        /* --- LOGO (ZMENŠENÉ NA 60px) --- */
         .logo-svg {
             position: absolute;
             top: 50%; left: 50%;
-            width: 120px; height: 120px;
+            width: 60px; height: 60px; /* Polovičná veľkosť */
             fill: #000;
             z-index: 40;
             opacity: 0;
-            /* Štartovacia pozícia: skryté v strede */
             transform: translate(-50%, -50%) scale(0.8);
             will-change: transform, opacity, fill;
             animation: 
@@ -77,12 +76,12 @@
 
         @keyframes moveLogo {
             to { 
-                /* Výpočet pozície pre presnú 8px medzeru nad textom */
-                transform: translate(-50%, calc(-50% - 134px)) scale(1); 
+                /* Upravený prepočet pre 60px logo, aby zostalo 8px nad textom */
+                transform: translate(-50%, calc(-50% - 100px)) scale(1); 
             }
         }
 
-        /* --- ELEMENTY WEBU (STAGGERED FLY-IN) --- */
+        /* --- ELEMENTY WEBU (STAGGERED FLY-IN ZOSPODU) --- */
         .ui-element {
             position: absolute;
             left: 50%;
@@ -115,6 +114,7 @@
             border-radius: var(--radius-pill);
             display: flex; align-items: center; justify-content: center;
             background: var(--text-white); color: #000; border: none; cursor: pointer;
+            /* Špeciálny fly-in pre stredový prvok */
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
         }
         
@@ -131,8 +131,9 @@
             font-size: var(--f-small);
             text-transform: uppercase;
             letter-spacing: 0.18em;
-            color: #ffffff; /* Solid white */
+            color: #ffffff; /* Čisto biela solid farba */
             white-space: nowrap;
+            /* Priletí zdola ako posledný */
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
         }
 
