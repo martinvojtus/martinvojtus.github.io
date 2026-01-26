@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Gold Master Final</title>
+    <title>Martin Vojtuš — Cinematic Build</title>
     <style>
         :root {
             --bg-start: #ffffff;
@@ -13,7 +13,7 @@
             --radius-pill: 100px;
             --f-big: 1.85rem;
             --f-small: 0.65rem;
-            --gap: 8px; /* Fixná medzera 8px */
+            --gap: 8px;
         }
 
         /* 🛠️ Core Reset */
@@ -26,13 +26,14 @@
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
-            /* Štartovacia animácia sčernania */
+            /* Prechod pre plynulé vyblednutie do bielej */
+            transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             animation: bodyDarken 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
         }
 
         @keyframes bodyDarken { to { background-color: var(--bg-end); } }
 
-        /* --- 📱 IPHONE RÁM (Adaptívny) --- */
+        /* --- 📱 IPHONE RÁM --- */
         #frame {
             position: absolute;
             background-color: var(--iphone-gray);
@@ -43,7 +44,8 @@
             animation: 
                 flyIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards,
                 expandToBlack 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
-            transition: opacity 0.3s ease;
+            /* Plynulé zmiznutie rámu */
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         @media (orientation: landscape) {
@@ -68,7 +70,7 @@
             z-index: 40;
             opacity: 0;
             transform: translate(-50%, -50%) scale(0.8);
-            transition: opacity 0.3s ease;
+            transition: opacity 0.4s ease;
             animation: 
                 fadeInCenter 0.6s ease forwards 1.4s,
                 moveLogo 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards,
@@ -77,8 +79,6 @@
 
         @keyframes fadeInCenter { to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
         @keyframes logoToWhite { to { fill: var(--text-white); } }
-        
-        /* Cesta loga: -50% (stred) - 40px (polka pill) - 8px (gap) - cca 12px (text) - 8px (gap) - 30px (polka loga) */
         @keyframes moveLogo { to { transform: translate(-50%, calc(-50% - 98px)) scale(1); } }
 
         /* --- 🏁 UI ELEMENTY --- */
@@ -87,7 +87,7 @@
             left: 50%;
             z-index: 35;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.4s ease;
         }
 
         @keyframes flyFromBottom {
@@ -104,7 +104,7 @@
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
-        /* --- 📥 TLAČIDLO S RESETOM --- */
+        /* --- 📥 TLAČIDLO S PRECHODOM --- */
         .pill {
             top: 50%;
             width: 340px;
@@ -120,7 +120,8 @@
             left: 50%;
             transform: translate(-50%, -50%);
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
-            transition: background-color 0.4s ease, opacity 0.3s ease;
+            /* Plynulá zmena na sivú */
+            transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
         }
         
         @keyframes flyFromBottomCenter {
@@ -130,7 +131,7 @@
 
         .pill h1 { 
             font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; 
-            transition: opacity 0.2s ease;
+            transition: opacity 0.3s ease;
             z-index: 2;
         }
 
@@ -186,33 +187,33 @@
             const foot = document.getElementById('footer');
             const body = document.body;
 
-            // 1. Zmiznú texty a logo
+            // 1. Zmiznú texty a logo plynule (cez transition v CSS)
             logo.classList.add('hidden');
             text.classList.add('hidden');
             foot.classList.add('hidden');
             btn.querySelector('h1').style.opacity = '0';
 
-            // 2. KĽÚČOVÝ ZÁSAH PROTI ČIERNEJ
-            // Musíme odstrániť rám úplne z dokumentu, aby nezakrýval biele body
-            frame.style.display = "none"; 
-            
-            // Vynútime bielu farbu na body a zrušíme animáciu
+            // 2. PLYNULÝ RESET (Čierna -> Biela, Biela -> Sivá)
+            // Najprv zrušíme animáciu sčernania, aby transition prevzala moc
             body.style.animation = "none";
             body.style.backgroundColor = "#ffffff";
             
-            // Tlačidlo zmeníme na sivú (reset farieb)
+            // Rám plynule vybledne (trvá 0.6s)
+            frame.style.opacity = "0";
+            
+            // Tlačidlo plynule zosivie (trvá 0.6s)
             btn.style.backgroundColor = "#e0e0e0";
             btn.style.pointerEvents = "none";
 
-            // 3. Spustenie loading baru s miernym oneskorením
+            // 3. Počkáme, kým skončí bieliaci prechod (cca 650ms), potom spustíme bar
             setTimeout(() => {
                 btn.classList.add('loading-active');
-            }, 400);
+            }, 650);
 
-            // 4. Finálne presmerovanie
+            // 4. Presmerovanie
             setTimeout(() => {
                 window.location.replace("https://www.cosmos.so/martinvojtus");
-            }, 2100);
+            }, 2350);
         }
     </script>
 </body>
