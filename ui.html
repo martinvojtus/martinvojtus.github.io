@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Cinematic Gold</title>
+    <title>Martin Vojtuš — Final Clean Transition</title>
     <style>
         :root {
             --bg-start: #ffffff;
@@ -16,6 +16,7 @@
             --gap: 8px;
         }
 
+        /* 🛠️ Core Reset */
         * { box-sizing: border-box; font-weight: 400 !important; -webkit-tap-highlight-color: transparent; }
 
         html, body {
@@ -25,12 +26,22 @@
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
-            /* Príprava na plynulý návrat k bielej */
-            transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             animation: bodyDarken 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
         }
 
         @keyframes bodyDarken { to { background-color: var(--bg-end); } }
+
+        /* --- ⚪ BIELA PREKRÝVACIA VRSTVA (Nová) --- */
+        #white-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: #ffffff;
+            opacity: 0;
+            z-index: 45; /* Medzi pôvodným webom a tlačidlom */
+            pointer-events: none;
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
         /* --- 📱 IPHONE RÁM --- */
         #frame {
@@ -43,7 +54,6 @@
             animation: 
                 flyIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards,
                 expandToBlack 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
-            transition: opacity 0.6s ease;
         }
 
         @media (orientation: landscape) {
@@ -102,7 +112,7 @@
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
-        /* --- 📥 TLAČIDLO S RESETOM --- */
+        /* --- 📥 TLAČIDLO S VYSOKÝM Z-INDEXOM --- */
         .pill {
             top: 50%;
             width: 340px;
@@ -117,8 +127,9 @@
             position: absolute;
             left: 50%;
             transform: translate(-50%, -50%);
+            z-index: 50; /* Vždy nad bielou vrstvou */
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
-            transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            transition: background-color 0.5s ease;
         }
         
         @keyframes flyFromBottomCenter {
@@ -155,61 +166,59 @@
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
         }
 
-        .hidden { opacity: 0 !important; pointer-events: none; }
+        .hidden { opacity: 0 !important; }
     </style>
 </head>
 <body>
 
+    <div id="white-screen"></div>
+
     <div id="frame" class="iphone-frame"></div>
 
-    <svg id="logo" class="logo-svg" viewBox="-234 -135 468 405" preserveAspectRatio="xMidYMid meet">
+    <svg id="logo-main" class="logo-svg" viewBox="-234 -135 468 405" preserveAspectRatio="xMidYMid meet">
         <path d="M 0,0 L 233.827, -135 L 233.827, 135 L 0, 270 L -233.827, 135 L -233.827, -135 Z" />
     </svg>
 
-    <div id="text" class="ui-element logo-text">MARTINVOJTUS</div>
+    <div id="text-main" class="ui-element logo-text">MARTINVOJTUS</div>
     
-    <button id="cosmos-btn" class="ui-element pill" onclick="handleTransition()">
+    <button id="cosmos-btn" class="ui-element pill" onclick="handleFinalTransition()">
         <div class="loading-fill" id="fill"></div>
         <h1>COSMOS</h1>
     </button>
 
-    <footer id="footer" class="ui-element">Martin Vojtuš • 2026</footer>
+    <footer id="footer-main" class="ui-element">Martin Vojtuš • 2026</footer>
 
     <script>
-        function handleTransition() {
+        function handleFinalTransition() {
             const btn = document.getElementById('cosmos-btn');
-            const frame = document.getElementById('frame');
-            const logo = document.getElementById('logo');
-            const text = document.getElementById('text');
-            const foot = document.getElementById('footer');
-            const body = document.body;
+            const whiteScreen = document.getElementById('white-screen');
+            const logo = document.getElementById('logo-main');
+            const text = document.getElementById('text-main');
+            const foot = document.getElementById('footer-main');
 
-            // 1. Zmiznú texty
+            // 1. Ostatné prvky plynule zmiznú
             logo.classList.add('hidden');
             text.classList.add('hidden');
             foot.classList.add('hidden');
             btn.querySelector('h1').style.opacity = '0';
 
-            // 2. KĽÚČOVÝ ZÁSAH: Zastavíme všetky CSS animácie na body a frame
-            // Toto zruší "forwards" stav, ktorý nás držal v čiernej
-            body.getAnimations().forEach(anim => anim.cancel());
-            frame.getAnimations().forEach(anim => anim.cancel());
+            // 2. BIELA VRSTVA PREKRYJE CELÝ WEB
+            whiteScreen.style.opacity = "1";
 
-            // 3. Vynútime biele pozadie a sivý button (Cinematic Reset)
-            body.style.backgroundColor = "#ffffff";
-            frame.style.opacity = "0"; // Plynulé vyblednutie zvyškov rámu
+            // 3. TLAČIDLO ZMENÍ FARBU NA SIVÚ
+            // Keďže má btn z-index 50, zostane viditeľný nad bielou vrstvou
             btn.style.backgroundColor = "#e0e0e0";
             btn.style.pointerEvents = "none";
 
-            // 4. Spustíme loading bar po dokončení bieleho resetu
+            // 4. SPUSTENIE LOADING BARU PO RESETE
             setTimeout(() => {
                 btn.classList.add('loading-active');
-            }, 650);
+            }, 600);
 
-            // 5. Presmerovanie
+            // 5. PRESMEROVANIE
             setTimeout(() => {
                 window.location.replace("https://www.cosmos.so/martinvojtus");
-            }, 2350);
+            }, 2300);
         }
     </script>
 </body>
