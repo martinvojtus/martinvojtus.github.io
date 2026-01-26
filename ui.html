@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iPhone Frame</title>
+    <style>
+        /* 🎨 Základné nastavenie pozadia */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #ffffff; /* Biele pozadie */
+        }
+
+        /* 📐 Obdĺžnik s pomerom strán iPhone */
+        .iphone-mockup {
+            width: 300px; /* Šírka sa dá meniť, výška sa dopočíta */
+            aspect-ratio: 1170 / 2532;
+            background-color: #e0e0e0; /* Svetlosivá farba */
+            
+            /* 🌀 Zaoblenie rohov */
+            /* Poznámka: 47% vytvorí takmer elipsu, 
+               pre reálny vzhľad iPhonu sa zvyčajne používa cca 18-20% */
+            border-radius: 47px; 
+            
+            /* Tieň pre lepší vizuál (voliteľné) */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        /* Responzivita pre malé displeje */
+        @media (max-height: 700px) {
+            .iphone-mockup {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="iphone-mockup"></div>
+
+</body>
+</html>
