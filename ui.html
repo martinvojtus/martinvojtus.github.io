@@ -10,7 +10,6 @@
             --bg-end: #000000;
             --iphone-gray: #e0e0e0;
             --text-white: #ffffff;
-            --sol-neon: linear-gradient(90deg, #9945FF, #14F195);
             --radius-pill: 100px;
             --f-big: 1.85rem;
             --f-small: 0.65rem;
@@ -30,18 +29,24 @@
 
         @keyframes bodyDarken { to { background-color: var(--bg-end); } }
 
-        /* --- IPHONE RÁM --- */
+        /* --- IPHONE RÁM (RESPONZÍVNY) --- */
         .iphone-frame {
             position: absolute;
-            width: 50vw;
+            /* Na výšku 50% šírky, na šírku 25% šírky */
+            width: 50vw; 
             aspect-ratio: 1170 / 2532;
+            max-height: 80vh;
             background-color: var(--iphone-gray);
-            border-radius: 8vw;
+            border-radius: 4vw;
             z-index: 10;
             will-change: transform;
             animation: 
                 flyIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards,
                 expandToBlack 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
+        }
+
+        @media (orientation: landscape) {
+            .iphone-frame { width: 18vw; border-radius: 2vw; }
         }
 
         @keyframes flyIn {
@@ -50,23 +55,22 @@
         }
 
         @keyframes expandToBlack {
-            to { transform: scale(5); background-color: var(--bg-end); }
+            to { 
+                /* Masívny zoom, aby pokryl aj ultra-wide monitory */
+                transform: scale(12); 
+                background-color: var(--bg-end); 
+            }
         }
 
         /* --- LOGO (CESTOVATEĽ) --- */
         .logo-wrapper {
             position: absolute;
-            /* Dokonalé centrovanie bez pixelových odchýlok */
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             z-index: 30;
             display: flex; flex-direction: column; align-items: center;
-            /* Štartovacia pozícia: skrytá a vycentrovaná */
             transform: translate(-50%, -50%) scale(1.4);
             opacity: 0;
             will-change: transform, opacity;
-            /* 1. fadeInLogo sa spustí tesne pred koncom príletu iPhonu */
-            /* 2. moveLogo ho presunie hore počas expanzie */
             animation: 
                 fadeInLogo 0.6s ease forwards 1.1s,
                 moveLogo 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
@@ -75,18 +79,18 @@
         @keyframes fadeInLogo { to { opacity: 1; } }
 
         @keyframes moveLogo {
-            to { 
-                /* Upravená hodnota z -210px na -160px pre lepšie vycentrovanie */
-                transform: translate(-50%, -200%) scale(1); 
+            to { transform: translate(-50%, -220%) scale(1); }
+        }
+
+        /* Úprava pozície loga na šírku */
+        @media (orientation: landscape) and (max-height: 500px) {
+            @keyframes moveLogo {
+                to { transform: translate(-50%, -160%) scale(0.8); }
             }
         }
 
-        .logo-svg { width: 80px; height: 80px; fill: #000; transition: fill 1.2s ease 2.2s; }
-        /* Keď sa spustí expanzia, zmeníme farbu loga na bielu */
-        .iphone-frame[style*="expandToBlack"] ~ .logo-wrapper .logo-svg { fill: #fff; } 
-        /* Alternatívna plynulá zmena farby cez animáciu */
+        .logo-svg { width: 80px; height: 80px; fill: #000; animation: logoToWhite 1.2s ease 2.2s forwards; }
         @keyframes logoToWhite { to { fill: var(--text-white); } }
-        .logo-svg { animation: logoToWhite 1.2s ease 2.2s forwards; }
 
         .logo-text { 
             font-size: var(--f-small); text-transform: uppercase; letter-spacing: 0.4em; margin-top: 15px;
@@ -95,44 +99,35 @@
             white-space: nowrap;
         }
 
-        /* --- HLAVNÝ OBSAH (TLAČIDLÁ) --- */
+        /* --- OBSAH (COSMOS + FOOTER) --- */
         .main-content {
             display: flex; flex-direction: column; align-items: center;
-            gap: 15px; width: 100%; max-width: 380px; padding: 20px;
+            gap: 20px; width: 100%; max-width: 380px; padding: 20px;
             z-index: 25;
-            /* Jemný posun nižšie pre lepšiu optickú rovnováhu */
-            margin-top: 140px; 
+            margin-top: 120px; 
             opacity: 0;
             transform: translateY(40px);
             animation: contentFlyUp 1s cubic-bezier(0.22, 1, 0.36, 1) 2.7s forwards;
         }
 
-        @keyframes contentFlyUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @media (max-height: 500px) { .main-content { margin-top: 80px; gap: 10px; } }
 
+        @keyframes contentFlyUp { to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeInText { to { opacity: 1; transform: translateY(0); } }
 
-        /* UI Prvky */
         .pill { 
             width: 100%; height: 80px; border-radius: var(--radius-pill); 
             display: flex; align-items: center; justify-content: center; 
-            text-transform: uppercase; text-decoration: none; color: inherit; cursor: pointer;
+            text-transform: uppercase; text-decoration: none; cursor: pointer;
+            background: var(--text-white); color: #000; border: none;
+            transition: transform 0.2s ease;
         }
-        .doc-btn { background: var(--text-white); color: #000; border: none; }
+        .pill:active { transform: scale(0.98); }
         .pill h1 { font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; }
 
-        .don-btn { 
-            width: 240px; height: 40px; border-radius: var(--radius-pill); 
-            background-image: linear-gradient(#000, #000), var(--sol-neon); 
-            background-clip: padding-box, border-box; background-origin: border-box; 
-            border: 1px solid transparent; cursor: pointer; color: var(--text-white);
-            display: flex; align-items: center; justify-content: center; text-transform: uppercase; position: relative;
-        }
+        footer { font-size: var(--f-small); text-transform: uppercase; letter-spacing: 0.18em; margin-top: 20px; opacity: 0.5; text-align: center; }
 
-        footer { font-size: var(--f-small); text-transform: uppercase; letter-spacing: 0.18em; margin-top: 20px; opacity: 0.5; }
-
-        /* Loading Overlay */
+        /* Loading */
         #l-ov { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: #000; z-index: 100; flex-direction: column; align-items: center; justify-content: center; 
@@ -156,11 +151,8 @@
     </div>
 
     <div class="main-content">
-        <div class="pill doc-btn" onclick="startLoading()">
+        <div class="pill" onclick="startLoading()">
             <h1>COSMOS</h1>
-        </div>
-        <div class="don-btn" onclick="don()">
-            <span id="dS" style="font-size: var(--f-small); letter-spacing: 0.12em;">Support via Solana</span>
         </div>
         <footer>Martin Vojtuš • 2026</footer>
     </div>
@@ -171,21 +163,9 @@
 
     <script>
         function startLoading() {
-            document.body.style.opacity = '0.9';
-            setTimeout(() => {
-                document.getElementById('l-ov').style.display = 'flex';
-                document.getElementById('l-f').style.animation = "load 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards";
-                setTimeout(() => { window.location.replace("https://www.cosmos.so/martinvojtus"); }, 2500);
-            }, 100);
-        }
-
-        function don() {
-            const btn = document.getElementById('dS');
-            const addr = "eKBBQ7...WbNFreG";
-            btn.innerText = addr;
-            navigator.clipboard.writeText("eKBBQ7cPqupa9wUAYHPPyhKFDQJrTJiRkn1fWbNFreG");
-            setTimeout(() => { btn.innerText = "COPIED!"; }, 400);
-            setTimeout(() => { btn.innerText = addr; }, 2400);
+            document.getElementById('l-ov').style.display = 'flex';
+            document.getElementById('l-f').style.animation = "load 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards";
+            setTimeout(() => { window.location.replace("https://www.cosmos.so/martinvojtus"); }, 2500);
         }
     </script>
 </body>
