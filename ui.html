@@ -3,42 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Final Clean Transition</title>
+    <title>Martin Vojtuš — Adaptive Build</title>
     <style>
+        /* 🎨 DYNAMICKÉ PREMENNÉ */
         :root {
-            --bg-start: #ffffff;
-            --bg-end: #000000;
+            --bg-initial: #ffffff;
+            --bg-final: #000000;
             --iphone-gray: #e0e0e0;
-            --text-white: #ffffff;
+            --logo-start: #000000;
+            --text-final: #ffffff;
+            --pill-bg: #ffffff;
+            --pill-text: #000000;
+            --loading-fill: #000000;
+            --overlay-reset: #ffffff; /* Biela vrstva po kliku */
+            
             --radius-pill: 100px;
             --f-big: 1.85rem;
             --f-small: 0.65rem;
             --gap: 8px;
         }
 
-        /* 🛠️ Core Reset */
+        /* 🌙 INVERZIA PRE TMAVÝ REŽIM */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-initial: #000000;
+                --bg-final: #ffffff;
+                --iphone-gray: #2a2a2a;
+                --logo-start: #ffffff;
+                --text-final: #000000;
+                --pill-bg: #000000;
+                --pill-text: #ffffff;
+                --loading-fill: #ffffff;
+                --overlay-reset: #000000; /* Čierna vrstva po kliku */
+            }
+        }
+
         * { box-sizing: border-box; font-weight: 400 !important; -webkit-tap-highlight-color: transparent; }
 
         html, body {
             height: 100%; width: 100%; margin: 0;
-            background-color: var(--bg-start);
-            color: var(--text-white);
+            background-color: var(--bg-initial);
+            color: var(--text-final);
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
-            animation: bodyDarken 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
+            animation: bodyTransition 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
         }
 
-        @keyframes bodyDarken { to { background-color: var(--bg-end); } }
+        @keyframes bodyTransition { to { background-color: var(--bg-final); } }
 
-        /* --- ⚪ BIELA PREKRÝVACIA VRSTVA (Nová) --- */
-        #white-screen {
+        /* --- ⚪ OVERLAY VRSTVA PO KLIKU --- */
+        #reset-screen {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background-color: #ffffff;
+            background-color: var(--overlay-reset);
             opacity: 0;
-            z-index: 45; /* Medzi pôvodným webom a tlačidlom */
+            z-index: 45;
             pointer-events: none;
             transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -66,15 +87,15 @@
         }
 
         @keyframes expandToBlack {
-            to { transform: scale(30); background-color: var(--bg-end); }
+            to { transform: scale(30); background-color: var(--bg-final); }
         }
 
-        /* --- 🎨 LOGO (60px, 100% Fill) --- */
+        /* --- 🎨 LOGO (60px) --- */
         .logo-svg {
             position: absolute;
             top: 50%; left: 50%;
             width: 60px; height: 60px;
-            fill: #000;
+            fill: var(--logo-start);
             z-index: 40;
             opacity: 0;
             transform: translate(-50%, -50%) scale(0.8);
@@ -82,11 +103,11 @@
             animation: 
                 fadeInCenter 0.6s ease forwards 1.4s,
                 moveLogo 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards,
-                logoToWhite 1.2s ease 2.2s forwards;
+                logoFinalColor 1.2s ease 2.2s forwards;
         }
 
         @keyframes fadeInCenter { to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
-        @keyframes logoToWhite { to { fill: var(--text-white); } }
+        @keyframes logoFinalColor { to { fill: var(--text-final); } }
         @keyframes moveLogo { to { transform: translate(-50%, calc(-50% - 98px)) scale(1); } }
 
         /* --- 🏁 UI ELEMENTY --- */
@@ -112,22 +133,22 @@
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
-        /* --- 📥 TLAČIDLO S VYSOKÝM Z-INDEXOM --- */
+        /* --- 📥 TLAČIDLO --- */
         .pill {
             top: 50%;
             width: 340px;
             height: 80px;
             border-radius: var(--radius-pill);
             display: flex; align-items: center; justify-content: center;
-            background: var(--text-white); 
-            color: #000; 
+            background: var(--pill-bg); 
+            color: var(--pill-text); 
             border: none; 
             cursor: pointer;
             overflow: hidden;
             position: absolute;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: 50; /* Vždy nad bielou vrstvou */
+            z-index: 50;
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
             transition: background-color 0.5s ease;
         }
@@ -147,7 +168,7 @@
             position: absolute;
             top: 0; left: 0;
             width: 0%; height: 100%;
-            background: #000;
+            background: var(--loading-fill);
             z-index: 1;
         }
 
@@ -161,7 +182,7 @@
             font-size: var(--f-small);
             text-transform: uppercase;
             letter-spacing: 0.18em;
-            color: #ffffff;
+            color: var(--text-final);
             white-space: nowrap;
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
         }
@@ -171,9 +192,8 @@
 </head>
 <body>
 
-    <div id="white-screen"></div>
-
-    <div id="frame" class="iphone-frame"></div>
+    <div id="reset-screen"></div>
+    <div id="frame"></div>
 
     <svg id="logo-main" class="logo-svg" viewBox="-234 -135 468 405" preserveAspectRatio="xMidYMid meet">
         <path d="M 0,0 L 233.827, -135 L 233.827, 135 L 0, 270 L -233.827, 135 L -233.827, -135 Z" />
@@ -191,31 +211,26 @@
     <script>
         function handleFinalTransition() {
             const btn = document.getElementById('cosmos-btn');
-            const whiteScreen = document.getElementById('white-screen');
+            const resetScreen = document.getElementById('reset-screen');
             const logo = document.getElementById('logo-main');
             const text = document.getElementById('text-main');
             const foot = document.getElementById('footer-main');
 
-            // 1. Ostatné prvky plynule zmiznú
             logo.classList.add('hidden');
             text.classList.add('hidden');
             foot.classList.add('hidden');
             btn.querySelector('h1').style.opacity = '0';
 
-            // 2. BIELA VRSTVA PREKRYJE CELÝ WEB
-            whiteScreen.style.opacity = "1";
+            resetScreen.style.opacity = "1";
 
-            // 3. TLAČIDLO ZMENÍ FARBU NA SIVÚ
-            // Keďže má btn z-index 50, zostane viditeľný nad bielou vrstvou
-            btn.style.backgroundColor = "#e0e0e0";
+            // Tlačidlo sa prefarbí na pôvodnú sivú (adaptívnu)
+            btn.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--iphone-gray');
             btn.style.pointerEvents = "none";
 
-            // 4. SPUSTENIE LOADING BARU PO RESETE
             setTimeout(() => {
                 btn.classList.add('loading-active');
             }, 600);
 
-            // 5. PRESMEROVANIE
             setTimeout(() => {
                 window.location.replace("https://www.cosmos.so/martinvojtus");
             }, 2300);
