@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Reset & Load Build</title>
+    <title>Martin Vojtuš — Gold Master Build</title>
     <style>
         :root {
             --bg-start: #ffffff;
@@ -13,9 +13,10 @@
             --radius-pill: 100px;
             --f-big: 1.85rem;
             --f-small: 0.65rem;
-            --gap: 8px;
+            --gap: 8px; /* Fixná medzera 8px */
         }
 
+        /* 🛠️ Core Reset */
         * { box-sizing: border-box; font-weight: 400 !important; -webkit-tap-highlight-color: transparent; }
 
         html, body {
@@ -25,14 +26,13 @@
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
-            /* Plynulý prechod farieb pozadia */
-            transition: background-color 0.5s ease;
+            /* Animácia sčernania pri štarte */
             animation: bodyDarken 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
         }
 
         @keyframes bodyDarken { to { background-color: var(--bg-end); } }
 
-        /* --- IPHONE RÁM --- */
+        /* --- 📱 IPHONE RÁM --- */
         .iphone-frame {
             position: absolute;
             background-color: var(--iphone-gray);
@@ -58,7 +58,7 @@
             to { transform: scale(20); background-color: var(--bg-end); }
         }
 
-        /* --- LOGO (60px) --- */
+        /* --- 🎨 LOGO (60px, 100% Fill) --- */
         .logo-svg {
             position: absolute;
             top: 50%; left: 50%;
@@ -78,7 +78,7 @@
         @keyframes logoToWhite { to { fill: var(--text-white); } }
         @keyframes moveLogo { to { transform: translate(-50%, calc(-50% - 100px)) scale(1); } }
 
-        /* --- UI ELEMENTY --- */
+        /* --- 🏁 UI ELEMENTY --- */
         .ui-element {
             position: absolute;
             left: 50%;
@@ -100,7 +100,7 @@
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
-        /* --- TLAČIDLO S DYNAMICKÝM RESETOM --- */
+        /* --- 📥 TLAČIDLO S RESETOM --- */
         .pill {
             top: 50%;
             width: 340px;
@@ -116,7 +116,6 @@
             left: 50%;
             transform: translate(-50%, 30px);
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
-            /* Plynulá zmena farby tlačidla */
             transition: background-color 0.4s ease, opacity 0.3s ease;
         }
         
@@ -133,18 +132,14 @@
 
         .loading-fill {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 0%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 0%; height: 100%;
             background: #000;
             z-index: 1;
         }
 
-        /* TRIEDY PRE KLIK */
-        body.white-reset { background-color: #ffffff !important; transition: background-color 0.4s ease; }
-        .pill.gray-reset { background-color: var(--iphone-gray) !important; pointer-events: none; }
-        .pill.loading-start .loading-fill { 
+        /* Animácia plnenia po kliku */
+        .loading-start .loading-fill { 
             width: 100%; 
             transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -158,55 +153,58 @@
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
         }
 
-        .hide-now { opacity: 0 !important; }
+        .hide-effect { opacity: 0 !important; pointer-events: none; }
     </style>
 </head>
 <body>
 
     <div class="iphone-frame"></div>
 
-    <svg id="logo" class="logo-svg" viewBox="-234 -135 468 405" preserveAspectRatio="xMidYMid meet">
+    <svg id="logo-main" class="logo-svg" viewBox="-234 -135 468 405" preserveAspectRatio="xMidYMid meet">
         <path d="M 0,0 L 233.827, -135 L 233.827, 135 L 0, 270 L -233.827, 135 L -233.827, -135 Z" />
     </svg>
 
-    <div id="text" class="ui-element logo-text">MARTINVOJTUS</div>
+    <div id="text-main" class="ui-element logo-text">MARTINVOJTUS</div>
     
     <button id="cosmos-btn" class="ui-element pill" onclick="handleTransition()">
         <div class="loading-fill" id="fill"></div>
         <h1>COSMOS</h1>
     </button>
 
-    <footer id="footer" class="ui-element">Martin Vojtuš • 2026</footer>
+    <footer id="footer-main" class="ui-element">Martin Vojtuš • 2026</footer>
 
     <script>
         function handleTransition() {
             const btn = document.getElementById('cosmos-btn');
+            const logo = document.getElementById('logo-main');
+            const text = document.getElementById('text-main');
+            const foot = document.getElementById('footer-main');
             const body = document.body;
-            const logo = document.getElementById('logo');
-            const text = document.getElementById('text');
-            const foot = document.getElementById('footer');
 
-            // 1. Zmiznú texty a logo
-            logo.classList.add('hide-now');
-            text.classList.add('hide-now');
-            foot.classList.add('hide-now');
+            // 1. Okamžité skrytie textových prvkov
+            logo.classList.add('hide-effect');
+            text.classList.add('hide-effect');
+            foot.classList.add('hide-effect');
             btn.querySelector('h1').style.opacity = '0';
 
-            // 2. Reset farieb (Biele pozadie, sivý button)
-            setTimeout(() => {
-                body.classList.add('white-reset');
-                btn.classList.add('gray-reset');
-            }, 100);
+            // 2. FORSOVANÝ RESET FARIEB
+            // Zrušíme prebiehajúcu animáciu sčernania a vnútime bielu
+            body.style.animation = "none"; 
+            body.style.backgroundColor = "#ffffff";
+            
+            // Tlačidlo zmeníme na sivú (ako pôvodný iPhone rám)
+            btn.style.backgroundColor = "#e0e0e0";
+            btn.style.pointerEvents = "none";
 
-            // 3. Spustenie loadingu až PO resete farieb
+            // 3. Spustenie loading baru po krátkom "predýchaní" v bielej farbe
             setTimeout(() => {
                 btn.classList.add('loading-start');
-            }, 600); // 0.5s pauza na "vydýchnutie" v bielo-sivej
+            }, 500);
 
-            // 4. Presmerovanie
+            // 4. Presmerovanie po dokončení baru
             setTimeout(() => {
                 window.location.replace("https://www.cosmos.so/martinvojtus");
-            }, 2300);
+            }, 2200);
         }
     </script>
 </body>
