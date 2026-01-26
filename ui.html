@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — adaptive Landscape Build</title>
+    <title>Martin Vojtuš — Liquid Build</title>
     <style>
         :root {
             --bg-start: #ffffff;
@@ -13,10 +13,9 @@
             --radius-pill: 100px;
             --f-big: 1.85rem;
             --f-small: 0.65rem;
-            --gap: 8px; /* Fixná medzera 8px */
+            --gap: 8px;
         }
 
-        /* 🛠️ Core Reset */
         * { box-sizing: border-box; font-weight: 400 !important; -webkit-tap-highlight-color: transparent; }
 
         html, body {
@@ -31,29 +30,21 @@
 
         @keyframes bodyDarken { to { background-color: var(--bg-end); } }
 
-        /* --- 📱 IPHONE RÁM (Portrait & Landscape) --- */
+        /* --- IPHONE RÁM --- */
         .iphone-frame {
             position: absolute;
-            background-color: var(--iphone-gray);
-            z-index: 10;
-            will-change: transform;
-            /* Default Portrait */
             width: 50vw; 
             aspect-ratio: 1170 / 2532;
+            background-color: var(--iphone-gray);
             border-radius: 8vw;
+            z-index: 10;
             animation: 
                 flyIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards,
                 expandToBlack 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
         }
 
-        /* Úprava pre Landscape (Na šírku) */
         @media (orientation: landscape) {
-            .iphone-frame {
-                width: auto;
-                height: 50vh; /* Na šírku berieme výšku ako základ */
-                aspect-ratio: 2532 / 1170; /* Preklopený pomer strán */
-                border-radius: 4vh;
-            }
+            .iphone-frame { width: auto; height: 50vh; aspect-ratio: 2532 / 1170; border-radius: 4vh; }
         }
 
         @keyframes flyIn {
@@ -65,7 +56,7 @@
             to { transform: scale(20); background-color: var(--bg-end); }
         }
 
-        /* --- 🎨 LOGO (60px, 100% Fill) --- */
+        /* --- LOGO (60px) --- */
         .logo-svg {
             position: absolute;
             top: 50%; left: 50%;
@@ -74,7 +65,7 @@
             z-index: 40;
             opacity: 0;
             transform: translate(-50%, -50%) scale(0.8);
-            will-change: transform, opacity, fill;
+            transition: opacity 0.4s ease; /* Pre zmiznutie po kliku */
             animation: 
                 fadeInCenter 0.6s ease forwards 1.4s,
                 moveLogo 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards,
@@ -83,18 +74,15 @@
 
         @keyframes fadeInCenter { to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
         @keyframes logoToWhite { to { fill: var(--text-white); } }
+        @keyframes moveLogo { to { transform: translate(-50%, calc(-50% - 100px)) scale(1); } }
 
-        @keyframes moveLogo {
-            to { transform: translate(-50%, calc(-50% - 100px)) scale(1); }
-        }
-
-        /* --- 🏁 ELEMENTY WEBU (Staggered Fly-In) --- */
+        /* --- UI ELEMENTY --- */
         .ui-element {
             position: absolute;
             left: 50%;
             z-index: 35;
             opacity: 0;
-            will-change: transform, opacity;
+            transition: opacity 0.4s ease; /* Pre zmiznutie po kliku */
         }
 
         @keyframes flyFromBottom {
@@ -102,7 +90,6 @@
             100% { transform: translate(-50%, 0); opacity: 1; }
         }
 
-        /* 1. Martin Vojtuš */
         .logo-text {
             bottom: calc(50% + 40px + var(--gap));
             font-size: var(--f-small);
@@ -112,16 +99,23 @@
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
-        /* 2. COSMOS Pill (Anchor v strede) */
+        /* --- 🧪 TLAČIDLO COSMOS S TEKUTINOU --- */
         .pill {
             top: 50%;
-            width: 100%;
-            max-width: 340px;
+            width: 340px;
             height: 80px;
             border-radius: var(--radius-pill);
             display: flex; align-items: center; justify-content: center;
-            background: var(--text-white); color: #000; border: none; cursor: pointer;
+            background: var(--text-white); 
+            color: #000; 
+            border: none; 
+            cursor: pointer;
+            overflow: hidden;
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%, 30px); /* Štartovacia pozícia pre animáciu */
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
+            transition: width 0.6s cubic-bezier(0.65, 0, 0.35, 1), border-radius 0.6s ease;
         }
         
         @keyframes flyFromBottomCenter {
@@ -129,9 +123,32 @@
             100% { transform: translate(-50%, -50%); opacity: 1; }
         }
 
-        .pill h1 { font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; }
+        .pill h1 { 
+            font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; 
+            transition: opacity 0.3s ease;
+            z-index: 2;
+        }
 
-        /* 3. Footer (Čisto biely) */
+        /* Tekutina vo vnútri */
+        .liquid {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: #000;
+            z-index: 1;
+            transition: height 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Stav po kliknutí */
+        .pill.active {
+            width: 80px; /* Zúženie do kruhu */
+            pointer-events: none;
+        }
+        .pill.active h1 { opacity: 0; }
+        .pill.active .liquid { height: 100%; }
+
         footer {
             top: calc(50% + 40px + var(--gap));
             font-size: var(--f-small);
@@ -142,41 +159,49 @@
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
         }
 
-        /* --- 🌀 LOADING OVERLAY --- */
-        #l-ov { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #000; z-index: 100; flex-direction: column; align-items: center; justify-content: center; 
-        }
-        .l-bar-bg { width: 180px; height: 1px; background: rgba(255,255,255,0.2); overflow: hidden; }
-        .l-bar-fill { height: 100%; width: 0%; background: #fff; }
-        @keyframes load { to { width: 100%; } }
+        /* Skrytie pri odchode */
+        .hide { opacity: 0 !important; pointer-events: none; }
     </style>
 </head>
 <body>
 
     <div class="iphone-frame"></div>
 
-    <svg class="logo-svg" viewBox="-234 -135 468 405" preserveAspectRatio="xMidYMid meet">
+    <svg id="logo" class="logo-svg" viewBox="-234 -135 468 405" preserveAspectRatio="xMidYMid meet">
         <path d="M 0,0 L 233.827, -135 L 233.827, 135 L 0, 270 L -233.827, 135 L -233.827, -135 Z" />
     </svg>
 
-    <div class="ui-element logo-text">MARTINVOJTUS</div>
+    <div id="txt" class="ui-element logo-text">MARTINVOJTUS</div>
     
-    <div class="ui-element pill" onclick="startLoading()">
+    <button id="cosmos-btn" class="ui-element pill" onclick="triggerLiquidTransition()">
+        <div class="liquid" id="liquid-fill"></div>
         <h1>COSMOS</h1>
-    </div>
+    </button>
 
-    <footer class="ui-element">Martin Vojtuš • 2026</footer>
-
-    <div id="l-ov">
-        <div class="l-bar-bg"><div class="l-bar-fill" id="l-f"></div></div>
-    </div>
+    <footer id="foot" class="ui-element">Martin Vojtuš • 2026</footer>
 
     <script>
-        function startLoading() {
-            document.getElementById('l-ov').style.display = 'flex';
-            document.getElementById('l-f').style.animation = "load 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards";
-            setTimeout(() => { window.location.replace("https://www.cosmos.so/martinvojtus"); }, 2500);
+        function triggerLiquidTransition() {
+            const btn = document.getElementById('cosmos-btn');
+            const logo = document.getElementById('logo');
+            const text = document.getElementById('txt');
+            const foot = document.getElementById('foot');
+            const liquid = document.getElementById('liquid-fill');
+
+            // 1. Zmiznú ostatné prvky
+            logo.classList.add('hide');
+            text.classList.add('hide');
+            foot.classList.add('hide');
+
+            // 2. Tlačidlo sa zúži na kruh a spustí tekutinu
+            setTimeout(() => {
+                btn.classList.add('active');
+            }, 100);
+
+            // 3. Po naplnení (keď splynie s čiernou) prepne web
+            setTimeout(() => {
+                window.location.replace("https://www.cosmos.so/martinvojtus");
+            }, 1800); // Čas o niečo dlhší ako animácia tekutiny
         }
     </script>
 </body>
