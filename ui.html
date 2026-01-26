@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Cinematic Precision</title>
+    <title>Martin Vojtuš — Cinematic Gold</title>
     <style>
         :root {
             --bg-start: #ffffff;
@@ -13,10 +13,9 @@
             --radius-pill: 100px;
             --f-big: 1.85rem;
             --f-small: 0.65rem;
-            --gap: 8px; /* Fixná medzera 8px */
+            --gap: 8px;
         }
 
-        /* 🛠️ Core Reset */
         * { box-sizing: border-box; font-weight: 400 !important; -webkit-tap-highlight-color: transparent; }
 
         html, body {
@@ -26,7 +25,7 @@
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
-            /* Plynulý prechod pre "flashback" do bielej */
+            /* Príprava na plynulý návrat k bielej */
             transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             animation: bodyDarken 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
         }
@@ -44,8 +43,7 @@
             animation: 
                 flyIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards,
                 expandToBlack 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
-            /* Plynulé zmiznutie rámu po kliknutí */
-            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 0.6s ease;
         }
 
         @media (orientation: landscape) {
@@ -58,7 +56,7 @@
         }
 
         @keyframes expandToBlack {
-            to { transform: scale(25); background-color: var(--bg-end); }
+            to { transform: scale(30); background-color: var(--bg-end); }
         }
 
         /* --- 🎨 LOGO (60px, 100% Fill) --- */
@@ -104,7 +102,7 @@
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
-        /* --- 📥 TLAČIDLO S LOADING BAROM --- */
+        /* --- 📥 TLAČIDLO S RESETOM --- */
         .pill {
             top: 50%;
             width: 340px;
@@ -120,8 +118,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
-            /* Plynulá zmena farby na sivú */
-            transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
         }
         
         @keyframes flyFromBottomCenter {
@@ -131,7 +128,7 @@
 
         .pill h1 { 
             font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; 
-            transition: opacity 0.2s ease;
+            transition: opacity 0.3s ease;
             z-index: 2;
         }
 
@@ -187,30 +184,29 @@
             const foot = document.getElementById('footer');
             const body = document.body;
 
-            // 1. Zmiznú okolité prvky
+            // 1. Zmiznú texty
             logo.classList.add('hidden');
             text.classList.add('hidden');
             foot.classList.add('hidden');
             btn.querySelector('h1').style.opacity = '0';
 
-            // 2. PLYNULÝ RESET (Čierna -> Biela)
-            // Musíme zrušiť pôvodnú animáciu bodyDarken
-            body.style.animation = "none";
+            // 2. KĽÚČOVÝ ZÁSAH: Zastavíme všetky CSS animácie na body a frame
+            // Toto zruší "forwards" stav, ktorý nás držal v čiernej
+            body.getAnimations().forEach(anim => anim.cancel());
+            frame.getAnimations().forEach(anim => anim.cancel());
+
+            // 3. Vynútime biele pozadie a sivý button (Cinematic Reset)
             body.style.backgroundColor = "#ffffff";
-            
-            // Rám plynule vybledne a odhalí biele body pod ním
-            frame.style.opacity = "0";
-            
-            // Tlačidlo plynule zosivie
+            frame.style.opacity = "0"; // Plynulé vyblednutie zvyškov rámu
             btn.style.backgroundColor = "#e0e0e0";
             btn.style.pointerEvents = "none";
 
-            // 3. Spustenie loading baru po dokončení "vybielenia"
+            // 4. Spustíme loading bar po dokončení bieleho resetu
             setTimeout(() => {
                 btn.classList.add('loading-active');
             }, 650);
 
-            // 4. Presmerovanie
+            // 5. Presmerovanie
             setTimeout(() => {
                 window.location.replace("https://www.cosmos.so/martinvojtus");
             }, 2350);
