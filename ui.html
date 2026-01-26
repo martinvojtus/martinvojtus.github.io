@@ -3,38 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Adaptive Build</title>
+    <title>Martin Vojtuš — Consistent Build</title>
     <style>
-        /* 🎨 DYNAMICKÉ PREMENNÉ */
+        /* 🎨 TÉMATICKÉ PREMENNÉ */
         :root {
-            --bg-initial: #ffffff;
-            --bg-final: #000000;
-            --iphone-gray: #e0e0e0;
-            --logo-start: #000000;
-            --text-final: #ffffff;
-            --pill-bg: #ffffff;
-            --pill-text: #000000;
-            --loading-fill: #000000;
-            --overlay-reset: #ffffff; /* Biela vrstva po kliku */
+            --bg: #ffffff;           /* Pozadie zostáva biele */
+            --iphone-gray: #e0e0e0;  /* Rám */
+            --text-main: #000000;    /* Texty a logo */
+            --pill-bg: #000000;      /* Čierne tlačidlo vo svetlom režime */
+            --pill-text: #ffffff;
+            --loading-fill: #ffffff; /* Biely loading v čiernom tlačidle */
             
+            --gap: 8px;
             --radius-pill: 100px;
             --f-big: 1.85rem;
             --f-small: 0.65rem;
-            --gap: 8px;
         }
 
-        /* 🌙 INVERZIA PRE TMAVÝ REŽIM */
+        /* 🌙 TMAVÝ REŽIM (Bez preklápania do svetlej) */
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-initial: #000000;
-                --bg-final: #ffffff;
-                --iphone-gray: #2a2a2a;
-                --logo-start: #ffffff;
-                --text-final: #000000;
-                --pill-bg: #000000;
-                --pill-text: #ffffff;
-                --loading-fill: #ffffff;
-                --overlay-reset: #000000; /* Čierna vrstva po kliku */
+                --bg: #000000;
+                --iphone-gray: #1a1a1a;
+                --text-main: #ffffff;
+                --pill-bg: #ffffff;
+                --pill-text: #000000;
+                --loading-fill: #000000;
             }
         }
 
@@ -42,39 +36,29 @@
 
         html, body {
             height: 100%; width: 100%; margin: 0;
-            background-color: var(--bg-initial);
-            color: var(--text-final);
+            background-color: var(--bg);
+            color: var(--text-main);
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
-            animation: bodyTransition 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
         }
 
-        @keyframes bodyTransition { to { background-color: var(--bg-final); } }
-
-        /* --- ⚪ OVERLAY VRSTVA PO KLIKU --- */
+        /* --- ⚪ OVERLAY PRE RESET (Rovnaká farba ako BG) --- */
         #reset-screen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: var(--overlay-reset);
-            opacity: 0;
-            z-index: 45;
-            pointer-events: none;
-            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg);
+            opacity: 0; z-index: 45; pointer-events: none;
+            transition: opacity 0.5s ease;
         }
 
-        /* --- 📱 IPHONE RÁM --- */
+        /* --- 📱 IPHONE RÁM (Expanzia do rovnakej farby) --- */
         #frame {
-            position: absolute;
-            background-color: var(--iphone-gray);
-            z-index: 10;
-            width: 50vw; 
-            aspect-ratio: 1170 / 2532;
-            border-radius: 8vw;
+            position: absolute; background-color: var(--iphone-gray); z-index: 10;
+            width: 50vw; aspect-ratio: 1170 / 2532; border-radius: 8vw;
             animation: 
                 flyIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards,
-                expandToBlack 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
+                expandToBG 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
+            transition: opacity 0.5s ease;
         }
 
         @media (orientation: landscape) {
@@ -86,38 +70,26 @@
             100% { transform: translateY(0) scale(1); opacity: 1; }
         }
 
-        @keyframes expandToBlack {
-            to { transform: scale(30); background-color: var(--bg-final); }
+        @keyframes expandToBG {
+            to { transform: scale(30); background-color: var(--bg); opacity: 0; }
         }
 
         /* --- 🎨 LOGO (60px) --- */
         .logo-svg {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 60px; height: 60px;
-            fill: var(--logo-start);
-            z-index: 40;
-            opacity: 0;
+            position: absolute; top: 50%; left: 50%; width: 60px; height: 60px;
+            fill: var(--text-main); z-index: 40; opacity: 0;
             transform: translate(-50%, -50%) scale(0.8);
             transition: opacity 0.4s ease;
             animation: 
                 fadeInCenter 0.6s ease forwards 1.4s,
-                moveLogo 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards,
-                logoFinalColor 1.2s ease 2.2s forwards;
+                moveLogo 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
         }
 
         @keyframes fadeInCenter { to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
-        @keyframes logoFinalColor { to { fill: var(--text-final); } }
         @keyframes moveLogo { to { transform: translate(-50%, calc(-50% - 98px)) scale(1); } }
 
         /* --- 🏁 UI ELEMENTY --- */
-        .ui-element {
-            position: absolute;
-            left: 50%;
-            z-index: 35;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
+        .ui-element { position: absolute; left: 50%; z-index: 35; opacity: 0; transition: opacity 0.4s ease; }
 
         @keyframes flyFromBottom {
             0% { transform: translate(-50%, 80px); opacity: 0; }
@@ -125,66 +97,35 @@
         }
 
         .logo-text {
-            bottom: calc(50% + 40px + var(--gap));
-            font-size: var(--f-small);
-            text-transform: uppercase;
-            letter-spacing: 0.4em;
-            white-space: nowrap;
+            bottom: calc(50% + 40px + var(--gap)); font-size: var(--f-small);
+            text-transform: uppercase; letter-spacing: 0.4em; white-space: nowrap;
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
-        /* --- 📥 TLAČIDLO --- */
         .pill {
-            top: 50%;
-            width: 340px;
-            height: 80px;
-            border-radius: var(--radius-pill);
+            top: 50%; width: 340px; height: 80px; border-radius: var(--radius-pill);
             display: flex; align-items: center; justify-content: center;
-            background: var(--pill-bg); 
-            color: var(--pill-text); 
-            border: none; 
-            cursor: pointer;
-            overflow: hidden;
-            position: absolute;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            background: var(--pill-bg); color: var(--pill-text); border: none; cursor: pointer;
+            overflow: hidden; position: absolute; left: 50%; transform: translate(-50%, -50%);
             z-index: 50;
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
             transition: background-color 0.5s ease;
         }
-        
+
         @keyframes flyFromBottomCenter {
             0% { transform: translate(-50%, 30px); opacity: 0; }
             100% { transform: translate(-50%, -50%); opacity: 1; }
         }
 
-        .pill h1 { 
-            font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; 
-            transition: opacity 0.3s ease;
-            z-index: 2;
-        }
+        .pill h1 { font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; transition: opacity 0.3s ease; z-index: 2; }
 
-        .loading-fill {
-            position: absolute;
-            top: 0; left: 0;
-            width: 0%; height: 100%;
-            background: var(--loading-fill);
-            z-index: 1;
-        }
-
-        .loading-active .loading-fill { 
-            width: 100%; 
-            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        .loading-fill { position: absolute; top: 0; left: 0; width: 0%; height: 100%; background: var(--loading-fill); opacity: 0.3; z-index: 1; }
+        .loading-active .loading-fill { width: 100%; opacity: 1; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
 
         footer {
-            top: calc(50% + 40px + var(--gap));
-            font-size: var(--f-small);
-            text-transform: uppercase;
-            letter-spacing: 0.18em;
-            color: var(--text-final);
-            white-space: nowrap;
-            animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
+            top: calc(50% + 40px + var(--gap)); font-size: var(--f-small);
+            text-transform: uppercase; letter-spacing: 0.18em; color: var(--text-main);
+            white-space: nowrap; animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
         }
 
         .hidden { opacity: 0 !important; }
@@ -211,29 +152,33 @@
     <script>
         function handleFinalTransition() {
             const btn = document.getElementById('cosmos-btn');
-            const resetScreen = document.getElementById('reset-screen');
+            const screen = document.getElementById('reset-screen');
             const logo = document.getElementById('logo-main');
             const text = document.getElementById('text-main');
             const foot = document.getElementById('footer-main');
+            const frame = document.getElementById('frame');
 
             logo.classList.add('hidden');
             text.classList.add('hidden');
             foot.classList.add('hidden');
             btn.querySelector('h1').style.opacity = '0';
 
-            resetScreen.style.opacity = "1";
+            // Zobrazenie čistej plochy v aktuálnej farbe témy
+            screen.style.opacity = "1";
+            frame.style.opacity = "0";
 
-            // Tlačidlo sa prefarbí na pôvodnú sivú (adaptívnu)
-            btn.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--iphone-gray');
+            // Tlačidlo zmení farbu na neutrálnu sivú (pôvodný rám)
+            const gray = getComputedStyle(document.documentElement).getPropertyValue('--iphone-gray');
+            btn.style.backgroundColor = gray;
             btn.style.pointerEvents = "none";
 
             setTimeout(() => {
                 btn.classList.add('loading-active');
-            }, 600);
+            }, 550);
 
             setTimeout(() => {
                 window.location.replace("https://www.cosmos.so/martinvojtus");
-            }, 2300);
+            }, 2200);
         }
     </script>
 </body>
