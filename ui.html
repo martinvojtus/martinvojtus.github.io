@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Premium Build</title>
+    <title>Martin Vojtuš — Final Precision</title>
     <style>
         :root {
             --bg-start: #ffffff;
@@ -13,7 +13,7 @@
             --radius-pill: 100px;
             --f-big: 1.85rem;
             --f-small: 0.65rem;
-            --gap: 6px; /* Zmenšené medzery na 6px */
+            --gap: 6px; /* Presná medzera 6px */
         }
 
         * { box-sizing: border-box; font-weight: 400 !important; -webkit-tap-highlight-color: transparent; }
@@ -38,7 +38,6 @@
             background-color: var(--iphone-gray);
             border-radius: 8vw;
             z-index: 10;
-            will-change: transform;
             animation: 
                 flyIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards,
                 expandToBlack 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
@@ -52,94 +51,92 @@
         }
 
         @keyframes expandToBlack {
-            to { transform: scale(12); background-color: var(--bg-end); }
+            to { transform: scale(15); background-color: var(--bg-end); }
         }
 
-        /* --- LOGO (CESTOVATEĽ) --- */
+        /* --- LOGO (NASTAVENÉ NA 120px) --- */
         .logo-svg {
             position: absolute;
             top: 50%; left: 50%;
-            width: 100px; height: 100px; /* Zväčšené logo */
+            width: 120px; height: 120px; /* Zväčšené logo */
             fill: #000;
             z-index: 40;
             opacity: 0;
             transform: translate(-50%, -50%) scale(0.8);
             will-change: transform, opacity, fill;
-            /* 1. fadeIn v strede iPhonu, 2. moveAndScale do finálnej pozície */
             animation: 
                 fadeInCenter 0.6s ease forwards 1.4s,
-                moveAndScaleLogo 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards,
+                moveLogo 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards,
                 logoToWhite 1.2s ease 2.2s forwards;
         }
 
         @keyframes fadeInCenter { to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
         @keyframes logoToWhite { to { fill: var(--text-white); } }
 
-        @keyframes moveAndScaleLogo {
+        @keyframes moveLogo {
             to { 
-                /* Presun nad vycentrované tlačidlo */
-                transform: translate(-50%, calc(-50% - 130px)) scale(0.85); 
+                /* Pozícia presne nad textom MARTINVOJTUS */
+                transform: translate(-50%, calc(-50% - 130px)) scale(1); 
             }
         }
 
-        /* --- POSTUPNÝ NÁBEH PRVKOV (STAGGERED) --- */
+        /* --- ELEMENTY WEBU (VŠETKY PRILIETAJÚ ZOSPODU) --- */
         .ui-element {
             position: absolute;
+            left: 50%;
             z-index: 35;
             opacity: 0;
-            transform: translateY(30px);
             will-change: transform, opacity;
+            animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
-        /* Martin Vojtuš Text */
+        @keyframes flyFromBottom {
+            0% { transform: translate(-50%, 100px); opacity: 0; }
+            100% { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        /* 1. Popis loga: MARTINVOJTUS */
         .logo-text {
-            top: 50%; left: 50%;
-            transform: translate(-50%, calc(-50% - 70px)) translateY(30px);
+            bottom: calc(50% + 40px + var(--gap)); /* 40px je polka pill + 6px gap */
             font-size: var(--f-small);
             text-transform: uppercase;
             letter-spacing: 0.4em;
             white-space: nowrap;
-            animation: staggerIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
+            animation-delay: 2.8s;
         }
 
-        /* COSMOS Tlačidlo (Stred) */
+        /* 2. Tlačidlo COSMOS (Mŕtvy stred) */
         .pill {
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%) translateY(30px);
+            top: 50%;
+            transform: translate(-50%, -50%);
             width: 100%;
             max-width: 340px;
             height: 80px;
             border-radius: var(--radius-pill);
             display: flex; align-items: center; justify-content: center;
             background: var(--text-white); color: #000; border: none; cursor: pointer;
-            animation: staggerIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
+            animation-delay: 2.95s;
+            /* Prepísanie flyFromBottom pre udržanie centerY */
+            animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
         }
+        
+        @keyframes flyFromBottomCenter {
+            0% { transform: translate(-50%, 50px); opacity: 0; }
+            100% { transform: translate(-50%, -50%); opacity: 1; }
+        }
+
         .pill h1 { font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; }
 
-        /* Footer */
+        /* 3. Footer */
         footer {
-            top: 50%; left: 50%;
-            transform: translate(-50%, calc(-50% + 60px)) translateY(30px);
+            top: calc(50% + 40px + var(--gap)); /* 40px je polka pill + 6px gap */
             font-size: var(--f-small);
             text-transform: uppercase;
             letter-spacing: 0.18em;
             color: #ffffff; /* Čisto biela solid farba */
             white-space: nowrap;
-            animation: staggerIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
+            animation-delay: 3.1s;
         }
-
-        @keyframes staggerIn {
-            to { 
-                opacity: 1; 
-                /* Zachovanie horizontálneho centrovania pri zrušení translateY */
-                transform: translate(-50%, var(--final-y, -50%)) translateY(0); 
-            }
-        }
-
-        /* Definícia koncových Y pozícií pre každú sekciu */
-        .logo-text { --final-y: calc(-50% - 70px); }
-        .pill { --final-y: -50%; }
-        footer { --final-y: calc(-50% + 60px); }
 
         /* Loading Overlay */
         #l-ov { 
