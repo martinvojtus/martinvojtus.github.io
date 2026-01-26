@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Precision Build</title>
+    <title>Martin Vojtuš — Final Build</title>
     <style>
         :root {
             --bg-start: #ffffff;
@@ -13,7 +13,7 @@
             --radius-pill: 100px;
             --f-big: 1.85rem;
             --f-small: 0.65rem;
-            --gap: 6px; /* Fixná medzera všade */
+            --gap: 8px; /* Upravená medzera na 8px */
         }
 
         /* Reset */
@@ -55,7 +55,7 @@
             to { transform: scale(15); background-color: var(--bg-end); }
         }
 
-        /* --- LOGO (NASTAVENÉ NA 120px) --- */
+        /* --- LOGO (NASTAVENÉ NA 120px, 100% FILL) --- */
         .logo-svg {
             position: absolute;
             top: 50%; left: 50%;
@@ -63,6 +63,7 @@
             fill: #000;
             z-index: 40;
             opacity: 0;
+            /* Štartovacia pozícia: skryté v strede */
             transform: translate(-50%, -50%) scale(0.8);
             will-change: transform, opacity, fill;
             animation: 
@@ -76,8 +77,8 @@
 
         @keyframes moveLogo {
             to { 
-                /* Presný výpočet: -50% (stred) - 40px (polka pill) - 6px (gap) - cca 18px (text) - 6px (gap) - 60px (polka loga) */
-                transform: translate(-50%, calc(-50% - 132px)) scale(1); 
+                /* Výpočet pozície pre presnú 8px medzeru nad textom */
+                transform: translate(-50%, calc(-50% - 134px)) scale(1); 
             }
         }
 
@@ -86,11 +87,10 @@
             position: absolute;
             left: 50%;
             z-index: 35;
-            opacity: 0; /* Skryté na začiatku */
+            opacity: 0;
             will-change: transform, opacity;
         }
 
-        /* Animácia príletu zdola */
         @keyframes flyFromBottom {
             0% { transform: translate(-50%, 80px); opacity: 0; }
             100% { transform: translate(-50%, 0); opacity: 1; }
@@ -98,7 +98,7 @@
 
         /* 1. Popis loga: MARTINVOJTUS */
         .logo-text {
-            bottom: calc(50% + 46px); /* 40px (polka pill) + 6px gap */
+            bottom: calc(50% + 40px + var(--gap)); /* 40px (polka pill) + 8px gap */
             font-size: var(--f-small);
             text-transform: uppercase;
             letter-spacing: 0.4em;
@@ -115,7 +115,6 @@
             border-radius: var(--radius-pill);
             display: flex; align-items: center; justify-content: center;
             background: var(--text-white); color: #000; border: none; cursor: pointer;
-            /* Špeciálna fly-in animácia pre stredový prvok */
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
         }
         
@@ -128,13 +127,12 @@
 
         /* 3. Footer (Päta) */
         footer {
-            top: calc(50% + 46px); /* 40px (polka pill) + 6px gap */
+            top: calc(50% + 40px + var(--gap)); /* 40px (polka pill) + 8px gap */
             font-size: var(--f-small);
             text-transform: uppercase;
             letter-spacing: 0.18em;
-            color: #ffffff;
+            color: #ffffff; /* Solid white */
             white-space: nowrap;
-            /* Teraz priletí zdola rovnako ako ostatné */
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
         }
 
@@ -152,10 +150,8 @@
 
     <div class="iphone-frame"></div>
 
-    <svg class="logo-svg" viewBox="0 0 1080 1080">
-        <g transform="translate(540, 540)">
-            <path d="M 0,0 L 233.827, -135 L 233.827, 135 L 0, 270 L -233.827, 135 L -233.827, -135 Z" />
-        </g>
+    <svg class="logo-svg" viewBox="-234 -135 468 405" preserveAspectRatio="xMidYMid meet">
+        <path d="M 0,0 L 233.827, -135 L 233.827, 135 L 0, 270 L -233.827, 135 L -233.827, -135 Z" />
     </svg>
 
     <div class="ui-element logo-text">MARTINVOJTUS</div>
