@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Cinematic Build</title>
+    <title>Martin Vojtuš — Cinematic Precision</title>
     <style>
         :root {
             --bg-start: #ffffff;
@@ -13,7 +13,7 @@
             --radius-pill: 100px;
             --f-big: 1.85rem;
             --f-small: 0.65rem;
-            --gap: 8px;
+            --gap: 8px; /* Fixná medzera 8px */
         }
 
         /* 🛠️ Core Reset */
@@ -26,7 +26,7 @@
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
-            /* Prechod pre plynulé vyblednutie do bielej */
+            /* Plynulý prechod pre "flashback" do bielej */
             transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             animation: bodyDarken 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
         }
@@ -44,7 +44,7 @@
             animation: 
                 flyIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards,
                 expandToBlack 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
-            /* Plynulé zmiznutie rámu */
+            /* Plynulé zmiznutie rámu po kliknutí */
             transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -104,7 +104,7 @@
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
-        /* --- 📥 TLAČIDLO S PRECHODOM --- */
+        /* --- 📥 TLAČIDLO S LOADING BAROM --- */
         .pill {
             top: 50%;
             width: 340px;
@@ -120,8 +120,8 @@
             left: 50%;
             transform: translate(-50%, -50%);
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
-            /* Plynulá zmena na sivú */
-            transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            /* Plynulá zmena farby na sivú */
+            transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         @keyframes flyFromBottomCenter {
@@ -131,7 +131,7 @@
 
         .pill h1 { 
             font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; 
-            transition: opacity 0.3s ease;
+            transition: opacity 0.2s ease;
             z-index: 2;
         }
 
@@ -187,25 +187,25 @@
             const foot = document.getElementById('footer');
             const body = document.body;
 
-            // 1. Zmiznú texty a logo plynule (cez transition v CSS)
+            // 1. Zmiznú okolité prvky
             logo.classList.add('hidden');
             text.classList.add('hidden');
             foot.classList.add('hidden');
             btn.querySelector('h1').style.opacity = '0';
 
-            // 2. PLYNULÝ RESET (Čierna -> Biela, Biela -> Sivá)
-            // Najprv zrušíme animáciu sčernania, aby transition prevzala moc
+            // 2. PLYNULÝ RESET (Čierna -> Biela)
+            // Musíme zrušiť pôvodnú animáciu bodyDarken
             body.style.animation = "none";
             body.style.backgroundColor = "#ffffff";
             
-            // Rám plynule vybledne (trvá 0.6s)
+            // Rám plynule vybledne a odhalí biele body pod ním
             frame.style.opacity = "0";
             
-            // Tlačidlo plynule zosivie (trvá 0.6s)
+            // Tlačidlo plynule zosivie
             btn.style.backgroundColor = "#e0e0e0";
             btn.style.pointerEvents = "none";
 
-            // 3. Počkáme, kým skončí bieliaci prechod (cca 650ms), potom spustíme bar
+            // 3. Spustenie loading baru po dokončení "vybielenia"
             setTimeout(() => {
                 btn.classList.add('loading-active');
             }, 650);
