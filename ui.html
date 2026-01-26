@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Gold Master Precision</title>
+    <title>Martin Vojtuš — Gold Master Final</title>
     <style>
         :root {
             --bg-start: #ffffff;
@@ -13,9 +13,10 @@
             --radius-pill: 100px;
             --f-big: 1.85rem;
             --f-small: 0.65rem;
-            --gap: 8px;
+            --gap: 8px; /* Fixná medzera 8px */
         }
 
+        /* 🛠️ Core Reset */
         * { box-sizing: border-box; font-weight: 400 !important; -webkit-tap-highlight-color: transparent; }
 
         html, body {
@@ -25,14 +26,14 @@
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
+            /* Štartovacia animácia sčernania */
             animation: bodyDarken 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
-            transition: background-color 0.3s ease;
         }
 
         @keyframes bodyDarken { to { background-color: var(--bg-end); } }
 
-        /* --- 📱 IPHONE RÁM --- */
-        .iphone-frame {
+        /* --- 📱 IPHONE RÁM (Adaptívny) --- */
+        #frame {
             position: absolute;
             background-color: var(--iphone-gray);
             z-index: 10;
@@ -42,11 +43,11 @@
             animation: 
                 flyIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards,
                 expandToBlack 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
-            transition: opacity 0.3s ease, background-color 0.3s ease;
+            transition: opacity 0.3s ease;
         }
 
         @media (orientation: landscape) {
-            .iphone-frame { width: auto; height: 50vh; aspect-ratio: 2532 / 1170; border-radius: 4vh; }
+            #frame { width: auto; height: 50vh; aspect-ratio: 2532 / 1170; border-radius: 4vh; }
         }
 
         @keyframes flyIn {
@@ -76,7 +77,9 @@
 
         @keyframes fadeInCenter { to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
         @keyframes logoToWhite { to { fill: var(--text-white); } }
-        @keyframes moveLogo { to { transform: translate(-50%, calc(-50% - 100px)) scale(1); } }
+        
+        /* Cesta loga: -50% (stred) - 40px (polka pill) - 8px (gap) - cca 12px (text) - 8px (gap) - 30px (polka loga) */
+        @keyframes moveLogo { to { transform: translate(-50%, calc(-50% - 98px)) scale(1); } }
 
         /* --- 🏁 UI ELEMENTY --- */
         .ui-element {
@@ -97,10 +100,11 @@
             font-size: var(--f-small);
             text-transform: uppercase;
             letter-spacing: 0.4em;
+            white-space: nowrap;
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
-        /* --- 📥 TLAČIDLO S LOADING BAROM --- */
+        /* --- 📥 TLAČIDLO S RESETOM --- */
         .pill {
             top: 50%;
             width: 340px;
@@ -114,9 +118,9 @@
             overflow: hidden;
             position: absolute;
             left: 50%;
-            transform: translate(-50%, 30px);
+            transform: translate(-50%, -50%);
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
-            transition: background-color 0.4s ease, transform 0.3s ease;
+            transition: background-color 0.4s ease, opacity 0.3s ease;
         }
         
         @keyframes flyFromBottomCenter {
@@ -138,7 +142,7 @@
             z-index: 1;
         }
 
-        .loading-start .loading-fill { 
+        .loading-active .loading-fill { 
             width: 100%; 
             transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -149,10 +153,11 @@
             text-transform: uppercase;
             letter-spacing: 0.18em;
             color: #ffffff;
+            white-space: nowrap;
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
         }
 
-        .hide-now { opacity: 0 !important; pointer-events: none; }
+        .hidden { opacity: 0 !important; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -182,29 +187,32 @@
             const body = document.body;
 
             // 1. Zmiznú texty a logo
-            logo.classList.add('hide-now');
-            text.classList.add('hide-now');
-            foot.classList.add('hide-now');
+            logo.classList.add('hidden');
+            text.classList.add('hidden');
+            foot.classList.add('hidden');
             btn.querySelector('h1').style.opacity = '0';
 
-            // 2. KĽÚČOVÁ OPRAVA: Skryjeme obrovský čierny rám a resetujeme body
-            frame.style.opacity = "0"; // Rám zmizne, aby odhalil pozadie pod ním
-            body.style.animation = "none"; 
+            // 2. KĽÚČOVÝ ZÁSAH PROTI ČIERNEJ
+            // Musíme odstrániť rám úplne z dokumentu, aby nezakrýval biele body
+            frame.style.display = "none"; 
+            
+            // Vynútime bielu farbu na body a zrušíme animáciu
+            body.style.animation = "none";
             body.style.backgroundColor = "#ffffff";
             
-            // Tlačidlo zmeníme na sivú
+            // Tlačidlo zmeníme na sivú (reset farieb)
             btn.style.backgroundColor = "#e0e0e0";
             btn.style.pointerEvents = "none";
 
-            // 3. Spustenie loading baru po krátkom resete
+            // 3. Spustenie loading baru s miernym oneskorením
             setTimeout(() => {
-                btn.classList.add('loading-start');
-            }, 500);
+                btn.classList.add('loading-active');
+            }, 400);
 
-            // 4. Presmerovanie
+            // 4. Finálne presmerovanie
             setTimeout(() => {
                 window.location.replace("https://www.cosmos.so/martinvojtus");
-            }, 2300);
+            }, 2100);
         }
     </script>
 </body>
