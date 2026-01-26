@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Final Precision</title>
+    <title>Martin Vojtuš — Precision Build</title>
     <style>
         :root {
             --bg-start: #ffffff;
@@ -13,9 +13,10 @@
             --radius-pill: 100px;
             --f-big: 1.85rem;
             --f-small: 0.65rem;
-            --gap: 6px; /* Presná medzera 6px */
+            --gap: 6px; /* Fixná medzera všade */
         }
 
+        /* Reset */
         * { box-sizing: border-box; font-weight: 400 !important; -webkit-tap-highlight-color: transparent; }
 
         html, body {
@@ -58,7 +59,7 @@
         .logo-svg {
             position: absolute;
             top: 50%; left: 50%;
-            width: 120px; height: 120px; /* Zväčšené logo */
+            width: 120px; height: 120px;
             fill: #000;
             z-index: 40;
             opacity: 0;
@@ -75,67 +76,66 @@
 
         @keyframes moveLogo {
             to { 
-                /* Pozícia presne nad textom MARTINVOJTUS */
-                transform: translate(-50%, calc(-50% - 130px)) scale(1); 
+                /* Presný výpočet: -50% (stred) - 40px (polka pill) - 6px (gap) - cca 18px (text) - 6px (gap) - 60px (polka loga) */
+                transform: translate(-50%, calc(-50% - 132px)) scale(1); 
             }
         }
 
-        /* --- ELEMENTY WEBU (VŠETKY PRILIETAJÚ ZOSPODU) --- */
+        /* --- ELEMENTY WEBU (STAGGERED FLY-IN) --- */
         .ui-element {
             position: absolute;
             left: 50%;
             z-index: 35;
-            opacity: 0;
+            opacity: 0; /* Skryté na začiatku */
             will-change: transform, opacity;
-            animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
+        /* Animácia príletu zdola */
         @keyframes flyFromBottom {
-            0% { transform: translate(-50%, 100px); opacity: 0; }
+            0% { transform: translate(-50%, 80px); opacity: 0; }
             100% { transform: translate(-50%, 0); opacity: 1; }
         }
 
         /* 1. Popis loga: MARTINVOJTUS */
         .logo-text {
-            bottom: calc(50% + 40px + var(--gap)); /* 40px je polka pill + 6px gap */
+            bottom: calc(50% + 46px); /* 40px (polka pill) + 6px gap */
             font-size: var(--f-small);
             text-transform: uppercase;
             letter-spacing: 0.4em;
             white-space: nowrap;
-            animation-delay: 2.8s;
+            animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
         /* 2. Tlačidlo COSMOS (Mŕtvy stred) */
         .pill {
             top: 50%;
-            transform: translate(-50%, -50%);
             width: 100%;
             max-width: 340px;
             height: 80px;
             border-radius: var(--radius-pill);
             display: flex; align-items: center; justify-content: center;
             background: var(--text-white); color: #000; border: none; cursor: pointer;
-            animation-delay: 2.95s;
-            /* Prepísanie flyFromBottom pre udržanie centerY */
+            /* Špeciálna fly-in animácia pre stredový prvok */
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
         }
         
         @keyframes flyFromBottomCenter {
-            0% { transform: translate(-50%, 50px); opacity: 0; }
+            0% { transform: translate(-50%, 30px); opacity: 0; }
             100% { transform: translate(-50%, -50%); opacity: 1; }
         }
 
         .pill h1 { font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; }
 
-        /* 3. Footer */
+        /* 3. Footer (Päta) */
         footer {
-            top: calc(50% + 40px + var(--gap)); /* 40px je polka pill + 6px gap */
+            top: calc(50% + 46px); /* 40px (polka pill) + 6px gap */
             font-size: var(--f-small);
             text-transform: uppercase;
             letter-spacing: 0.18em;
-            color: #ffffff; /* Čisto biela solid farba */
+            color: #ffffff;
             white-space: nowrap;
-            animation-delay: 3.1s;
+            /* Teraz priletí zdola rovnako ako ostatné */
+            animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
         }
 
         /* Loading Overlay */
