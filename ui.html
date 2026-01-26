@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Gold Master Build</title>
+    <title>Martin Vojtuš — Gold Master Precision</title>
     <style>
         :root {
             --bg-start: #ffffff;
@@ -13,10 +13,9 @@
             --radius-pill: 100px;
             --f-big: 1.85rem;
             --f-small: 0.65rem;
-            --gap: 8px; /* Fixná medzera 8px */
+            --gap: 8px;
         }
 
-        /* 🛠️ Core Reset */
         * { box-sizing: border-box; font-weight: 400 !important; -webkit-tap-highlight-color: transparent; }
 
         html, body {
@@ -26,8 +25,8 @@
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
-            /* Animácia sčernania pri štarte */
             animation: bodyDarken 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
+            transition: background-color 0.3s ease;
         }
 
         @keyframes bodyDarken { to { background-color: var(--bg-end); } }
@@ -43,6 +42,7 @@
             animation: 
                 flyIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards,
                 expandToBlack 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
+            transition: opacity 0.3s ease, background-color 0.3s ease;
         }
 
         @media (orientation: landscape) {
@@ -55,7 +55,7 @@
         }
 
         @keyframes expandToBlack {
-            to { transform: scale(20); background-color: var(--bg-end); }
+            to { transform: scale(25); background-color: var(--bg-end); }
         }
 
         /* --- 🎨 LOGO (60px, 100% Fill) --- */
@@ -100,7 +100,7 @@
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
-        /* --- 📥 TLAČIDLO S RESETOM --- */
+        /* --- 📥 TLAČIDLO S LOADING BAROM --- */
         .pill {
             top: 50%;
             width: 340px;
@@ -116,7 +116,7 @@
             left: 50%;
             transform: translate(-50%, 30px);
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
-            transition: background-color 0.4s ease, opacity 0.3s ease;
+            transition: background-color 0.4s ease, transform 0.3s ease;
         }
         
         @keyframes flyFromBottomCenter {
@@ -138,7 +138,6 @@
             z-index: 1;
         }
 
-        /* Animácia plnenia po kliku */
         .loading-start .loading-fill { 
             width: 100%; 
             transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -153,58 +152,59 @@
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
         }
 
-        .hide-effect { opacity: 0 !important; pointer-events: none; }
+        .hide-now { opacity: 0 !important; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <div class="iphone-frame"></div>
+    <div id="frame" class="iphone-frame"></div>
 
-    <svg id="logo-main" class="logo-svg" viewBox="-234 -135 468 405" preserveAspectRatio="xMidYMid meet">
+    <svg id="logo" class="logo-svg" viewBox="-234 -135 468 405" preserveAspectRatio="xMidYMid meet">
         <path d="M 0,0 L 233.827, -135 L 233.827, 135 L 0, 270 L -233.827, 135 L -233.827, -135 Z" />
     </svg>
 
-    <div id="text-main" class="ui-element logo-text">MARTINVOJTUS</div>
+    <div id="text" class="ui-element logo-text">MARTINVOJTUS</div>
     
     <button id="cosmos-btn" class="ui-element pill" onclick="handleTransition()">
         <div class="loading-fill" id="fill"></div>
         <h1>COSMOS</h1>
     </button>
 
-    <footer id="footer-main" class="ui-element">Martin Vojtuš • 2026</footer>
+    <footer id="footer" class="ui-element">Martin Vojtuš • 2026</footer>
 
     <script>
         function handleTransition() {
             const btn = document.getElementById('cosmos-btn');
-            const logo = document.getElementById('logo-main');
-            const text = document.getElementById('text-main');
-            const foot = document.getElementById('footer-main');
+            const frame = document.getElementById('frame');
+            const logo = document.getElementById('logo');
+            const text = document.getElementById('text');
+            const foot = document.getElementById('footer');
             const body = document.body;
 
-            // 1. Okamžité skrytie textových prvkov
-            logo.classList.add('hide-effect');
-            text.classList.add('hide-effect');
-            foot.classList.add('hide-effect');
+            // 1. Zmiznú texty a logo
+            logo.classList.add('hide-now');
+            text.classList.add('hide-now');
+            foot.classList.add('hide-now');
             btn.querySelector('h1').style.opacity = '0';
 
-            // 2. FORSOVANÝ RESET FARIEB
-            // Zrušíme prebiehajúcu animáciu sčernania a vnútime bielu
+            // 2. KĽÚČOVÁ OPRAVA: Skryjeme obrovský čierny rám a resetujeme body
+            frame.style.opacity = "0"; // Rám zmizne, aby odhalil pozadie pod ním
             body.style.animation = "none"; 
             body.style.backgroundColor = "#ffffff";
             
-            // Tlačidlo zmeníme na sivú (ako pôvodný iPhone rám)
+            // Tlačidlo zmeníme na sivú
             btn.style.backgroundColor = "#e0e0e0";
             btn.style.pointerEvents = "none";
 
-            // 3. Spustenie loading baru po krátkom "predýchaní" v bielej farbe
+            // 3. Spustenie loading baru po krátkom resete
             setTimeout(() => {
                 btn.classList.add('loading-start');
             }, 500);
 
-            // 4. Presmerovanie po dokončení baru
+            // 4. Presmerovanie
             setTimeout(() => {
                 window.location.replace("https://www.cosmos.so/martinvojtus");
-            }, 2200);
+            }, 2300);
         }
     </script>
 </body>
