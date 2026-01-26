@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Final Precision</title>
+    <title>Martin Vojtuš — adaptive Landscape Build</title>
     <style>
         :root {
             --bg-start: #ffffff;
@@ -16,7 +16,7 @@
             --gap: 8px; /* Fixná medzera 8px */
         }
 
-        /* Reset */
+        /* 🛠️ Core Reset */
         * { box-sizing: border-box; font-weight: 400 !important; -webkit-tap-highlight-color: transparent; }
 
         html, body {
@@ -31,20 +31,30 @@
 
         @keyframes bodyDarken { to { background-color: var(--bg-end); } }
 
-        /* --- IPHONE RÁM --- */
+        /* --- 📱 IPHONE RÁM (Portrait & Landscape) --- */
         .iphone-frame {
             position: absolute;
+            background-color: var(--iphone-gray);
+            z-index: 10;
+            will-change: transform;
+            /* Default Portrait */
             width: 50vw; 
             aspect-ratio: 1170 / 2532;
-            background-color: var(--iphone-gray);
             border-radius: 8vw;
-            z-index: 10;
             animation: 
                 flyIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards,
                 expandToBlack 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
         }
 
-        @media (orientation: landscape) { .iphone-frame { width: 18vw; border-radius: 2vw; } }
+        /* Úprava pre Landscape (Na šírku) */
+        @media (orientation: landscape) {
+            .iphone-frame {
+                width: auto;
+                height: 50vh; /* Na šírku berieme výšku ako základ */
+                aspect-ratio: 2532 / 1170; /* Preklopený pomer strán */
+                border-radius: 4vh;
+            }
+        }
 
         @keyframes flyIn {
             0% { transform: translateY(110vh) scale(0.9); opacity: 0; }
@@ -52,14 +62,14 @@
         }
 
         @keyframes expandToBlack {
-            to { transform: scale(15); background-color: var(--bg-end); }
+            to { transform: scale(20); background-color: var(--bg-end); }
         }
 
-        /* --- LOGO (ZMENŠENÉ NA 60px) --- */
+        /* --- 🎨 LOGO (60px, 100% Fill) --- */
         .logo-svg {
             position: absolute;
             top: 50%; left: 50%;
-            width: 60px; height: 60px; /* Polovičná veľkosť */
+            width: 60px; height: 60px;
             fill: #000;
             z-index: 40;
             opacity: 0;
@@ -75,13 +85,10 @@
         @keyframes logoToWhite { to { fill: var(--text-white); } }
 
         @keyframes moveLogo {
-            to { 
-                /* Upravený prepočet pre 60px logo, aby zostalo 8px nad textom */
-                transform: translate(-50%, calc(-50% - 100px)) scale(1); 
-            }
+            to { transform: translate(-50%, calc(-50% - 100px)) scale(1); }
         }
 
-        /* --- ELEMENTY WEBU (STAGGERED FLY-IN ZOSPODU) --- */
+        /* --- 🏁 ELEMENTY WEBU (Staggered Fly-In) --- */
         .ui-element {
             position: absolute;
             left: 50%;
@@ -95,9 +102,9 @@
             100% { transform: translate(-50%, 0); opacity: 1; }
         }
 
-        /* 1. Popis loga: MARTINVOJTUS */
+        /* 1. Martin Vojtuš */
         .logo-text {
-            bottom: calc(50% + 40px + var(--gap)); /* 40px (polka pill) + 8px gap */
+            bottom: calc(50% + 40px + var(--gap));
             font-size: var(--f-small);
             text-transform: uppercase;
             letter-spacing: 0.4em;
@@ -105,7 +112,7 @@
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
-        /* 2. Tlačidlo COSMOS (Mŕtvy stred) */
+        /* 2. COSMOS Pill (Anchor v strede) */
         .pill {
             top: 50%;
             width: 100%;
@@ -114,7 +121,6 @@
             border-radius: var(--radius-pill);
             display: flex; align-items: center; justify-content: center;
             background: var(--text-white); color: #000; border: none; cursor: pointer;
-            /* Špeciálny fly-in pre stredový prvok */
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
         }
         
@@ -125,19 +131,18 @@
 
         .pill h1 { font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; }
 
-        /* 3. Footer (Päta) */
+        /* 3. Footer (Čisto biely) */
         footer {
-            top: calc(50% + 40px + var(--gap)); /* 40px (polka pill) + 8px gap */
+            top: calc(50% + 40px + var(--gap));
             font-size: var(--f-small);
             text-transform: uppercase;
             letter-spacing: 0.18em;
-            color: #ffffff; /* Čisto biela solid farba */
+            color: #ffffff;
             white-space: nowrap;
-            /* Priletí zdola ako posledný */
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
         }
 
-        /* Loading Overlay */
+        /* --- 🌀 LOADING OVERLAY --- */
         #l-ov { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: #000; z-index: 100; flex-direction: column; align-items: center; justify-content: center; 
