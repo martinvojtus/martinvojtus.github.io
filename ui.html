@@ -174,14 +174,15 @@
     </div>
 
     <script>
-        // Úvodný nábeh cookies
         setTimeout(() => {
             document.getElementById('cookie-banner').classList.add('show');
         }, 4000);
 
         function hideCookies() {
-            // ⚡ Haptická odozva (krátky "tap")
-            if (navigator.vibrate) navigator.vibrate(10);
+            // ⚡ Pattern vibrovania pre lepšiu kompatibilitu (krátky impulz)
+            if ("vibrate" in navigator) {
+                navigator.vibrate([15]);
+            }
             document.getElementById('cookie-banner').classList.remove('show');
         }
 
@@ -193,8 +194,10 @@
             const foot = document.getElementById('footer-main');
             const cookie = document.getElementById('cookie-banner');
 
-            // ⚡ Haptická odozva (výraznejší klik)
-            if (navigator.vibrate) navigator.vibrate(25);
+            // ⚡ Dvojitý pattern vibrácie pre dôležitý klik (vibrácia 30ms, pauza 10ms, vibrácia 30ms)
+            if ("vibrate" in navigator) {
+                navigator.vibrate([30, 10, 30]);
+            }
 
             logo.classList.add('hidden');
             text.classList.add('hidden');
