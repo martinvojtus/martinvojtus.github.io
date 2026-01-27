@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Final Clean Transition</title>
+    <title>Martin Vojtuš — Geometric Precision</title>
     <style>
         :root {
             --bg-start: #ffffff;
@@ -14,6 +14,8 @@
             --f-big: 1.85rem;
             --f-small: 0.65rem;
             --gap: 8px;
+            /* Matematicky odvodený polomer pre okno */
+            --radius-cookie-box: 32px; 
         }
 
         * { box-sizing: border-box; font-weight: 400 !important; -webkit-tap-highlight-color: transparent; }
@@ -32,24 +34,16 @@
 
         /* --- ⚪ BIELA PREKRÝVACIA VRSTVA --- */
         #white-screen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: #ffffff;
-            opacity: 0;
-            z-index: 100;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #ffffff; opacity: 0; z-index: 100;
             pointer-events: none;
             transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* --- 📱 IPHONE RÁM --- */
         #frame {
-            position: absolute;
-            background-color: var(--iphone-gray);
-            z-index: 10;
-            width: 50vw; 
-            aspect-ratio: 1170 / 2532;
-            border-radius: 8vw;
+            position: absolute; background-color: var(--iphone-gray); z-index: 10;
+            width: 50vw; aspect-ratio: 1170 / 2532; border-radius: 8vw;
             animation: 
                 flyIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards,
                 expandToBlack 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
@@ -70,12 +64,8 @@
 
         /* --- 🎨 LOGO (60px) --- */
         .logo-svg {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 60px; height: 60px;
-            fill: #000;
-            z-index: 40;
-            opacity: 0;
+            position: absolute; top: 50%; left: 50%; width: 60px; height: 60px;
+            fill: #000; z-index: 40; opacity: 0;
             transform: translate(-50%, -50%) scale(0.8);
             transition: opacity 0.4s ease;
             animation: 
@@ -90,10 +80,7 @@
 
         /* --- 🏁 UI ELEMENTY --- */
         .ui-element {
-            position: absolute;
-            left: 50%;
-            z-index: 35;
-            opacity: 0;
+            position: absolute; left: 50%; z-index: 35; opacity: 0;
             transition: opacity 0.4s ease;
         }
 
@@ -104,27 +91,15 @@
 
         .logo-text {
             bottom: calc(50% + 40px + var(--gap));
-            font-size: var(--f-small);
-            text-transform: uppercase;
-            letter-spacing: 0.4em;
-            white-space: nowrap;
+            font-size: var(--f-small); text-transform: uppercase; letter-spacing: 0.4em; white-space: nowrap;
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
         .pill {
-            top: 50%;
-            width: 340px;
-            height: 80px;
-            border-radius: var(--radius-pill);
+            top: 50%; width: 340px; height: 80px; border-radius: var(--radius-pill);
             display: flex; align-items: center; justify-content: center;
-            background: var(--text-white); 
-            color: #000; 
-            border: none; 
-            cursor: pointer;
-            overflow: hidden;
-            position: absolute;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            background: var(--text-white); color: #000; border: none; cursor: pointer;
+            overflow: hidden; position: absolute; left: 50%; transform: translate(-50%, -50%);
             z-index: 50; 
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
             transition: background-color 0.5s ease;
@@ -135,47 +110,36 @@
             100% { transform: translate(-50%, -50%); opacity: 1; }
         }
 
-        .pill h1 { 
-            font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; 
-            transition: opacity 0.3s ease;
-            z-index: 2;
-        }
+        .pill h1 { font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; transition: opacity 0.3s ease; z-index: 2; }
 
         .loading-fill {
-            position: absolute;
-            top: 0; left: 0;
-            width: 0%; height: 100%;
-            background: #000;
-            z-index: 1;
+            position: absolute; top: 0; left: 0; width: 0%; height: 100%;
+            background: #000; z-index: 1;
         }
 
-        .loading-active .loading-fill { 
-            width: 100%; 
-            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        .loading-active .loading-fill { width: 100%; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
 
         footer {
             top: calc(50% + 40px + var(--gap));
-            font-size: var(--f-small);
-            text-transform: uppercase;
-            letter-spacing: 0.18em;
-            color: #ffffff;
-            white-space: nowrap;
+            font-size: var(--f-small); text-transform: uppercase; letter-spacing: 0.18em;
+            color: #ffffff; white-space: nowrap;
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
         }
 
-        /* --- 🍪 FLOATING COOKIE PILL --- */
+        /* --- 🍪 GEOMETRIC COOKIE BOX --- */
         #cookie-banner {
             position: fixed;
             bottom: 24px;
             left: 50%;
-            transform: translate(-50%, 200px);
+            transform: translate(-50%, 250px);
             width: calc(100% - 40px);
             max-width: 360px;
             background: #ffffff;
             color: #000000;
-            padding: 12px;
-            border-radius: var(--radius-pill);
+            /* Rovnomerná medzera 8px po celom obvode tlačidiel */
+            padding: var(--gap); 
+            /* Sústredný rádius: 24px (button) + 8px (gap) = 32px */
+            border-radius: var(--radius-cookie-box);
             z-index: 60;
             text-align: center;
             transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s;
@@ -186,19 +150,20 @@
 
         .cookie-text {
             font-size: 0.65rem;
-            margin-bottom: 8px;
+            margin: 8px 0 12px 0;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
         .cookie-btns {
             display: flex;
-            gap: 8px;
+            gap: var(--gap);
         }
 
         .c-btn {
             flex: 1;
             height: 48px;
+            /* Tlačidlá zostávajú pill-shaped (24px radius) */
             border-radius: var(--radius-pill);
             border: none;
             font-size: 0.7rem;
