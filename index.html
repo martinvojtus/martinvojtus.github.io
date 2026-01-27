@@ -1,163 +1,130 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Všetky práva vyhradené</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kontakt | Design Showcase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root {
-            --bg: #ffffff; --text: #000000;
-            --sol-neon: linear-gradient(90deg, #9945FF, #14F195);
-            --radius-pill: 100px; 
-            --f-big: 1.85rem; 
-            --f-small: 0.65rem; 
-            --gap: 15px;
+        /* 🎨 Globálne nastavenia podľa tvojich preferencií */
+        body {
+            font-family: 'Inter', sans-serif;
+            font-weight: 400; /* Všetky písma sú regular */
+            background-color: #fcfcfc;
+            color: #1a1a1a;
         }
-        body.dark { --bg: #000000; --text: #ffffff; }
 
-        /* Core reset: Strictly 100% Solid & Regular */
-        * { 
-            box-sizing: border-box; 
-            font-weight: 400 !important; 
-            -webkit-tap-highlight-color: transparent; 
+        /* 📏 Úprava malých písiem z 0.55rem na viditeľnejšiu veľkosť */
+        .text-xs-custom {
+            font-size: 0.75rem; 
+        }
+
+        .contact-card {
+            background: #ffffff;
+            border: 1px solid #eaeaea;
+            transition: transform 0.2s ease;
+        }
+
+        input, textarea {
+            border: 1px solid #d1d1d1;
+            padding: 0.75rem;
+            border-radius: 4px;
+            width: 100%;
+            font-weight: 400;
+        }
+
+        .btn-primary {
+            background: #000;
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            transition: opacity 0.2s;
         }
         
-        html, body { 
-            height: 100%; width: 100%; margin: 0; background: var(--bg); color: var(--text); 
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
+        .btn-primary:hover {
+            opacity: 0.8;
         }
-
-        .center-core { 
-            display: flex; flex-direction: column; align-items: center; 
-            gap: var(--gap); width: 100%; max-width: 380px; padding: 20px;
-        }
-
-        /* Branding */
-        .logo-svg { 
-            width: 80px; 
-            height: 80px; 
-            fill: var(--text); 
-            display: block; 
-        }
-        
-        .logo-text { 
-            font-size: var(--f-small); 
-            text-transform: uppercase; 
-            letter-spacing: 0.4em; 
-            display: inline-flex;
-            white-space: nowrap;
-        }
-
-        /* Action Buttons */
-        .pill { 
-            width: 100%; height: 80px; border-radius: var(--radius-pill); border: 1px solid var(--text); 
-            display: flex; align-items: center; justify-content: center; 
-            text-transform: uppercase; background: var(--bg); text-decoration: none; color: inherit; position: relative;
-            cursor: pointer;
-        }
-        .doc-btn { background: var(--text); color: var(--bg); border: none; }
-        .pill h1 { font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; line-height: 1; text-align: center; }
-
-        /* Support Button */
-        .don-btn { 
-            width: 240px; height: 40px; border-radius: var(--radius-pill); 
-            background-image: linear-gradient(var(--bg), var(--bg)), var(--sol-neon); 
-            background-clip: padding-box, border-box; background-origin: border-box; 
-            border: 1px solid transparent; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center;
-            text-transform: uppercase; color: var(--text); position: relative;
-        }
-        .don-btn .sub, #addr-w { 
-            font-size: var(--f-small); letter-spacing: 0.12em; text-align: center;
-            position: absolute; top: 50%; transform: translateY(-50%); width: 100%;
-        }
-
-        #addr-w { display: none; align-items: center; justify-content: center; }
-        .copy { width: 12px; height: 12px; margin-left: 8px; fill: var(--text); cursor: pointer; }
-
-        /* Loading Overlay - Minimalist 1px B&W */
-        #l-ov { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: var(--bg); z-index: 99; flex-direction: column; align-items: center; justify-content: center; 
-        }
-        .l-bar-bg { width: 180px; height: 1px; background: rgba(128,128,128,0.2); overflow: hidden; }
-        .l-bar-fill { height: 100%; width: 0%; background: var(--text); }
-
-        @keyframes load { to { width: 100%; } }
-
-        footer { font-size: var(--f-small); text-transform: uppercase; letter-spacing: 0.18em; }
     </style>
 </head>
 <body>
 
-    <div id="l-ov">
-        <div class="l-bar-bg"><div class="l-bar-fill" id="l-f"></div></div>
-    </div>
-
-    <div class="center-core" id="main-ui">
-        <svg class="logo-svg" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-            <g transform="translate(540, 540)">
-                <path d="M 0,0 L 233.827, -135 L 233.827, 135 L 0, 270 L -233.827, 135 L -233.827, -135 Z" />
-            </g>
-        </svg>
-
-        <div class="logo-text">MARTINVOJTUS</div>
-
-        <div class="pill doc-btn" onclick="startLoading()">
-            <h1>COSMOS</h1>
-        </div>
-
-        <div class="don-btn" onclick="don()">
-            <span class="sub" id="dS">Support via Solana</span>
-            <div id="addr-w">
-                <span id="addr"></span>
-                <svg class="copy" id="cI" onclick="cpy(event)" viewBox="0 0 24 24"><path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"/></svg>
+    <nav class="p-6 flex justify-between items-center border-b border-gray-100">
+        <div class="flex items-center gap-2">
+            <div class="font-normal text-lg flex items-center gap-2">
+                <span class="bg-black text-white p-1 px-2 rounded">MV</span>
+                <span class="hidden sm:inline">Martin Vojtuš</span>
+                <span class="sm:hidden text-xs-custom uppercase tracking-widest border-l pl-2">Design Showcase</span>
             </div>
         </div>
+        <div class="flex gap-6 text-sm uppercase tracking-wider">
+            <a href="#" class="hover:underline">Domov</a>
+            <a href="#" class="hover:underline">Ateliér</a>
+            <a href="#" class="font-medium underline underline-offset-4">Kontakt</a>
+        </div>
+    </nav>
 
-        <footer>Martin Vojtuš • Build v1.0.0 • 2026</footer>
-    </div>
+    <main class="max-w-6xl mx-auto py-16 px-6">
+        <div class="grid md:grid-cols-2 gap-16">
+            
+            <section>
+                <h1 class="text-4xl mb-8">Napíšte nám ✉️</h1>
+                <form class="space-y-4">
+                    <div>
+                        <label class="block text-xs-custom uppercase mb-1">Meno a priezvisko</label>
+                        <input type="text" placeholder="Vaše meno">
+                    </div>
+                    <div>
+                        <label class="block text-xs-custom uppercase mb-1">Email</label>
+                        <input type="email" placeholder="vas@email.com">
+                    </div>
+                    <div>
+                        <label class="block text-xs-custom uppercase mb-1">Správa</label>
+                        <textarea rows="5" placeholder="Ako vám môžeme pomôcť?"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary w-full sm:w-auto">Odoslať správu 🚀</button>
+                </form>
+            </section>
 
-    <script>
-        const ADDR = "eKBBQ7cPqupa9wUAYHPPyhKFDQJrTJiRkn1fWbNFreG";
+            <section class="flex flex-col justify-center">
+                <div class="contact-card p-8 rounded-lg shadow-sm">
+                    <h2 class="text-xl mb-6 font-normal">Kontaktné údaje 📞</h2>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <i class="fa-solid fa-location-dot mt-1 text-gray-500"></i>
+                            <div>
+                                <p class="text-xs-custom uppercase text-gray-500">Adresa</p>
+                                <p>1064 Calle Negocio suite E<br>San Clemente, CA 92673</p>
+                            </div>
+                        </div>
 
-        function applyAutoTheme() {
-            const hour = new Date().getHours();
-            if (hour >= 18 || hour < 6 || window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.body.classList.add('dark');
-            }
-        }
+                        <div class="flex items-start gap-4">
+                            <i class="fa-solid fa-phone mt-1 text-gray-500"></i>
+                            <div>
+                                <p class="text-xs-custom uppercase text-gray-500">Telefón</p>
+                                <p>949-413-6689</p>
+                            </div>
+                        </div>
 
-        function startLoading() {
-            document.getElementById('main-ui').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('main-ui').style.display = 'none';
-                document.getElementById('l-ov').style.display = 'flex';
-                const bar = document.getElementById('l-f');
-                bar.style.animation = "load 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards";
-                setTimeout(() => {
-                    window.location.replace("https://www.cosmos.so/martinvojtus");
-                }, 2500);
-            }, 100);
-        }
+                        <div class="flex items-start gap-4">
+                            <i class="fa-solid fa-envelope mt-1 text-gray-500"></i>
+                            <div>
+                                <p class="text-xs-custom uppercase text-gray-500">Email</p>
+                                <p>m.vojtus@yahoo.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
 
-        function don() { 
-            const s = document.getElementById('dS'), w = document.getElementById('addr-w'), a = document.getElementById('addr');
-            s.style.display = "none"; w.style.display = "flex"; 
-            a.innerText = ADDR.slice(0,6)+"..."+ADDR.slice(-6); 
-        }
+    <footer class="mt-20 border-t border-gray-100 p-10 text-center">
+        <p class="text-xs-custom text-gray-400 uppercase tracking-widest">
+            © 2026 RenaEssence Dental Atelier ✨ Martin Vojtuš
+        </p>
+    </footer>
 
-        function cpy(e) { 
-            e.stopPropagation(); 
-            const el = document.createElement('textarea'); el.value = ADDR; document.body.appendChild(el); el.select();
-            document.execCommand('copy'); document.body.removeChild(el);
-            const a = document.getElementById('addr'), i = document.getElementById('cI');
-            a.innerText = "ADDRESS COPIED!"; i.style.display = "none";
-            setTimeout(() => { a.innerText = ADDR.slice(0,6)+"..."+ADDR.slice(-6); i.style.display = "block"; }, 2000);
-        }
-
-        applyAutoTheme();
-    </script>
 </body>
 </html>
