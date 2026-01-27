@@ -2,161 +2,221 @@
 <html lang="sk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RenaEssence Dental Atelier ✨ Martin Vojtuš</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
+    <title>Martin Vojtuš — Final Clean Transition</title>
     <style>
-        /* 🎨 Striktne 'regular' písmo pre celý web */
-        * {
-            font-family: 'Inter', sans-serif;
-            font-weight: 400 !important;
-            -webkit-font-smoothing: antialiased;
+        :root {
+            --bg-start: #ffffff;
+            --bg-end: #000000;
+            --iphone-gray: #e0e0e0;
+            --text-white: #ffffff;
+            --radius-pill: 100px;
+            --f-big: 1.85rem;
+            --f-small: 0.65rem;
+            --gap: 8px;
+            --radius-cookie-box: 24px; 
         }
 
-        body {
-            background-color: #ffffff;
-            color: #111111;
+        /* 🛠️ Core Reset */
+        * { box-sizing: border-box; font-weight: 400 !important; -webkit-tap-highlight-color: transparent; }
+
+        html, body {
+            height: 100%; width: 100%; margin: 0;
+            background-color: var(--bg-start);
+            color: var(--text-white);
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            animation: bodyDarken 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
         }
 
-        /* 📏 Zväčšené malé písma pre lepšiu viditeľnosť (namiesto 0.55rem) */
-        .text-detail {
-            font-size: 0.85rem;
-            letter-spacing: 0.05em;
-            color: #666;
-            text-transform: uppercase;
+        @keyframes bodyDarken { to { background-color: var(--bg-end); } }
+
+        /* --- ⚪ BIELA PREKRÝVACIA VRSTVA --- */
+        #white-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #ffffff; opacity: 0; 
+            z-index: 100;
+            pointer-events: none;
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* ✨ Moderný minimalistický input */
-        .input-minimal {
-            border: none;
-            border-bottom: 1px solid #e2e2e2;
-            padding: 1rem 0;
-            width: 100%;
-            transition: border-color 0.3s ease;
-            outline: none;
-            border-radius: 0;
+        /* --- 📱 IPHONE RÁM --- */
+        #frame {
+            position: absolute; background-color: var(--iphone-gray); z-index: 10;
+            width: 50vw; aspect-ratio: 1170 / 2532; border-radius: 8vw;
+            animation: 
+                flyIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+                expandToBlack 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
         }
 
-        .input-minimal:focus {
-            border-bottom-color: #000;
+        @media (orientation: landscape) {
+            #frame { width: auto; height: 50vh; aspect-ratio: 2532 / 1170; border-radius: 4vh; }
         }
 
-        /* 🔘 Solana-style tlačidlo s jemným efektom */
-        .btn-modern {
-            background: #000;
-            color: #fff;
-            padding: 1.25rem 2.5rem;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
+        @keyframes flyIn {
+            0% { transform: translateY(110vh) scale(0.9); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
         }
 
-        .btn-modern:hover {
-            background: #222;
-            transform: translateY(-2px);
+        @keyframes expandToBlack {
+            to { transform: scale(30); background-color: var(--bg-end); }
         }
 
-        .logo-box {
-            background: #000;
-            color: #fff;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
+        /* --- 🎨 LOGO (60px) --- */
+        .logo-svg {
+            position: absolute; top: 50%; left: 50%; width: 60px; height: 60px;
+            fill: #000; z-index: 40; opacity: 0;
+            transform: translate(-50%, -50%) scale(0.8);
+            transition: opacity 0.4s ease;
+            animation: 
+                fadeInCenter 0.6s ease forwards 1.4s,
+                moveLogo 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards,
+                logoToWhite 1.2s ease 2.2s forwards;
         }
+
+        @keyframes fadeInCenter { to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+        @keyframes logoToWhite { to { fill: var(--text-white); } }
+        @keyframes moveLogo { to { transform: translate(-50%, calc(-50% - 98px)) scale(1); } }
+
+        /* --- 🏁 UI ELEMENTY --- */
+        .ui-element {
+            position: absolute; left: 50%; z-index: 35; opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        @keyframes flyFromBottom {
+            0% { transform: translate(-50%, 80px); opacity: 0; }
+            100% { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        .logo-text {
+            bottom: calc(50% + 40px + var(--gap));
+            font-size: var(--f-small); text-transform: uppercase; letter-spacing: 0.4em; white-space: nowrap;
+            animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
+        }
+
+        .pill {
+            top: 50%; width: 340px; height: 80px; border-radius: var(--radius-pill);
+            display: flex; align-items: center; justify-content: center;
+            background: var(--text-white); color: #000; border: none; cursor: pointer;
+            overflow: hidden; position: absolute; left: 50%; transform: translate(-50%, -50%);
+            z-index: 110; 
+            animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
+            transition: background-color 0.5s ease;
+        }
+        
+        @keyframes flyFromBottomCenter {
+            0% { transform: translate(-50%, 30px); opacity: 0; }
+            100% { transform: translate(-50%, -50%); opacity: 1; }
+        }
+
+        .pill h1 { font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; transition: opacity 0.3s ease; z-index: 2; }
+
+        .loading-fill {
+            position: absolute; top: 0; left: 0; width: 0%; height: 100%;
+            background: #000; z-index: 1;
+        }
+
+        .loading-active .loading-fill { width: 100%; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        footer {
+            top: calc(50% + 40px + var(--gap));
+            font-size: var(--f-small); text-transform: uppercase; letter-spacing: 0.18em;
+            color: #ffffff; white-space: nowrap;
+            animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
+        }
+
+        /* --- 🍪 COOKIE BOX --- */
+        #cookie-banner {
+            position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 250px);
+            width: calc(100% - 40px); max-width: 360px;
+            background: #ffffff; color: #000000; padding: var(--gap); 
+            border-radius: var(--radius-cookie-box); z-index: 60; text-align: center;
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+
+        #cookie-banner.show { transform: translate(-50%, 0); }
+        .cookie-text { font-size: var(--f-small); margin: 4px 0 10px 0; text-transform: uppercase; letter-spacing: 0.05em; color: #000; }
+        .cookie-btns { display: flex; gap: var(--gap); }
+        .c-btn { flex: 1; height: 32px; border-radius: var(--radius-pill); border: none; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer; white-space: nowrap; }
+        .c-btn-accept { background: #000000; color: #ffffff; }
+        .c-btn-decline { background: #e0e0e0; color: #000000; }
+
+        .hidden { opacity: 0 !important; pointer-events: none; }
     </style>
 </head>
-<body class="antialiased">
+<body>
 
-    <header class="p-8 md:p-12 flex justify-between items-center">
-        <div class="flex items-center gap-4">
-            <div class="logo-box">RE</div>
-            <span class="text-lg md:text-xl tracking-tight">
-                RenaEssence Dental Atelier
-            </span>
+    <div id="white-screen"></div>
+    <div id="frame" class="iphone-frame"></div>
+
+    <svg id="logo-main" class="logo-svg" viewBox="-234 -135 468 405" preserveAspectRatio="xMidYMid meet">
+        <path d="M 0,0 L 233.827, -135 L 233.827, 135 L 0, 270 L -233.827, 135 L -233.827, -135 Z" />
+    </svg>
+
+    <div id="text-main" class="ui-element logo-text">MARTINVOJTUS</div>
+    
+    <button id="cosmos-btn" class="ui-element pill" onclick="handleFinalTransition()">
+        <div class="loading-fill" id="fill"></div>
+        <h1>COSMOS</h1>
+    </button>
+
+    <footer id="footer-main" class="ui-element">Martin Vojtuš • 2026</footer>
+
+    <div id="cookie-banner">
+        <div class="cookie-text">Súhlasíte s použitím cookies?</div>
+        <div class="cookie-btns">
+            <button class="c-btn c-btn-decline" onclick="hideCookies()">Nesúhlasím</button>
+            <button class="c-btn c-btn-accept" onclick="hideCookies()">Súhlasím</button>
         </div>
-        
-        <nav class="hidden md:flex gap-12 text-detail">
-            <a href="#" class="hover:text-black">Ateliér</a>
-            <a href="#" class="hover:text-black">Projekty</a>
-            <a href="#" class="text-black border-b border-black">Kontakt</a>
-        </nav>
-    </header>
+    </div>
 
-    <main class="max-w-7xl mx-auto px-8 md:px-12 py-12 md:py-24">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
-            
-            <div class="lg:col-span-7">
-                <h1 class="text-5xl md:text-7xl mb-16 tracking-tighter">Kontaktujte nás ✉️</h1>
-                
-                <form class="space-y-12">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-                        <div>
-                            <label class="text-detail">Meno</label>
-                            <input type="text" class="input-minimal" placeholder="Meno Priezvisko">
-                        </div>
-                        <div>
-                            <label class="text-detail">E-mail</label>
-                            <input type="email" class="input-minimal" placeholder="email@priklad.sk">
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="text-detail">Vaša správa</label>
-                        <textarea rows="4" class="input-minimal" placeholder="Povedzte nám o vašej predstave..."></textarea>
-                    </div>
+    <script>
+        setTimeout(() => {
+            document.getElementById('cookie-banner').classList.add('show');
+        }, 4000);
 
-                    <button class="btn-modern">
-                        Odoslať dopyt 🚀
-                    </button>
-                </form>
-            </div>
+        function hideCookies() {
+            // ⚡ Pattern vibrovania pre lepšiu kompatibilitu (krátky impulz)
+            if ("vibrate" in navigator) {
+                navigator.vibrate([15]);
+            }
+            document.getElementById('cookie-banner').classList.remove('show');
+        }
 
-            <div class="lg:col-span-4 lg:col-start-9 space-y-16">
-                <div>
-                    <h3 class="text-detail mb-6">Sídlo ateliéru 🏠</h3>
-                    <p class="text-xl leading-relaxed">
-                        1064 Calle Negocio suite E<br>
-                        San Clemente, CA 92673<br>
-                        United States
-                    </p>
-                </div>
+        function handleFinalTransition() {
+            const btn = document.getElementById('cosmos-btn');
+            const whiteScreen = document.getElementById('white-screen');
+            const logo = document.getElementById('logo-main');
+            const text = document.getElementById('text-main');
+            const foot = document.getElementById('footer-main');
+            const cookie = document.getElementById('cookie-banner');
 
-                <div>
-                    <h3 class="text-detail mb-6">Spojte sa s nami 📞</h3>
-                    <div class="space-y-2 text-xl">
-                        <p>+421 9XX XXX XXX</p>
-                        <p>m.vojtus@yahoo.com</p>
-                    </div>
-                </div>
+            // ⚡ Dvojitý pattern vibrácie pre dôležitý klik (vibrácia 30ms, pauza 10ms, vibrácia 30ms)
+            if ("vibrate" in navigator) {
+                navigator.vibrate([30, 10, 30]);
+            }
 
-                <div class="pt-8 border-t border-gray-100">
-                    <p class="text-detail mb-4">Podporte náš projekt</p>
-                    <div class="inline-flex items-center gap-2 p-4 bg-gray-50 rounded-lg">
-                        <span>💎</span>
-                        <span class="text-sm">Donate on Solana</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
+            logo.classList.add('hidden');
+            text.classList.add('hidden');
+            foot.classList.add('hidden');
+            cookie.classList.add('hidden');
+            btn.querySelector('h1').style.opacity = '0';
 
-    <footer class="p-12 md:p-24 border-t border-gray-50">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-8">
-            <p class="text-detail">
-                RenaEssence Dental Atelier ✨ Martin Vojtuš
-            </p>
-            <div class="flex gap-8 text-detail">
-                <a href="#">Instagram</a>
-                <a href="#">LinkedIn</a>
-                <a href="#">Behance</a>
-            </div>
-        </div>
-    </footer>
+            whiteScreen.style.opacity = "1";
+            btn.style.backgroundColor = "#e0e0e0";
+            btn.style.pointerEvents = "none";
 
+            setTimeout(() => {
+                btn.classList.add('loading-active');
+            }, 600);
+
+            setTimeout(() => {
+                window.location.replace("https://www.cosmos.so/martinvojtus");
+            }, 2300);
+        }
+    </script>
 </body>
 </html>
