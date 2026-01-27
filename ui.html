@@ -179,12 +179,18 @@
             position: fixed;
             left: 50%;
             bottom: 20px;
-            transform: translateX(-50%);
+            /* start slightly off / below so it "flies in" from the bottom */
+            transform: translateX(-50%) translateY(24px);
             max-width: 920px;
             width: calc(100% - 40px);
-            background: rgba(0,0,0,0.90);
-            color: #fff;
-            padding: 14px 16px;
+            /* inverted: white background with dark text */
+            background: #ffffff;
+            color: #0b0b0b;
+            /* Use the site's small font size to match typography */
+            font-size: var(--f-small);
+            /* Use padding derived from the site's gap variable so spacing matches */
+            padding: calc(var(--gap) * 1.75) calc(var(--gap) * 2);
+            /* visible rectangle with gentle rounded corners */
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -192,11 +198,16 @@
             z-index: 48; /* Below the main button (50) but above white-screen (45) */
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.25s ease, transform 0.2s ease;
-            box-shadow: 0 6px 24px rgba(0,0,0,0.35);
-            font-size: 0.95rem;
+            transition: opacity 0.32s cubic-bezier(0.2,0,0,1), transform 0.36s cubic-bezier(0.2,0,0,1);
+            box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+            /* ensure rectangular appearance (not pill-like) */
+            min-height: 56px;
+            /* removed outer border as requested */
+            font-weight: 400;
+            font-family: inherit;
         }
 
+        /* when shown, slide up into view from bottom edge */
         #cookie-banner.show {
             opacity: 1;
             pointer-events: auto;
@@ -206,6 +217,13 @@
         #cookie-banner .cookie-text {
             flex: 1 1 auto;
             line-height: 1.35;
+            color: inherit;
+        }
+
+        #cookie-banner .cookie-text a {
+            color: #0b0b0b;
+            text-decoration: underline;
+            margin-left: 8px;
         }
 
         #cookie-banner .cookie-actions {
@@ -217,22 +235,25 @@
 
         .cookie-btn {
             background: transparent;
-            border: 1px solid rgba(255,255,255,0.12);
-            color: #fff;
+            border: 1px solid rgba(0,0,0,0.12);
+            color: #0b0b0b;
             padding: 8px 12px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
+            /* match button text sizing with site small font */
+            font-size: var(--f-small);
         }
 
+        /* inverted accept: dark button with white text (emphasized) */
         .cookie-btn.accept {
-            background: #fff;
-            color: #000;
+            background: #0b0b0b;
+            color: #fff;
             border-color: transparent;
         }
 
         .cookie-btn:focus {
-            outline: 3px solid rgba(255,255,255,0.14);
+            outline: 3px solid rgba(11,11,11,0.14);
         }
 
         /* Prefer reduced motion — stop most animations/transitions */
@@ -240,7 +261,8 @@
             html, body { animation: none !important; }
             #frame, .logo-svg, .pill, .logo-text, footer { animation: none !important; transition: none !important; transform: none !important; }
             .loading-active .loading-fill { transition: none !important; width: 100% !important; }
-            #cookie-banner { transition: none !important; opacity: 1 !important; pointer-events: auto !important; }
+            /* keep banner visible without motion */
+            #cookie-banner { transition: none !important; opacity: 1 !important; pointer-events: auto !important; transform: translateX(-50%) translateY(0) !important; }
         }
     </style>
 </head>
@@ -266,8 +288,8 @@
     <!-- COOKIE / CONSENT BANNER -->
     <div id="cookie-banner" role="dialog" aria-live="polite" aria-label="Súhlas so spracovaním údajov" aria-hidden="true">
         <div class="cookie-text">
-            Používame cookies na zlepšenie zážitku a analytiku. Pokračovaním súhlasíte so spracovaním údajov. 
-            <a href="/privacy" style="color: #fff; text-decoration: underline; margin-left: 8px;">Viac informácií</a>
+            Používame cookies. Pokračovaním súhlasíte.
+            <a href="/privacy">Viac</a>
         </div>
         <div class="cookie-actions">
             <button class="cookie-btn accept" id="cookie-accept">Súhlasím</button>
