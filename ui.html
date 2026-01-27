@@ -14,10 +14,11 @@
             --f-big: 1.85rem;
             --f-small: 0.65rem;
             --gap: 8px;
-            /* Koncentrický rádius: 24px (polomer tlačidla) + 8px (gap) = 32px */
-            --radius-cookie-box: 32px; 
+            /* Matematika: 16px (polomer 32px tlačidla) + 8px (gap) = 24px */
+            --radius-cookie-box: 24px; 
         }
 
+        /* 🛠️ Core Reset */
         * { box-sizing: border-box; font-weight: 400 !important; -webkit-tap-highlight-color: transparent; }
 
         html, body {
@@ -62,7 +63,7 @@
             to { transform: scale(30); background-color: var(--bg-end); }
         }
 
-        /* --- 🎨 LOGO (60px) --- */
+        /* --- 🎨 LOGO (60px, 100% Fill) --- */
         .logo-svg {
             position: absolute; top: 50%; left: 50%; width: 60px; height: 60px;
             fill: #000; z-index: 40; opacity: 0;
@@ -147,11 +148,11 @@
         #cookie-banner.show { transform: translate(-50%, 0); }
 
         .cookie-text {
-            font-size: 0.6rem;
-            margin: 8px 0 12px 0;
+            font-size: var(--f-small);
+            margin: 4px 0 10px 0;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: #555;
+            color: #000;
         }
 
         .cookie-btns {
@@ -161,10 +162,10 @@
 
         .c-btn {
             flex: 1;
-            height: 48px;
+            height: 32px; /* Znížená výška tlačidiel */
             border-radius: var(--radius-pill);
             border: none;
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             cursor: pointer;
