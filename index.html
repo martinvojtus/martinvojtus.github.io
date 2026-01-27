@@ -3,127 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kontakt | Design Showcase</title>
+    <title>RenaEssence Dental Atelier ✨ Martin Vojtuš</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet">
     <style>
-        /* 🎨 Globálne nastavenia podľa tvojich preferencií */
-        body {
+        /* 🎨 Striktne 'regular' písmo pre celý web */
+        * {
             font-family: 'Inter', sans-serif;
-            font-weight: 400; /* Všetky písma sú regular */
-            background-color: #fcfcfc;
-            color: #1a1a1a;
+            font-weight: 400 !important;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* 📏 Úprava malých písiem z 0.55rem na viditeľnejšiu veľkosť */
-        .text-xs-custom {
-            font-size: 0.75rem; 
+        body {
+            background-color: #ffffff;
+            color: #111111;
         }
 
-        .contact-card {
-            background: #ffffff;
-            border: 1px solid #eaeaea;
-            transition: transform 0.2s ease;
+        /* 📏 Zväčšené malé písma pre lepšiu viditeľnosť (namiesto 0.55rem) */
+        .text-detail {
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            color: #666;
+            text-transform: uppercase;
         }
 
-        input, textarea {
-            border: 1px solid #d1d1d1;
-            padding: 0.75rem;
-            border-radius: 4px;
+        /* ✨ Moderný minimalistický input */
+        .input-minimal {
+            border: none;
+            border-bottom: 1px solid #e2e2e2;
+            padding: 1rem 0;
             width: 100%;
-            font-weight: 400;
+            transition: border-color 0.3s ease;
+            outline: none;
+            border-radius: 0;
         }
 
-        .btn-primary {
+        .input-minimal:focus {
+            border-bottom-color: #000;
+        }
+
+        /* 🔘 Solana-style tlačidlo s jemným efektom */
+        .btn-modern {
             background: #000;
             color: #fff;
-            padding: 0.75rem 1.5rem;
-            border-radius: 4px;
-            transition: opacity 0.2s;
+            padding: 1.25rem 2.5rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
         }
-        
-        .btn-primary:hover {
-            opacity: 0.8;
+
+        .btn-modern:hover {
+            background: #222;
+            transform: translateY(-2px);
+        }
+
+        .logo-box {
+            background: #000;
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
         }
     </style>
 </head>
-<body>
+<body class="antialiased">
 
-    <nav class="p-6 flex justify-between items-center border-b border-gray-100">
-        <div class="flex items-center gap-2">
-            <div class="font-normal text-lg flex items-center gap-2">
-                <span class="bg-black text-white p-1 px-2 rounded">MV</span>
-                <span class="hidden sm:inline">Martin Vojtuš</span>
-                <span class="sm:hidden text-xs-custom uppercase tracking-widest border-l pl-2">Design Showcase</span>
-            </div>
+    <header class="p-8 md:p-12 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <div class="logo-box">RE</div>
+            <span class="text-lg md:text-xl tracking-tight">
+                RenaEssence Dental Atelier
+            </span>
         </div>
-        <div class="flex gap-6 text-sm uppercase tracking-wider">
-            <a href="#" class="hover:underline">Domov</a>
-            <a href="#" class="hover:underline">Ateliér</a>
-            <a href="#" class="font-medium underline underline-offset-4">Kontakt</a>
-        </div>
-    </nav>
+        
+        <nav class="hidden md:flex gap-12 text-detail">
+            <a href="#" class="hover:text-black">Ateliér</a>
+            <a href="#" class="hover:text-black">Projekty</a>
+            <a href="#" class="text-black border-b border-black">Kontakt</a>
+        </nav>
+    </header>
 
-    <main class="max-w-6xl mx-auto py-16 px-6">
-        <div class="grid md:grid-cols-2 gap-16">
+    <main class="max-w-7xl mx-auto px-8 md:px-12 py-12 md:py-24">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
             
-            <section>
-                <h1 class="text-4xl mb-8">Napíšte nám ✉️</h1>
-                <form class="space-y-4">
-                    <div>
-                        <label class="block text-xs-custom uppercase mb-1">Meno a priezvisko</label>
-                        <input type="text" placeholder="Vaše meno">
+            <div class="lg:col-span-7">
+                <h1 class="text-5xl md:text-7xl mb-16 tracking-tighter">Kontaktujte nás ✉️</h1>
+                
+                <form class="space-y-12">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        <div>
+                            <label class="text-detail">Meno</label>
+                            <input type="text" class="input-minimal" placeholder="Meno Priezvisko">
+                        </div>
+                        <div>
+                            <label class="text-detail">E-mail</label>
+                            <input type="email" class="input-minimal" placeholder="email@priklad.sk">
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs-custom uppercase mb-1">Email</label>
-                        <input type="email" placeholder="vas@email.com">
-                    </div>
-                    <div>
-                        <label class="block text-xs-custom uppercase mb-1">Správa</label>
-                        <textarea rows="5" placeholder="Ako vám môžeme pomôcť?"></textarea>
-                    </div>
-                    <button type="submit" class="btn-primary w-full sm:w-auto">Odoslať správu 🚀</button>
-                </form>
-            </section>
-
-            <section class="flex flex-col justify-center">
-                <div class="contact-card p-8 rounded-lg shadow-sm">
-                    <h2 class="text-xl mb-6 font-normal">Kontaktné údaje 📞</h2>
                     
-                    <div class="space-y-6">
-                        <div class="flex items-start gap-4">
-                            <i class="fa-solid fa-location-dot mt-1 text-gray-500"></i>
-                            <div>
-                                <p class="text-xs-custom uppercase text-gray-500">Adresa</p>
-                                <p>1064 Calle Negocio suite E<br>San Clemente, CA 92673</p>
-                            </div>
-                        </div>
+                    <div>
+                        <label class="text-detail">Vaša správa</label>
+                        <textarea rows="4" class="input-minimal" placeholder="Povedzte nám o vašej predstave..."></textarea>
+                    </div>
 
-                        <div class="flex items-start gap-4">
-                            <i class="fa-solid fa-phone mt-1 text-gray-500"></i>
-                            <div>
-                                <p class="text-xs-custom uppercase text-gray-500">Telefón</p>
-                                <p>949-413-6689</p>
-                            </div>
-                        </div>
+                    <button class="btn-modern">
+                        Odoslať dopyt 🚀
+                    </button>
+                </form>
+            </div>
 
-                        <div class="flex items-start gap-4">
-                            <i class="fa-solid fa-envelope mt-1 text-gray-500"></i>
-                            <div>
-                                <p class="text-xs-custom uppercase text-gray-500">Email</p>
-                                <p>m.vojtus@yahoo.com</p>
-                            </div>
-                        </div>
+            <div class="lg:col-span-4 lg:col-start-9 space-y-16">
+                <div>
+                    <h3 class="text-detail mb-6">Sídlo ateliéru 🏠</h3>
+                    <p class="text-xl leading-relaxed">
+                        1064 Calle Negocio suite E<br>
+                        San Clemente, CA 92673<br>
+                        United States
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-detail mb-6">Spojte sa s nami 📞</h3>
+                    <div class="space-y-2 text-xl">
+                        <p>+421 9XX XXX XXX</p>
+                        <p>m.vojtus@yahoo.com</p>
                     </div>
                 </div>
-            </section>
+
+                <div class="pt-8 border-t border-gray-100">
+                    <p class="text-detail mb-4">Podporte náš projekt</p>
+                    <div class="inline-flex items-center gap-2 p-4 bg-gray-50 rounded-lg">
+                        <span>💎</span>
+                        <span class="text-sm">Donate on Solana</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
-    <footer class="mt-20 border-t border-gray-100 p-10 text-center">
-        <p class="text-xs-custom text-gray-400 uppercase tracking-widest">
-            © 2026 RenaEssence Dental Atelier ✨ Martin Vojtuš
-        </p>
+    <footer class="p-12 md:p-24 border-t border-gray-50">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+            <p class="text-detail">
+                RenaEssence Dental Atelier ✨ Martin Vojtuš
+            </p>
+            <div class="flex gap-8 text-detail">
+                <a href="#">Instagram</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">Behance</a>
+            </div>
+        </div>
     </footer>
 
 </body>
