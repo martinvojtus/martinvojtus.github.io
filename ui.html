@@ -184,8 +184,8 @@
             /* slightly narrower max width to avoid overly wide banner on large displays */
             max-width: 720px;
             width: calc(100% - 40px);
-            /* inverted: white background with dark text */
-            background: #ffffff;
+            /* changed to site gray */
+            background: var(--iphone-gray);
             color: #0b0b0b;
             /* Use the site's small font size to match typography */
             font-size: var(--f-small);
@@ -196,7 +196,8 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            z-index: 48; /* Below the main button (50) but above white-screen (45) */
+            /* put above nearly everything to avoid stacking issues in Safari */
+            z-index: 9999;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.32s cubic-bezier(0.2,0,0,1), transform 0.36s cubic-bezier(0.2,0,0,1);
@@ -208,6 +209,9 @@
             font-family: inherit;
             /* allow content to wrap nicely */
             flex-wrap: nowrap;
+            /* force GPU compositing in some Safari cases to avoid rendering bugs */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
 
         /* when shown, slide up into view from bottom edge */
@@ -243,26 +247,33 @@
 
         .cookie-btn {
             background: transparent;
-            border: 1px solid rgba(0,0,0,0.12);
+            /* removed border */
+            border: none;
             color: #0b0b0b;
-            padding: 8px 12px;
-            border-radius: 8px;
+            padding: 10px 14px;
+            border-radius: 999px; /* pill-shaped */
             cursor: pointer;
             font-weight: 600;
             /* match button text sizing with site small font */
             font-size: var(--f-small);
             white-space: nowrap;
+            min-height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* inverted accept: dark button with white text (emphasized) */
         .cookie-btn.accept {
             background: #0b0b0b;
             color: #fff;
-            border-color: transparent;
+            border: none;
         }
 
+        /* focus styling kept subtle for accessibility, no harsh rim */
         .cookie-btn:focus {
-            outline: 3px solid rgba(11,11,11,0.14);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(11,11,11,0.06);
         }
 
         /* Prefer reduced motion — stop most animations/transitions */
@@ -488,8 +499,12 @@
                 if (existing) return;
                 cookieBanner.classList.add('show');
                 cookieBanner.setAttribute('aria-hidden', 'false');
-                // move focus to Accept for keyboard users
-                cookieAccept.focus();
+                // move focus to Accept for keyboard users, but guard against focus exceptions (Safari)
+                try {
+                    cookieAccept.focus();
+                } catch (e) {
+                    // ignore focus errors (some Safari/private modes can throw)
+                }
             }
 
             cookieAccept.addEventListener('click', () => {
