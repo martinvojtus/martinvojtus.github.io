@@ -31,14 +31,14 @@
 
         @keyframes bodyDarken { to { background-color: var(--bg-end); } }
 
-        /* --- ⚪ BIELA PREKRÝVACIA VRSTVA (Nová) --- */
+        /* --- ⚪ BIELA PREKRÝVACIA VRSTVA --- */
         #white-screen {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
             background-color: #ffffff;
             opacity: 0;
-            z-index: 45; /* Medzi pôvodným webom a tlačidlom */
+            z-index: 100; /* Najvyššia vrstva pre finálny prechod */
             pointer-events: none;
             transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -112,7 +112,6 @@
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
-        /* --- 📥 TLAČIDLO S VYSOKÝM Z-INDEXOM --- */
         .pill {
             top: 50%;
             width: 340px;
@@ -127,7 +126,7 @@
             position: absolute;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: 50; /* Vždy nad bielou vrstvou */
+            z-index: 50; 
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
             transition: background-color 0.5s ease;
         }
@@ -166,6 +165,55 @@
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
         }
 
+        /* --- 🍪 COOKIE BANNER --- */
+        #cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translate(-50%, 100%);
+            width: 100%;
+            max-width: 400px;
+            background: #ffffff;
+            color: #000000;
+            padding: 20px;
+            border-radius: 24px 24px 0 0;
+            z-index: 60;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
+        }
+
+        #cookie-banner.show { transform: translate(-50%, 0); }
+
+        .cookie-text {
+            font-size: 0.75rem;
+            margin-bottom: 16px;
+            line-height: 1.4;
+            letter-spacing: 0.02em;
+        }
+
+        .cookie-btns {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .c-btn {
+            flex: 1;
+            height: 40px;
+            border-radius: var(--radius-pill);
+            border: none;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .c-btn:active { opacity: 0.7; }
+        .c-btn-accept { background: #000000; color: #ffffff; }
+        .c-btn-decline { background: #e0e0e0; color: #000000; }
+
         .hidden { opacity: 0 !important; }
     </style>
 </head>
@@ -188,25 +236,45 @@
 
     <footer id="footer-main" class="ui-element">Martin Vojtuš • 2026</footer>
 
+    <div id="cookie-banner">
+        <div class="cookie-text">
+            Tento web používa cookies na zlepšenie vášho digitálneho zážitku.
+        </div>
+        <div class="cookie-btns">
+            <button class="c-btn c-btn-decline" onclick="hideCookies()">Nesúhlasím</button>
+            <button class="c-btn c-btn-accept" onclick="hideCookies()">Súhlasím</button>
+        </div>
+    </div>
+
     <script>
+        // Zobrazenie cookies po skončení úvodných animácií
+        setTimeout(() => {
+            document.getElementById('cookie-banner').classList.add('show');
+        }, 4000);
+
+        function hideCookies() {
+            document.getElementById('cookie-banner').classList.remove('show');
+        }
+
         function handleFinalTransition() {
             const btn = document.getElementById('cosmos-btn');
             const whiteScreen = document.getElementById('white-screen');
             const logo = document.getElementById('logo-main');
             const text = document.getElementById('text-main');
             const foot = document.getElementById('footer-main');
+            const cookie = document.getElementById('cookie-banner');
 
-            // 1. Ostatné prvky plynule zmiznú
+            // 1. Ostatné prvky plynule zmiznú (vrátane cookies)
             logo.classList.add('hidden');
             text.classList.add('hidden');
             foot.classList.add('hidden');
+            cookie.classList.add('hidden');
             btn.querySelector('h1').style.opacity = '0';
 
             // 2. BIELA VRSTVA PREKRYJE CELÝ WEB
             whiteScreen.style.opacity = "1";
 
             // 3. TLAČIDLO ZMENÍ FARBU NA SIVÚ
-            // Keďže má btn z-index 50, zostane viditeľný nad bielou vrstvou
             btn.style.backgroundColor = "#e0e0e0";
             btn.style.pointerEvents = "none";
 
