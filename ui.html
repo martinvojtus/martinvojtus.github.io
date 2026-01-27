@@ -181,7 +181,8 @@
             bottom: 20px;
             /* start slightly off / below so it "flies in" from the bottom */
             transform: translateX(-50%) translateY(24px);
-            max-width: 920px;
+            /* slightly narrower max width to avoid overly wide banner on large displays */
+            max-width: 720px;
             width: calc(100% - 40px);
             /* inverted: white background with dark text */
             background: #ffffff;
@@ -205,6 +206,8 @@
             /* removed outer border as requested */
             font-weight: 400;
             font-family: inherit;
+            /* allow content to wrap nicely */
+            flex-wrap: nowrap;
         }
 
         /* when shown, slide up into view from bottom edge */
@@ -218,6 +221,11 @@
             flex: 1 1 auto;
             line-height: 1.35;
             color: inherit;
+            /* better wrapping and hyphenation for narrow screens */
+            text-align: left;
+            hyphens: auto;
+            word-break: break-word;
+            min-width: 0; /* allow flex children to shrink properly */
         }
 
         #cookie-banner .cookie-text a {
@@ -243,6 +251,7 @@
             font-weight: 600;
             /* match button text sizing with site small font */
             font-size: var(--f-small);
+            white-space: nowrap;
         }
 
         /* inverted accept: dark button with white text (emphasized) */
@@ -263,6 +272,70 @@
             .loading-active .loading-fill { transition: none !important; width: 100% !important; }
             /* keep banner visible without motion */
             #cookie-banner { transition: none !important; opacity: 1 !important; pointer-events: auto !important; transform: translateX(-50%) translateY(0) !important; }
+        }
+
+        /* --- RESPONSIVE ADJUSTMENTS FOR COOKIE BANNER --- */
+        /* On medium and small screens stack buttons under the text and improve wrapping */
+        @media (max-width: 720px) {
+            #cookie-banner {
+                max-width: 620px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            #cookie-banner {
+                /* make banner more compact horizontally */
+                width: calc(100% - 28px);
+                padding: 12px 14px;
+                gap: 10px;
+            }
+            #cookie-banner .cookie-text {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Mobile: stack content vertically, buttons full-width under the text */
+        @media (max-width: 460px) {
+            #cookie-banner {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: left;
+                width: calc(100% - 20px);
+                padding: 12px;
+                gap: 10px;
+                min-height: auto;
+            }
+
+            #cookie-banner .cookie-text {
+                /* ensure the text takes its own line and wraps nicely */
+                margin: 0;
+            }
+
+            #cookie-banner .cookie-actions {
+                display: flex;
+                width: 100%;
+                gap: 8px;
+                flex-direction: column;
+                align-items: stretch;
+                justify-content: center;
+                margin-top: 2px;
+            }
+
+            /* make buttons full width and slightly taller for easy tapping */
+            .cookie-btn {
+                width: 100%;
+                padding: 10px 12px;
+                text-align: center;
+                font-size: 0.85rem;
+            }
+
+            /* keep accept visually prominent but stacked below/after decline if desired */
+            .cookie-btn.accept {
+                order: 2;
+            }
+            .cookie-btn:not(.accept) {
+                order: 1;
+            }
         }
     </style>
 </head>
