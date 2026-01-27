@@ -174,11 +174,73 @@
             box-shadow: 0 0 0 5px rgba(255,255,255,0.08), 0 0 0 8px rgba(0,0,0,0.08) inset;
         }
 
+        /* --- COOKIE BANNER --- */
+        #cookie-banner {
+            position: fixed;
+            left: 50%;
+            bottom: 20px;
+            transform: translateX(-50%);
+            max-width: 920px;
+            width: calc(100% - 40px);
+            background: rgba(0,0,0,0.90);
+            color: #fff;
+            padding: 14px 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 48; /* Below the main button (50) but above white-screen (45) */
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.2s ease;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.35);
+            font-size: 0.95rem;
+        }
+
+        #cookie-banner.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        #cookie-banner .cookie-text {
+            flex: 1 1 auto;
+            line-height: 1.35;
+        }
+
+        #cookie-banner .cookie-actions {
+            display: flex;
+            gap: 8px;
+            flex: 0 0 auto;
+            align-items: center;
+        }
+
+        .cookie-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .cookie-btn.accept {
+            background: #fff;
+            color: #000;
+            border-color: transparent;
+        }
+
+        .cookie-btn:focus {
+            outline: 3px solid rgba(255,255,255,0.14);
+        }
+
         /* Prefer reduced motion — stop most animations/transitions */
         @media (prefers-reduced-motion: reduce) {
             html, body { animation: none !important; }
             #frame, .logo-svg, .pill, .logo-text, footer { animation: none !important; transition: none !important; transform: none !important; }
             .loading-active .loading-fill { transition: none !important; width: 100% !important; }
+            #cookie-banner { transition: none !important; opacity: 1 !important; pointer-events: auto !important; }
         }
     </style>
 </head>
@@ -201,6 +263,18 @@
 
     <footer id="footer-main" class="ui-element" aria-hidden="true">Martin Vojtuš • 2026</footer>
 
+    <!-- COOKIE / CONSENT BANNER -->
+    <div id="cookie-banner" role="dialog" aria-live="polite" aria-label="Súhlas so spracovaním údajov" aria-hidden="true">
+        <div class="cookie-text">
+            Používame cookies na zlepšenie zážitku a analytiku. Pokračovaním súhlasíte so spracovaním údajov. 
+            <a href="/privacy" style="color: #fff; text-decoration: underline; margin-left: 8px;">Viac informácií</a>
+        </div>
+        <div class="cookie-actions">
+            <button class="cookie-btn accept" id="cookie-accept">Súhlasím</button>
+            <button class="cookie-btn" id="cookie-decline">Nesúhlasím</button>
+        </div>
+    </div>
+
     <script>
         (function () {
             const btn = document.getElementById('cosmos-btn');
@@ -209,6 +283,11 @@
             const text = document.getElementById('text-main');
             const foot = document.getElementById('footer-main');
             const fill = document.getElementById('fill');
+
+            // cookie banner elements
+            const cookieBanner = document.getElementById('cookie-banner');
+            const cookieAccept = document.getElementById('cookie-accept');
+            const cookieDecline = document.getElementById('cookie-decline');
 
             // prevent double activation
             let triggered = false;
@@ -230,7 +309,6 @@
                 btn.querySelector('h1').style.opacity = '0';
 
                 // 2. BIELA VRSTVA PREKRYJE CELÝ WEB
-                // keep pointer-events none on whiteScreen so button remains interactive (z-index of button is higher)
                 whiteScreen.style.opacity = "1";
                 whiteScreen.setAttribute('aria-hidden', 'false');
 
@@ -244,12 +322,10 @@
                     btn.classList.add('loading-active');
                 }, 600));
 
-                // Fallback for reduced-motion users: if prefers-reduced-motion is set we don't wait unnecessary time
                 const redirectDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 600 : 2300;
 
                 // 5. PRESMEROVANIE
                 timeouts.push(setTimeout(() => {
-                    // use replace so history isn't polluted
                     window.location.replace("https://www.cosmos.so/martinvojtus");
                 }, redirectDelay));
             }
@@ -288,6 +364,63 @@
             // Provide a small, safe fallback that cleans up timers if page is hidden / unloaded
             window.addEventListener('pagehide', () => clearAllTimeouts());
             window.addEventListener('beforeunload', () => clearAllTimeouts());
+
+            // --- COOKIE BANNER LOGIC ---
+            const CONSENT_KEY = 'cookieConsent';
+
+            function setConsent(value) {
+                try {
+                    localStorage.setItem(CONSENT_KEY, value);
+                } catch (e) {
+                    // ignore storage errors
+                }
+                // also set a cookie as fallback
+                try {
+                    document.cookie = `cookieConsent=${value}; path=/; max-age=${60*60*24*365};`;
+                } catch (e) {}
+            }
+
+            function hideCookieBanner() {
+                cookieBanner.classList.remove('show');
+                cookieBanner.setAttribute('aria-hidden', 'true');
+            }
+
+            function showCookieBanner() {
+                // only show if not already decided
+                const existing = (() => {
+                    try { return localStorage.getItem(CONSENT_KEY); } catch (e) { return null; }
+                })();
+                if (existing) return;
+                cookieBanner.classList.add('show');
+                cookieBanner.setAttribute('aria-hidden', 'false');
+                // move focus to Accept for keyboard users
+                cookieAccept.focus();
+            }
+
+            cookieAccept.addEventListener('click', () => {
+                setConsent('accepted');
+                hideCookieBanner();
+            });
+
+            cookieDecline.addEventListener('click', () => {
+                setConsent('declined');
+                hideCookieBanner();
+            });
+
+            // allow Escape to close banner without choosing (keeps no-consent state)
+            cookieBanner.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    hideCookieBanner();
+                }
+            });
+
+            // Show banner after animations settle (respect reduced motion)
+            const bannerDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 600 : 3500;
+            // But if user already has consent, don't show
+            timeouts.push(setTimeout(showCookieBanner, bannerDelay));
+
+            // Clean up if page hides
+            window.addEventListener('pagehide', () => clearAllTimeouts());
         })();
     </script>
 </body>
