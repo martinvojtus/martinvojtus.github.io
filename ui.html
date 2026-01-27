@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Geometric Precision</title>
+    <title>Martin Vojtuš — Final Clean Transition</title>
     <style>
         :root {
             --bg-start: #ffffff;
@@ -14,11 +14,9 @@
             --f-big: 1.85rem;
             --f-small: 0.65rem;
             --gap: 8px;
-            /* Matematika: 16px (polomer 32px tlačidla) + 8px (gap) = 24px */
             --radius-cookie-box: 24px; 
         }
 
-        /* 🛠️ Core Reset */
         * { box-sizing: border-box; font-weight: 400 !important; -webkit-tap-highlight-color: transparent; }
 
         html, body {
@@ -36,7 +34,8 @@
         /* --- ⚪ BIELA PREKRÝVACIA VRSTVA --- */
         #white-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #ffffff; opacity: 0; z-index: 100;
+            background-color: #ffffff; opacity: 0; 
+            z-index: 100; /* Prekryje pozadie, frame a footer */
             pointer-events: none;
             transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -63,7 +62,7 @@
             to { transform: scale(30); background-color: var(--bg-end); }
         }
 
-        /* --- 🎨 LOGO (60px, 100% Fill) --- */
+        /* --- 🎨 LOGO (60px) --- */
         .logo-svg {
             position: absolute; top: 50%; left: 50%; width: 60px; height: 60px;
             fill: #000; z-index: 40; opacity: 0;
@@ -96,12 +95,13 @@
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
+        /* --- 📥 TLAČIDLO COSMOS (Opravený z-index) --- */
         .pill {
             top: 50%; width: 340px; height: 80px; border-radius: var(--radius-pill);
             display: flex; align-items: center; justify-content: center;
             background: var(--text-white); color: #000; border: none; cursor: pointer;
             overflow: hidden; position: absolute; left: 50%; transform: translate(-50%, -50%);
-            z-index: 50; 
+            z-index: 110; /* VYŠŠIE AKO WHITE-SCREEN (100) */
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
             transition: background-color 0.5s ease;
         }
@@ -127,51 +127,20 @@
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
         }
 
-        /* --- 🍪 GEOMETRIC COOKIE BOX --- */
+        /* --- 🍪 COOKIE BOX --- */
         #cookie-banner {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translate(-50%, 250px);
-            width: calc(100% - 40px);
-            max-width: 360px;
-            background: #ffffff;
-            color: #000000;
-            padding: var(--gap); 
-            border-radius: var(--radius-cookie-box);
-            z-index: 60;
-            text-align: center;
+            position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 250px);
+            width: calc(100% - 40px); max-width: 360px;
+            background: #ffffff; color: #000000; padding: var(--gap); 
+            border-radius: var(--radius-cookie-box); z-index: 60; text-align: center;
             transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s;
             box-shadow: 0 10px 40px rgba(0,0,0,0.4);
         }
 
         #cookie-banner.show { transform: translate(-50%, 0); }
-
-        .cookie-text {
-            font-size: var(--f-small);
-            margin: 4px 0 10px 0;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #000;
-        }
-
-        .cookie-btns {
-            display: flex;
-            gap: var(--gap);
-        }
-
-        .c-btn {
-            flex: 1;
-            height: 32px; /* Znížená výška tlačidiel */
-            border-radius: var(--radius-pill);
-            border: none;
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
+        .cookie-text { font-size: var(--f-small); margin: 4px 0 10px 0; text-transform: uppercase; letter-spacing: 0.05em; color: #000; }
+        .cookie-btns { display: flex; gap: var(--gap); }
+        .c-btn { flex: 1; height: 32px; border-radius: var(--radius-pill); border: none; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer; white-space: nowrap; }
         .c-btn-accept { background: #000000; color: #ffffff; }
         .c-btn-decline { background: #e0e0e0; color: #000000; }
 
@@ -221,20 +190,26 @@
             const foot = document.getElementById('footer-main');
             const cookie = document.getElementById('cookie-banner');
 
+            // 1. Ostatné prvky zmiznú
             logo.classList.add('hidden');
             text.classList.add('hidden');
             foot.classList.add('hidden');
             cookie.classList.add('hidden');
             btn.querySelector('h1').style.opacity = '0';
 
+            // 2. Biela vrstva prekryje pozadie (tlačidlo je nad ňou vďaka z-index 110)
             whiteScreen.style.opacity = "1";
+
+            // 3. Tlačidlo zosivie
             btn.style.backgroundColor = "#e0e0e0";
             btn.style.pointerEvents = "none";
 
+            // 4. Spustenie loading baru
             setTimeout(() => {
                 btn.classList.add('loading-active');
             }, 600);
 
+            // 5. Presmerovanie
             setTimeout(() => {
                 window.location.replace("https://www.cosmos.so/martinvojtus");
             }, 2300);
