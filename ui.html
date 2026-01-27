@@ -167,59 +167,128 @@
         }
 
         .hidden { opacity: 0 !important; }
+
+        /* Focus styles for keyboard users */
+        .pill:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 5px rgba(255,255,255,0.08), 0 0 0 8px rgba(0,0,0,0.08) inset;
+        }
+
+        /* Prefer reduced motion — stop most animations/transitions */
+        @media (prefers-reduced-motion: reduce) {
+            html, body { animation: none !important; }
+            #frame, .logo-svg, .pill, .logo-text, footer { animation: none !important; transition: none !important; transform: none !important; }
+            .loading-active .loading-fill { transition: none !important; width: 100% !important; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="white-screen"></div>
+    <div id="white-screen" aria-hidden="true"></div>
 
-    <div id="frame" class="iphone-frame"></div>
+    <div id="frame" class="iphone-frame" aria-hidden="true"></div>
 
-    <svg id="logo-main" class="logo-svg" viewBox="-234 -135 468 405" preserveAspectRatio="xMidYMid meet">
+    <svg id="logo-main" class="logo-svg" viewBox="-234 -135 468 405" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
         <path d="M 0,0 L 233.827, -135 L 233.827, 135 L 0, 270 L -233.827, 135 L -233.827, -135 Z" />
     </svg>
 
-    <div id="text-main" class="ui-element logo-text">MARTINVOJTUS</div>
+    <div id="text-main" class="ui-element logo-text" aria-hidden="true">MARTINVOJTUS</div>
     
-    <button id="cosmos-btn" class="ui-element pill" onclick="handleFinalTransition()">
-        <div class="loading-fill" id="fill"></div>
-        <h1>COSMOS</h1>
+    <button id="cosmos-btn" class="ui-element pill" aria-label="Open Cosmos" aria-busy="false" type="button">
+        <div class="loading-fill" id="fill" aria-hidden="true"></div>
+        <h1 role="presentation">COSMOS</h1>
     </button>
 
-    <footer id="footer-main" class="ui-element">Martin Vojtuš • 2026</footer>
+    <footer id="footer-main" class="ui-element" aria-hidden="true">Martin Vojtuš • 2026</footer>
 
     <script>
-        function handleFinalTransition() {
+        (function () {
             const btn = document.getElementById('cosmos-btn');
             const whiteScreen = document.getElementById('white-screen');
             const logo = document.getElementById('logo-main');
             const text = document.getElementById('text-main');
             const foot = document.getElementById('footer-main');
+            const fill = document.getElementById('fill');
 
-            // 1. Ostatné prvky plynule zmiznú
-            logo.classList.add('hidden');
-            text.classList.add('hidden');
-            foot.classList.add('hidden');
-            btn.querySelector('h1').style.opacity = '0';
+            // prevent double activation
+            let triggered = false;
+            let timeouts = [];
 
-            // 2. BIELA VRSTVA PREKRYJE CELÝ WEB
-            whiteScreen.style.opacity = "1";
+            function clearAllTimeouts() {
+                timeouts.forEach(t => clearTimeout(t));
+                timeouts = [];
+            }
 
-            // 3. TLAČIDLO ZMENÍ FARBU NA SIVÚ
-            // Keďže má btn z-index 50, zostane viditeľný nad bielou vrstvou
-            btn.style.backgroundColor = "#e0e0e0";
-            btn.style.pointerEvents = "none";
+            function handleFinalTransition() {
+                if (triggered) return;
+                triggered = true;
 
-            // 4. SPUSTENIE LOADING BARU PO RESETE
-            setTimeout(() => {
-                btn.classList.add('loading-active');
-            }, 600);
+                // 1. Ostatné prvky plynule zmiznú
+                logo.classList.add('hidden');
+                text.classList.add('hidden');
+                foot.classList.add('hidden');
+                btn.querySelector('h1').style.opacity = '0';
 
-            // 5. PRESMEROVANIE
-            setTimeout(() => {
-                window.location.replace("https://www.cosmos.so/martinvojtus");
-            }, 2300);
-        }
+                // 2. BIELA VRSTVA PREKRYJE CELÝ WEB
+                // keep pointer-events none on whiteScreen so button remains interactive (z-index of button is higher)
+                whiteScreen.style.opacity = "1";
+                whiteScreen.setAttribute('aria-hidden', 'false');
+
+                // 3. TLAČIDLO ZMENÍ FARBU NA SIVÚ
+                btn.style.backgroundColor = "#e0e0e0";
+                btn.style.pointerEvents = "none"; // disable further clicks
+                btn.setAttribute('aria-busy', 'true');
+
+                // 4. SPUSTENIE LOADING BARU PO RESETE
+                timeouts.push(setTimeout(() => {
+                    btn.classList.add('loading-active');
+                }, 600));
+
+                // Fallback for reduced-motion users: if prefers-reduced-motion is set we don't wait unnecessary time
+                const redirectDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 600 : 2300;
+
+                // 5. PRESMEROVANIE
+                timeouts.push(setTimeout(() => {
+                    // use replace so history isn't polluted
+                    window.location.replace("https://www.cosmos.so/martinvojtus");
+                }, redirectDelay));
+            }
+
+            // Keyboard accessibility: Space or Enter triggers the button
+            btn.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleFinalTransition();
+                }
+            });
+
+            // Also allow activation via click / pointer (debounced by the triggered guard)
+            btn.addEventListener('click', handleFinalTransition);
+
+            // Optional: if the user presses Escape before redirect, cancel the transition
+            document.addEventListener('keydown', (e) => {
+                if ((e.key === 'Escape' || e.key === 'Esc') && triggered) {
+                    // Cancel transition (only if we haven't redirected yet)
+                    clearAllTimeouts();
+                    triggered = false;
+                    // revert UI to previous state
+                    logo.classList.remove('hidden');
+                    text.classList.remove('hidden');
+                    foot.classList.remove('hidden');
+                    btn.querySelector('h1').style.opacity = '1';
+                    whiteScreen.style.opacity = "0";
+                    whiteScreen.setAttribute('aria-hidden', 'true');
+                    btn.style.backgroundColor = "var(--text-white)";
+                    btn.style.pointerEvents = "auto";
+                    btn.classList.remove('loading-active');
+                    btn.setAttribute('aria-busy', 'false');
+                }
+            });
+
+            // Provide a small, safe fallback that cleans up timers if page is hidden / unloaded
+            window.addEventListener('pagehide', () => clearAllTimeouts());
+            window.addEventListener('beforeunload', () => clearAllTimeouts());
+        })();
     </script>
 </body>
 </html>
