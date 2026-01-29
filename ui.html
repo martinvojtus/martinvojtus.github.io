@@ -7,9 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Jednotný font pre celý web */
             --font-main: 'Space Grotesk', sans-serif;
-            --size-header: 1.8rem;
+            --size-header: 1.5rem;
+            --size-title: 2.2rem;
             --size-body: 1rem;
         }
 
@@ -17,13 +17,13 @@
             margin: 0;
             padding: 0;
             font-family: var(--font-main);
-            font-weight: 400; /* Všetko v regular podľa požiadavky */
-            background-color: #ffffff;
+            font-weight: 400;
+            background-color: #ffffff; /* Čisto biele pozadie */
             color: #000000;
-            line-height: 1.6;
+            line-height: 1.4;
         }
 
-        /* 🧊 Ultra transparentný banner s matným sklom */
+        /* 🧊 Banner bez rámečkov s matným sklom */
         header {
             position: fixed;
             top: 0;
@@ -33,39 +33,57 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* Ešte transparentnejšie pozadie */
-            background: rgba(255, 255, 255, 0.3); 
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.2); 
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             z-index: 1000;
-            /* Nenápadná linka na oddelenie */
-            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
         }
 
         .logo {
             font-size: var(--size-header);
-            /* Mierne hrubšie (600), aby vyniklo, ale nie príliš */
-            font-weight: 600; 
-            letter-spacing: -0.03em;
-            margin: 0;
+            font-weight: 600;
+            letter-spacing: -0.02em;
         }
 
+        /* 📏 Hlavný obsah s upraveným odsadením */
         main {
-            padding: 100px 20px 50px;
+            padding: 90px 20px 50px; /* Znížené horné odsadenie */
             max-width: 800px;
             margin: 0 auto;
         }
 
-        p {
-            font-size: var(--size-body);
-            margin-bottom: 1.5rem;
-            color: #333;
+        h2 {
+            font-size: var(--size-title);
+            font-weight: 600;
+            margin-bottom: 10px;
+            letter-spacing: -0.03em;
         }
 
-        /* Demonštrácia obsahu pod bannerom */
-        .spacer {
-            height: 2000px;
-            background: linear-gradient(180deg, #ffffff 0%, #f9f9f9 100%);
+        .content-text {
+            font-size: var(--size-body);
+            max-width: 500px;
+            margin-bottom: 40px;
+        }
+
+        /* 🖼️ Foto placeholder 3:4 s jediným povoleným rámčekom */
+        .photo-container {
+            width: 100%;
+            max-width: 400px; /* Šírka podľa potreby */
+        }
+
+        .photo-frame {
+            width: 100%;
+            aspect-ratio: 3 / 4; /* Formát na výšku */
+            border: 1px solid #000000; /* Jediný povolený rámček */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fafafa;
+        }
+
+        .photo-label {
+            font-size: 0.9rem;
+            color: #666;
         }
     </style>
 </head>
@@ -76,15 +94,16 @@
     </header>
 
     <main>
-        <p>
-            Toto je tvoj nový vizuálny priestor. Použitý font Space Grotesk dodáva webu 
-            charakter bez toho, aby uberal na čitateľnosti. 
-        </p>
-        <p>
-            Banner hore je teraz ešte viac priehľadný, čo zvýrazňuje efekt rozmazania 
-            textu, ktorý pod ním prechádza pri scrollovaní.
-        </p>
-        <div class="spacer"></div>
+        <h2>Vybrané práce</h2>
+        <div class="content-text">
+            Zameriavam sa na vizuálnu tvorbu a priestorový dizajn. Tu nájdeš ukážky mojich najnovších projektov a experimentov.
+        </div>
+
+        <div class="photo-container">
+            <div class="photo-frame">
+                <span class="photo-label">foto_01.jpg [3:4]</span>
+            </div>
+        </div>
     </main>
 
 </body>
