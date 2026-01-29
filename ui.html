@@ -72,27 +72,30 @@
             margin-bottom: 30px;
         }
 
-        /* Rámček fotky - Čiernobiely + Radius */
+        /* Rámček a spracovanie obrazu */
         .photo-frame {
             width: 100%;
             aspect-ratio: 3 / 4;
-            /* Zmena pozadia na čierne pre B&W efekt */
-            background-color: var(--black); 
             border: 1px solid var(--black);
-            /* Pridaný jemný rádius */
-            border-radius: 12px; 
+            border-radius: 12px;
+            overflow: hidden;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden; /* Aby fotka nepretekala cez zaoblené rohy */
+            background-color: #f0f0f0; /* Záložné pozadie */
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Vyplní 3:4 bez deformácie */
+            filter: grayscale(100%); /* Čiernobiely efekt */
         }
 
         .photo-label {
+            display: block;
+            margin-top: 8px;
             font-size: var(--size-small);
             font-weight: 400;
-            /* Zmena farby textu na bielu pre kontrast */
-            color: var(--white); 
+            color: var(--black);
         }
 
         /* 🧱 Zarovnaný blok textu */
@@ -100,6 +103,7 @@
             font-size: var(--size-small);
             text-align: justify;
             hyphens: auto;
+            margin-top: 25px;
             margin-bottom: 50px;
         }
     </style>
@@ -115,8 +119,9 @@
 
         <div class="portrait-container">
             <div class="photo-frame">
-                <span class="photo-label">IMG_0606.jpeg</span>
+                <img src="IMG_0606.jpeg" alt="Portrait">
             </div>
+            <span class="photo-label">Portrait</span>
         </div>
 
         <div class="content-text">
