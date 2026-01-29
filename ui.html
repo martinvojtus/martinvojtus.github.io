@@ -7,13 +7,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* 📏 Striktne dve veľkosti fontu */
+            /* 📏 Striktne dve veľkosti fontu pre celý web */
             --size-large: 2.2rem;
             --size-small: 1rem;
             
-            /* ⚫⚪ Striktné farby */
             --black: #000000;
             --white: #ffffff;
+        }
+
+        html {
+            /* Zabraňuje mobilným prehliadačom meniť veľkosť písma pri otočení na šírku */
+            -webkit-text-size-adjust: 100%;
         }
 
         body {
@@ -29,7 +33,7 @@
             align-items: center;
         }
 
-        /* 🧊 Priesvitný banner s matným sklom */
+        /* 🧊 Banner s matným sklom */
         header {
             position: fixed;
             top: 0;
@@ -46,12 +50,12 @@
         }
 
         .logo {
+            /* Zjednotená malá veľkosť */
             font-size: var(--size-small);
             font-weight: 400;
             letter-spacing: 0.05em;
         }
 
-        /* 📏 Hlavný obsah */
         main {
             padding: 65px 20px 60px;
             width: 100%;
@@ -66,35 +70,31 @@
             letter-spacing: -0.04em;
         }
 
-        /* 🖼️ Kontajner na fotku */
+        /* 🖼️ Portrét 3:4 bez rámčeka */
         .portrait-container {
             width: 100%;
             margin-bottom: 30px;
         }
 
-        /* Rámček a spracovanie obrazu */
         .photo-frame {
             width: 100%;
             aspect-ratio: 3 / 4;
-            border: 1px solid var(--black);
-            border-radius: 12px;
+            border-radius: 12px; /* Zaoblenie zachované */
             overflow: hidden;
+            background-color: #f0f0f0;
             display: flex;
-            background-color: #f0f0f0; /* Záložné pozadie */
+            align-items: center;
+            justify-content: center;
+            text-align: center;
         }
 
         .photo-frame img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Vyplní 3:4 bez deformácie */
-            filter: grayscale(100%); /* Čiernobiely efekt */
-        }
-
-        .photo-label {
-            display: block;
-            margin-top: 8px;
+            object-fit: cover;
+            filter: grayscale(100%);
+            /* Formátovanie alt textu, ak sa obrázok nenačíta */
             font-size: var(--size-small);
-            font-weight: 400;
             color: var(--black);
         }
 
@@ -104,7 +104,6 @@
             text-align: justify;
             hyphens: auto;
             margin-top: 25px;
-            margin-bottom: 50px;
         }
     </style>
 </head>
@@ -121,7 +120,6 @@
             <div class="photo-frame">
                 <img src="IMG_0606.jpeg" alt="Portrait">
             </div>
-            <span class="photo-label">Portrait</span>
         </div>
 
         <div class="content-text">
