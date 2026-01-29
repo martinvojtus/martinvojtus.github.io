@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* 📏 Striktne dve veľkosti fontu (Nadpis zmenšený na 2.0rem) */
+            /* 📏 Striktne dve veľkosti fontu */
             --size-large: 2.0rem;
             --size-small: 1rem;
             
@@ -46,7 +46,6 @@
             position: relative;
         }
 
-        /* Klikateľné logo a názov */
         .logo-link {
             display: flex; align-items: center;
             text-decoration: none; color: inherit;
@@ -105,7 +104,7 @@
 
         /* 📏 Hlavný obsah */
         main {
-            padding: 65px 20px 60px;
+            padding: 65px 20px 40px;
             width: 100%; max-width: var(--content-width); 
             box-sizing: border-box;
         }
@@ -129,6 +128,36 @@
 
         .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
         .content-text p { margin-bottom: 1.5rem; }
+
+        /* 🦶 Pätička */
+        footer {
+            width: 100%; max-width: var(--content-width);
+            padding: 0 20px 60px; box-sizing: border-box;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        .footer-separator {
+            width: 100%; height: 1px;
+            background-color: var(--black);
+            opacity: 0.1; /* Extrémne jemný predel */
+            margin-bottom: 40px;
+        }
+
+        .footer-socials {
+            display: flex; gap: 24px; margin-bottom: 30px;
+        }
+
+        .footer-socials a svg {
+            width: 22px; height: 22px; fill: var(--black);
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-socials a:hover svg { opacity: 0.6; }
+
+        .footer-info {
+            font-size: var(--size-small);
+            opacity: 0.4; letter-spacing: 0.02em;
+        }
     </style>
 </head>
 <body>
@@ -145,7 +174,6 @@
                 </div>
                 <div class="logo-text">martinvojtus.space</div>
             </a>
-
             <div class="menu-toggle" id="menuToggle">
                 <div class="line"></div>
                 <div class="line"></div>
@@ -174,21 +202,34 @@
         </div>
     </nav>
 
-    <main id="main-content">
+    <main>
         <h2>My space</h2>
-
         <div class="portrait-container">
             <div class="photo-frame">
                 <img src="IMG_0072.jpeg" alt="Portrait">
             </div>
         </div>
-
         <div class="content-text">
             <p>A minimalist designer focused on functional beauty and clear communication.</p>
             <p>I believe that good design is as little design as possible. My approach is rooted in subtraction—removing the non-essential to reveal the core purpose of a product or brand.</p>
             <p>My work spans across UI/UX design, design systems, and art direction. I'm constantly exploring the intersection of technology and aesthetics.</p>
         </div>
     </main>
+
+    <footer>
+        <div class="footer-separator"></div>
+        <div class="footer-socials">
+            <a href="https://www.tiktok.com/@martinvojtus" target="_blank" aria-label="TikTok">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.09-1.47-.88-.64-1.61-1.47-2.11-2.43-.04 4.1-.03 8.21-.03 12.31 0 2.02-.78 4.12-2.45 5.3-1.61 1.2-3.88 1.48-5.74.83-1.81-.6-3.26-2.18-3.79-3.96-.58-1.89-.25-4.1.99-5.63 1.13-1.48 3-2.35 4.88-2.35.32 0 .64.02.95.07v4.14c-.31-.09-.64-.13-.96-.13-1.2 0-2.44.75-2.88 1.86-.43 1.01-.1 2.3.82 2.92.83.58 2.01.44 2.7-.27.46-.43.68-1.06.68-1.69.01-6.52.01-13.04.01-19.56z"/></svg>
+            </a>
+            <a href="https://www.cosmos.so/martinvojtus" target="_blank" aria-label="Cosmos">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v2h-2V7zm0 4h2v6h-2v-6z"/></svg>
+            </a>
+        </div>
+        <div class="footer-info">
+            build v1.0.0 © 2026
+        </div>
+    </footer>
 
     <script>
         const menuToggle = document.getElementById('menuToggle');
@@ -212,7 +253,6 @@
         document.addEventListener('click', (e) => {
             const isClickInsideMenu = navOverlay.contains(e.target);
             const isClickOnToggle = menuToggle.contains(e.target);
-            
             if (!isClickInsideMenu && !isClickOnToggle && navOverlay.classList.contains('active')) {
                 closeMenu();
             }
