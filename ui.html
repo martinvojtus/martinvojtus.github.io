@@ -61,21 +61,22 @@
             white-space: nowrap;
         }
 
-        /* ☰ Menu Toggle */
+        /* ☰ Menu Toggle (Upravené na tenšie čiary) */
         .menu-toggle {
-            width: 24px; height: 14px;
+            width: 24px; height: 12px; /* Mierne znížená výška pre lepšiu optiku tenších čiar */
             display: flex; flex-direction: column; justify-content: space-between;
             cursor: pointer; z-index: 2100;
         }
 
         .line {
-            width: 24px; height: 2px;
+            width: 24px; height: 1px; /* Zoštíhlené z 2px na 1px */
             background-color: var(--black);
             transition: transform 0.3s ease;
         }
 
-        .menu-toggle.active .line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-        .menu-toggle.active .line:nth-child(2) { transform: translateY(-6px) rotate(-45deg); }
+        /* Animácia do tvaru X */
+        .menu-toggle.active .line:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+        .menu-toggle.active .line:nth-child(2) { transform: translateY(-5.5px) rotate(-45deg); }
 
         /* 📜 Rolovacie Menu */
         .nav-overlay {
@@ -126,16 +127,20 @@
             margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1;
         }
 
+        /* 🖼️ Portrét (Upravený na 4:3) */
         .portrait-container { width: 100%; margin-bottom: 40px; }
         .photo-frame {
-            width: 100%; aspect-ratio: 1 / 1; border-radius: 12px;
+            width: 100%; aspect-ratio: 4 / 3; /* Zmenené z 1:1 na 4:3 */
+            border-radius: 12px;
             overflow: hidden; background-color: #f0f0f0;
             display: flex; align-items: center; justify-content: center;
         }
 
         .photo-frame img {
             width: 100%; height: 100%; object-fit: cover;
-            filter: grayscale(100%); font-size: var(--size-small); color: var(--black);
+            /* Zosvetlené o 50% (brightness 1.5) */
+            filter: grayscale(100%) brightness(1.5); 
+            font-size: var(--size-small); color: var(--black);
         }
 
         .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
@@ -146,43 +151,23 @@
         .form-group { margin-bottom: 25px; }
         
         .form-label {
-            display: block;
-            font-size: var(--size-small);
-            text-transform: uppercase;
-            font-weight: 600;
-            margin-bottom: 8px;
-            letter-spacing: 0.05em;
+            display: block; font-size: var(--size-small); text-transform: uppercase;
+            font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em;
         }
 
         .form-input, .form-textarea {
-            width: 100%;
-            border: none;
-            border-bottom: 1px solid var(--black);
-            background: transparent;
-            font-family: inherit;
-            font-size: var(--size-small);
-            padding: 10px 0;
-            color: var(--black);
-            outline: none;
-            border-radius: 0;
+            width: 100%; border: none; border-bottom: 1px solid var(--black);
+            background: transparent; font-family: inherit; font-size: var(--size-small);
+            padding: 10px 0; color: var(--black); outline: none; border-radius: 0;
         }
 
         .form-textarea { min-height: 80px; resize: vertical; }
 
         .submit-btn {
-            width: 100%;
-            background: var(--black);
-            color: var(--white);
-            border: none;
-            padding: 18px;
-            font-family: inherit;
-            font-size: var(--size-small);
-            text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: opacity 0.3s ease;
+            width: 100%; background: var(--black); color: var(--white);
+            border: none; padding: 18px; font-family: inherit; font-size: var(--size-small);
+            text-transform: uppercase; font-weight: 600; letter-spacing: 0.1em;
+            cursor: pointer; margin-top: 20px; transition: opacity 0.3s ease;
         }
 
         .submit-btn:hover { opacity: 0.8; }
@@ -195,17 +180,12 @@
         }
 
         .footer-separator {
-            width: 100%; height: 1px;
-            background-color: var(--black);
-            margin-bottom: 30px;
+            width: 100%; height: 1px; background-color: var(--black); margin-bottom: 30px;
         }
 
         .footer-info {
-            font-size: var(--size-small);
-            color: var(--black);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            text-align: center;
+            font-size: var(--size-small); color: var(--black);
+            text-transform: uppercase; letter-spacing: 0.1em; text-align: center;
         }
     </style>
 </head>
@@ -253,7 +233,7 @@
 
     <main>
         <div id="section-about" class="content-section active">
-            <h2>My space</h2>
+            <h2>My space.</h2>
             <div class="portrait-container">
                 <div class="photo-frame">
                     <img src="IMG_0072.jpeg" alt="Portrait">
@@ -272,21 +252,21 @@
                 <p>Have a project in mind? I'm currently available for new opportunities. Send me a message and let's discuss how we can create something meaningful.</p>
             </div>
             
-            <form class="contact-form">
+            <div class="contact-form">
                 <div class="form-group">
                     <label class="form-label">Name</label>
-                    <input type="text" class="form-input" placeholder="Charlie Harper">
+                    <input type="text" id="contact-name" class="form-input" placeholder="Charlie Harper">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Email</label>
-                    <input type="email" class="form-input" placeholder="charlie@example.com">
+                    <input type="email" id="contact-email" class="form-input" placeholder="charlie@example.com">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Message</label>
-                    <textarea class="form-textarea" placeholder="Tell me about your project…"></textarea>
+                    <textarea id="contact-message" class="form-textarea" placeholder="Tell me about your project…"></textarea>
                 </div>
-                <button type="submit" class="submit-btn">Send message</button>
-            </form>
+                <button type="button" class="submit-btn" onclick="sendMail()">Send message</button>
+            </div>
         </div>
     </main>
 
@@ -301,39 +281,27 @@
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
 
-        function toggleMenu() {
-            menuToggle.classList.toggle('active');
-            navOverlay.classList.toggle('active');
-        }
-
-        function closeMenu() {
-            menuToggle.classList.remove('active');
-            navOverlay.classList.remove('active');
-        }
+        function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
+        function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); }
 
         function showSection(sectionId) {
-            // Skryť všetky sekcie
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            // Zobraziť vybranú sekciu
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
             document.getElementById('section-' + sectionId).classList.add('active');
-            // Zavrieť menu a scrolovať hore
-            closeMenu();
-            window.scrollTo(0, 0);
+            closeMenu(); window.scrollTo(0, 0);
         }
 
-        menuToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleMenu();
-        });
+        function sendMail() {
+            const name = document.getElementById('contact-name').value;
+            const email = document.getElementById('contact-email').value;
+            const message = document.getElementById('contact-message').value;
+            const subject = encodeURIComponent("Contact from " + name);
+            const body = encodeURIComponent("Name: " + name + "\nEmail: " + email + "\n\nMessage:\n" + message);
+            window.location.href = `mailto:martinvojtus@icloud.com?subject=${subject}&body=${body}`;
+        }
 
+        menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
         document.addEventListener('click', (e) => {
-            const isClickInsideMenu = navOverlay.contains(e.target);
-            const isClickOnToggle = menuToggle.contains(e.target);
-            if (!isClickInsideMenu && !isClickOnToggle && navOverlay.classList.contains('active')) {
-                closeMenu();
-            }
+            if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu();
         });
     </script>
 
