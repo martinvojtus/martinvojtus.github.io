@@ -4,79 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>martinvojtus.space</title>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Londrina+Solid:wght@400;900&family=Inter:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --font-main: 'Quicksand', sans-serif;
-            --size-large: 2.5rem;   /* Veľký font pre nadpisy */
-            --size-small: 0.9rem;   /* Mierne zvýšený malý font pre čitateľnosť */
+            --font-header: 'Londrina Solid', cursive;
+            --font-body: 'Inter', sans-serif;
+            --size-large: 2.2rem;
+            --size-small: 1rem;
         }
 
         body {
             margin: 0;
             padding: 0;
-            font-family: var(--font-main);
-            font-weight: 400; /* Vždy regular */
-            background-color: #e0e0e0; /* Šedý podklad pre vyniknutie skla */
-            color: #1a1a1a;
-            line-height: 1.6;
+            font-family: var(--font-body);
+            font-weight: 400;
+            background-color: #ffffff; /* Čisto biele pozadie */
+            color: #000000;
+            line-height: 1.5;
         }
 
-        /* 🧊 Pevný banner s efektom matného skla */
+        /* 🧊 Fixný banner s vyššou transparentnosťou */
         header {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 80px;
+            height: 70px;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: rgba(255, 255, 255, 0.7); /* Priesvitná biela */
-            backdrop-filter: blur(15px);        /* Rozmazanie obsahu pod ním */
-            -webkit-backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.5); /* Zvýšená priesvitnosť */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        .logo {
+        h1.logo {
+            font-family: var(--font-header);
             font-size: var(--size-large);
-            color: black;
+            font-weight: 900; /* Hrubšie, ale nie príliš */
+            color: #000000;
             margin: 0;
-            letter-spacing: -1px;
+            text-transform: lowercase; /* Umeleckejší štýl */
+            letter-spacing: 0.5px;
         }
 
-        /* Testovací obsah pre scrollovanie */
         main {
             padding: 120px 20px 50px;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
-        p {
+        .content-text {
             font-size: var(--size-small);
-            margin-bottom: 2rem;
+            max-width: 600px;
         }
 
-        .section-title {
-            font-size: var(--size-large);
-            margin-top: 40px;
+        .placeholder-box {
+            height: 400px;
+            background: #f0f0f0;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ddd;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1 class="logo">martinvojtus.space 🚀</h1>
+        <h1 class="logo">martinvojtus.space</h1>
     </header>
 
     <main>
-        <h2 class="section-title">Vitaj v portfóliu</h2>
-        <p>Tento text slúži na ukážku toho, ako vyzerá menšie písmo na webe. Je nastavené tak, aby bolo dobre viditeľné a čitateľné.</p>
-        
-        <div style="height: 1500px; background: linear-gradient(to bottom, #e0e0e0, #a1a1a1);">
-            <p>Scrolluj nižšie, aby si videl, ako sa tento obsah rozmazáva pod bannerom...</p>
+        <div class="content-text">
+            Tento text reprezentuje základnú veľkosť písma. Je dostatočne veľký na to, aby bol dobre čitateľný na akomkoľvek zariadení, pričom zachováva čistotu bieleho pozadia.
         </div>
+        
+        <div class="placeholder-box">Miesto pre tvoje vizuálne diela</div>
+        <div class="placeholder-box">Miesto pre tvoje vizuálne diela</div>
+        <div class="placeholder-box">Miesto pre tvoje vizuálne diela</div>
     </main>
 
 </body>
