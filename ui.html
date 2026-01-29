@@ -16,7 +16,6 @@
         }
 
         html {
-            /* Zabraňuje mobilným prehliadačom meniť veľkosť písma pri otočení na šírku */
             -webkit-text-size-adjust: 100%;
         }
 
@@ -33,7 +32,7 @@
             align-items: center;
         }
 
-        /* 🧊 Banner s matným sklom */
+        /* 🧊 Banner s matným sklom a novým rozložením */
         header {
             position: fixed;
             top: 0;
@@ -41,19 +40,51 @@
             width: 100%;
             height: 50px;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
+            padding: 0 20px;
+            box-sizing: border-box;
             background: rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             z-index: 1000;
         }
 
-        .logo {
-            /* Zjednotená malá veľkosť */
+        /* Logo naľavo */
+        .header-left {
+            display: flex;
+            align-items: center;
+            width: 30px; /* Fixná šírka pre vyváženie */
+        }
+
+        .header-left svg {
+            height: 24px; /* Prispôsobená veľkosť aby nemenila výšku banneru */
+            width: auto;
+        }
+
+        /* Názov v strede */
+        .logo-text {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
             font-size: var(--size-small);
             font-weight: 400;
             letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        /* Kontakt napravo */
+        .header-right {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            width: 30px;
+        }
+
+        .contact-icon svg {
+            width: 20px;
+            height: 20px;
+            display: block;
         }
 
         main {
@@ -70,7 +101,7 @@
             letter-spacing: -0.04em;
         }
 
-        /* 🖼️ Portrét 3:4 bez rámčeka */
+        /* 🖼️ Portrét 3:4 bez rámčeka, so zaoblením */
         .portrait-container {
             width: 100%;
             margin-bottom: 30px;
@@ -79,13 +110,12 @@
         .photo-frame {
             width: 100%;
             aspect-ratio: 3 / 4;
-            border-radius: 12px; /* Zaoblenie zachované */
+            border-radius: 12px;
             overflow: hidden;
             background-color: #f0f0f0;
             display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
         }
 
         .photo-frame img {
@@ -93,7 +123,6 @@
             height: 100%;
             object-fit: cover;
             filter: grayscale(100%);
-            /* Formátovanie alt textu, ak sa obrázok nenačíta */
             font-size: var(--size-small);
             color: var(--black);
         }
@@ -110,7 +139,24 @@
 <body>
 
     <header>
-        <div class="logo">martinvojtus.space</div>
+        <div class="header-left">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2160 2160">
+                <g transform="translate(1080, 1080)">
+                  <path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="#000000" />
+                </g>
+            </svg>
+        </div>
+
+        <div class="logo-text">martinvojtus.space</div>
+
+        <div class="header-right">
+            <a href="mailto:tvoj@email.sk" class="contact-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M22 6L12 13L2 6" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+        </div>
     </header>
 
     <main>
