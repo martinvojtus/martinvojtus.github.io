@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* 📏 Len dve veľkosti fontu pre celý web */
+            /* 📏 Striktne dve veľkosti fontu */
             --size-large: 2.2rem;
             --size-small: 1rem;
             
@@ -19,7 +19,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Space Grotesk', sans-serif;
-            font-weight: 400;
+            font-weight: 400; /* Regular váha pre text */
             background-color: var(--white);
             color: var(--black);
             line-height: 1.5;
@@ -28,7 +28,7 @@
             align-items: center;
         }
 
-        /* 🧊 Banner s menším fontom a matným sklom */
+        /* 🧊 Priesvitný banner s matným sklom */
         header {
             position: fixed;
             top: 0;
@@ -45,45 +45,38 @@
         }
 
         .logo {
-            /* Použitá menšia veľkosť podľa zásady */
             font-size: var(--size-small);
             font-weight: 400;
             letter-spacing: 0.05em;
         }
 
-        /* 📏 Hlavný obsah */
+        /* 📏 Hlavný obsah s upraveným horným odstupom */
         main {
-            padding: 80px 20px 60px;
+            padding: 65px 20px 60px; /* Zmenšený odskok od banneru */
             width: 100%;
-            max-width: 600px; /* Obmedzená šírka pre mobil na šírku */
+            max-width: 600px; 
             box-sizing: border-box;
         }
 
         h2 {
             font-size: var(--size-large);
             font-weight: 600;
-            margin: 0 0 15px 0;
+            margin: 0 0 25px 0;
             letter-spacing: -0.04em;
         }
 
-        .content-text {
-            font-size: var(--size-small);
-            text-align: justify; /* Zarovnanie k obom okrajom */
-            hyphens: auto;
-            margin-bottom: 50px;
-        }
-
-        /* 🖼️ Foto 3:4 prispôsobivé šírke */
-        .photo-container {
+        /* 🖼️ Portrét 3:4 pod nadpisom */
+        .portrait-container {
             width: 100%;
-            max-width: 100%;
+            margin-bottom: 30px;
         }
 
         .photo-frame {
             width: 100%;
             aspect-ratio: 3 / 4;
-            border: 1px solid var(--black); /* Solid čierna */
+            border: 1px solid var(--black); /* Jediný povolený rámček */
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             background-color: var(--white);
@@ -91,7 +84,15 @@
 
         .photo-label {
             font-size: var(--size-small);
-            color: var(--black);
+            font-weight: 400;
+        }
+
+        /* 🧱 Zarovnaný blok textu pod obrázkom */
+        .content-text {
+            font-size: var(--size-small);
+            text-align: justify;
+            hyphens: auto;
+            margin-bottom: 50px;
         }
     </style>
 </head>
@@ -103,14 +104,15 @@
 
     <main>
         <h2>My space</h2>
-        <div class="content-text">
-            Tento text je teraz zarovnaný k obom okrajom, čo vytvára čistý blokový vizuál typický pre umelecké katalógy. Celý web využíva len dve definované veľkosti písma, čím dosahujeme maximálnu vizuálnu stabilitu. Pri otočení mobilu na šírku zostáva šírka textu obmedzená, aby sa zachovala jeho čitateľnosť a estetický dojem.
+
+        <div class="portrait-container">
+            <div class="photo-frame">
+                <span class="photo-label">portrait.jpg</span>
+            </div>
         </div>
 
-        <div class="photo-container">
-            <div class="photo-frame">
-                <span class="photo-label">foto_01.jpg</span>
-            </div>
+        <div class="content-text">
+            Tento text je teraz zarovnaný k obom okrajom, čo vytvára čistý blokový vizuál typický pre umelecké katalógy. Celý web využíva len dve definované veľkosti písma, čím dosahujeme maximálnu vizuálnu stabilitu. Pri otočení mobilu na šírku zostáva šírka textu obmedzená, aby sa zachovala jeho čitateľnosť a estetický dojem.
         </div>
     </main>
 
