@@ -11,6 +11,7 @@
             --size-large: 2.2rem;
             --size-small: 1rem;
             
+            /* ⚫⚪ Striktné farby */
             --black: #000000;
             --white: #ffffff;
         }
@@ -19,7 +20,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Space Grotesk', sans-serif;
-            font-weight: 400; /* Regular váha pre text */
+            font-weight: 400;
             background-color: var(--white);
             color: var(--black);
             line-height: 1.5;
@@ -50,9 +51,9 @@
             letter-spacing: 0.05em;
         }
 
-        /* 📏 Hlavný obsah s upraveným horným odstupom */
+        /* 📏 Hlavný obsah */
         main {
-            padding: 65px 20px 60px; /* Zmenšený odskok od banneru */
+            padding: 65px 20px 60px;
             width: 100%;
             max-width: 600px; 
             box-sizing: border-box;
@@ -65,29 +66,36 @@
             letter-spacing: -0.04em;
         }
 
-        /* 🖼️ Portrét 3:4 pod nadpisom */
+        /* 🖼️ Kontajner na fotku */
         .portrait-container {
             width: 100%;
             margin-bottom: 30px;
         }
 
+        /* Rámček fotky - Čiernobiely + Radius */
         .photo-frame {
             width: 100%;
             aspect-ratio: 3 / 4;
-            border: 1px solid var(--black); /* Jediný povolený rámček */
+            /* Zmena pozadia na čierne pre B&W efekt */
+            background-color: var(--black); 
+            border: 1px solid var(--black);
+            /* Pridaný jemný rádius */
+            border-radius: 12px; 
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background-color: var(--white);
+            overflow: hidden; /* Aby fotka nepretekala cez zaoblené rohy */
         }
 
         .photo-label {
             font-size: var(--size-small);
             font-weight: 400;
+            /* Zmena farby textu na bielu pre kontrast */
+            color: var(--white); 
         }
 
-        /* 🧱 Zarovnaný blok textu pod obrázkom */
+        /* 🧱 Zarovnaný blok textu */
         .content-text {
             font-size: var(--size-small);
             text-align: justify;
@@ -107,7 +115,7 @@
 
         <div class="portrait-container">
             <div class="photo-frame">
-                <span class="photo-label">portrait.jpg</span>
+                <span class="photo-label">IMG_0606.jpeg</span>
             </div>
         </div>
 
