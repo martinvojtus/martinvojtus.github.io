@@ -61,20 +61,19 @@
             white-space: nowrap;
         }
 
-        /* ☰ Menu Toggle (Upravené na tenšie čiary) */
+        /* ☰ Menu Toggle (Tenké čiary) */
         .menu-toggle {
-            width: 24px; height: 12px; /* Mierne znížená výška pre lepšiu optiku tenších čiar */
+            width: 24px; height: 12px;
             display: flex; flex-direction: column; justify-content: space-between;
             cursor: pointer; z-index: 2100;
         }
 
         .line {
-            width: 24px; height: 1px; /* Zoštíhlené z 2px na 1px */
+            width: 24px; height: 1px;
             background-color: var(--black);
             transition: transform 0.3s ease;
         }
 
-        /* Animácia do tvaru X */
         .menu-toggle.active .line:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
         .menu-toggle.active .line:nth-child(2) { transform: translateY(-5.5px) rotate(-45deg); }
 
@@ -127,10 +126,10 @@
             margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1;
         }
 
-        /* 🖼️ Portrét (Upravený na 4:3) */
+        /* 🖼️ Portrét (Upravený na 16:9) */
         .portrait-container { width: 100%; margin-bottom: 40px; }
         .photo-frame {
-            width: 100%; aspect-ratio: 4 / 3; /* Zmenené z 1:1 na 4:3 */
+            width: 100%; aspect-ratio: 16 / 9; /* Zmenené na 16:9 */
             border-radius: 12px;
             overflow: hidden; background-color: #f0f0f0;
             display: flex; align-items: center; justify-content: center;
@@ -138,8 +137,8 @@
 
         .photo-frame img {
             width: 100%; height: 100%; object-fit: cover;
-            /* Zosvetlené o 50% (brightness 1.5) */
-            filter: grayscale(100%) brightness(1.5); 
+            /* Vrátené na pôvodnú svetlosť (len grayscale) */
+            filter: grayscale(100%); 
             font-size: var(--size-small); color: var(--black);
         }
 
