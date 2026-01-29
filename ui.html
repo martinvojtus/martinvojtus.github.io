@@ -101,7 +101,7 @@
             letter-spacing: -0.04em;
         }
 
-        /* 🖼️ Portrét 1:1 */
+        /* 🖼️ Portrét 1:1 - Statický */
         .portrait-container {
             width: 100%;
             margin-bottom: 30px;
@@ -116,27 +116,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer; 
-            outline: none; /* Odstránenie predvoleného modrého rámu pri kliku */
-            -webkit-tap-highlight-color: transparent;
+            /* Odstránené interaktívne vlastnosti (cursor, outline, tap-highlight) */
         }
 
         .photo-frame img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            /* Trvalý čiernobiely filter */
             filter: grayscale(100%);
-            transition: filter 0.5s ease;
+            /* Odstránený transition */
             font-size: var(--size-small);
             color: var(--black);
         }
 
-        /* ✨ Farebný stav: Pri hoveri alebo keď je prvok aktívny/zaostrený */
-        .photo-frame:hover img,
-        .photo-frame:focus img,
-        .photo-frame:active img {
-            filter: grayscale(0%);
-        }
+        /* Odstránené bloky pre :hover, :focus a :active stavy */
 
         /* 🧱 Zarovnaný blok textu */
         .content-text {
@@ -173,7 +167,7 @@
         <h2>My space</h2>
 
         <div class="portrait-container">
-            <div class="photo-frame" tabindex="0">
+            <div class="photo-frame">
                 <img src="IMG_0072.jpeg" alt="Portrait">
             </div>
         </div>
