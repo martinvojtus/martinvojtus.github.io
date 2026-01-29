@@ -4,88 +4,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>martinvojtus.space</title>
-    <link href="https://fonts.googleapis.com/css2?family=Londrina+Solid:wght@400;900&family=Inter:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --font-header: 'Londrina Solid', cursive;
-            --font-body: 'Inter', sans-serif;
-            --size-large: 2.2rem;
-            --size-small: 1rem;
+            /* Jednotný font pre celý web */
+            --font-main: 'Space Grotesk', sans-serif;
+            --size-header: 1.8rem;
+            --size-body: 1rem;
         }
 
         body {
             margin: 0;
             padding: 0;
-            font-family: var(--font-body);
-            font-weight: 400;
-            background-color: #ffffff; /* Čisto biele pozadie */
+            font-family: var(--font-main);
+            font-weight: 400; /* Všetko v regular podľa požiadavky */
+            background-color: #ffffff;
             color: #000000;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
-        /* 🧊 Fixný banner s vyššou transparentnosťou */
+        /* 🧊 Ultra transparentný banner s matným sklom */
         header {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 70px;
+            height: 60px;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: rgba(255, 255, 255, 0.5); /* Zvýšená priesvitnosť */
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            /* Ešte transparentnejšie pozadie */
+            background: rgba(255, 255, 255, 0.3); 
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             z-index: 1000;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            /* Nenápadná linka na oddelenie */
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
         }
 
-        h1.logo {
-            font-family: var(--font-header);
-            font-size: var(--size-large);
-            font-weight: 900; /* Hrubšie, ale nie príliš */
-            color: #000000;
+        .logo {
+            font-size: var(--size-header);
+            /* Mierne hrubšie (600), aby vyniklo, ale nie príliš */
+            font-weight: 600; 
+            letter-spacing: -0.03em;
             margin: 0;
-            text-transform: lowercase; /* Umeleckejší štýl */
-            letter-spacing: 0.5px;
         }
 
         main {
-            padding: 120px 20px 50px;
-            max-width: 900px;
+            padding: 100px 20px 50px;
+            max-width: 800px;
             margin: 0 auto;
         }
 
-        .content-text {
-            font-size: var(--size-small);
-            max-width: 600px;
+        p {
+            font-size: var(--size-body);
+            margin-bottom: 1.5rem;
+            color: #333;
         }
 
-        .placeholder-box {
-            height: 400px;
-            background: #f0f0f0;
-            margin: 20px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #ddd;
+        /* Demonštrácia obsahu pod bannerom */
+        .spacer {
+            height: 2000px;
+            background: linear-gradient(180deg, #ffffff 0%, #f9f9f9 100%);
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1 class="logo">martinvojtus.space</h1>
+        <div class="logo">martinvojtus.space</div>
     </header>
 
     <main>
-        <div class="content-text">
-            Tento text reprezentuje základnú veľkosť písma. Je dostatočne veľký na to, aby bol dobre čitateľný na akomkoľvek zariadení, pričom zachováva čistotu bieleho pozadia.
-        </div>
-        
-        <div class="placeholder-box">Miesto pre tvoje vizuálne diela</div>
-        <div class="placeholder-box">Miesto pre tvoje vizuálne diela</div>
-        <div class="placeholder-box">Miesto pre tvoje vizuálne diela</div>
+        <p>
+            Toto je tvoj nový vizuálny priestor. Použitý font Space Grotesk dodáva webu 
+            charakter bez toho, aby uberal na čitateľnosti. 
+        </p>
+        <p>
+            Banner hore je teraz ešte viac priehľadný, čo zvýrazňuje efekt rozmazania 
+            textu, ktorý pod ním prechádza pri scrollovaní.
+        </p>
+        <div class="spacer"></div>
     </main>
 
 </body>
