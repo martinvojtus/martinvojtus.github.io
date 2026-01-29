@@ -14,6 +14,9 @@
             /* ⚫⚪ Striktné farby */
             --black: #000000;
             --white: #ffffff;
+            
+            /* 📐 Šírka obsahu */
+            --content-width: 600px;
         }
 
         html {
@@ -41,14 +44,24 @@
             width: 100%;
             height: 50px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            box-sizing: border-box;
+            justify-content: center; /* Centrovanie vnútorného obsahu */
             background: rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             z-index: 1000;
+        }
+
+        /* 📏 Kontajner vnútri banneru zladený s main */
+        .header-content {
+            width: 100%;
+            max-width: var(--content-width);
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-sizing: border-box;
+            position: relative;
         }
 
         .header-left {
@@ -90,7 +103,7 @@
         main {
             padding: 65px 20px 60px;
             width: 100%;
-            max-width: 600px; 
+            max-width: var(--content-width); 
             box-sizing: border-box;
         }
 
@@ -143,22 +156,24 @@
 <body>
 
     <header>
-        <div class="header-left">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2160 2160">
-                <g transform="translate(1080, 1080)">
-                  <path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="#000000" />
-                </g>
-            </svg>
-        </div>
-
-        <div class="logo-text">martinvojtus.space</div>
-
-        <div class="header-right">
-            <a href="mailto:martinvojtus@icloud.com" class="contact-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+        <div class="header-content">
+            <div class="header-left">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2160 2160">
+                    <g transform="translate(1080, 1080)">
+                      <path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="#000000" />
+                    </g>
                 </svg>
-            </a>
+            </div>
+
+            <div class="logo-text">martinvojtus.space</div>
+
+            <div class="header-right">
+                <a href="mailto:martinvojtus@icloud.com" class="contact-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                    </svg>
+                </a>
+            </div>
         </div>
     </header>
 
@@ -173,10 +188,8 @@
 
         <div class="content-text">
             <p>A minimalist designer focused on functional beauty and clear communication.</p>
-            
             <p>I believe that good design is as little design as possible. My approach is rooted in subtraction—removing the non-essential to reveal the core purpose of a product or brand.</p>
-            
-            <p>My work spans abcross UI/UX design, design systems, and art direction. I'm constantly exploring the intersection of technology and aesthetics.</p>
+            <p>My work spans across UI/UX design, design systems, and art direction. I'm constantly exploring the intersection of technology and aesthetics.</p>
         </div>
     </main>
 
