@@ -7,83 +7,91 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --font-main: 'Space Grotesk', sans-serif;
-            --size-header: 1.5rem;
-            --size-title: 2.2rem;
-            --size-body: 1rem;
+            /* 📏 Len dve veľkosti fontu pre celý web */
+            --size-large: 2.2rem;
+            --size-small: 1rem;
+            
+            --black: #000000;
+            --white: #ffffff;
         }
 
         body {
             margin: 0;
             padding: 0;
-            font-family: var(--font-main);
+            font-family: 'Space Grotesk', sans-serif;
             font-weight: 400;
-            background-color: #ffffff; /* Čisto biele pozadie */
-            color: #000000;
-            line-height: 1.4;
+            background-color: var(--white);
+            color: var(--black);
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        /* 🧊 Banner bez rámečkov s matným sklom */
+        /* 🧊 Banner s menším fontom a matným sklom */
         header {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 60px;
+            height: 50px;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: rgba(255, 255, 255, 0.2); 
+            background: rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             z-index: 1000;
         }
 
         .logo {
-            font-size: var(--size-header);
-            font-weight: 600;
-            letter-spacing: -0.02em;
+            /* Použitá menšia veľkosť podľa zásady */
+            font-size: var(--size-small);
+            font-weight: 400;
+            letter-spacing: 0.05em;
         }
 
-        /* 📏 Hlavný obsah s upraveným odsadením */
+        /* 📏 Hlavný obsah */
         main {
-            padding: 90px 20px 50px; /* Znížené horné odsadenie */
-            max-width: 800px;
-            margin: 0 auto;
+            padding: 80px 20px 60px;
+            width: 100%;
+            max-width: 600px; /* Obmedzená šírka pre mobil na šírku */
+            box-sizing: border-box;
         }
 
         h2 {
-            font-size: var(--size-title);
+            font-size: var(--size-large);
             font-weight: 600;
-            margin-bottom: 10px;
-            letter-spacing: -0.03em;
+            margin: 0 0 15px 0;
+            letter-spacing: -0.04em;
         }
 
         .content-text {
-            font-size: var(--size-body);
-            max-width: 500px;
-            margin-bottom: 40px;
+            font-size: var(--size-small);
+            text-align: justify; /* Zarovnanie k obom okrajom */
+            hyphens: auto;
+            margin-bottom: 50px;
         }
 
-        /* 🖼️ Foto placeholder 3:4 s jediným povoleným rámčekom */
+        /* 🖼️ Foto 3:4 prispôsobivé šírke */
         .photo-container {
             width: 100%;
-            max-width: 400px; /* Šírka podľa potreby */
+            max-width: 100%;
         }
 
         .photo-frame {
             width: 100%;
-            aspect-ratio: 3 / 4; /* Formát na výšku */
-            border: 1px solid #000000; /* Jediný povolený rámček */
+            aspect-ratio: 3 / 4;
+            border: 1px solid var(--black); /* Solid čierna */
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #fafafa;
+            background-color: var(--white);
         }
 
         .photo-label {
-            font-size: 0.9rem;
-            color: #666;
+            font-size: var(--size-small);
+            color: var(--black);
         }
     </style>
 </head>
@@ -94,14 +102,14 @@
     </header>
 
     <main>
-        <h2>Vybrané práce</h2>
+        <h2>My space</h2>
         <div class="content-text">
-            Zameriavam sa na vizuálnu tvorbu a priestorový dizajn. Tu nájdeš ukážky mojich najnovších projektov a experimentov.
+            Tento text je teraz zarovnaný k obom okrajom, čo vytvára čistý blokový vizuál typický pre umelecké katalógy. Celý web využíva len dve definované veľkosti písma, čím dosahujeme maximálnu vizuálnu stabilitu. Pri otočení mobilu na šírku zostáva šírka textu obmedzená, aby sa zachovala jeho čitateľnosť a estetický dojem.
         </div>
 
         <div class="photo-container">
             <div class="photo-frame">
-                <span class="photo-label">foto_01.jpg [3:4]</span>
+                <span class="photo-label">foto_01.jpg</span>
             </div>
         </div>
     </main>
