@@ -16,7 +16,7 @@
             --content-width: 600px;
         }
 
-        html { -webkit-text-size-adjust: 100%; }
+        html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
         body {
             margin: 0; padding: 0;
@@ -26,6 +26,7 @@
             color: var(--black);
             line-height: 1.5;
             display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh;
         }
 
         /* 🧊 Banner s matným sklom */
@@ -49,6 +50,7 @@
         .logo-link {
             display: flex; align-items: center;
             text-decoration: none; color: inherit;
+            cursor: pointer;
         }
 
         .header-left svg { height: 24px; width: auto; display: block; }
@@ -98,6 +100,7 @@
             text-decoration: none; color: var(--black);
             font-size: var(--size-small);
             display: flex; align-items: center; gap: 15px;
+            cursor: pointer;
         }
 
         .menu-link svg { width: 22px; height: 22px; fill: var(--black); }
@@ -107,6 +110,15 @@
             padding: 65px 20px 40px;
             width: 100%; max-width: var(--content-width); 
             box-sizing: border-box;
+            flex-grow: 1;
+        }
+
+        .content-section { display: none; animation: fadeIn 0.4s ease; }
+        .content-section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h2 {
@@ -129,7 +141,53 @@
         .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
         .content-text p { margin-bottom: 1.5rem; }
 
-        /* 🦶 Pätička v1.0.0 */
+        /* ✉️ Form styling */
+        .contact-form { margin-top: 30px; }
+        .form-group { margin-bottom: 25px; }
+        
+        .form-label {
+            display: block;
+            font-size: var(--size-small);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.05em;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid var(--black);
+            background: transparent;
+            font-family: inherit;
+            font-size: var(--size-small);
+            padding: 10px 0;
+            color: var(--black);
+            outline: none;
+            border-radius: 0;
+        }
+
+        .form-textarea { min-height: 80px; resize: vertical; }
+
+        .submit-btn {
+            width: 100%;
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            padding: 18px;
+            font-family: inherit;
+            font-size: var(--size-small);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: opacity 0.3s ease;
+        }
+
+        .submit-btn:hover { opacity: 0.8; }
+
+        /* 🦶 Pätička */
         footer {
             width: 100%; max-width: var(--content-width);
             padding: 0 20px 60px; box-sizing: border-box;
@@ -138,14 +196,14 @@
 
         .footer-separator {
             width: 100%; height: 1px;
-            background-color: var(--black); /* Plná čierna bez opacity */
+            background-color: var(--black);
             margin-bottom: 30px;
         }
 
         .footer-info {
             font-size: var(--size-small);
             color: var(--black);
-            text-transform: uppercase; /* Všetko veľkým písmom */
+            text-transform: uppercase;
             letter-spacing: 0.1em;
             text-align: center;
         }
@@ -155,7 +213,7 @@
 
     <header>
         <div class="header-content">
-            <a href="#" class="logo-link" onclick="closeMenu()">
+            <div class="logo-link" onclick="showSection('about')">
                 <div class="header-left">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080">
                         <g transform="translate(540, 540)">
@@ -164,7 +222,7 @@
                     </svg>
                 </div>
                 <div class="logo-text">martinvojtus.space</div>
-            </a>
+            </div>
             <div class="menu-toggle" id="menuToggle">
                 <div class="line"></div>
                 <div class="line"></div>
@@ -174,19 +232,19 @@
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
-            <a href="#" class="menu-link" onclick="closeMenu()">
+            <a class="menu-link" onclick="showSection('about')">
                 <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 <span>About</span>
             </a>
-            <a href="#" class="menu-link" onclick="closeMenu()">
+            <a class="menu-link" onclick="closeMenu()">
                 <svg viewBox="0 0 24 24"><path d="M4 4h7v7H4V4zm0 9h7v7H4v-7zm9-9h7v7h-7V4zm0 9h7v7h-7v-7z"/></svg>
                 <span>Work</span>
             </a>
-            <a href="#" class="menu-link" onclick="closeMenu()">
+            <a class="menu-link" onclick="closeMenu()">
                 <svg viewBox="0 0 24 24"><path d="M20 4h-3.17L15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/><circle cx="12" cy="12" r="3"/></svg>
                 <span>Amateur photography</span>
             </a>
-            <a href="mailto:martinvojtus@icloud.com" class="menu-link" onclick="closeMenu()">
+            <a class="menu-link" onclick="showSection('contact')">
                 <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z"/></svg>
                 <span>Contact</span>
             </a>
@@ -194,16 +252,41 @@
     </nav>
 
     <main>
-        <h2>My space</h2>
-        <div class="portrait-container">
-            <div class="photo-frame">
-                <img src="IMG_0072.jpeg" alt="Portrait">
+        <div id="section-about" class="content-section active">
+            <h2>My space</h2>
+            <div class="portrait-container">
+                <div class="photo-frame">
+                    <img src="IMG_0072.jpeg" alt="Portrait">
+                </div>
+            </div>
+            <div class="content-text">
+                <p>A minimalist designer focused on functional beauty and clear communication.</p>
+                <p>I believe that good design is as little design as possible. My approach is rooted in subtraction—removing the non-essential to reveal the core purpose of a product or brand.</p>
+                <p>My work spans across UI/UX design, design systems, and art direction. I'm constantly exploring the intersection of technology and aesthetics.</p>
             </div>
         </div>
-        <div class="content-text">
-            <p>A minimalist designer focused on functional beauty and clear communication.</p>
-            <p>I believe that good design is as little design as possible. My approach is rooted in subtraction—removing the non-essential to reveal the core purpose of a product or brand.</p>
-            <p>My work spans across UI/UX design, design systems, and art direction. I'm constantly exploring the intersection of technology and aesthetics.</p>
+
+        <div id="section-contact" class="content-section">
+            <h2>Let's work together.</h2>
+            <div class="content-text">
+                <p>Have a project in mind? I'm currently available for new opportunities. Send me a message and let's discuss how we can create something meaningful.</p>
+            </div>
+            
+            <form class="contact-form">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-input" placeholder="Charlie Harper">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" placeholder="charlie@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Message</label>
+                    <textarea class="form-textarea" placeholder="Tell me about your project…"></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Send message</button>
+            </form>
         </div>
     </main>
 
@@ -226,6 +309,18 @@
         function closeMenu() {
             menuToggle.classList.remove('active');
             navOverlay.classList.remove('active');
+        }
+
+        function showSection(sectionId) {
+            // Skryť všetky sekcie
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            // Zobraziť vybranú sekciu
+            document.getElementById('section-' + sectionId).classList.add('active');
+            // Zavrieť menu a scrolovať hore
+            closeMenu();
+            window.scrollTo(0, 0);
         }
 
         menuToggle.addEventListener('click', (e) => {
