@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* 📏 Striktne dve veľkosti fontu */
+            /* 📏 Striktne dve veľkosti fontu (Nadpis zmenšený na 2.0rem) */
             --size-large: 2.0rem;
             --size-small: 1rem;
             
@@ -46,15 +46,21 @@
             position: relative;
         }
 
+        /* Klikateľné logo a názov */
+        .logo-link {
+            display: flex; align-items: center;
+            text-decoration: none; color: inherit;
+        }
+
         .header-left svg { height: 24px; width: auto; display: block; }
 
         .logo-text {
             position: absolute; left: 50%; transform: translateX(-50%);
             font-size: var(--size-small); letter-spacing: 0.05em;
-            white-space: nowrap; pointer-events: none;
+            white-space: nowrap;
         }
 
-        /* ☰ Menu Toggle (Dve čiary) */
+        /* ☰ Menu Toggle */
         .menu-toggle {
             width: 24px; height: 14px;
             display: flex; flex-direction: column; justify-content: space-between;
@@ -67,11 +73,10 @@
             transition: transform 0.3s ease;
         }
 
-        /* Animácia do tvaru X */
         .menu-toggle.active .line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
         .menu-toggle.active .line:nth-child(2) { transform: translateY(-6px) rotate(-45deg); }
 
-        /* 📜 Rolovacie Menu - Matné sklo */
+        /* 📜 Rolovacie Menu */
         .nav-overlay {
             position: fixed; top: -100%; left: 0;
             width: 100%; 
@@ -81,7 +86,6 @@
             transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1);
             z-index: 1500; padding: 80px 0 40px 0;
             display: flex; flex-direction: column; align-items: center;
-            border-bottom: none;
         }
 
         .nav-overlay.active { top: 0; }
@@ -111,7 +115,6 @@
             margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1;
         }
 
-        /* 🖼️ Portrét 1:1 */
         .portrait-container { width: 100%; margin-bottom: 40px; }
         .photo-frame {
             width: 100%; aspect-ratio: 1 / 1; border-radius: 12px;
@@ -124,7 +127,6 @@
             filter: grayscale(100%); font-size: var(--size-small); color: var(--black);
         }
 
-        /* 🧱 Zarovnaný blok textu */
         .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
         .content-text p { margin-bottom: 1.5rem; }
     </style>
@@ -133,15 +135,16 @@
 
     <header>
         <div class="header-content">
-            <div class="header-left">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080">
-                    <g transform="translate(540, 540)">
-                        <path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="#000000" />
-                    </g>
-                </svg>
-            </div>
-
-            <div class="logo-text">martinvojtus.space</div>
+            <a href="#" class="logo-link" onclick="closeMenu()">
+                <div class="header-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080">
+                        <g transform="translate(540, 540)">
+                            <path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="#000000" />
+                        </g>
+                    </svg>
+                </div>
+                <div class="logo-text">martinvojtus.space</div>
+            </a>
 
             <div class="menu-toggle" id="menuToggle">
                 <div class="line"></div>
@@ -152,22 +155,26 @@
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
-            <a href="#" class="menu-link">
+            <a href="#" class="menu-link" onclick="closeMenu()">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <span>About</span>
+            </a>
+            <a href="#" class="menu-link" onclick="closeMenu()">
+                <svg viewBox="0 0 24 24"><path d="M4 4h7v7H4V4zm0 9h7v7H4v-7zm9-9h7v7h-7V4zm0 9h7v7h-7v-7z"/></svg>
+                <span>Work</span>
+            </a>
+            <a href="#" class="menu-link" onclick="closeMenu()">
                 <svg viewBox="0 0 24 24"><path d="M20 4h-3.17L15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/><circle cx="12" cy="12" r="3"/></svg>
                 <span>Amateur photography</span>
             </a>
-            <a href="#" class="menu-link">
-                <svg viewBox="0 0 24 24"><path d="M4 4h7v7H4V4zm0 9h7v7H4v-7zm9-9h7v7h-7V4zm0 9h7v7h-7v-7z"/></svg>
-                <span>Web templates gallery</span>
-            </a>
-            <a href="mailto:martinvojtus@icloud.com" class="menu-link">
+            <a href="mailto:martinvojtus@icloud.com" class="menu-link" onclick="closeMenu()">
                 <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z"/></svg>
                 <span>Contact</span>
             </a>
         </div>
     </nav>
 
-    <main>
+    <main id="main-content">
         <h2>My space</h2>
 
         <div class="portrait-container">
@@ -187,25 +194,27 @@
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
 
-        // Funkcia na prepínanie menu
         function toggleMenu() {
             menuToggle.classList.toggle('active');
             navOverlay.classList.toggle('active');
         }
 
-        // Kliknutie na hamburger tlačidlo
+        function closeMenu() {
+            menuToggle.classList.remove('active');
+            navOverlay.classList.remove('active');
+        }
+
         menuToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             toggleMenu();
         });
 
-        // Zatvorenie pri kliknutí kdekoľvek mimo menu
         document.addEventListener('click', (e) => {
             const isClickInsideMenu = navOverlay.contains(e.target);
             const isClickOnToggle = menuToggle.contains(e.target);
             
             if (!isClickInsideMenu && !isClickOnToggle && navOverlay.classList.contains('active')) {
-                toggleMenu();
+                closeMenu();
             }
         });
     </script>
