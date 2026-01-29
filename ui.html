@@ -17,7 +17,6 @@
         }
 
         html {
-            /* Stabilita fontu pri otočení mobilu */
             -webkit-text-size-adjust: 100%;
         }
 
@@ -52,7 +51,6 @@
             z-index: 1000;
         }
 
-        /* Logo naľavo */
         .header-left {
             display: flex;
             align-items: center;
@@ -64,7 +62,6 @@
             width: auto;
         }
 
-        /* Názov v strede */
         .logo-text {
             position: absolute;
             left: 50%;
@@ -75,7 +72,6 @@
             white-space: nowrap;
         }
 
-        /* Kontakt napravo */
         .header-right {
             display: flex;
             align-items: center;
@@ -120,8 +116,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Pridané pre lepšiu interakciu na mobiloch */
             cursor: pointer; 
+            outline: none; /* Odstránenie predvoleného modrého rámu pri kliku */
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -129,16 +125,15 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Predvolený stav: čiernobiely */
             filter: grayscale(100%);
-            /* Plynulý prechod pre filter trvajúci 0.5 sekundy */
             transition: filter 0.5s ease;
             font-size: var(--size-small);
             color: var(--black);
         }
 
-        /* ✨ Interakcia: Pri prejdení myšou alebo dotyku sa filter odstráni */
+        /* ✨ Farebný stav: Pri hoveri alebo keď je prvok aktívny/zaostrený */
         .photo-frame:hover img,
+        .photo-frame:focus img,
         .photo-frame:active img {
             filter: grayscale(0%);
         }
@@ -178,7 +173,7 @@
         <h2>My space</h2>
 
         <div class="portrait-container">
-            <div class="photo-frame">
+            <div class="photo-frame" tabindex="0">
                 <img src="IMG_0072.jpeg" alt="Portrait">
             </div>
         </div>
