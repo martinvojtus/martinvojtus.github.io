@@ -84,14 +84,15 @@
             white-space: nowrap;
         }
 
-        /* Kontajner pre ikony napravo */
+        /* Kontajner pre ikony napravo - teraz pre tri ikony */
         .header-right {
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 16px; /* Medzera medzi galériou a kontaktom */
+            gap: 16px; /* Medzera medzi ikonami */
         }
 
+        /* Všetky ikony majú rovnakú veľkosť a farbu */
         .nav-icon svg, .contact-icon svg {
             width: 24px;
             height: 24px;
@@ -170,7 +171,13 @@
             <div class="header-right">
                 <a href="#" class="nav-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path d="M4 4h7v7H4V4zm0 9h7v7H4v-7zm9-9h7v7h-7V4zm0 9h7v7h-7v-7z"/>
+                        <path d="M20 4h-3.17L15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </a>
+                <a href="#" class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                         <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-7 14H4v-4h9v4zm0-6H4v-4h9v4zm7 6h-5v-9h5v9zM4 8V6h16v2H4z"/>
                     </svg>
                 </a>
                 <a href="mailto:martinvojtus@icloud.com" class="contact-icon">
