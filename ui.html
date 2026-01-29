@@ -94,17 +94,19 @@
             box-sizing: border-box;
         }
 
+        /* Nadpisy využívajúce veľký font */
         h2 {
             font-size: var(--size-large);
             font-weight: 600;
             margin: 0 0 25px 0;
             letter-spacing: -0.04em;
+            line-height: 1.1;
         }
 
-        /* 🖼️ Portrét 1:1 - Statický */
+        /* 🖼️ Portrét 1:1 */
         .portrait-container {
             width: 100%;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
         .photo-frame {
@@ -116,28 +118,26 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Odstránené interaktívne vlastnosti (cursor, outline, tap-highlight) */
         }
 
         .photo-frame img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Trvalý čiernobiely filter */
             filter: grayscale(100%);
-            /* Odstránený transition */
             font-size: var(--size-small);
             color: var(--black);
         }
 
-        /* Odstránené bloky pre :hover, :focus a :active stavy */
-
-        /* 🧱 Zarovnaný blok textu */
+        /* 🧱 Zarovnaný blok textu využívajúci malý font */
         .content-text {
             font-size: var(--size-small);
             text-align: justify;
             hyphens: auto;
-            margin-top: 25px;
+        }
+
+        .content-text p {
+            margin-bottom: 1.5rem;
         }
     </style>
 </head>
@@ -172,8 +172,14 @@
             </div>
         </div>
 
+        <h2>A minimalist designer focused on functional beauty and clear communication.</h2>
+
         <div class="content-text">
-            Tento text je teraz zarovnaný k obom okrajom, čo vytvára čistý blokový vizuál typický pre umelecké katalógy. Celý web využíva len dve definované veľkosti písma, čím dosahujeme maximálnu vizuálnu stabilitu. Pri otočení mobilu na šírku zostáva šírka textu obmedzená, aby sa zachovala jeho čitateľnosť a estetický dojem.
+            <p>I believe that good design is as little design as possible. My approach is rooted in subtraction—removing the non-essential to reveal the core purpose of a product or brand.</p>
+            
+            <p>With over 5 years of experience in digital product design, I've had the privilege of working with startups and established brands to create digital experiences that are intuitive, accessible, and visually striking.</p>
+            
+            <p>My work spans across UI/UX design, design systems, and art direction. I'm constantly exploring the intersection of technology and aesthetics.</p>
         </div>
     </main>
 
