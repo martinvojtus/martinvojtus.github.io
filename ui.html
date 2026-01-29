@@ -272,18 +272,18 @@
                 <p>Have a project in mind? I'm currently available for new opportunities. Send me a message and let's discuss how we can create something meaningful.</p>
             </div>
             
-            <form action="https://formspree.io/f/martinvojtus@icloud.com" method="POST" class="contact-form">
+            <form class="contact-form">
                 <div class="form-group">
                     <label class="form-label">Name</label>
-                    <input type="text" name="name" class="form-input" placeholder="Charlie Harper" required>
+                    <input type="text" class="form-input" placeholder="Charlie Harper">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-input" placeholder="charlie@example.com" required>
+                    <input type="email" class="form-input" placeholder="charlie@example.com">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Message</label>
-                    <textarea name="message" class="form-textarea" placeholder="Tell me about your project…" required></textarea>
+                    <textarea class="form-textarea" placeholder="Tell me about your project…"></textarea>
                 </div>
                 <button type="submit" class="submit-btn">Send message</button>
             </form>
@@ -312,10 +312,13 @@
         }
 
         function showSection(sectionId) {
+            // Skryť všetky sekcie
             document.querySelectorAll('.content-section').forEach(section => {
                 section.classList.remove('active');
             });
+            // Zobraziť vybranú sekciu
             document.getElementById('section-' + sectionId).classList.add('active');
+            // Zavrieť menu a scrolovať hore
             closeMenu();
             window.scrollTo(0, 0);
         }
