@@ -7,13 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* 📏 Striktne dve veľkosti fontu */
             --size-large: 2.0rem;
             --size-small: 1rem;
-            
             --black: #000000;
             --white: #ffffff;
-            /* 📐 Zúžená šírka obsahu na 540px */
             --content-width: 540px;
         }
 
@@ -64,7 +61,7 @@
 
         .logo-text span { font-weight: 700; }
 
-        /* ☰ Menu Toggle (Tenké čiary 1px) */
+        /* ☰ Menu Toggle */
         .menu-toggle {
             width: 24px; height: 12px;
             display: flex; flex-direction: column; justify-content: space-between;
@@ -123,22 +120,15 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        h2 {
-            font-size: var(--size-large); font-weight: 600;
-            margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1;
-        }
-
-        /* 🖼️ Foto rámy */
-        .portrait-container { width: 100%; margin-bottom: 40px; }
+        /* 🖼️ Blokový systém */
+        .block-container { width: 100%; margin-bottom: 20px; position: relative; }
+        
         .photo-frame {
             width: 100%;
             border-radius: 12px; 
             overflow: hidden;
             background-color: #000000; 
             position: relative;
-            color: var(--white); 
-            font-size: var(--size-small);
-            letter-spacing: 0.05em;
             display: flex; align-items: center; justify-content: center;
         }
 
@@ -147,72 +137,56 @@
             filter: grayscale(100%); display: block;
         }
 
-        /* Galéria s gradientom (50% -> 100%) */
-        .gallery-link {
-            display: block; width: 100%; height: 100%; text-decoration: none;
-        }
-
-        .gallery-overlay {
+        .block-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, var(--black) 100%);
-            display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
-            padding-bottom: 10px; 
-            box-sizing: border-box;
-            color: var(--white); text-align: center;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.9) 100%);
+            display: flex; flex-direction: column; justify-content: flex-end;
+            padding: 30px; box-sizing: border-box;
+            color: var(--white);
         }
 
-        .gallery-title {
-            font-size: var(--size-large); font-weight: 600; line-height: 1; margin-bottom: 5px;
+        .block-title {
+            font-size: var(--size-large); font-weight: 700; line-height: 1.1; margin-bottom: 15px;
         }
-        .gallery-desc {
-            font-size: var(--size-small); font-weight: 400; opacity: 0.8;
+        
+        .block-text {
+            font-size: var(--size-small); font-weight: 400; opacity: 0.9;
+            text-align: justify; hyphens: auto;
         }
 
-        .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
-        .content-text p { margin-bottom: 1.5rem; }
+        .block-text p { margin: 0 0 10px 0; }
 
         /* ✉️ Form styling */
         .contact-form { margin-top: 30px; }
         .form-group { margin-bottom: 25px; }
-        
         .form-label {
             display: block; font-size: var(--size-small); text-transform: uppercase;
             font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em;
         }
-
         .form-input, .form-textarea {
             width: 100%; border: none; border-bottom: 1px solid var(--black);
             background: transparent; font-family: inherit; font-size: var(--size-small);
             padding: 10px 0; color: var(--black); outline: none; border-radius: 0;
         }
-
-        .form-textarea { min-height: 80px; resize: vertical; }
-
         .submit-btn {
             width: 100%; background: var(--black); color: var(--white);
             border: none; padding: 18px; font-family: inherit; font-size: var(--size-small);
             text-transform: uppercase; font-weight: 600; letter-spacing: 0.1em;
-            cursor: pointer; margin-top: 20px; transition: opacity 0.3s ease;
+            cursor: pointer; margin-top: 20px;
         }
-
-        .submit-btn:hover { opacity: 0.8; }
 
         /* 🦶 Pätička */
         footer {
             width: 100%; max-width: var(--content-width);
-            padding: 0 20px 30px;
+            padding: 40px 20px 30px; /* Zväčšený horný padding namiesto čiary */
             box-sizing: border-box;
             display: flex; flex-direction: column; align-items: center;
         }
 
-        .footer-separator {
-            width: 100%; height: 1px; background-color: var(--black);
-            margin-bottom: 15px;
-        }
-
         .footer-info {
             font-size: var(--size-small); color: var(--black);
-            text-transform: uppercase; letter-spacing: 0.1em; text-align: center;
+            letter-spacing: 0.02em; text-align: center;
+            /* Zrušené uppercase */
         }
     </style>
 </head>
@@ -239,44 +213,38 @@
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
-            <a class="menu-link" onclick="showSection('about')">
-                <span>About</span>
-            </a>
-            <a class="menu-link" onclick="closeMenu()">
-                <span>Work</span>
-            </a>
-            <a class="menu-link" onclick="showSection('photography')">
-                <span>iPhone photography</span>
-            </a>
-            <a class="menu-link" onclick="showSection('contact')">
-                <span>Contact</span>
-            </a>
+            <a class="menu-link" onclick="showSection('about')"><span>About</span></a>
+            <a class="menu-link" onclick="closeMenu()"><span>Work</span></a>
+            <a class="menu-link" onclick="showSection('photography')"><span>iPhone photography</span></a>
+            <a class="menu-link" onclick="showSection('contact')"><span>Contact</span></a>
         </div>
     </nav>
 
     <main>
         <div id="section-about" class="content-section active">
-            <h2>My space, my vision.</h2>
-            <div class="portrait-container">
+            <div class="block-container">
                 <div class="photo-frame" style="aspect-ratio: 3 / 4;">
-                    <img src="portrait.jpeg" alt="Portrait" onerror="this.style.display='none'; this.parentNode.textContent='Portrait';">
+                    <img src="portrait.jpeg" alt="Portrait" onerror="this.style.display='none';">
+                    <div class="block-overlay">
+                        <div class="block-title">My space, my vision.</div>
+                        <div class="block-text">
+                            <p>A minimalist designer focused on functional beauty and clear communication.</p>
+                            <p>Subtraction is my core method—removing the non-essential to reveal the purpose of every brand.</p>
+                            <p>Exploring the intersection of technology and aesthetics through UI/UX and art direction.</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="content-text">
-                <p>A minimalist designer focused on functional beauty and clear communication.</p>
-                <p>I believe that good design is as little design as possible. My approach is rooted in subtraction—removing the non-essential to reveal the core purpose of a product or brand.</p>
-                <p>My work spans across UI/UX design, design systems, and art direction. I'm constantly exploring the intersection of technology and aesthetics.</p>
             </div>
         </div>
 
         <div id="section-photography" class="content-section">
-            <div class="portrait-container">
+            <div class="block-container">
                 <div class="photo-frame" style="aspect-ratio: 3 / 4;">
-                    <a href="#" class="gallery-link">
+                    <a href="#" style="text-decoration: none; color: inherit; width: 100%; height: 100%;">
                         <img src="IMG_4850.jpeg" alt="iPhone Photography" onerror="this.style.display='none';">
-                        <div class="gallery-overlay">
-                            <span class="gallery-title">Gallery.</span>
-                            <span class="gallery-desc">World through my eyes.</span>
+                        <div class="block-overlay" style="align-items: center; justify-content: flex-end; text-align: center;">
+                            <div class="block-title" style="margin-bottom: 5px;">Gallery.</div>
+                            <div class="block-text" style="opacity: 0.8;">World through my eyes.</div>
                         </div>
                     </a>
                 </div>
@@ -284,33 +252,34 @@
         </div>
 
         <div id="section-contact" class="content-section">
-            <h2>Let's work together.</h2>
-            <div class="content-text">
-                <p>Have a project in mind? I'm currently available for new opportunities. Send me a message and let's discuss how we can create something meaningful.</p>
-            </div>
-            
-            <div class="contact-form">
-                <div class="form-group">
-                    <label class="form-label">Name</label>
-                    <input type="text" id="contact-name" class="form-input" placeholder="Charlie Harper">
+            <div class="block-container">
+                <div class="block-title" style="color: var(--black);">Let's work together.</div>
+                <div class="block-text" style="color: var(--black); margin-bottom: 30px;">
+                    Currently available for new opportunities. Send me a message and let's create something meaningful.
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" id="contact-email" class="form-input" placeholder="charlie@example.com">
+                
+                <div class="contact-form">
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input type="text" id="contact-name" class="form-input" placeholder="Charlie Harper">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="contact-email" class="form-input" placeholder="charlie@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea id="contact-message" class="form-textarea" placeholder="Tell me about your project…"></textarea>
+                    </div>
+                    <button type="button" class="submit-btn" onclick="sendMail()">Send message</button>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Message</label>
-                    <textarea id="contact-message" class="form-textarea" placeholder="Tell me about your project…"></textarea>
-                </div>
-                <button type="button" class="submit-btn" onclick="sendMail()">Send message</button>
             </div>
         </div>
     </main>
 
     <footer>
-        <div class="footer-separator"></div>
         <div class="footer-info">
-            build v1.1.5 • martin vojtus • 2026
+            build v1.1.6 • martin vojtus • 2026
         </div>
     </footer>
 
