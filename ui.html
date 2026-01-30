@@ -130,12 +130,12 @@
         /* 🖼️ Portrét (16:9, Zaoblené rohy, Fallback) */
         .portrait-container { width: 100%; margin-bottom: 40px; }
         .photo-frame {
-            width: 100%; aspect-ratio: 16 / 9; /* Zmenené na 16:9 */
-            border-radius: 12px; /* Vrátené zaoblenie */
+            width: 100%; aspect-ratio: 16 / 9; 
+            border-radius: 12px; 
             overflow: hidden;
-            background-color: #000000; /* Čierne pozadie pre fallback */
+            background-color: #000000; 
             display: flex; align-items: center; justify-content: center;
-            color: var(--white); /* Biela farba pre fallback text */
+            color: var(--white); 
             font-size: var(--size-small);
             letter-spacing: 0.05em;
         }
@@ -224,7 +224,7 @@
                 <svg viewBox="0 0 24 24"><path d="M4 4h7v7H4V4zm0 9h7v7H4v-7zm9-9h7v7h-7V4zm0 9h7v7h-7v-7z"/></svg>
                 <span>Work</span>
             </a>
-            <a class="menu-link" onclick="closeMenu()">
+            <a class="menu-link" onclick="showSection('photography')">
                 <svg viewBox="0 0 24 24"><path d="M20 4h-3.17L15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/><circle cx="12" cy="12" r="3"/></svg>
                 <span>Amateur photography</span>
             </a>
@@ -247,6 +247,20 @@
                 <p>A minimalist designer focused on functional beauty and clear communication.</p>
                 <p>I believe that good design is as little design as possible. My approach is rooted in subtraction—removing the non-essential to reveal the core purpose of a product or brand.</p>
                 <p>My work spans across UI/UX design, design systems, and art direction. I'm constantly exploring the intersection of technology and aesthetics.</p>
+            </div>
+        </div>
+
+        <div id="section-photography" class="content-section">
+            <h2>One tool for everything.</h2>
+            <div class="portrait-container">
+                <div class="photo-frame">
+                    <img src="IMG_4850.jpeg" alt="Photography" onerror="this.style.display='none'; this.parentNode.textContent='Photo';">
+                </div>
+            </div>
+            <div class="content-text">
+                <p>Just point and shoot. That simple. No further editing. Capture the moment as it is.</p>
+                <p>Post-processing on the iPhone captures the most realistic version of whatever you're shooting.</p>
+                <p>No SLR. No extra weight. No problem.</p>
             </div>
         </div>
 
@@ -277,7 +291,7 @@
     <footer>
         <div class="footer-separator"></div>
         <div class="footer-info">
-            build v1.0.1 • martin vojtus • 2026
+            build v1.0.2 • martin vojtus • 2026
         </div>
     </footer>
 
