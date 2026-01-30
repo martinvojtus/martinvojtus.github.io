@@ -102,8 +102,8 @@
             font-size: var(--size-small);
             display: flex; align-items: center;
             cursor: pointer;
-            text-transform: uppercase; /* Voliteľné pre extra čistý vzhľad */
-            letter-spacing: 0.05em;
+            /* Odstránené text-transform: uppercase pre "arty" vzhľad */
+            letter-spacing: 0.02em;
         }
 
         /* 📏 Hlavný obsah */
@@ -127,10 +127,10 @@
             margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1;
         }
 
-        /* 🖼️ Portrét (3:4, Zaoblené rohy, Fallback centering) */
+        /* 🖼️ Portrét (Zaoblené rohy, Fallback centering) */
         .portrait-container { width: 100%; margin-bottom: 40px; }
         .photo-frame {
-            width: 100%; aspect-ratio: 16 / 9; 
+            width: 100%;
             border-radius: 12px; 
             overflow: hidden;
             background-color: #000000; 
@@ -271,7 +271,7 @@
         <div id="section-photography" class="content-section">
             <h2>One tool for everything.</h2>
             <div class="portrait-container">
-                <div class="photo-frame">
+                <div class="photo-frame" style="aspect-ratio: 16 / 9;">
                     <a href="#" class="gallery-link">
                         <img src="IMG_4850.jpeg" alt="Photography" onerror="this.style.display='none';">
                         <div class="gallery-overlay">
@@ -315,7 +315,7 @@
     <footer>
         <div class="footer-separator"></div>
         <div class="footer-info">
-            build v1.0.6 • martin vojtus • 2026
+            build v1.0.7 • martin vojtus • 2026
         </div>
     </footer>
 
