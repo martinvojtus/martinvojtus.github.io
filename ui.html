@@ -30,18 +30,20 @@
             min-height: 100vh;
         }
 
-        /* 🧊 Banner s matným sklom - UPDATED: Vyššia opacita a väčší blur pre lepší kontrast */
-        header {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 50px;
-            display: flex; justify-content: center;
-            background: rgba(255, 255, 255, 0.6); /* Zmenené z 0.3 na 0.6 */
-            backdrop-filter: blur(30px); /* Zmenené z 15px na 30px */
+        /* 🧊 Spoločný štýl pre bannery (Header & Footer) */
+        header, footer {
+            position: fixed; left: 0; width: 100%; height: 50px;
+            display: flex; justify-content: center; align-items: center;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             z-index: 2000;
         }
 
-        .header-content {
+        header { top: 0; }
+        footer { bottom: 0; }
+
+        .banner-content {
             width: 100%; max-width: var(--content-width);
             height: 100%; display: flex; justify-content: space-between;
             align-items: center; padding: 0 20px; box-sizing: border-box;
@@ -62,10 +64,9 @@
             white-space: nowrap;
         }
 
-        /* 🖋️ Moja voľba: martinvojtus zjednotené v Bold 700 */
         .logo-text span { font-weight: 700; }
 
-        /* ☰ Menu Toggle (Tenké čiary 1px) */
+        /* ☰ Menu Toggle */
         .menu-toggle {
             width: 24px; height: 12px;
             display: flex; flex-direction: column; justify-content: space-between;
@@ -81,12 +82,12 @@
         .menu-toggle.active .line:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
         .menu-toggle.active .line:nth-child(2) { transform: translateY(-5.5px) rotate(-45deg); }
 
-        /* 📜 Rolovacie Menu - UPDATED: Vyššia opacita a väčší blur */
+        /* 📜 Rolovacie Menu */
         .nav-overlay {
             position: fixed; top: -100%; left: 0;
             width: 100%; 
-            background: rgba(255, 255, 255, 0.6); /* Zmenené z 0.3 na 0.6 */
-            backdrop-filter: blur(30px); /* Zmenené z 15px na 30px */
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1);
             z-index: 1500; padding: 80px 0 40px 0;
@@ -108,9 +109,9 @@
             letter-spacing: 0.02em;
         }
 
-        /* 📏 Hlavný obsah */
+        /* 📏 Hlavný obsah (Padding kvôli fixným bannerom) */
         main {
-            padding: 65px 20px 20px;
+            padding: 70px 20px;
             width: 100%; max-width: var(--content-width); 
             box-sizing: border-box;
             flex-grow: 1;
@@ -124,15 +125,10 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        h2 {
-            font-size: var(--size-large); font-weight: 600;
-            margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1;
-        }
-
-        /* 🖼️ Portrét (3:4, Zaoblené rohy) */
-        .portrait-container { width: 100%; margin-bottom: 40px; }
+        /* 🖼️ Portréty */
+        .portrait-container { width: 100%; margin-bottom: 20px; }
         .photo-frame {
-            width: 100%; aspect-ratio: 3 / 4;
+            width: 100%;
             border-radius: 12px; 
             overflow: hidden;
             background-color: #000000; 
@@ -148,7 +144,7 @@
             filter: grayscale(100%); display: block;
         }
 
-        /* Galéria s gradientom (50% -> 100%) */
+        /* Galéria s textom vo vnútri (Ponechané) */
         .gallery-link {
             display: block; width: 100%; height: 100%; text-decoration: none;
         }
@@ -169,11 +165,8 @@
             font-size: var(--size-small); font-weight: 400; opacity: 0.8;
         }
 
-        .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
-        .content-text p { margin-bottom: 1.5rem; }
-
         /* ✉️ Form styling */
-        .contact-form { margin-top: 30px; }
+        .contact-form { margin-top: 10px; }
         .form-group { margin-bottom: 25px; }
         
         .form-label {
@@ -193,34 +186,22 @@
             width: 100%; background: var(--black); color: var(--white);
             border: none; padding: 18px; font-family: inherit; font-size: var(--size-small);
             text-transform: uppercase; font-weight: 600; letter-spacing: 0.1em;
-            cursor: pointer; margin-top: 20px; transition: opacity 0.3s ease;
+            cursor: pointer; margin-top: 10px; transition: opacity 0.3s ease;
         }
 
         .submit-btn:hover { opacity: 0.8; }
 
-        /* 🦶 Pätička */
-        footer {
-            width: 100%; max-width: var(--content-width);
-            padding: 0 20px 30px;
-            box-sizing: border-box;
-            display: flex; flex-direction: column; align-items: center;
-        }
-
-        .footer-separator {
-            width: 100%; height: 1px; background-color: var(--black);
-            margin-bottom: 15px;
-        }
-
+        /* 🦶 Pätička štýlovaná ako Header */
         .footer-info {
             font-size: var(--size-small); color: var(--black);
-            text-transform: uppercase; letter-spacing: 0.1em; text-align: center;
+            letter-spacing: 0.05em; text-align: center;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="header-content">
+        <div class="banner-content">
             <div class="logo-link" onclick="showSection('about')">
                 <div class="header-left">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080">
@@ -240,38 +221,23 @@
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
-            <a class="menu-link" onclick="showSection('about')">
-                <span>About</span>
-            </a>
-            <a class="menu-link" onclick="closeMenu()">
-                <span>Work</span>
-            </a>
-            <a class="menu-link" onclick="showSection('photography')">
-                <span>Amateur photography</span>
-            </a>
-            <a class="menu-link" onclick="showSection('contact')">
-                <span>Contact</span>
-            </a>
+            <a class="menu-link" onclick="showSection('about')"><span>About</span></a>
+            <a class="menu-link" onclick="closeMenu()"><span>Work</span></a>
+            <a class="menu-link" onclick="showSection('photography')"><span>Amateur photography</span></a>
+            <a class="menu-link" onclick="showSection('contact')"><span>Contact</span></a>
         </div>
     </nav>
 
     <main>
         <div id="section-about" class="content-section active">
-            <h2>My space, my vision.</h2>
             <div class="portrait-container">
-                <div class="photo-frame">
+                <div class="photo-frame" style="aspect-ratio: 3 / 4;">
                     <img src="portrait.jpeg" alt="Portrait" onerror="this.style.display='none'; this.parentNode.textContent='Portrait';">
                 </div>
-            </div>
-            <div class="content-text">
-                <p>A minimalist designer focused on functional beauty and clear communication.</p>
-                <p>I believe that good design is as little design as possible. My approach is rooted in subtraction—removing the non-essential to reveal the core purpose of a product or brand.</p>
-                <p>My work spans across UI/UX design, design systems, and art direction. I'm constantly exploring the intersection of technology and aesthetics.</p>
             </div>
         </div>
 
         <div id="section-photography" class="content-section">
-            <h2>One tool for everything.</h2>
             <div class="portrait-container">
                 <div class="photo-frame" style="aspect-ratio: 16 / 9;">
                     <a href="#" class="gallery-link">
@@ -283,19 +249,9 @@
                     </a>
                 </div>
             </div>
-            <div class="content-text">
-                <p>Just point and shoot. That simple. No further editing. Capture the moment as it is.</p>
-                <p>Post-processing on the iPhone captures the most realistic version of whatever you're shooting.</p>
-                <p>No SLR. No extra weight. No problem.</p>
-            </div>
         </div>
 
         <div id="section-contact" class="content-section">
-            <h2>Let's work together.</h2>
-            <div class="content-text">
-                <p>Have a project in mind? I'm currently available for new opportunities. Send me a message and let's discuss how we can create something meaningful.</p>
-            </div>
-            
             <div class="contact-form">
                 <div class="form-group">
                     <label class="form-label">Name</label>
@@ -315,9 +271,10 @@
     </main>
 
     <footer>
-        <div class="footer-separator"></div>
-        <div class="footer-info">
-            build v1.1.4 • martin vojtus • 2026
+        <div class="banner-content" style="justify-content: center;">
+            <div class="footer-info">
+                build v1.1.10 • martin vojtus • 2026
+            </div>
         </div>
     </footer>
 
