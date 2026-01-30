@@ -105,9 +105,9 @@
 
         .menu-link svg { width: 22px; height: 22px; fill: var(--black); }
 
-        /* 📏 Hlavný obsah */
+        /* 📏 Hlavný obsah - Znížený spodný padding */
         main {
-            padding: 65px 20px 40px;
+            padding: 65px 20px 20px; /* Zmenené zo 40px na 20px */
             width: 100%; max-width: var(--content-width); 
             box-sizing: border-box;
             flex-grow: 1;
@@ -126,10 +126,10 @@
             margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1;
         }
 
-        /* 🖼️ Portrét (Upravený na 16:9) */
+        /* 🖼️ Portrét (Vrátený na 1:1) */
         .portrait-container { width: 100%; margin-bottom: 40px; }
         .photo-frame {
-            width: 100%; aspect-ratio: 16 / 9; /* Zmenené na 16:9 */
+            width: 100%; aspect-ratio: 1 / 1; /* Zmenené na 1:1 */
             border-radius: 12px;
             overflow: hidden; background-color: #f0f0f0;
             display: flex; align-items: center; justify-content: center;
@@ -137,7 +137,6 @@
 
         .photo-frame img {
             width: 100%; height: 100%; object-fit: cover;
-            /* Vrátené na pôvodnú svetlosť (len grayscale) */
             filter: grayscale(100%); 
             font-size: var(--size-small); color: var(--black);
         }
@@ -171,15 +170,17 @@
 
         .submit-btn:hover { opacity: 0.8; }
 
-        /* 🦶 Pätička */
+        /* 🦶 Pätička - Znížené odsadenia */
         footer {
             width: 100%; max-width: var(--content-width);
-            padding: 0 20px 60px; box-sizing: border-box;
+            padding: 0 20px 30px; /* Zmenené zo 60px na 30px */
+            box-sizing: border-box;
             display: flex; flex-direction: column; align-items: center;
         }
 
         .footer-separator {
-            width: 100%; height: 1px; background-color: var(--black); margin-bottom: 30px;
+            width: 100%; height: 1px; background-color: var(--black);
+            margin-bottom: 15px; /* Zmenené z 30px na 15px */
         }
 
         .footer-info {
