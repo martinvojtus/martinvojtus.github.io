@@ -7,13 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* 📏 Striktne dve veľkosti fontu */
             --size-large: 2.0rem;
             --size-small: 1rem;
-            
             --black: #000000;
             --white: #ffffff;
-            /* 📐 Zúžená šírka obsahu na 540px */
             --content-width: 540px;
         }
 
@@ -30,14 +27,14 @@
             min-height: 100vh;
         }
 
-        /* 🧊 Banner s matným sklom - opacita 0.6 a blur 30px */
+        /* 🧊 Banner - Návrat k 0.3 opacity a 15px blur */
         header {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 50px;
             display: flex; justify-content: center;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             z-index: 2000;
         }
 
@@ -54,7 +51,6 @@
             cursor: pointer;
         }
 
-        /* Štýlovanie nového loga */
         .header-left svg { height: 24px; width: auto; display: block; }
 
         .logo-text {
@@ -63,10 +59,8 @@
             white-space: nowrap;
         }
 
-        /* 🖋️ Martinvojtus zjednotené v Bold 700 */
         .logo-text span { font-weight: 700; }
 
-        /* ☰ Menu Toggle (Tenké čiary 1px) */
         .menu-toggle {
             width: 24px; height: 12px;
             display: flex; flex-direction: column; justify-content: space-between;
@@ -82,13 +76,13 @@
         .menu-toggle.active .line:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
         .menu-toggle.active .line:nth-child(2) { transform: translateY(-5.5px) rotate(-45deg); }
 
-        /* 📜 Rolovacie Menu */
+        /* 📜 Menu - Zladené s bannerom */
         .nav-overlay {
             position: fixed; top: -100%; left: 0;
             width: 100%; 
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1);
             z-index: 1500; padding: 80px 0 40px 0;
             display: flex; flex-direction: column; align-items: center;
@@ -109,7 +103,6 @@
             letter-spacing: 0.02em;
         }
 
-        /* 📏 Hlavný obsah */
         main {
             padding: 65px 20px 20px;
             width: 100%; max-width: var(--content-width); 
@@ -130,7 +123,6 @@
             margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1;
         }
 
-        /* 🖼️ Portrét (3:4, Zaoblené rohy) */
         .portrait-container { width: 100%; margin-top: 20px; margin-bottom: 40px; }
         .photo-frame {
             width: 100%; aspect-ratio: 3 / 4;
@@ -149,7 +141,6 @@
             filter: grayscale(100%); display: block;
         }
 
-        /* Galéria s gradientom (50% -> 100%) */
         .gallery-link {
             display: block; width: 100%; height: 100%; text-decoration: none;
         }
@@ -173,7 +164,6 @@
         .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
         .content-text p { margin-bottom: 1.5rem; }
 
-        /* ✉️ Form styling */
         .contact-form { margin-top: 30px; }
         .form-group { margin-bottom: 25px; }
         
@@ -199,7 +189,6 @@
 
         .submit-btn:hover { opacity: 0.8; }
 
-        /* 🦶 Pätička */
         footer {
             width: 100%; max-width: var(--content-width);
             padding: 0 20px 30px;
@@ -241,18 +230,10 @@
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
-            <a class="menu-link" onclick="showSection('about')">
-                <span>About</span>
-            </a>
-            <a class="menu-link" onclick="closeMenu()">
-                <span>Work</span>
-            </a>
-            <a class="menu-link" onclick="showSection('photography')">
-                <span>Amateur photography</span>
-            </a>
-            <a class="menu-link" onclick="showSection('contact')">
-                <span>Contact</span>
-            </a>
+            <a class="menu-link" onclick="showSection('about')"><span>About</span></a>
+            <a class="menu-link" onclick="closeMenu()"><span>Work</span></a>
+            <a class="menu-link" onclick="showSection('photography')"><span>Amateur photography</span></a>
+            <a class="menu-link" onclick="showSection('contact')"><span>Contact</span></a>
         </div>
     </nav>
 
@@ -296,7 +277,6 @@
             <div class="content-text">
                 <p>Have a project in mind? I'm currently available for new opportunities. Send me a message and let's discuss how we can create something meaningful.</p>
             </div>
-            
             <div class="contact-form">
                 <div class="form-group">
                     <label class="form-label">Name</label>
@@ -317,9 +297,7 @@
 
     <footer>
         <div class="footer-separator"></div>
-        <div class="footer-info">
-            build v1.1.6 • martin vojtus • 2026
-        </div>
+        <div class="footer-info">build v1.1.7 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -349,6 +327,5 @@
             if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu();
         });
     </script>
-
 </body>
 </html>
