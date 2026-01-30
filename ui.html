@@ -139,22 +139,22 @@
 
         .block-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.9) 100%);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.85) 100%);
             display: flex; flex-direction: column; justify-content: flex-end;
             padding: 30px; box-sizing: border-box;
             color: var(--white);
         }
 
         .block-title {
-            font-size: var(--size-large); font-weight: 700; line-height: 1.1; margin-bottom: 15px;
+            font-size: var(--size-large); font-weight: 700; line-height: 1.1; margin-bottom: 12px;
         }
         
         .block-text {
-            font-size: var(--size-small); font-weight: 400; opacity: 0.9;
+            font-size: var(--size-small); font-weight: 400; opacity: 0.95;
             text-align: justify; hyphens: auto;
         }
 
-        .block-text p { margin: 0 0 10px 0; }
+        .block-text p { margin: 0; }
 
         /* ✉️ Form styling */
         .contact-form { margin-top: 30px; }
@@ -178,7 +178,7 @@
         /* 🦶 Pätička */
         footer {
             width: 100%; max-width: var(--content-width);
-            padding: 40px 20px 30px; /* Zväčšený horný padding namiesto čiary */
+            padding: 40px 20px 30px; 
             box-sizing: border-box;
             display: flex; flex-direction: column; align-items: center;
         }
@@ -186,7 +186,6 @@
         .footer-info {
             font-size: var(--size-small); color: var(--black);
             letter-spacing: 0.02em; text-align: center;
-            /* Zrušené uppercase */
         }
     </style>
 </head>
@@ -224,13 +223,11 @@
         <div id="section-about" class="content-section active">
             <div class="block-container">
                 <div class="photo-frame" style="aspect-ratio: 3 / 4;">
-                    <img src="portrait.jpeg" alt="Portrait" onerror="this.style.display='none';">
+                    <img src="about.jpeg" alt="Portrait" onerror="this.style.display='none';">
                     <div class="block-overlay">
-                        <div class="block-title">My space, my vision.</div>
+                        <div class="block-title">My vision.</div>
                         <div class="block-text">
-                            <p>A minimalist designer focused on functional beauty and clear communication.</p>
-                            <p>Subtraction is my core method—removing the non-essential to reveal the purpose of every brand.</p>
-                            <p>Exploring the intersection of technology and aesthetics through UI/UX and art direction.</p>
+                            <p>A minimalist focused on a functional, beautiful and clean look for your website.</p>
                         </div>
                     </div>
                 </div>
@@ -279,7 +276,7 @@
 
     <footer>
         <div class="footer-info">
-            build v1.1.6 • martin vojtus • 2026
+            build v1.1.7 • martin vojtus • 2026
         </div>
     </footer>
 
