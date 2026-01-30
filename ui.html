@@ -62,7 +62,7 @@
             white-space: nowrap;
         }
 
-        /* ☰ Menu Toggle (Tenké čiary) */
+        /* ☰ Menu Toggle (Tenké čiary 1px) */
         .menu-toggle {
             width: 24px; height: 12px;
             display: flex; flex-direction: column; justify-content: space-between;
@@ -100,11 +100,11 @@
         .menu-link {
             text-decoration: none; color: var(--black);
             font-size: var(--size-small);
-            display: flex; align-items: center; gap: 15px;
+            display: flex; align-items: center;
             cursor: pointer;
+            text-transform: uppercase; /* Voliteľné pre extra čistý vzhľad */
+            letter-spacing: 0.05em;
         }
-
-        .menu-link svg { width: 22px; height: 22px; fill: var(--black); }
 
         /* 📏 Hlavný obsah */
         main {
@@ -127,7 +127,7 @@
             margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1;
         }
 
-        /* 🖼️ Portrét (16:9 base, Zaoblené rohy, Fallback centering) */
+        /* 🖼️ Portrét (3:4, Zaoblené rohy, Fallback centering) */
         .portrait-container { width: 100%; margin-bottom: 40px; }
         .photo-frame {
             width: 100%; aspect-ratio: 16 / 9; 
@@ -138,13 +138,7 @@
             color: var(--white); 
             font-size: var(--size-small);
             letter-spacing: 0.05em;
-            /* Flexbox zabezpečí vycentrovanie fallback textu */
             display: flex; align-items: center; justify-content: center;
-        }
-
-        /* Štýl pre klikateľný odkaz galérie */
-        .gallery-link {
-            display: block; width: 100%; height: 100%; text-decoration: none;
         }
 
         .photo-frame img {
@@ -152,13 +146,15 @@
             filter: grayscale(100%); display: block;
         }
 
-        /* UPDATED: Gradientné prekrytie a text */
+        /* Galéria s gradientom (50% -> 100%) */
+        .gallery-link {
+            display: block; width: 100%; height: 100%; text-decoration: none;
+        }
+
         .gallery-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            /* UPDATED: Gradient zhora (50% čierna) nadol (100% čierna) */
             background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, var(--black) 100%);
             display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
-            /* UPDATED: Znížený padding pre posun textu nižšie */
             padding-bottom: 10px; 
             box-sizing: border-box;
             color: var(--white); text-align: center;
@@ -243,19 +239,15 @@
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
             <a class="menu-link" onclick="showSection('about')">
-                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 <span>About</span>
             </a>
             <a class="menu-link" onclick="closeMenu()">
-                <svg viewBox="0 0 24 24"><path d="M4 4h7v7H4V4zm0 9h7v7H4v-7zm9-9h7v7h-7V4zm0 9h7v7h-7v-7z"/></svg>
                 <span>Work</span>
             </a>
             <a class="menu-link" onclick="showSection('photography')">
-                <svg viewBox="0 0 24 24"><path d="M20 4h-3.17L15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/><circle cx="12" cy="12" r="3"/></svg>
                 <span>Amateur photography</span>
             </a>
             <a class="menu-link" onclick="showSection('contact')">
-                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z"/></svg>
                 <span>Contact</span>
             </a>
         </div>
@@ -323,7 +315,7 @@
     <footer>
         <div class="footer-separator"></div>
         <div class="footer-info">
-            build v1.0.5 • martin vojtus • 2026
+            build v1.0.6 • martin vojtus • 2026
         </div>
     </footer>
 
