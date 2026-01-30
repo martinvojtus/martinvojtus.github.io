@@ -2,32 +2,30 @@
 <html lang="sk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>martinvojtus.space</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* 📐 Nová výška bannerov */
             --banner-height: 40px;
             --size-large: 2.0rem;
             --size-small: 1rem;
-            
             --black: #000000;
             --white: #ffffff;
             --content-width: 540px;
         }
 
-        html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-
-        body {
+        /* 🛠️ Fix pre Safari a nescrollovateľný layout */
+        html, body {
             margin: 0; padding: 0;
+            height: 100dvh; /* Dynamická výška podľa líšt prehliadača */
+            width: 100%;
+            overflow: hidden; /* Zákaz scrollovania pre Single-View */
             font-family: 'Space Grotesk', sans-serif;
-            font-weight: 400;
             background-color: var(--white);
             color: var(--black);
-            line-height: 1.5;
-            display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* 🧊 Bannery (Header & Footer) */
@@ -40,159 +38,95 @@
             z-index: 2000;
         }
 
-        header { top: 0; }
-        footer { bottom: 0; }
+        header { top: 0; padding-top: env(safe-area-inset-top); }
+        footer { 
+            bottom: 0; 
+            padding-bottom: env(safe-area-inset-bottom); 
+            height: calc(var(--banner-height) + env(safe-area-inset-bottom));
+        }
 
         .banner-content {
             width: 100%; max-width: var(--content-width);
-            height: 100%; display: flex; justify-content: space-between;
+            height: var(--banner-height); display: flex; justify-content: space-between;
             align-items: center; padding: 0 20px; box-sizing: border-box;
             position: relative;
         }
 
-        .logo-link {
-            display: flex; align-items: center;
-            text-decoration: none; color: inherit;
-            cursor: pointer;
-        }
-
-        /* Ikona prispôsobená nižšiemu banneru */
+        .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
         .header-left svg { height: 20px; width: auto; display: block; }
-
-        .logo-text {
-            position: absolute; left: 50%; transform: translateX(-50%);
-            font-size: var(--size-small); letter-spacing: 0.05em;
-            white-space: nowrap;
-        }
-
+        .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); letter-spacing: 0.05em; white-space: nowrap; }
         .logo-text span { font-weight: 700; }
 
         /* ☰ Menu Toggle */
-        .menu-toggle {
-            width: 24px; height: 10px;
-            display: flex; flex-direction: column; justify-content: space-between;
-            cursor: pointer; z-index: 2100;
-        }
-
-        .line {
-            width: 24px; height: 1px;
-            background-color: var(--black);
-            transition: transform 0.3s ease;
-        }
-
+        .menu-toggle { width: 24px; height: 10px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; z-index: 2100; }
+        .line { width: 24px; height: 1px; background-color: var(--black); transition: 0.3s; }
         .menu-toggle.active .line:nth-child(1) { transform: translateY(4.5px) rotate(45deg); }
         .menu-toggle.active .line:nth-child(2) { transform: translateY(-4.5px) rotate(-45deg); }
 
         /* 📜 Rolovacie Menu */
         .nav-overlay {
-            position: fixed; top: -100%; left: 0;
-            width: 100%; 
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1);
-            z-index: 1500; padding: 60px 0 40px 0;
-            display: flex; flex-direction: column; align-items: center;
+            position: fixed; top: -110%; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1); z-index: 1500;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-
         .nav-overlay.active { top: 0; }
+        .menu-items { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: 20px; padding: 0 20px; box-sizing: border-box; }
+        .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; }
 
-        .menu-items {
-            width: 100%; max-width: var(--content-width);
-            display: flex; flex-direction: column; gap: 20px; padding: 0 20px; box-sizing: border-box;
-        }
-
-        .menu-link {
-            text-decoration: none; color: var(--black);
-            font-size: var(--size-small);
-            display: flex; align-items: center;
-            cursor: pointer;
-            letter-spacing: 0.02em;
-        }
-
-        /* 📏 Hlavný obsah */
+        /* 📏 Hlavný obsah - Vždy vycentrovaný */
         main {
-            padding: 60px 20px; /* Upravené kvôli nižšiemu banneru */
-            width: 100%; max-width: var(--content-width); 
-            box-sizing: border-box;
             flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: var(--banner-height) 20px;
+            box-sizing: border-box;
+            position: relative;
         }
 
-        .content-section { display: none; animation: fadeIn 0.4s ease; }
+        .content-section { display: none; width: 100%; max-width: var(--content-width); animation: fadeIn 0.4s ease; }
         .content-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* 🖼️ Foto rámy */
-        .portrait-container { width: 100%; margin-bottom: 20px; }
+        /* 🖼️ Foto rámy - Adaptívne pre Landscape */
+        .portrait-container { width: 100%; display: flex; justify-content: center; }
         .photo-frame {
             width: 100%;
+            max-height: calc(100dvh - 120px); /* Ochrana pred pretiahnutím na výšku v Landscape */
             border-radius: 12px; 
             overflow: hidden;
             background-color: #000000; 
             position: relative;
-            color: var(--white); 
             display: flex; align-items: center; justify-content: center;
         }
 
-        .photo-frame img {
-            width: 100%; height: 100%; object-fit: cover;
-            filter: grayscale(100%); display: block;
-        }
+        .photo-frame img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); display: block; }
 
-        .gallery-link {
-            display: block; width: 100%; height: 100%; text-decoration: none;
-        }
-
+        /* Galéria prekrývaná textom */
+        .gallery-link { display: block; width: 100%; height: 100%; text-decoration: none; }
         .gallery-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, var(--black) 100%);
+            position: absolute; inset: 0;
+            background: linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.8) 100%);
             display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
-            padding-bottom: 10px; 
-            box-sizing: border-box;
-            color: var(--white); text-align: center;
+            padding-bottom: 20px; box-sizing: border-box; color: var(--white); text-align: center;
         }
-
-        .gallery-title {
-            font-size: var(--size-large); font-weight: 600; line-height: 1; margin-bottom: 5px;
-        }
-        .gallery-desc {
-            font-size: var(--size-small); font-weight: 400; opacity: 0.8;
-        }
+        .gallery-title { font-size: var(--size-large); font-weight: 600; line-height: 1; margin: 0 0 5px 0; }
+        .gallery-desc { font-size: var(--size-small); font-weight: 400; opacity: 0.8; margin: 0; }
 
         /* ✉️ Form styling */
-        .contact-form { margin-top: 10px; }
-        .form-group { margin-bottom: 25px; }
-        
-        .form-label {
-            display: block; font-size: var(--size-small); text-transform: uppercase;
-            font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em;
-        }
+        .contact-form { width: 100%; }
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; margin-bottom: 5px; }
+        .form-input, .form-textarea { width: 100%; border: none; border-bottom: 1px solid var(--black); background: transparent; font-family: inherit; font-size: var(--size-small); padding: 8px 0; outline: none; }
+        .submit-btn { width: 100%; background: var(--black); color: var(--white); border: none; padding: 15px; font-weight: 600; text-transform: uppercase; cursor: pointer; margin-top: 10px; }
 
-        .form-input, .form-textarea {
-            width: 100%; border: none; border-bottom: 1px solid var(--black);
-            background: transparent; font-family: inherit; font-size: var(--size-small);
-            padding: 10px 0; color: var(--black); outline: none; border-radius: 0;
-        }
-
-        .form-textarea { min-height: 80px; resize: vertical; }
-
-        .submit-btn {
-            width: 100%; background: var(--black); color: var(--white);
-            border: none; padding: 18px; font-family: inherit; font-size: var(--size-small);
-            text-transform: uppercase; font-weight: 600; letter-spacing: 0.1em;
-            cursor: pointer; margin-top: 10px; transition: opacity 0.3s ease;
-        }
-
-        .submit-btn:hover { opacity: 0.8; }
-
-        /* 🦶 Pätička */
-        .footer-info {
-            font-size: var(--size-small); color: var(--black);
-            letter-spacing: 0.05em; text-align: center;
+        /* 📱 Špecifické úpravy pre režim na šírku (Landscape) */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .photo-frame { aspect-ratio: 16 / 7 !important; }
+            .gallery-title { font-size: 1.5rem; }
+            .menu-items { flex-direction: row; flex-wrap: wrap; justify-content: center; }
         }
     </style>
 </head>
@@ -202,11 +136,7 @@
         <div class="banner-content">
             <div class="logo-link" onclick="showSection('about')">
                 <div class="header-left">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080">
-                        <g transform="translate(540, 540)">
-                            <path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="#000000" />
-                        </g>
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="#000000" /></g></svg>
                 </div>
                 <div class="logo-text"><span>martinvojtus</span> • space</div>
             </div>
@@ -219,10 +149,10 @@
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
-            <a class="menu-link" onclick="showSection('about')"><span>About</span></a>
-            <a class="menu-link" onclick="closeMenu()"><span>Work</span></a>
-            <a class="menu-link" onclick="showSection('photography')"><span>Amateur photography</span></a>
-            <a class="menu-link" onclick="showSection('contact')"><span>Contact</span></a>
+            <a class="menu-link" onclick="showSection('about')">About</a>
+            <a class="menu-link" onclick="closeMenu()">Work</a>
+            <a class="menu-link" onclick="showSection('photography')">iPhone photography</a>
+            <a class="menu-link" onclick="showSection('contact')">Contact</a>
         </div>
     </nav>
 
@@ -241,8 +171,8 @@
                     <a href="#" class="gallery-link">
                         <img src="IMG_4850.jpeg" alt="Photography" onerror="this.style.display='none';">
                         <div class="gallery-overlay">
-                            <span class="gallery-title">Gallery.</span>
-                            <span class="gallery-desc">World through my eyes.</span>
+                            <h2 class="gallery-title">Gallery.</h2>
+                            <p class="gallery-desc">World through my eyes.</p>
                         </div>
                     </a>
                 </div>
@@ -251,18 +181,9 @@
 
         <div id="section-contact" class="content-section">
             <div class="contact-form">
-                <div class="form-group">
-                    <label class="form-label">Name</label>
-                    <input type="text" id="contact-name" class="form-input" placeholder="Charlie Harper">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" id="contact-email" class="form-input" placeholder="charlie@example.com">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Message</label>
-                    <textarea id="contact-message" class="form-textarea" placeholder="Tell me about your project…"></textarea>
-                </div>
+                <div class="form-group"><label class="form-label">Name</label><input type="text" id="contact-name" class="form-input" placeholder="Charlie Harper"></div>
+                <div class="form-group"><label class="form-label">Email</label><input type="email" id="contact-email" class="form-input" placeholder="charlie@example.com"></div>
+                <div class="form-group"><label class="form-label">Message</label><textarea id="contact-message" class="form-textarea" placeholder="Message..."></textarea></div>
                 <button type="button" class="submit-btn" onclick="sendMail()">Send message</button>
             </div>
         </div>
@@ -270,9 +191,7 @@
 
     <footer>
         <div class="banner-content" style="justify-content: center;">
-            <div class="footer-info">
-                build v1.1.11 • martin vojtus • 2026
-            </div>
+            <div class="footer-info">build v1.1.12 • martin vojtus • 2026</div>
         </div>
     </footer>
 
@@ -286,7 +205,7 @@
         function showSection(sectionId) {
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
             document.getElementById('section-' + sectionId).classList.add('active');
-            closeMenu(); window.scrollTo(0, 0);
+            closeMenu();
         }
 
         function sendMail() {
