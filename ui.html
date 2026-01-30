@@ -131,7 +131,7 @@
         }
 
         /* 🖼️ Portrét (3:4, Zaoblené rohy) */
-        .portrait-container { width: 100%; margin-bottom: 40px; }
+        .portrait-container { width: 100%; margin-top: 20px; margin-bottom: 40px; }
         .photo-frame {
             width: 100%; aspect-ratio: 3 / 4;
             border-radius: 12px; 
@@ -259,20 +259,25 @@
     <main>
         <div id="section-about" class="content-section active">
             <h2>My space, my vision.</h2>
-            <div class="portrait-container">
-                <div class="photo-frame">
-                    <img src="portrait.jpeg" alt="Portrait" onerror="this.style.display='none'; this.parentNode.textContent='Portrait';">
-                </div>
-            </div>
             <div class="content-text">
                 <p>A minimalist designer focused on functional beauty and clear communication.</p>
                 <p>I believe that good design is as little design as possible. My approach is rooted in subtraction—removing the non-essential to reveal the core purpose of a product or brand.</p>
                 <p>My work spans across UI/UX design, design systems, and art direction. I'm constantly exploring the intersection of technology and aesthetics.</p>
             </div>
+            <div class="portrait-container">
+                <div class="photo-frame">
+                    <img src="portrait.jpeg" alt="Portrait" onerror="this.style.display='none'; this.parentNode.textContent='Portrait';">
+                </div>
+            </div>
         </div>
 
         <div id="section-photography" class="content-section">
             <h2>One tool for everything.</h2>
+            <div class="content-text">
+                <p>Just point and shoot. That simple. No further editing. Capture the moment as it is.</p>
+                <p>Post-processing on the iPhone captures the most realistic version of whatever you're shooting.</p>
+                <p>No SLR. No extra weight. No problem.</p>
+            </div>
             <div class="portrait-container">
                 <div class="photo-frame" style="aspect-ratio: 16 / 9;">
                     <a href="#" class="gallery-link">
@@ -283,11 +288,6 @@
                         </div>
                     </a>
                 </div>
-            </div>
-            <div class="content-text">
-                <p>Just point and shoot. That simple. No further editing. Capture the moment as it is.</p>
-                <p>Post-processing on the iPhone captures the most realistic version of whatever you're shooting.</p>
-                <p>No SLR. No extra weight. No problem.</p>
             </div>
         </div>
 
@@ -318,7 +318,7 @@
     <footer>
         <div class="footer-separator"></div>
         <div class="footer-info">
-            build v1.1.5 • martin vojtus • 2026
+            build v1.1.6 • martin vojtus • 2026
         </div>
     </footer>
 
