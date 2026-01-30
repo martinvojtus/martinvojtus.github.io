@@ -13,8 +13,8 @@
             
             --black: #000000;
             --white: #ffffff;
-            /* 📐 Rozšírená šírka obsahu na 720px */
-            --content-width: 720px;
+            /* 📐 Zúžená šírka obsahu na 540px */
+            --content-width: 540px;
         }
 
         html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
@@ -127,10 +127,10 @@
             margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1;
         }
 
-        /* 🖼️ Portrét (Upravený na 3:4) */
+        /* 🖼️ Portrét (Vrátený na 1:1) */
         .portrait-container { width: 100%; margin-bottom: 40px; }
         .photo-frame {
-            width: 100%; aspect-ratio: 3 / 4; /* Zmenené na 3:4 */
+            width: 100%; aspect-ratio: 1 / 1; 
             border-radius: 12px;
             overflow: hidden; background-color: #f0f0f0;
             display: flex; align-items: center; justify-content: center;
@@ -234,10 +234,10 @@
 
     <main>
         <div id="section-about" class="content-section active">
-            <h2>My space.</h2>
+            <h2>My space, my vision.</h2>
             <div class="portrait-container">
                 <div class="photo-frame">
-                    <img src="IMG_1218.jpeg" alt="Portrait">
+                    <img src="IMG_0196.jpeg" alt="Portrait">
                 </div>
             </div>
             <div class="content-text">
