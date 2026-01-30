@@ -127,18 +127,19 @@
             margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1;
         }
 
-        /* 🖼️ Portrét (16:9, Zaoblené rohy, Fallback) */
+        /* 🖼️ Portrét (16:9 base, Zaoblené rohy, Fallback centering) */
         .portrait-container { width: 100%; margin-bottom: 40px; }
         .photo-frame {
             width: 100%; aspect-ratio: 16 / 9; 
             border-radius: 12px; 
             overflow: hidden;
             background-color: #000000; 
-            /* display: flex; Removed flex here to allow absolute positioning inside */
-            position: relative; /* Needed for absolute positioning of overlay */
+            position: relative;
             color: var(--white); 
             font-size: var(--size-small);
             letter-spacing: 0.05em;
+            /* Flexbox zabezpečí vycentrovanie fallback textu */
+            display: flex; align-items: center; justify-content: center;
         }
 
         /* Štýl pre klikateľný odkaz galérie */
@@ -151,13 +152,15 @@
             filter: grayscale(100%); display: block;
         }
 
-        /* Gradientné prekrytie a text */
+        /* UPDATED: Gradientné prekrytie a text */
         .gallery-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            /* Gradient zhora nadol: transparentná -> čierna */
-            background: linear-gradient(to bottom, transparent 40%, var(--black) 100%);
+            /* UPDATED: Gradient zhora (50% čierna) nadol (100% čierna) */
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, var(--black) 100%);
             display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
-            padding-bottom: 25px; box-sizing: border-box;
+            /* UPDATED: Znížený padding pre posun textu nižšie */
+            padding-bottom: 10px; 
+            box-sizing: border-box;
             color: var(--white); text-align: center;
         }
 
@@ -262,7 +265,7 @@
         <div id="section-about" class="content-section active">
             <h2>My space, my vision.</h2>
             <div class="portrait-container">
-                <div class="photo-frame" style="aspect-ratio: 1/1;">
+                <div class="photo-frame" style="aspect-ratio: 3 / 4;">
                     <img src="portrait.jpeg" alt="Portrait" onerror="this.style.display='none'; this.parentNode.textContent='Portrait';">
                 </div>
             </div>
@@ -320,7 +323,7 @@
     <footer>
         <div class="footer-separator"></div>
         <div class="footer-info">
-            build v1.0.4 • martin vojtus • 2026
+            build v1.0.5 • martin vojtus • 2026
         </div>
     </footer>
 
