@@ -127,11 +127,11 @@
             margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1;
         }
 
-        /* 🖼️ Portrét (Vrátený na 1:1) */
+        /* 🖼️ Portrét (1:1, Ostré hrany) */
         .portrait-container { width: 100%; margin-bottom: 40px; }
         .photo-frame {
             width: 100%; aspect-ratio: 1 / 1; 
-            border-radius: 12px;
+            /* Odstránené zaoblenie rohov */
             overflow: hidden; background-color: #f0f0f0;
             display: flex; align-items: center; justify-content: center;
         }
@@ -274,7 +274,7 @@
     <footer>
         <div class="footer-separator"></div>
         <div class="footer-info">
-            build v1.0.0 • martin vojtus
+            build v1.0.1 • martin vojtus • 2026
         </div>
     </footer>
 
