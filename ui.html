@@ -13,7 +13,8 @@
             
             --black: #000000;
             --white: #ffffff;
-            --content-width: 600px;
+            /* 📐 Rozšírená šírka obsahu na 720px */
+            --content-width: 720px;
         }
 
         html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
@@ -105,9 +106,9 @@
 
         .menu-link svg { width: 22px; height: 22px; fill: var(--black); }
 
-        /* 📏 Hlavný obsah - Znížený spodný padding */
+        /* 📏 Hlavný obsah */
         main {
-            padding: 65px 20px 20px; /* Zmenené zo 40px na 20px */
+            padding: 65px 20px 20px;
             width: 100%; max-width: var(--content-width); 
             box-sizing: border-box;
             flex-grow: 1;
@@ -126,10 +127,10 @@
             margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1;
         }
 
-        /* 🖼️ Portrét (Vrátený na 1:1) */
+        /* 🖼️ Portrét (Upravený na 3:4) */
         .portrait-container { width: 100%; margin-bottom: 40px; }
         .photo-frame {
-            width: 100%; aspect-ratio: 1 / 1; /* Zmenené na 1:1 */
+            width: 100%; aspect-ratio: 3 / 4; /* Zmenené na 3:4 */
             border-radius: 12px;
             overflow: hidden; background-color: #f0f0f0;
             display: flex; align-items: center; justify-content: center;
@@ -170,17 +171,17 @@
 
         .submit-btn:hover { opacity: 0.8; }
 
-        /* 🦶 Pätička - Znížené odsadenia */
+        /* 🦶 Pätička */
         footer {
             width: 100%; max-width: var(--content-width);
-            padding: 0 20px 30px; /* Zmenené zo 60px na 30px */
+            padding: 0 20px 30px;
             box-sizing: border-box;
             display: flex; flex-direction: column; align-items: center;
         }
 
         .footer-separator {
             width: 100%; height: 1px; background-color: var(--black);
-            margin-bottom: 15px; /* Zmenené z 30px na 15px */
+            margin-bottom: 15px;
         }
 
         .footer-info {
@@ -236,7 +237,7 @@
             <h2>My space.</h2>
             <div class="portrait-container">
                 <div class="photo-frame">
-                    <img src="IMG_0072.jpeg" alt="Portrait">
+                    <img src="IMG_1218.jpeg" alt="Portrait">
                 </div>
             </div>
             <div class="content-text">
