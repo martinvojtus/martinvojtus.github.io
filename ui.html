@@ -30,13 +30,13 @@
             min-height: 100vh;
         }
 
-        /* 🧊 Banner s matným sklom - UPDATED: Vyššia opacita a väčší blur pre lepší kontrast */
+        /* 🧊 Banner s matným sklom */
         header {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 50px;
             display: flex; justify-content: center;
-            background: rgba(255, 255, 255, 0.6); /* Zmenené z 0.3 na 0.6 */
-            backdrop-filter: blur(30px); /* Zmenené z 15px na 30px */
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             z-index: 2000;
         }
@@ -62,7 +62,6 @@
             white-space: nowrap;
         }
 
-        /* 🖋️ Moja voľba: martinvojtus zjednotené v Bold 700 */
         .logo-text span { font-weight: 700; }
 
         /* ☰ Menu Toggle (Tenké čiary 1px) */
@@ -81,12 +80,12 @@
         .menu-toggle.active .line:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
         .menu-toggle.active .line:nth-child(2) { transform: translateY(-5.5px) rotate(-45deg); }
 
-        /* 📜 Rolovacie Menu - UPDATED: Vyššia opacita a väčší blur */
+        /* 📜 Rolovacie Menu */
         .nav-overlay {
             position: fixed; top: -100%; left: 0;
             width: 100%; 
-            background: rgba(255, 255, 255, 0.6); /* Zmenené z 0.3 na 0.6 */
-            backdrop-filter: blur(30px); /* Zmenené z 15px na 30px */
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1);
             z-index: 1500; padding: 80px 0 40px 0;
@@ -129,10 +128,10 @@
             margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1;
         }
 
-        /* 🖼️ Portrét (3:4, Zaoblené rohy) */
+        /* 🖼️ Foto rámy */
         .portrait-container { width: 100%; margin-bottom: 40px; }
         .photo-frame {
-            width: 100%; aspect-ratio: 3 / 4;
+            width: 100%;
             border-radius: 12px; 
             overflow: hidden;
             background-color: #000000; 
@@ -247,7 +246,7 @@
                 <span>Work</span>
             </a>
             <a class="menu-link" onclick="showSection('photography')">
-                <span>Amateur photography</span>
+                <span>iPhone photography</span>
             </a>
             <a class="menu-link" onclick="showSection('contact')">
                 <span>Contact</span>
@@ -259,7 +258,7 @@
         <div id="section-about" class="content-section active">
             <h2>My space, my vision.</h2>
             <div class="portrait-container">
-                <div class="photo-frame">
+                <div class="photo-frame" style="aspect-ratio: 3 / 4;">
                     <img src="portrait.jpeg" alt="Portrait" onerror="this.style.display='none'; this.parentNode.textContent='Portrait';">
                 </div>
             </div>
@@ -271,22 +270,16 @@
         </div>
 
         <div id="section-photography" class="content-section">
-            <h2>One tool for everything.</h2>
             <div class="portrait-container">
-                <div class="photo-frame" style="aspect-ratio: 16 / 9;">
+                <div class="photo-frame" style="aspect-ratio: 3 / 4;">
                     <a href="#" class="gallery-link">
-                        <img src="IMG_4850.jpeg" alt="Photography" onerror="this.style.display='none';">
+                        <img src="IMG_4850.jpeg" alt="iPhone Photography" onerror="this.style.display='none';">
                         <div class="gallery-overlay">
                             <span class="gallery-title">Gallery.</span>
                             <span class="gallery-desc">World through my eyes.</span>
                         </div>
                     </a>
                 </div>
-            </div>
-            <div class="content-text">
-                <p>Just point and shoot. That simple. No further editing. Capture the moment as it is.</p>
-                <p>Post-processing on the iPhone captures the most realistic version of whatever you're shooting.</p>
-                <p>No SLR. No extra weight. No problem.</p>
             </div>
         </div>
 
@@ -317,7 +310,7 @@
     <footer>
         <div class="footer-separator"></div>
         <div class="footer-info">
-            build v1.1.4 • martin vojtus • 2026
+            build v1.1.5 • martin vojtus • 2026
         </div>
     </footer>
 
