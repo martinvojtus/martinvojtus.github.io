@@ -30,14 +30,14 @@
             min-height: 100vh;
         }
 
-        /* 🧊 Banner s matným sklom */
+        /* 🧊 Banner s matným sklom - UPDATED: Vyššia opacita a väčší blur pre lepší kontrast */
         header {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 50px;
             display: flex; justify-content: center;
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.6); /* Zmenené z 0.3 na 0.6 */
+            backdrop-filter: blur(30px); /* Zmenené z 15px na 30px */
+            -webkit-backdrop-filter: blur(30px);
             z-index: 2000;
         }
 
@@ -81,13 +81,13 @@
         .menu-toggle.active .line:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
         .menu-toggle.active .line:nth-child(2) { transform: translateY(-5.5px) rotate(-45deg); }
 
-        /* 📜 Rolovacie Menu */
+        /* 📜 Rolovacie Menu - UPDATED: Vyššia opacita a väčší blur */
         .nav-overlay {
             position: fixed; top: -100%; left: 0;
             width: 100%; 
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.6); /* Zmenené z 0.3 na 0.6 */
+            backdrop-filter: blur(30px); /* Zmenené z 15px na 30px */
+            -webkit-backdrop-filter: blur(30px);
             transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1);
             z-index: 1500; padding: 80px 0 40px 0;
             display: flex; flex-direction: column; align-items: center;
@@ -317,7 +317,7 @@
     <footer>
         <div class="footer-separator"></div>
         <div class="footer-info">
-            build v1.1.3 • martin vojtus • 2026
+            build v1.1.4 • martin vojtus • 2026
         </div>
     </footer>
 
