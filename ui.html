@@ -27,7 +27,6 @@
             min-height: 100vh;
         }
 
-        /* 🧊 Banner - Návrat k 0.3 opacity a 15px blur */
         header {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 50px;
@@ -76,7 +75,6 @@
         .menu-toggle.active .line:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
         .menu-toggle.active .line:nth-child(2) { transform: translateY(-5.5px) rotate(-45deg); }
 
-        /* 📜 Menu - Zladené s bannerom */
         .nav-overlay {
             position: fixed; top: -100%; left: 0;
             width: 100%; 
@@ -191,9 +189,28 @@
 
         footer {
             width: 100%; max-width: var(--content-width);
-            padding: 0 20px 30px;
+            padding: 60px 20px 30px;
             box-sizing: border-box;
             display: flex; flex-direction: column; align-items: center;
+        }
+
+        /* ✉️ Nový štýl pre email v pätičke */
+        .footer-email {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .footer-email a {
+            font-size: var(--size-large);
+            font-weight: 700;
+            color: var(--black);
+            text-decoration: none;
+            letter-spacing: -0.04em;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-email a:hover {
+            opacity: 0.6;
         }
 
         .footer-separator {
@@ -296,8 +313,11 @@
     </main>
 
     <footer>
+        <div class="footer-email">
+            <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
+        </div>
         <div class="footer-separator"></div>
-        <div class="footer-info">build v1.1.7 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.8 • martin vojtus • 2026</div>
     </footer>
 
     <script>
