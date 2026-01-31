@@ -189,33 +189,33 @@
 
         footer {
             width: 100%; max-width: var(--content-width);
-            padding: 60px 20px 30px;
+            padding: 40px 20px 30px;
             box-sizing: border-box;
             display: flex; flex-direction: column; align-items: center;
         }
 
-        /* ✉️ Nový štýl pre email v pätičke */
+        .footer-separator {
+            width: 100%; height: 1px; background-color: var(--black);
+            margin-bottom: 20px;
+        }
+
+        /* ✉️ E-mail v pätičke pod čiarou */
         .footer-email {
-            margin-bottom: 30px;
+            margin-bottom: 15px;
             text-align: center;
         }
 
         .footer-email a {
-            font-size: var(--size-large);
-            font-weight: 700;
+            font-size: var(--size-small);
+            font-weight: 400;
             color: var(--black);
             text-decoration: none;
-            letter-spacing: -0.04em;
+            letter-spacing: 0.02em;
             transition: opacity 0.3s ease;
         }
 
         .footer-email a:hover {
             opacity: 0.6;
-        }
-
-        .footer-separator {
-            width: 100%; height: 1px; background-color: var(--black);
-            margin-bottom: 15px;
         }
 
         .footer-info {
@@ -313,11 +313,11 @@
     </main>
 
     <footer>
+        <div class="footer-separator"></div>
         <div class="footer-email">
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-separator"></div>
-        <div class="footer-info">build v1.1.8 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.9 • martin vojtus • 2026</div>
     </footer>
 
     <script>
