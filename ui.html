@@ -199,13 +199,16 @@
             margin-bottom: 20px;
         }
 
-        /* ✉️ E-mail v pätičke pod čiarou */
-        .footer-email {
+        /* ✉️ Spoločný štýl pre odkazy v pätičke */
+        .footer-link-group {
             margin-bottom: 15px;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
-        .footer-email a {
+        .footer-link-group a {
             font-size: var(--size-small);
             font-weight: 400;
             color: var(--black);
@@ -214,7 +217,7 @@
             transition: opacity 0.3s ease;
         }
 
-        .footer-email a:hover {
+        .footer-link-group a:hover {
             opacity: 0.6;
         }
 
@@ -314,10 +317,11 @@
 
     <footer>
         <div class="footer-separator"></div>
-        <div class="footer-email">
+        <div class="footer-link-group">
+            <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.9 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.10 • martin vojtus • 2026</div>
     </footer>
 
     <script>
