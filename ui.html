@@ -27,6 +27,7 @@
             min-height: 100vh;
         }
 
+        /* 🧊 Header - Frosted efekt zachovaný */
         header {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 50px;
@@ -121,10 +122,11 @@
             margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1;
         }
 
+        /* 🖼️ Foto rámy - ODSTRÁNENÉ ZAOBLENIE */
         .portrait-container { width: 100%; margin-top: 20px; margin-bottom: 40px; }
         .photo-frame {
             width: 100%; aspect-ratio: 3 / 4;
-            border-radius: 12px; 
+            border-radius: 0; /* Ostré rohy */
             overflow: hidden;
             background-color: #000000; 
             position: relative;
@@ -162,6 +164,7 @@
         .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
         .content-text p { margin-bottom: 1.5rem; }
 
+        /* ✉️ Form styling */
         .contact-form { margin-top: 30px; }
         .form-group { margin-bottom: 25px; }
         
@@ -182,24 +185,22 @@
             width: 100%; background: var(--black); color: var(--white);
             border: none; padding: 18px; font-family: inherit; font-size: var(--size-small);
             text-transform: uppercase; font-weight: 600; letter-spacing: 0.1em;
-            cursor: pointer; margin-top: 20px; transition: opacity 0.3s ease;
+            cursor: pointer; 
+            margin-top: 0; /* ODSTRÁNENÁ MEDZERA */
+            transition: opacity 0.3s ease;
         }
 
         .submit-btn:hover { opacity: 0.8; }
 
+        /* 🦶 Pätička - NAHRADENÁ ČIARA TIEŇOM */
         footer {
             width: 100%; max-width: var(--content-width);
             padding: 40px 20px 30px;
             box-sizing: border-box;
             display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 -15px 30px rgba(0, 0, 0, 0.05); /* Jemný tieň namiesto čiary */
         }
 
-        .footer-separator {
-            width: 100%; height: 1px; background-color: var(--black);
-            margin-bottom: 20px;
-        }
-
-        /* ✉️ Spoločný štýl pre odkazy v pätičke */
         .footer-link-group {
             margin-bottom: 15px;
             text-align: center;
@@ -316,12 +317,11 @@
     </main>
 
     <footer>
-        <div class="footer-separator"></div>
         <div class="footer-link-group">
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.10 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.11 • martin vojtus • 2026</div>
     </footer>
 
     <script>
