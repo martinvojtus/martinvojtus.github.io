@@ -44,65 +44,28 @@
             position: relative;
         }
 
-        .logo-link {
-            display: flex; align-items: center;
-            text-decoration: none; color: inherit;
-            cursor: pointer;
-        }
-
+        .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
         .header-left svg { height: 24px; width: auto; display: block; }
-
-        .logo-text {
-            position: absolute; left: 50%; transform: translateX(-50%);
-            font-size: var(--size-small); letter-spacing: 0.05em;
-            white-space: nowrap;
-        }
-
+        .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); letter-spacing: 0.05em; white-space: nowrap; }
         .logo-text span { font-weight: 700; }
 
-        .menu-toggle {
-            width: 24px; height: 12px;
-            display: flex; flex-direction: column; justify-content: space-between;
-            cursor: pointer; z-index: 2100;
-        }
-
-        .line {
-            width: 24px; height: 1px;
-            background-color: var(--black);
-            transition: transform 0.3s ease;
-        }
-
+        .menu-toggle { width: 24px; height: 12px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; z-index: 2100; }
+        .line { width: 24px; height: 1px; background-color: var(--black); transition: transform 0.3s ease; }
         .menu-toggle.active .line:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
         .menu-toggle.active .line:nth-child(2) { transform: translateY(-5.5px) rotate(-45deg); }
 
         .nav-overlay {
-            position: fixed; top: -100%; left: 0;
-            width: 100%; 
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            position: fixed; top: -100%; left: 0; width: 100%; 
+            background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1);
-            z-index: 1500; padding: 80px 0 40px 0;
-            display: flex; flex-direction: column; align-items: center;
+            z-index: 1500; padding: 80px 0 40px 0; display: flex; flex-direction: column; align-items: center;
         }
-
         .nav-overlay.active { top: 0; }
-
-        .menu-items {
-            width: 100%; max-width: var(--content-width);
-            display: flex; flex-direction: column; gap: 25px; padding: 0 20px; box-sizing: border-box;
-        }
-
-        .menu-link {
-            text-decoration: none; color: var(--black);
-            font-size: var(--size-small);
-            display: flex; align-items: center;
-            cursor: pointer;
-            letter-spacing: 0.02em;
-        }
+        .menu-items { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: 25px; padding: 0 20px; box-sizing: border-box; }
+        .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; }
 
         main {
-            padding: 65px 20px 20px;
+            padding: 65px 20px 0px; /* Minimalizovaný spodný padding pre tesné nadviazanie pätičky */
             width: 100%; max-width: var(--content-width); 
             box-sizing: border-box;
             flex-grow: 1;
@@ -110,120 +73,57 @@
 
         .content-section { display: none; animation: fadeIn 0.4s ease; }
         .content-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h2 {
-            font-size: var(--size-large); font-weight: 600;
-            margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1;
-        }
+        h2 { font-size: var(--size-large); font-weight: 600; margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1; }
 
         .portrait-container { width: 100%; margin-top: 20px; margin-bottom: 40px; }
         .photo-frame {
-            width: 100%; aspect-ratio: 3 / 4;
-            border-radius: 12px; 
-            overflow: hidden;
-            background-color: #000000; 
-            position: relative;
-            color: var(--white); 
-            font-size: var(--size-small);
-            letter-spacing: 0.05em;
+            width: 100%; aspect-ratio: 3 / 4; border-radius: 12px; 
+            overflow: hidden; background-color: #000000; 
+            position: relative; color: var(--white); 
+            font-size: var(--size-small); letter-spacing: 0.05em;
             display: flex; align-items: center; justify-content: center;
         }
+        .photo-frame img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); display: block; }
 
-        .photo-frame img {
-            width: 100%; height: 100%; object-fit: cover;
-            filter: grayscale(100%); display: block;
-        }
-
-        .gallery-link {
-            display: block; width: 100%; height: 100%; text-decoration: none;
-        }
-
+        .gallery-link { display: block; width: 100%; height: 100%; text-decoration: none; }
         .gallery-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, var(--black) 100%);
             display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
-            padding-bottom: 10px; 
-            box-sizing: border-box;
-            color: var(--white); text-align: center;
+            padding-bottom: 15px; box-sizing: border-box; color: var(--white); text-align: center;
         }
-
-        .gallery-title {
-            font-size: var(--size-large); font-weight: 600; line-height: 1; margin-bottom: 5px;
-        }
-        .gallery-desc {
-            font-size: var(--size-small); font-weight: 400; opacity: 0.8;
-        }
+        .gallery-title { font-size: var(--size-large); font-weight: 600; line-height: 1; margin-bottom: 5px; }
+        .gallery-desc { font-size: var(--size-small); font-weight: 400; opacity: 0.8; }
 
         .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
         .content-text p { margin-bottom: 1.5rem; }
 
         .contact-form { margin-top: 30px; }
         .form-group { margin-bottom: 25px; }
-        
-        .form-label {
-            display: block; font-size: var(--size-small); text-transform: uppercase;
-            font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em;
-        }
-
-        .form-input, .form-textarea {
-            width: 100%; border: none; border-bottom: 1px solid var(--black);
-            background: transparent; font-family: inherit; font-size: var(--size-small);
-            padding: 10px 0; color: var(--black); outline: none; border-radius: 0;
-        }
-
+        .form-label { display: block; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em; }
+        .form-input, .form-textarea { width: 100%; border: none; border-bottom: 1px solid var(--black); background: transparent; font-family: inherit; font-size: var(--size-small); padding: 10px 0; outline: none; border-radius: 0; }
         .form-textarea { min-height: 80px; resize: vertical; }
 
         .submit-btn {
-            width: 100%; background: var(--black); color: var(--white);
-            border: none; padding: 18px; font-family: inherit; font-size: var(--size-small);
-            text-transform: uppercase; font-weight: 600; letter-spacing: 0.1em;
-            cursor: pointer; margin-top: 20px; transition: opacity 0.3s ease;
+            width: 100%; background: var(--black); color: var(--white); border: none; padding: 18px; 
+            font-family: inherit; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; 
+            letter-spacing: 0.1em; cursor: pointer; margin-top: 20px; transition: opacity 0.3s ease;
         }
-
         .submit-btn:hover { opacity: 0.8; }
 
+        /* 🦶 Pätička - Prisunutá hneď pod obsah */
         footer {
             width: 100%; max-width: var(--content-width);
-            padding: 40px 20px 30px;
+            padding: 10px 20px 30px; /* Zmenšený horný padding */
             box-sizing: border-box;
             display: flex; flex-direction: column; align-items: center;
         }
-
-        .footer-separator {
-            width: 100%; height: 1px; background-color: var(--black);
-            margin-bottom: 20px;
-        }
-
-        .footer-link-group {
-            margin-bottom: 15px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .footer-link-group a {
-            font-size: var(--size-small);
-            font-weight: 400;
-            color: var(--black);
-            text-decoration: none;
-            letter-spacing: 0.02em;
-            transition: opacity 0.3s ease;
-        }
-
-        .footer-link-group a:hover {
-            opacity: 0.6;
-        }
-
-        .footer-info {
-            font-size: var(--size-small); color: var(--black);
-            text-transform: uppercase; letter-spacing: 0.1em; text-align: center;
-        }
+        .footer-link-group { margin-bottom: 15px; text-align: center; display: flex; flex-direction: column; gap: 8px; }
+        .footer-link-group a { font-size: var(--size-small); font-weight: 400; color: var(--black); text-decoration: none; letter-spacing: 0.02em; transition: opacity 0.3s ease; }
+        .footer-link-group a:hover { opacity: 0.6; }
+        .footer-info { font-size: var(--size-small); color: var(--black); text-transform: uppercase; letter-spacing: 0.1em; text-align: center; }
     </style>
 </head>
 <body>
@@ -232,25 +132,18 @@
         <div class="header-content">
             <div class="logo-link" onclick="showSection('about')">
                 <div class="header-left">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="935.31" height="810" viewBox="72.35 270 935.31 810">
-                      <g transform="translate(540, 540)">
-                        <path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="#000000" />
-                      </g>
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="935.31" height="810" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="#000000" /></g></svg>
                 </div>
                 <div class="logo-text"><span>martinvojtus</span> • space</div>
             </div>
-            <div class="menu-toggle" id="menuToggle">
-                <div class="line"></div>
-                <div class="line"></div>
-            </div>
+            <div class="menu-toggle" id="menuToggle"><div class="line"></div><div class="line"></div></div>
         </div>
     </header>
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
             <a class="menu-link" onclick="showSection('about')"><span>About</span></a>
-            <a class="menu-link" onclick="closeMenu()"><span>Work</span></a>
+            <a class="menu-link" onclick="showSection('work')"><span>Work</span></a>
             <a class="menu-link" onclick="showSection('photography')"><span>Amateur photography</span></a>
             <a class="menu-link" onclick="showSection('contact')"><span>Contact</span></a>
         </div>
@@ -261,31 +154,37 @@
             <h2>My space, my vision.</h2>
             <div class="content-text">
                 <p>A minimalist designer focused on functional beauty and clear communication.</p>
-                <p>I believe that good design is as little design as possible. My approach is rooted in subtraction—removing the non-essential to reveal the core purpose of a product or brand.</p>
-                <p>My work spans across UI/UX design, design systems, and art direction. I'm constantly exploring the intersection of technology and aesthetics.</p>
+                <p>I believe that good design is as little design as possible. My approach is rooted in subtraction—removing the non-essential to reveal the core purpose.</p>
             </div>
             <div class="portrait-container">
+                <div class="photo-frame"><img src="portrait.jpeg" alt="Portrait" onerror="this.style.display='none'; this.parentNode.textContent='Portrait';"></div>
+            </div>
+        </div>
+
+        <div id="section-work" class="content-section">
+            <h2>Selected work.</h2>
+            <div class="content-text"><p>A collection of projects focused on digital products and brand identities.</p></div>
+            <div class="portrait-container">
                 <div class="photo-frame">
-                    <img src="portrait.jpeg" alt="Portrait" onerror="this.style.display='none'; this.parentNode.textContent='Portrait';">
+                    <a href="#" class="gallery-link">
+                        <img src="project-1.jpeg" alt="Work" onerror="this.style.display='none';">
+                        <div class="gallery-overlay">
+                            <span class="gallery-title">Project Name.</span>
+                            <span class="gallery-desc">Product Design • 2025</span>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
 
         <div id="section-photography" class="content-section">
             <h2>One tool for everything.</h2>
-            <div class="content-text">
-                <p>Just point and shoot. That simple. No further editing. Capture the moment as it is.</p>
-                <p>Post-processing on the iPhone captures the most realistic version of whatever you're shooting.</p>
-                <p>No SLR. No extra weight. No problem.</p>
-            </div>
+            <div class="content-text"><p>Just point and shoot. Capture the moment as it is.</p></div>
             <div class="portrait-container">
-                <div class="photo-frame" style="aspect-ratio: 3 / 4;">
+                <div class="photo-frame">
                     <a href="#" class="gallery-link">
                         <img src="IMG_4850.jpeg" alt="Photography" onerror="this.style.display='none';">
-                        <div class="gallery-overlay">
-                            <span class="gallery-title">Gallery.</span>
-                            <span class="gallery-desc">World through my eyes.</span>
-                        </div>
+                        <div class="gallery-overlay"><span class="gallery-title">Gallery.</span><span class="gallery-desc">World through my eyes.</span></div>
                     </a>
                 </div>
             </div>
@@ -293,34 +192,21 @@
 
         <div id="section-contact" class="content-section">
             <h2>Let's work together.</h2>
-            <div class="content-text">
-                <p>Have a project in mind? I'm currently available for new opportunities. Send me a message and let's discuss how we can create something meaningful.</p>
-            </div>
             <div class="contact-form">
-                <div class="form-group">
-                    <label class="form-label">Name</label>
-                    <input type="text" id="contact-name" class="form-input" placeholder="Charlie Harper">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" id="contact-email" class="form-input" placeholder="charlie@example.com">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Message</label>
-                    <textarea id="contact-message" class="form-textarea" placeholder="Tell me about your project…"></textarea>
-                </div>
+                <div class="form-group"><label class="form-label">Name</label><input type="text" id="contact-name" class="form-input" placeholder="Charlie Harper"></div>
+                <div class="form-group"><label class="form-label">Email</label><input type="email" id="contact-email" class="form-input" placeholder="charlie@example.com"></div>
+                <div class="form-group"><label class="form-label">Message</label><textarea id="contact-message" class="form-textarea" placeholder="Tell me about your project…"></textarea></div>
                 <button type="button" class="submit-btn" onclick="sendMail()">Send message</button>
             </div>
         </div>
     </main>
 
     <footer>
-        <div class="footer-separator"></div>
         <div class="footer-link-group">
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.11 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.12 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -338,17 +224,12 @@
 
         function sendMail() {
             const name = document.getElementById('contact-name').value;
-            const email = document.getElementById('contact-email').value;
             const message = document.getElementById('contact-message').value;
-            const subject = encodeURIComponent("Contact from " + name);
-            const body = encodeURIComponent("Name: " + name + "\nEmail: " + email + "\n\nMessage:\n" + message);
-            window.location.href = `mailto:martinvojtus@icloud.com?subject=${subject}&body=${body}`;
+            window.location.href = `mailto:martinvojtus@icloud.com?subject=Contact from ${name}&body=${message}`;
         }
 
         menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
-        document.addEventListener('click', (e) => {
-            if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu();
-        });
+        document.addEventListener('click', (e) => { if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); });
     </script>
 </body>
 </html>
