@@ -115,7 +115,6 @@
         }
         .submit-btn:hover { opacity: 0.8; }
 
-        /* 🦶 Pätička - Čistá, bez čiary a tieňa */
         footer {
             width: 100%; max-width: var(--content-width);
             padding: 15px 20px 30px;
@@ -160,7 +159,15 @@
                 <p>My work spans across UI/UX design, design systems, and art direction. I'm constantly exploring the intersection of technology and aesthetics.</p>
             </div>
             <div class="portrait-container">
-                <div class="photo-frame"><img src="portrait.jpeg" alt="Portrait" onerror="this.style.display='none'; this.parentNode.textContent='Portrait';"></div>
+                <div class="photo-frame">
+                    <div class="gallery-link">
+                        <img src="portrait.jpeg" alt="Portrait" onerror="this.style.display='none';">
+                        <div class="gallery-overlay">
+                            <span class="gallery-title">Portrait.</span>
+                            <span class="gallery-desc">Croatia • 2024</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -216,7 +223,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.13 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.14 • martin vojtus • 2026</div>
     </footer>
 
     <script>
