@@ -24,7 +24,6 @@
             -webkit-text-size-adjust: 100%;
         }
 
-        /* 🧊 Spoločný štýl pre dynamické bannery */
         header, footer {
             position: fixed; left: 0; width: 100%; height: var(--banner-height);
             display: flex; justify-content: center; align-items: center;
@@ -38,7 +37,6 @@
         header { top: 0; padding-top: env(safe-area-inset-top); }
         footer { bottom: 0; padding-bottom: env(safe-area-inset-bottom); }
 
-        /* 🙈 Stavy pre schovanie */
         header.nav-hidden { transform: translateY(-100%); }
         footer.nav-hidden { transform: translateY(100%); }
 
@@ -97,9 +95,6 @@
         .gallery-title { font-size: var(--size-large); font-weight: 600; line-height: 1; margin: 0 0 5px 0; }
         .gallery-desc { font-size: var(--size-small); font-weight: 400; opacity: 0.8; margin: 0; }
 
-        .content-text { font-size: var(--size-small); text-align: justify; }
-        .content-text p { margin-bottom: 1.5rem; }
-
         .contact-form { margin-top: 30px; }
         .form-group { margin-bottom: 25px; }
         .form-input, .form-textarea { width: 100%; border: none; border-bottom: 1px solid var(--black); background: transparent; font-family: inherit; font-size: var(--size-small); padding: 10px 0; outline: none; }
@@ -141,17 +136,12 @@
     <main>
         <div id="section-about" class="content-section active">
             <h2>My space, my vision.</h2>
-            <div class="content-text">
-                <p>A minimalist designer focused on functional beauty and clear communication.</p>
-                <p>Subtraction is my core method—removing the non-essential to reveal the core purpose.</p>
-            </div>
             <div class="portrait-container">
                 <div class="photo-frame"><img src="portrait.jpeg" alt="Portrait" onerror="this.style.display='none';"></div>
             </div>
         </div>
 
         <div id="section-photography" class="content-section">
-            <h2>One tool for everything.</h2>
             <div class="portrait-container">
                 <div class="photo-frame" style="aspect-ratio: 16 / 9;">
                     <a href="#" class="gallery-link">
@@ -178,7 +168,7 @@
 
     <footer id="mainFooter">
         <div class="banner-content" style="justify-content: center;">
-            <div class="footer-info">build v1.1.9 • martin vojtus • 2026</div>
+            <div class="footer-info">build v1.1.10 • martin vojtus • 2026</div>
         </div>
     </footer>
 
@@ -189,32 +179,32 @@
         const navOverlay = document.getElementById('navOverlay');
         let lastScroll = 0;
 
-        // Smart Show/Hide Logika
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;
-            
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+
+            // Logika pre schovanie počas pohybu
+            if (currentScroll > 10 && currentScroll < maxScroll - 10) {
+                header.classList.add('nav-hidden');
+                footer.classList.add('nav-hidden');
+            }
+
+            // Ukázať na úplnom začiatku
             if (currentScroll <= 0) {
                 header.classList.remove('nav-hidden');
                 footer.classList.remove('nav-hidden');
-                return;
             }
 
-            if (currentScroll > lastScroll && !header.classList.contains('nav-hidden')) {
-                // Scroll DOLE -> Skryť
-                header.classList.add('nav-hidden');
-                footer.classList.add('nav-hidden');
-            } else if (currentScroll < lastScroll && header.classList.contains('nav-hidden')) {
-                // Scroll HORE -> Ukázať
+            // Ukázať na úplnom konci
+            if (currentScroll >= maxScroll - 2) {
                 header.classList.remove('nav-hidden');
                 footer.classList.remove('nav-hidden');
             }
-            lastScroll = currentScroll;
         });
 
         function toggleMenu() { 
             menuToggle.classList.toggle('active'); 
             navOverlay.classList.toggle('active');
-            // Pri otvorenom menu bannery nezmiznú
             header.classList.remove('nav-hidden');
             footer.classList.remove('nav-hidden');
         }
