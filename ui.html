@@ -27,6 +27,7 @@
             min-height: 100vh;
         }
 
+        /* 🧊 Banner */
         header {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 50px;
@@ -54,6 +55,7 @@
         .menu-toggle.active .line:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
         .menu-toggle.active .line:nth-child(2) { transform: translateY(-5.5px) rotate(-45deg); }
 
+        /* 📜 Menu */
         .nav-overlay {
             position: fixed; top: -100%; left: 0; width: 100%; 
             background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
@@ -71,9 +73,30 @@
             flex-grow: 1;
         }
 
-        .content-section { display: none; animation: fadeIn 0.4s ease; }
+        /* 🪄 Animácie pre prechody */
+        .content-section { display: none; }
         .content-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-5px); }
+        }
+
+        /* Staggered Load efekt pre deti aktívnej sekcie */
+        .content-section.active > * {
+            opacity: 0;
+            animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .content-section.active h2 { animation-delay: 0.05s; }
+        .content-section.active .content-text { animation-delay: 0.15s; }
+        .content-section.active .portrait-container { animation-delay: 0.25s; }
+        .content-section.active .contact-form { animation-delay: 0.25s; }
 
         h2 { font-size: var(--size-large); font-weight: 600; margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1; }
 
@@ -223,7 +246,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.14 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.15 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -234,9 +257,28 @@
         function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); }
 
         function showSection(sectionId) {
-            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-            document.getElementById('section-' + sectionId).classList.add('active');
-            closeMenu(); window.scrollTo(0, 0);
+            const current = document.querySelector('.content-section.active');
+            const target = document.getElementById('section-' + sectionId);
+            
+            if (current === target) { closeMenu(); return; }
+
+            // 🌫️ Cross-fade: Odchod starej sekcie
+            if (current) {
+                current.style.animation = 'fadeOut 0.2s ease forwards';
+                setTimeout(() => {
+                    document.querySelectorAll('.content-section').forEach(s => {
+                        s.classList.remove('active');
+                        s.style.animation = '';
+                    });
+                    target.classList.add('active');
+                    closeMenu();
+                    window.scrollTo(0, 0);
+                }, 200);
+            } else {
+                target.classList.add('active');
+                closeMenu();
+                window.scrollTo(0, 0);
+            }
         }
 
         function sendMail() {
