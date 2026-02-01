@@ -11,10 +11,9 @@
             --size-small: 1rem;
             --black: #000000;
             --white: #ffffff;
-            --content-width: 540px; /* Základná šírka pre mobil */
+            --content-width: 540px;
         }
 
-        /* 📱 Responzivita pre širšie obrazovky (Tablety, Desktop, Mobil na šírku) */
         @media (min-width: 768px) {
             :root { --content-width: 900px; }
         }
@@ -82,22 +81,34 @@
         .content-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 📖 Typografia - Udržanie čitateľnosti na širokých displejoch */
-        h2, .content-text { max-width: 540px; }
+        /* 🏗️ Grid pre Side-by-Side rozloženie */
+        .section-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .section-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 60px;
+                align-items: start;
+                margin-top: 20px;
+            }
+        }
 
         h2 { font-size: var(--size-large); font-weight: 600; margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1; }
 
-        /* 🏗️ Grid pre Projekty a Fotky */
         .work-grid {
             display: grid;
-            grid-template-columns: 1fr; /* 1 stĺpec na mobile */
+            grid-template-columns: 1fr;
             gap: 20px;
             margin-top: 20px;
             margin-bottom: 40px;
             width: 100%;
         }
 
-        /* 📐 Prepnutie na 2 stĺpce pri dostatočnej šírke */
         @media (min-width: 600px) {
             .work-grid { grid-template-columns: 1fr 1fr; }
         }
@@ -116,8 +127,7 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, var(--black) 100%);
             display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
-            padding-bottom: 15px; padding-left: 10px; padding-right: 10px;
-            box-sizing: border-box; color: var(--white); text-align: center;
+            padding-bottom: 15px; box-sizing: border-box; color: var(--white); text-align: center;
         }
         .gallery-title { font-size: var(--size-large); font-weight: 600; line-height: 1; margin-bottom: 5px; }
         .gallery-desc { font-size: var(--size-small); font-weight: 400; opacity: 0.8; }
@@ -125,7 +135,6 @@
         .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
         .content-text p { margin-bottom: 1.5rem; }
 
-        /* ✉️ Form styling */
         .contact-form { margin-top: 30px; max-width: 540px; }
         .form-group { margin-bottom: 25px; }
         .form-label { display: block; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em; }
@@ -177,18 +186,23 @@
 
     <main>
         <div id="section-about" class="content-section active">
-            <h2>My space, my vision.</h2>
-            <div class="content-text">
-                <p>A minimalist designer focused on functional beauty and clear communication.</p>
-                <p>I believe that good design is as little design as possible. My approach is rooted in subtraction—removing the non-essential to reveal the core purpose of a product or brand.</p>
-                <p>My work spans across UI/UX design, design systems, and art direction. I'm constantly exploring the intersection of technology and aesthetics.</p>
-            </div>
-            <div class="work-grid" style="grid-template-columns: 1fr;"> <div class="photo-frame">
-                    <div class="gallery-link">
-                        <img src="portrait.jpeg" alt="Portrait" onerror="this.style.display='none';">
-                        <div class="gallery-overlay">
-                            <span class="gallery-title">Portrait.</span>
-                            <span class="gallery-desc">Croatia • 2024</span>
+            <div class="section-grid">
+                <div class="text-block">
+                    <h2>My space, my vision.</h2>
+                    <div class="content-text">
+                        <p>A minimalist designer focused on functional beauty and clear communication.</p>
+                        <p>I believe that good design is as little design as possible. My approach is rooted in subtraction—removing the non-essential to reveal the core purpose of a product or brand.</p>
+                        <p>My work spans across UI/UX design, design systems, and art direction. I'm constantly exploring the intersection of technology and aesthetics.</p>
+                    </div>
+                </div>
+                <div class="portrait-container">
+                    <div class="photo-frame">
+                        <div class="gallery-link">
+                            <img src="portrait.jpeg" alt="Portrait" onerror="this.style.display='none';">
+                            <div class="gallery-overlay">
+                                <span class="gallery-title">Portrait.</span>
+                                <span class="gallery-desc">Croatia • 2024</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -201,46 +215,42 @@
             <div class="work-grid">
                 <div class="photo-frame">
                     <a href="https://apple.com" target="_blank" class="gallery-link">
-                        <img src="project-1.jpeg" alt="Minimalist Home" onerror="this.style.display='none';">
-                        <div class="gallery-overlay">
-                            <span class="gallery-title">Minimalist Home.</span>
-                            <span class="gallery-desc">Interior Design • 2025</span>
-                        </div>
+                        <img src="project-1.jpeg" alt="Work" onerror="this.style.display='none';">
+                        <div class="gallery-overlay"><span class="gallery-title">Minimalist Home.</span><span class="gallery-desc">Interior Design • 2025</span></div>
                     </a>
                 </div>
                 <div class="photo-frame">
                     <a href="https://cosmos.so" target="_blank" class="gallery-link">
-                        <img src="project-2.jpeg" alt="Eco Brand" onerror="this.style.display='none';">
-                        <div class="gallery-overlay">
-                            <span class="gallery-title">Eco Brand.</span>
-                            <span class="gallery-desc">Identity • 2024</span>
-                        </div>
+                        <img src="project-2.jpeg" alt="Work" onerror="this.style.display='none';">
+                        <div class="gallery-overlay"><span class="gallery-title">Eco Brand.</span><span class="gallery-desc">Identity • 2024</span></div>
                     </a>
                 </div>
                 <div class="photo-frame">
                     <a href="https://behance.net" target="_blank" class="gallery-link">
-                        <img src="project-3.jpeg" alt="Space App" onerror="this.style.display='none';">
-                        <div class="gallery-overlay">
-                            <span class="gallery-title">Space App.</span>
-                            <span class="gallery-desc">UI/UX Design • 2025</span>
-                        </div>
+                        <img src="project-3.jpeg" alt="Work" onerror="this.style.display='none';">
+                        <div class="gallery-overlay"><span class="gallery-title">Space App.</span><span class="gallery-desc">UI/UX Design • 2025</span></div>
                     </a>
                 </div>
             </div>
         </div>
 
         <div id="section-photography" class="content-section">
-            <h2>One tool for everything.</h2>
-            <div class="content-text">
-                <p>Just point and shoot. That simple. No further editing. Capture the moment as it is.</p>
-                <p>Post-processing on the iPhone captures the most realistic version of whatever you're shooting.</p>
-            </div>
-            <div class="work-grid">
-                <div class="photo-frame">
-                    <a href="#" class="gallery-link">
-                        <img src="IMG_4850.jpeg" alt="Photography" onerror="this.style.display='none';">
-                        <div class="gallery-overlay"><span class="gallery-title">Gallery.</span><span class="gallery-desc">World through my eyes.</span></div>
-                    </a>
+            <div class="section-grid">
+                <div class="text-block">
+                    <h2>One tool for everything.</h2>
+                    <div class="content-text">
+                        <p>Just point and shoot. That simple. No further editing. Capture the moment as it is.</p>
+                        <p>Post-processing on the iPhone captures the most realistic version of whatever you're shooting.</p>
+                        <p>No SLR. No extra weight. No problem.</p>
+                    </div>
+                </div>
+                <div class="portrait-container">
+                    <div class="photo-frame">
+                        <a href="#" class="gallery-link">
+                            <img src="IMG_4850.jpeg" alt="Photography" onerror="this.style.display='none';">
+                            <div class="gallery-overlay"><span class="gallery-title">Gallery.</span><span class="gallery-desc">World through my eyes.</span></div>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -261,7 +271,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.15 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.16 • martin vojtus • 2026</div>
     </footer>
 
     <script>
