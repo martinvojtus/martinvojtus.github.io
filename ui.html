@@ -81,7 +81,6 @@
         .content-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 🏗️ Grid pre Side-by-Side rozloženie */
         .section-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -135,7 +134,9 @@
         .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
         .content-text p { margin-bottom: 1.5rem; }
 
-        .contact-form { margin-top: 30px; max-width: 540px; }
+        .contact-form { margin-top: 30px; }
+        @media (min-width: 768px) { .contact-form { margin-top: 0; } }
+        
         .form-group { margin-bottom: 25px; }
         .form-label { display: block; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em; }
         .form-input, .form-textarea { width: 100%; border: none; border-bottom: 1px solid var(--black); background: transparent; font-family: inherit; font-size: var(--size-small); padding: 10px 0; outline: none; border-radius: 0; }
@@ -256,12 +257,19 @@
         </div>
 
         <div id="section-contact" class="content-section">
-            <h2>Let's work together.</h2>
-            <div class="contact-form">
-                <div class="form-group"><label class="form-label">Name</label><input type="text" id="contact-name" class="form-input" placeholder="Charlie Harper"></div>
-                <div class="form-group"><label class="form-label">Email</label><input type="email" id="contact-email" class="form-input" placeholder="charlie@example.com"></div>
-                <div class="form-group"><label class="form-label">Message</label><textarea id="contact-message" class="form-textarea" placeholder="Tell me about your project…"></textarea></div>
-                <button type="button" class="submit-btn" onclick="sendMail()">Send message</button>
+            <div class="section-grid">
+                <div class="text-block">
+                    <h2>Let's work together.</h2>
+                    <div class="content-text">
+                        <p>Have a project in mind? I'm currently available for new opportunities. Send me a message and let's discuss how we can create something meaningful.</p>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <div class="form-group"><label class="form-label">Name</label><input type="text" id="contact-name" class="form-input" placeholder="Charlie Harper"></div>
+                    <div class="form-group"><label class="form-label">Email</label><input type="email" id="contact-email" class="form-input" placeholder="charlie@example.com"></div>
+                    <div class="form-group"><label class="form-label">Message</label><textarea id="contact-message" class="form-textarea" placeholder="Tell me about your project…"></textarea></div>
+                    <button type="button" class="submit-btn" onclick="sendMail()">Send message</button>
+                </div>
             </div>
         </div>
     </main>
@@ -271,7 +279,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.16 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.17 • martin vojtus • 2026</div>
     </footer>
 
     <script>
