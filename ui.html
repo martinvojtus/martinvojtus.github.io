@@ -117,7 +117,6 @@
         .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
         .content-text p { margin-bottom: 1.5rem; }
 
-        /* FORMULÁR: Ostré rohy, spodná linka */
         .contact-form { margin-top: 30px; max-width: 540px; width: 100%; }
         @media (min-width: 768px) { .contact-form { margin-top: 0; } }
         
@@ -262,7 +261,10 @@
                         <p>Have a project in mind? I'm currently available for new opportunities. Send me a message and let's discuss how we can create something meaningful.</p>
                     </div>
                 </div>
-                <form class="contact-form" action="https://formspree.io/f/xykpbkyo" method="POST">
+                <form class="contact-form" action="https://formsubmit.co/martinvojtus@icloud.com" method="POST">
+                    <input type="hidden" name="_captcha" value="false">
+                    <input type="hidden" name="_subject" value="New submission from martinvojtus.space">
+                    
                     <div class="form-group"><label class="form-label">Name</label><input type="text" name="name" class="form-input" placeholder="Charlie Harper" required></div>
                     <div class="form-group"><label class="form-label">Email</label><input type="email" name="email" class="form-input" placeholder="charlie@example.com" required></div>
                     <div class="form-group"><label class="form-label">Message</label><textarea name="message" class="form-textarea" placeholder="Tell me about your project…" required></textarea></div>
@@ -277,7 +279,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.26 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.27 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -293,7 +295,7 @@
             closeMenu(); window.scrollTo(0, 0);
         }
 
-        // Logic pre odoslanie formulára cez Formspree AJAX
+        // AJAX Skript pre Formsubmit.co
         const form = document.querySelector('.contact-form');
         form.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -317,13 +319,7 @@
                         btn.disabled = false;
                     }, 4000);
                 } else {
-                    response.json().then(data => {
-                        if (Object.hasOwn(data, 'errors')) {
-                            btn.innerText = data["errors"].map(error => error["message"]).join(", ");
-                        } else {
-                            btn.innerText = 'Error. Try again.';
-                        }
-                    });
+                    btn.innerText = 'Error. Try again.';
                     setTimeout(() => {
                         btn.innerText = originalText;
                         btn.disabled = false;
