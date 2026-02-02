@@ -7,10 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Fonty: 1rem = 16px (Rieši zoom na iPhone) */
+            /* Fonty: 1rem = 16px */
             --size-large: 2.0rem;
             --size-small: 1.0rem;
-            
             --black: #000000;
             --white: #ffffff;
             --content-width: 540px;
@@ -67,13 +66,13 @@
         }
         .nav-overlay.active { top: 0; }
         
-        /* ✏️ OPRAVA: Položky menu teraz lícujú so šírkou obsahu (900px na tablete) */
+        /* ✏️ OPRAVA: Menu sa teraz prispôsobí šírke obsahu (540px alebo 900px) */
         .menu-items { 
             width: 100%; 
-            max-width: var(--content-width); 
+            max-width: var(--content-width); /* Bolo 540px */
             display: flex; flex-direction: column; gap: 25px; padding: 0 20px; box-sizing: border-box; 
         }
-
+        
         .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; }
 
         main {
@@ -220,9 +219,9 @@
             <div class="content-text"><p>A collection of projects focused on digital products and brand identities.</p></div>
             <div class="work-grid">
                 <div class="photo-frame">
-                    <a href="#" onclick="showSection('about'); return false;" class="gallery-link">
-                        <img src="project-1.jpeg" alt="Work" onerror="this.style.display='none';">
-                        <div class="gallery-overlay"><span class="gallery-title">Minimalist Home.</span><span class="gallery-desc">Interior Design • 2025</span></div>
+                    <a href="https://martinvojtus.github.io" class="gallery-link">
+                        <img src="work1.png" alt="Animations" onerror="this.style.display='none';">
+                        <div class="gallery-overlay"><span class="gallery-title">Animations.</span><span class="gallery-desc">HTML, CSS, JS</span></div>
                     </a>
                 </div>
                 <div class="photo-frame">
