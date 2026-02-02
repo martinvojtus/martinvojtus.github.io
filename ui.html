@@ -117,20 +117,35 @@
         .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
         .content-text p { margin-bottom: 1.5rem; }
 
+        /* FORMULÁR: Ostré rohy, spodná linka */
         .contact-form { margin-top: 30px; max-width: 540px; width: 100%; }
         @media (min-width: 768px) { .contact-form { margin-top: 0; } }
         
         .form-group { margin-bottom: 25px; }
         .form-label { display: block; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em; }
-        .form-input, .form-textarea { width: 100%; border: none; border-bottom: 1px solid var(--black); background: transparent; font-family: inherit; font-size: var(--size-small); padding: 10px 0; outline: none; border-radius: 0; }
+        
+        .form-input, .form-textarea {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid var(--black);
+            background: transparent;
+            font-family: inherit;
+            font-size: var(--size-small);
+            padding: 10px 0;
+            outline: none;
+            border-radius: 0; 
+        }
+        
         .form-textarea { min-height: 80px; resize: vertical; }
 
         .submit-btn {
             width: 100%; background: var(--black); color: var(--white); border: none; padding: 18px; 
             font-family: inherit; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; 
-            letter-spacing: 0.1em; cursor: pointer; margin-top: 0; transition: opacity 0.3s ease; border-radius: 0;
+            letter-spacing: 0.1em; cursor: pointer; margin-top: 0; transition: opacity 0.3s ease;
+            border-radius: 0;
         }
-        .submit-btn:hover { opacity: 0.8; }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .submit-btn:hover:not(:disabled) { opacity: 0.8; }
 
         footer {
             width: 100%; max-width: var(--content-width); padding: 15px 20px 30px; box-sizing: border-box;
@@ -247,10 +262,7 @@
                         <p>Have a project in mind? I'm currently available for new opportunities. Send me a message and let's discuss how we can create something meaningful.</p>
                     </div>
                 </div>
-                <form class="contact-form" action="https://formsubmit.co/martinvojtus@icloud.com" method="POST">
-                    <input type="hidden" name="_captcha" value="false">
-                    <input type="hidden" name="_subject" value="New submission from martinvojtus.space">
-                    
+                <form class="contact-form" action="https://formspree.io/f/xykpbkyo" method="POST">
                     <div class="form-group"><label class="form-label">Name</label><input type="text" name="name" class="form-input" placeholder="Charlie Harper" required></div>
                     <div class="form-group"><label class="form-label">Email</label><input type="email" name="email" class="form-input" placeholder="charlie@example.com" required></div>
                     <div class="form-group"><label class="form-label">Message</label><textarea name="message" class="form-textarea" placeholder="Tell me about your project…" required></textarea></div>
@@ -265,7 +277,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.25 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.26 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -281,8 +293,52 @@
             closeMenu(); window.scrollTo(0, 0);
         }
 
-        // Tu už nie je žiadny kód pre Formsubmit, všetko rieši HTML formulár sám
-        
+        // Logic pre odoslanie formulára cez Formspree AJAX
+        const form = document.querySelector('.contact-form');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = form.querySelector('.submit-btn');
+            const originalText = btn.innerText;
+            
+            btn.innerText = 'Sending...';
+            btn.disabled = true;
+
+            fetch(form.action, {
+                method: "POST",
+                body: new FormData(form),
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(response => {
+                if (response.ok) {
+                    btn.innerText = 'Message sent';
+                    form.reset();
+                    setTimeout(() => {
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                    }, 4000);
+                } else {
+                    response.json().then(data => {
+                        if (Object.hasOwn(data, 'errors')) {
+                            btn.innerText = data["errors"].map(error => error["message"]).join(", ");
+                        } else {
+                            btn.innerText = 'Error. Try again.';
+                        }
+                    });
+                    setTimeout(() => {
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                    }, 4000);
+                }
+            })
+            .catch(error => {
+                btn.innerText = 'Error. Connection problem.';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }, 4000);
+            });
+        });
+
         menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
         document.addEventListener('click', (e) => { if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); });
     </script>
