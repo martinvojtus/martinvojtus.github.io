@@ -113,8 +113,10 @@
             .work-grid { grid-template-columns: 1fr 1fr; }
         }
 
+        /* ✏️ Ostré rohy pre fotky */
         .photo-frame {
-            width: 100%; aspect-ratio: 3 / 4; border-radius: 12px; 
+            width: 100%; aspect-ratio: 3 / 4; 
+            border-radius: 0; /* Ostré rohy */
             overflow: hidden; background-color: #000000; 
             position: relative; color: var(--white); 
             font-size: var(--size-small); letter-spacing: 0.05em;
@@ -143,27 +145,27 @@
         .form-group { margin-bottom: 25px; }
         .form-label { display: block; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em; }
         
-        /* ✏️ OPRAVA: Plný rámček, padding a zaoblenie pre inputy */
+        /* ✏️ Návrat k spodnej linke a ostrým rohom */
         .form-input, .form-textarea {
             width: 100%;
-            border: 1px solid var(--black);
+            border: none;
+            border-bottom: 1px solid var(--black);
             background: transparent;
             font-family: inherit;
             font-size: var(--size-small);
-            padding: 12px 16px; /* Vnútorné odsadenie textu od okraja */
+            padding: 10px 0;
             outline: none;
-            border-radius: 12px; /* Zaoblenie zhodné s fotkami */
-            box-sizing: border-box; /* Aby padding nezväčšoval šírku */
+            border-radius: 0; /* Ostré rohy */
         }
         
         .form-textarea { min-height: 80px; resize: vertical; }
 
-        /* ✏️ OPRAVA: Zaoblenie pre tlačidlo */
+        /* ✏️ Ostré rohy pre tlačidlo */
         .submit-btn {
             width: 100%; background: var(--black); color: var(--white); border: none; padding: 18px; 
             font-family: inherit; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; 
             letter-spacing: 0.1em; cursor: pointer; margin-top: 0; transition: opacity 0.3s ease;
-            border-radius: 12px; /* Zaoblenie zhodné s fotkami */
+            border-radius: 0; /* Ostré rohy */
         }
         .submit-btn:hover { opacity: 0.8; }
 
@@ -303,7 +305,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.22 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.23 • martin vojtus • 2026</div>
     </footer>
 
     <script>
