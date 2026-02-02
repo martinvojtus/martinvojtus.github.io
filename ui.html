@@ -113,10 +113,10 @@
             .work-grid { grid-template-columns: 1fr 1fr; }
         }
 
-        /* ✏️ Ostré rohy pre fotky */
+        /* Ostré rohy pre fotky */
         .photo-frame {
             width: 100%; aspect-ratio: 3 / 4; 
-            border-radius: 0; /* Ostré rohy */
+            border-radius: 0; 
             overflow: hidden; background-color: #000000; 
             position: relative; color: var(--white); 
             font-size: var(--size-small); letter-spacing: 0.05em;
@@ -139,13 +139,13 @@
         .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
         .content-text p { margin-bottom: 1.5rem; }
 
-        .contact-form { margin-top: 30px; max-width: 540px; }
+        /* FORMULÁR: Ostré rohy, spodná linka */
+        .contact-form { margin-top: 30px; max-width: 540px; width: 100%; }
         @media (min-width: 768px) { .contact-form { margin-top: 0; } }
         
         .form-group { margin-bottom: 25px; }
         .form-label { display: block; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em; }
         
-        /* ✏️ Návrat k spodnej linke a ostrým rohom */
         .form-input, .form-textarea {
             width: 100%;
             border: none;
@@ -155,19 +155,19 @@
             font-size: var(--size-small);
             padding: 10px 0;
             outline: none;
-            border-radius: 0; /* Ostré rohy */
+            border-radius: 0; 
         }
         
         .form-textarea { min-height: 80px; resize: vertical; }
 
-        /* ✏️ Ostré rohy pre tlačidlo */
         .submit-btn {
             width: 100%; background: var(--black); color: var(--white); border: none; padding: 18px; 
             font-family: inherit; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; 
             letter-spacing: 0.1em; cursor: pointer; margin-top: 0; transition: opacity 0.3s ease;
-            border-radius: 0; /* Ostré rohy */
+            border-radius: 0;
         }
-        .submit-btn:hover { opacity: 0.8; }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .submit-btn:hover:not(:disabled) { opacity: 0.8; }
 
         footer {
             width: 100%; max-width: var(--content-width);
@@ -290,12 +290,24 @@
                         <p>Have a project in mind? I'm currently available for new opportunities. Send me a message and let's discuss how we can create something meaningful.</p>
                     </div>
                 </div>
-                <div class="contact-form">
-                    <div class="form-group"><label class="form-label">Name</label><input type="text" id="contact-name" class="form-input" placeholder="Charlie Harper"></div>
-                    <div class="form-group"><label class="form-label">Email</label><input type="email" id="contact-email" class="form-input" placeholder="charlie@example.com"></div>
-                    <div class="form-group"><label class="form-label">Message</label><textarea id="contact-message" class="form-textarea" placeholder="Tell me about your project…"></textarea></div>
-                    <button type="button" class="submit-btn" onclick="sendMail()">Send message</button>
-                </div>
+                <form class="contact-form" action="https://formsubmit.co/martinvojtus@icloud.com" method="POST">
+                    <input type="hidden" name="_captcha" value="false">
+                    <input type="hidden" name="_subject" value="New submission from martinvojtus.space">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input type="text" name="name" class="form-input" placeholder="Charlie Harper" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-input" placeholder="charlie@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea name="message" class="form-textarea" placeholder="Tell me about your project…" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Send message</button>
+                </form>
             </div>
         </div>
     </main>
@@ -305,7 +317,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.23 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.24 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -321,11 +333,46 @@
             closeMenu(); window.scrollTo(0, 0);
         }
 
-        function sendMail() {
-            const name = document.getElementById('contact-name').value;
-            const message = document.getElementById('contact-message').value;
-            window.location.href = `mailto:martinvojtus@icloud.com?subject=Contact from ${name}&body=${message}`;
-        }
+        // Logic pre bezpečné odoslanie formulára cez AJAX
+        const form = document.querySelector('.contact-form');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Zastaví presmerovanie stránky
+            
+            const btn = form.querySelector('.submit-btn');
+            const originalText = btn.innerText;
+            
+            // Stav načítania
+            btn.innerText = 'Sending...';
+            btn.disabled = true;
+
+            fetch(form.action, {
+                method: "POST",
+                body: new FormData(form),
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Úspech
+                    btn.innerText = 'Message sent';
+                    form.reset(); // Vyčistenie polí
+                    setTimeout(() => {
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                    }, 4000);
+                } else {
+                    // Chyba na strane servera
+                    throw new Error('Server error');
+                }
+            })
+            .catch(error => {
+                // Chyba pripojenia
+                btn.innerText = 'Error. Try again.';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }, 4000);
+            });
+        });
 
         menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
         document.addEventListener('click', (e) => { if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); });
