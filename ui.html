@@ -92,8 +92,14 @@
 
         h2 { font-size: var(--size-large); font-weight: 600; margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1; }
 
+        /* ✏️ OPRAVA: Odstránená margin-bottom (bola 40px) */
         .work-grid {
-            display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 20px; margin-bottom: 40px; width: 100%;
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 20px; 
+            margin-top: 20px; 
+            margin-bottom: 0; 
+            width: 100%;
         }
         @media (min-width: 600px) { .work-grid { grid-template-columns: 1fr 1fr; } }
 
