@@ -7,10 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* ✏️ UPRAVENÉ: Zväčšené fonty (1rem = 16px) */
+            /* Fonty: 1rem = 16px */
             --size-large: 2.0rem;
             --size-small: 1.0rem;
-            
             --black: #000000;
             --white: #ffffff;
             --content-width: 540px;
@@ -66,7 +65,14 @@
             z-index: 1500; padding: 80px 0 40px 0; display: flex; flex-direction: column; align-items: center;
         }
         .nav-overlay.active { top: 0; }
-        .menu-items { width: 100%; max-width: 540px; display: flex; flex-direction: column; gap: 25px; padding: 0 20px; box-sizing: border-box; }
+        
+        /* ✏️ OPRAVA: Menu sa teraz prispôsobí šírke obsahu (540px alebo 900px) */
+        .menu-items { 
+            width: 100%; 
+            max-width: var(--content-width); /* Bolo 540px */
+            display: flex; flex-direction: column; gap: 25px; padding: 0 20px; box-sizing: border-box; 
+        }
+        
         .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; }
 
         main {
@@ -136,7 +142,7 @@
             border-bottom: 1px solid var(--black);
             background: transparent;
             font-family: inherit;
-            font-size: var(--size-small); /* Teraz už 16px */
+            font-size: var(--size-small);
             padding: 10px 0;
             outline: none;
             border-radius: 0; 
@@ -286,7 +292,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.29 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.30 • martin vojtus • 2026</div>
     </footer>
 
     <script>
