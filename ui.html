@@ -13,7 +13,7 @@
             --black: #000000;
             --white: #ffffff;
             --content-width: 540px;
-            --border-radius: 12px; /* Nová premenná pre zaoblenie */
+            --border-radius: 12px;
         }
 
         @media (min-width: 768px) { :root { --content-width: 900px; } }
@@ -110,44 +110,41 @@
         }
         @media (min-width: 600px) { .work-grid { grid-template-columns: 1fr 1fr; } }
 
-        /* ✏️ UPRAVENÉ: Rámik, zaoblenie a biele pozadie pre karty */
         .photo-frame {
             width: 100%; aspect-ratio: 3 / 4; 
-            border-radius: var(--border-radius); /* Zaoblené rohy */
-            border: 1px solid var(--black); /* 1px čierny rám */
+            border-radius: var(--border-radius); 
+            border: 1px solid var(--black); 
             overflow: hidden; 
             background-color: #ffffff; 
             position: relative; 
-            color: var(--black); /* Text je teraz čierny */
+            color: var(--black); 
             font-size: var(--size-small); letter-spacing: 0.05em;
             display: flex; align-items: center; justify-content: center;
         }
         .photo-frame img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); display: block; }
 
-        /* ✏️ NOVÉ: Pseudo-element pre gradientné rozostrenie (blur) */
+        /* ✏️ UPRAVENÉ: Silnejší blur a väčší dosah gradientu */
         .photo-frame::after {
             content: '';
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            backdrop-filter: blur(8px); /* Sila rozostrenia */
-            /* Maska: hore priehľadná (ostrý obraz), dole nepriehľadná (aplikuje sa blur) */
-            -webkit-mask-image: linear-gradient(to bottom, transparent 40%, black 100%);
-            mask-image: linear-gradient(to bottom, transparent 40%, black 100%);
+            backdrop-filter: blur(15px); /* Zvýšené z 8px na 15px */
+            -webkit-mask-image: linear-gradient(to bottom, transparent 25%, black 100%); /* Začína skôr */
+            mask-image: linear-gradient(to bottom, transparent 25%, black 100%);
             z-index: 1;
             pointer-events: none;
         }
 
         .gallery-link { display: block; width: 100%; height: 100%; text-decoration: none; cursor: pointer; }
         
-        /* ✏️ UPRAVENÉ: Odstránený starý tmavý gradient */
         .gallery-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: none; /* Žiadne pozadie */
+            background: none; 
             display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
             padding: 0 20px 20px 20px; box-sizing: border-box; 
-            color: var(--black); /* Čierny text */
+            color: var(--black); 
             text-align: center;
-            z-index: 2; /* Text musí byť nad vrstvou rozostrenia */
+            z-index: 2; 
         }
         .gallery-title { font-size: var(--size-large); font-weight: 600; line-height: 1; margin-bottom: 5px; }
         .gallery-desc { font-size: var(--size-small); font-weight: 400; opacity: 1; }
@@ -161,17 +158,16 @@
         .form-group { margin-bottom: 25px; }
         .form-label { display: block; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em; }
         
-        /* ✏️ UPRAVENÉ: Formulárové polia s rámikom a zaoblením */
         .form-input, .form-textarea {
             width: 100%;
-            border: 1px solid var(--black); /* Celý rámik */
-            border-radius: var(--border-radius); /* Zaoblené rohy */
+            border: 1px solid var(--black); 
+            border-radius: var(--border-radius); 
             background: transparent;
             font-family: inherit;
             font-size: var(--size-small);
-            padding: 15px; /* Vnútorné odsadenie textu */
+            padding: 15px; 
             outline: none;
-            box-sizing: border-box; /* Aby padding nerozbil šírku */
+            box-sizing: border-box; 
         }
         
         .form-textarea { min-height: 80px; resize: vertical; }
@@ -180,7 +176,7 @@
             width: 100%; background: var(--black); color: var(--white); border: none; padding: 18px; 
             font-family: inherit; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; 
             letter-spacing: 0.1em; cursor: pointer; margin-top: 0; transition: opacity 0.3s ease;
-            border-radius: var(--border-radius); /* Tlačidlo tiež zaoblíme */
+            border-radius: var(--border-radius); 
         }
         .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .submit-btn:hover:not(:disabled) { opacity: 0.8; }
@@ -256,18 +252,6 @@
                         <div class="gallery-overlay"><span class="gallery-title">Branding.</span><span class="gallery-desc">Logo • Ads • Graphics</span></div>
                     </a>
                 </div>
-                <div class="photo-frame">
-                    <a href="#" onclick="showSection('about'); return false;" class="gallery-link">
-                        <img src="project-3.jpeg" alt="Work" onerror="this.style.display='none';">
-                        <div class="gallery-overlay"><span class="gallery-title">Space App.</span><span class="gallery-desc">UI/UX Design • 2025</span></div>
-                    </a>
-                </div>
-                <div class="photo-frame">
-                    <a href="#" onclick="showSection('about'); return false;" class="gallery-link">
-                        <img src="project-4.jpeg" alt="Work" onerror="this.style.display='none';">
-                        <div class="gallery-overlay"><span class="gallery-title">Digital Platform.</span><span class="gallery-desc">Web Design • 2025</span></div>
-                    </a>
-                </div>
             </div>
         </div>
 
@@ -318,7 +302,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.35 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.36 • martin vojtus • 2026</div>
     </footer>
 
     <script>
