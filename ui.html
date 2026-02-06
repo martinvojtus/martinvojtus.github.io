@@ -15,6 +15,16 @@
             --content-width: 540px;
             --border-radius: 12px;
             --btn-height: 60px;
+            
+            /* Priehľadnosť pre header a nav (RGB hodnoty pre rgba) */
+            --glass-bg: 255, 255, 255; 
+        }
+
+        /* ✏️ DARK MODE DEFINÍCIA - Inverzia farieb */
+        body.dark-mode {
+            --black: #ffffff;
+            --white: #000000;
+            --glass-bg: 0, 0, 0; /* Tmavé sklo */
         }
 
         @media (min-width: 768px) { :root { --content-width: 900px; } }
@@ -30,16 +40,18 @@
             line-height: 1.5;
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease; /* Plynulý prechod farieb */
         }
 
         header {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 50px;
             display: flex; justify-content: center;
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(var(--glass-bg), 0.3); /* Použitie premennej pre glass efekt */
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             z-index: 2000;
+            transition: background-color 0.3s ease;
         }
 
         .header-content {
@@ -50,20 +62,76 @@
             transition: max-width 0.4s ease;
         }
 
+        /* Kontajner pre pravú časť hlavičky (Toggle + Menu) */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px; /* Medzera medzi prepínačom a menu */
+        }
+
         .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
-        .header-left svg { height: 24px; width: auto; display: block; }
+        .header-left svg { height: 24px; width: auto; display: block; transition: fill 0.3s ease; }
         .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); letter-spacing: 0.05em; white-space: nowrap; }
         .logo-text span { font-weight: 700; }
 
+        /* ✏️ NOVÝ DARK MODE TOGGLE (Pill Shape) */
+        .theme-toggle {
+            width: 44px;
+            height: 24px;
+            border: 1px solid var(--black);
+            border-radius: 50px;
+            position: relative;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            padding: 2px;
+            box-sizing: border-box;
+        }
+
+        .toggle-circle {
+            width: 18px;
+            height: 18px;
+            background-color: var(--black);
+            border-radius: 50%;
+            position: absolute;
+            left: 2px; /* Štartovacia pozícia (Light mode) */
+            transition: transform 0.3s cubic-bezier(0.45, 0.05, 0.55, 0.95), background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Posun guličky v dark mode */
+        body.dark-mode .toggle-circle {
+            transform: translateX(20px); /* Posun doprava */
+        }
+
+        /* Ikony vnútri prepínača */
+        .toggle-icon {
+            width: 10px;
+            height: 10px;
+            fill: var(--white); /* Ikona má opačnú farbu ako gulička */
+            display: block;
+        }
+        
+        /* Skrývanie/zobrazovanie ikon */
+        .icon-moon { display: none; }
+        .icon-sun { display: block; }
+
+        body.dark-mode .icon-moon { display: block; }
+        body.dark-mode .icon-sun { display: none; }
+
+
         .menu-toggle { width: 24px; height: 12px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; z-index: 2100; }
-        .line { width: 24px; height: 1px; background-color: var(--black); transition: transform 0.3s ease; }
+        .line { width: 24px; height: 1px; background-color: var(--black); transition: transform 0.3s ease, background-color 0.3s ease; }
         .menu-toggle.active .line:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
         .menu-toggle.active .line:nth-child(2) { transform: translateY(-5.5px) rotate(-45deg); }
 
         .nav-overlay {
             position: fixed; top: -100%; left: 0; width: 100%; 
-            background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+            background: rgba(var(--glass-bg), 0.3); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1), background-color 0.3s ease;
             z-index: 1500; padding: 80px 0 40px 0; display: flex; flex-direction: column; align-items: center;
         }
         .nav-overlay.active { top: 0; }
@@ -74,7 +142,7 @@
             display: flex; flex-direction: column; gap: 25px; padding: 0 20px; box-sizing: border-box; 
         }
         
-        .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; }
+        .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; transition: color 0.3s ease; }
 
         main {
             padding: 65px 20px 0px; 
@@ -102,7 +170,7 @@
             #section-contact .section-grid { gap: 60px; } 
         }
 
-        h2 { font-size: var(--size-large); font-weight: 600; margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1; }
+        h2 { font-size: var(--size-large); font-weight: 600; margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1; transition: color 0.3s ease; }
 
         .work-grid {
             display: grid; 
@@ -121,7 +189,8 @@
             border-radius: var(--border-radius);
             border: 1px solid var(--black);
             overflow: hidden;
-            background-color: #ffffff;
+            background-color: var(--white); /* Pozadie karty sa tiež invertuje */
+            transition: border-color 0.3s ease, background-color 0.3s ease;
         }
 
         .card-image {
@@ -138,36 +207,44 @@
 
         .project-card::after {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 85%);
+            /* Gradient prechádza do aktuálnej farby pozadia (biela alebo čierna v dark mode) */
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, var(--white) 85%);
             z-index: 2; pointer-events: none;
+            transition: background 0.3s ease;
         }
+        
+        /* V dark mode musíme upraviť gradient pseudo-elementu, aby išiel do čiernej (čo je v dark mode --white) */
+        /* Poznámka: Keďže --white sa v dark mode mení na #000000, gradient hore bude fungovať automaticky!
+           Ale pozor na rgba(255,255,255,0). V dark mode by to malo ísť z transparentnej čiernej.
+           Pre zjednodušenie a zachovanie logiky "invert" nechávame gradient do var(--white). */
 
         .card-text-overlay {
             position: absolute; bottom: var(--btn-height); left: 0; width: 100%;
             padding: 0 20px 20px 20px; box-sizing: border-box; text-align: center;
-            z-index: 3; color: var(--black);
+            z-index: 3; color: var(--black); /* Text sa invertuje */
+            transition: color 0.3s ease;
         }
         .gallery-title { font-size: var(--size-large); font-weight: 600; line-height: 1; margin-bottom: 5px; display: block; }
         .gallery-desc { font-size: var(--size-small); font-weight: 400; opacity: 1; display: block; }
 
         .card-btn {
             position: absolute; bottom: 0; left: 0; width: 100%; height: var(--btn-height);
-            background: var(--black); color: var(--white);
+            background: var(--black); color: var(--white); /* Tlačidlo: Čierne pozadie, biely text (v light) */
             display: flex; align-items: center; justify-content: center;
             text-decoration: none; font-size: var(--size-small); font-weight: 700;
             letter-spacing: 0.1em; text-transform: uppercase;
-            z-index: 4; transition: background-color 0.3s ease;
+            z-index: 4; transition: background-color 0.3s ease, color 0.3s ease;
         }
         .card-btn:hover { opacity: 0.9; }
 
-        .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
+        .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; transition: color 0.3s ease; }
         .content-text p { margin-bottom: 1.5rem; }
 
         /* FORMULÁR */
         .contact-form { margin-top: 0; max-width: 540px; width: 100%; }
         
         .form-group { margin-bottom: 25px; }
-        .form-label { display: block; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em; }
+        .form-label { display: block; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em; transition: color 0.3s ease; }
         
         .form-input {
             width: 100%;
@@ -179,6 +256,8 @@
             padding: 15px; 
             outline: none;
             box-sizing: border-box; 
+            color: var(--black); /* Text inputu */
+            transition: border-color 0.3s ease, color 0.3s ease;
         }
 
         .message-box-merged {
@@ -187,6 +266,7 @@
             border-radius: var(--border-radius);
             overflow: hidden;
             display: flex; flex-direction: column;
+            transition: border-color 0.3s ease;
         }
 
         .merged-textarea {
@@ -200,6 +280,8 @@
             box-sizing: border-box;
             resize: vertical;
             min-height: 120px;
+            color: var(--black); /* Text v poli */
+            transition: color 0.3s ease;
         }
 
         .merged-btn {
@@ -211,7 +293,7 @@
             text-transform: uppercase; font-weight: 600;
             letter-spacing: 0.1em; cursor: pointer;
             border-radius: 0; 
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease;
         }
         .merged-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .merged-btn:hover:not(:disabled) { opacity: 0.8; }
@@ -221,9 +303,9 @@
             display: flex; flex-direction: column; align-items: center; transition: max-width 0.4s ease;
         }
         .footer-link-group { margin-bottom: 15px; text-align: center; display: flex; flex-direction: column; gap: 8px; }
-        .footer-link-group a { font-size: var(--size-small); font-weight: 400; color: var(--black); text-decoration: none; letter-spacing: 0.02em; transition: opacity 0.3s ease; }
+        .footer-link-group a { font-size: var(--size-small); font-weight: 400; color: var(--black); text-decoration: none; letter-spacing: 0.02em; transition: opacity 0.3s ease, color 0.3s ease; }
         .footer-link-group a:hover { opacity: 0.6; }
-        .footer-info { font-size: var(--size-small); color: var(--black); text-transform: uppercase; letter-spacing: 0.1em; text-align: center; }
+        .footer-info { font-size: var(--size-small); color: var(--black); text-transform: uppercase; letter-spacing: 0.1em; text-align: center; transition: color 0.3s ease; }
     </style>
 </head>
 <body>
@@ -232,11 +314,26 @@
         <div class="header-content">
             <div class="logo-link" onclick="showSection('about')">
                 <div class="header-left">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="935.31" height="810" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="#000000" /></g></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="935.31" height="810" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
                 </div>
                 <div class="logo-text"><span>martinvojtus</span> • space</div>
             </div>
-            <div class="menu-toggle" id="menuToggle"><div class="line"></div><div class="line"></div></div>
+            
+            <div class="header-right">
+                <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+                    <div class="toggle-circle">
+                        <svg class="toggle-icon icon-sun" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z" fill="currentColor"/>
+                            <path d="M12 2V4M12 20V22M4 12H2M22 12H20M19.07 4.93L17.66 6.34M6.34 17.66L4.93 19.07M19.07 19.07L17.66 17.66M6.34 6.34L4.93 4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <svg class="toggle-icon icon-moon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="menu-toggle" id="menuToggle"><div class="line"></div><div class="line"></div></div>
+            </div>
         </div>
     </header>
 
@@ -261,7 +358,7 @@
                     </div>
                 </div>
                 <div class="portrait-container">
-                    <div class="project-card" style="border: 1px solid black;">
+                    <div class="project-card" style="border: 1px solid var(--black);">
                         <img src="portrait.jpeg" class="card-image" alt="Portrait" onerror="this.style.display='none';">
                         <div class="card-text-overlay" style="bottom: 0;">
                             <span class="gallery-title">Portrait.</span>
@@ -348,7 +445,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.46 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.47 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -362,6 +459,22 @@
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
             document.getElementById('section-' + sectionId).classList.add('active');
             closeMenu(); window.scrollTo(0, 0);
+        }
+
+        // ✏️ NOVÁ FUNKCIA: Prepínanie témy
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            // Uloženie voľby do prehliadača
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Načítanie témy pri štarte
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
         }
 
         const form = document.querySelector('.contact-form');
