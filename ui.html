@@ -95,12 +95,11 @@
             width: 100%;
         }
 
-        /* ✏️ UPRAVENÉ: Pre sekciu Contact zmenšíme gap v mobile */
         #section-contact .section-grid { gap: 0px; } 
 
         @media (min-width: 768px) {
             .section-grid { grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; margin-top: 20px; }
-            #section-contact .section-grid { gap: 60px; } /* Reset pre desktop */
+            #section-contact .section-grid { gap: 60px; } 
         }
 
         h2 { font-size: var(--size-large); font-weight: 600; margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1; }
@@ -170,7 +169,6 @@
         .form-group { margin-bottom: 25px; }
         .form-label { display: block; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em; }
         
-        /* Obyčajné inputy (Name, Email) */
         .form-input {
             width: 100%;
             border: 1px solid var(--black); 
@@ -183,7 +181,6 @@
             box-sizing: border-box; 
         }
 
-        /* ✏️ NOVÉ: Spojený kontajner pre správu a tlačidlo */
         .message-box-merged {
             width: 100%;
             border: 1px solid var(--black);
@@ -192,10 +189,9 @@
             display: flex; flex-direction: column;
         }
 
-        /* Textarea vnútri spojeného kontajnera */
         .merged-textarea {
             width: 100%;
-            border: none; /* Žiadny rámik, drží ho rodič */
+            border: none; 
             background: transparent;
             font-family: inherit;
             font-size: var(--size-small);
@@ -206,7 +202,6 @@
             min-height: 120px;
         }
 
-        /* Tlačidlo vnútri spojeného kontajnera */
         .merged-btn {
             width: 100%;
             background: var(--black); color: var(--white);
@@ -215,7 +210,7 @@
             font-family: inherit; font-size: var(--size-small);
             text-transform: uppercase; font-weight: 600;
             letter-spacing: 0.1em; cursor: pointer;
-            border-radius: 0; /* Rohy rieši rodič */
+            border-radius: 0; 
             transition: opacity 0.3s ease;
         }
         .merged-btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -305,9 +300,7 @@
                 <div class="text-block">
                     <h2>One tool for everything.</h2>
                     <div class="content-text">
-                        <p>Just point and shoot. That simple. No further editing. Capture the moment as it is.</p>
-                        <p>Post-processing on the iPhone captures the most realistic version of whatever you're shooting.</p>
-                        <p>No SLR. No extra weight. No problem.</p>
+                        <p>Just point and shoot. That simple. No further editing. Capture the moment as it is. No SLR. No extra weight. No problem.</p>
                     </div>
                 </div>
                 <div class="portrait-container">
@@ -355,7 +348,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.45 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.46 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -371,11 +364,10 @@
             closeMenu(); window.scrollTo(0, 0);
         }
 
-        // AJAX Skript pre Formsubmit.co
         const form = document.querySelector('.contact-form');
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-            const btn = form.querySelector('.merged-btn'); // ✏️ Update selectoru pre tlačidlo
+            const btn = form.querySelector('.merged-btn');
             const originalText = btn.innerText;
             
             btn.innerText = 'Sending...';
