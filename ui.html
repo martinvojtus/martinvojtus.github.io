@@ -123,20 +123,33 @@
         }
         .photo-frame img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); display: block; }
 
-        /* ✏️ UPRAVENÉ: Blur gradient od 0% do 100% */
+        /* ✏️ VRSTVA 1: BLUR EFEKT (::before) */
+        .photo-frame::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            backdrop-filter: blur(30px); /* Silné rozostrenie */
+            /* Maska zabezpečí plynulý prechod bluru od 0% hore po 100% dole */
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+            z-index: 1; /* Vrstva nad obrázkom */
+            pointer-events: none;
+        }
+
+        /* ✏️ VRSTVA 2: BIELY GRADIENT (::after) */
         .photo-frame::after {
             content: '';
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            backdrop-filter: blur(30px); 
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%); /* Od 0% */
-            mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
-            z-index: 1;
+            /* Gradient z priehľadnej (hore) do plnej bielej (dole) */
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+            z-index: 2; /* Vrstva nad blurom */
             pointer-events: none;
         }
 
         .gallery-link { display: block; width: 100%; height: 100%; text-decoration: none; cursor: pointer; }
         
+        /* ✏️ UPRAVENÉ: Zvýšený z-index pre text */
         .gallery-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: none; 
@@ -144,7 +157,7 @@
             padding: 0 20px 20px 20px; box-sizing: border-box; 
             color: var(--black); 
             text-align: center;
-            z-index: 2; 
+            z-index: 3; /* Text musí byť úplne najvyššie */
         }
         .gallery-title { font-size: var(--size-large); font-weight: 600; line-height: 1; margin-bottom: 5px; }
         .gallery-desc { font-size: var(--size-small); font-weight: 400; opacity: 1; }
@@ -302,7 +315,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.40 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.41 • martin vojtus • 2026</div>
     </footer>
 
     <script>
