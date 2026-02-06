@@ -110,72 +110,51 @@
         }
         @media (min-width: 600px) { .work-grid { grid-template-columns: 1fr 1fr; } }
 
-        .photo-frame {
-            width: 100%; aspect-ratio: 3 / 4; 
-            border-radius: var(--border-radius); 
-            border: 1px solid var(--black); 
-            overflow: hidden; 
-            background-color: #ffffff; 
-            position: relative; 
-            color: var(--black); 
-            font-size: var(--size-small); letter-spacing: 0.05em;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .photo-frame img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); display: block; }
-
-        /* VRSTVA 1: BLUR EFEKT */
-        .photo-frame::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            backdrop-filter: blur(30px); 
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
-            mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        /* VRSTVA 2: BIELY GRADIENT */
-        .photo-frame::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        /* Odstránená stará trieda .gallery-link */
-        
-        .gallery-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: none; 
-            display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
-            padding: 0 20px 20px 20px; box-sizing: border-box; 
-            color: var(--black); 
-            text-align: center;
-            z-index: 3; 
-        }
-        .gallery-title { font-size: var(--size-large); font-weight: 600; line-height: 1; margin-bottom: 5px; }
-        .gallery-desc { font-size: var(--size-small); font-weight: 400; opacity: 1; }
-
-        /* ✏️ NOVÉ: Štýl pre tlačidlo v galérii (rovnaký ako submit-btn) */
-        .gallery-btn {
-            width: 100%;
-            background: var(--black); color: var(--white); 
-            border: none; padding: 15px; /* Trochu menší padding ako submit-btn aby to nepôsobilo obrovsky */
-            font-family: inherit; font-size: var(--size-small); 
-            text-transform: uppercase; font-weight: 600; 
-            letter-spacing: 0.1em; cursor: pointer; 
-            text-decoration: none; /* Keďže je to <a> tag */
+        /* ✏️ NOVÁ ŠTRUKTÚRA KARTY */
+        .project-card {
+            display: flex; flex-direction: column;
+            border: 1px solid var(--black);
             border-radius: var(--border-radius);
-            transition: opacity 0.3s ease;
-            margin-top: 15px; /* Odstup od popisu */
-            display: block;
-            box-sizing: border-box;
+            overflow: hidden; /* Zabezpečí zaoblenie rohov pre vnútorné prvky */
         }
-        .gallery-btn:hover { opacity: 0.8; }
 
+        /* Horná vizuálna časť (obrázok) */
+        .card-visual {
+            width: 100%; aspect-ratio: 3 / 4; 
+            position: relative; 
+            background-color: #ffffff; 
+            display: flex; align-items: center; justify-content: center;
+            border-bottom: 1px solid var(--black); /* Oddeľovacia čiara */
+        }
+        .card-visual img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); display: block; }
+
+        /* Zachované efekty na obrázku (voliteľné, ak ich chceš odstrániť, zmaž tieto dva bloky) */
+        .card-visual::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            backdrop-filter: blur(30px); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+            z-index: 1; pointer-events: none;
+        }
+        .card-visual::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+            z-index: 2; pointer-events: none;
+        }
+
+        /* ✏️ NOVÁ SPODNÁ ČASŤ - TLAČIDLO */
+        .card-action-btn {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background-color: var(--black); color: var(--white);
+            text-decoration: none;
+            padding: 25px 20px; /* Väčší padding pre masívnejší vzhľad */
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        .card-action-btn:hover { background-color: #333333; }
+
+        /* Štýly pre text vnútri tlačidla */
+        .action-title { font-size: var(--size-large); font-weight: 600; line-height: 1; margin-bottom: 8px; }
+        .action-desc { font-size: var(--size-small); font-weight: 400; opacity: 0.8; margin-bottom: 20px; }
+        .action-label { font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
 
         .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
         .content-text p { margin-bottom: 1.5rem; }
@@ -254,11 +233,12 @@
                     </div>
                 </div>
                 <div class="portrait-container">
-                    <div class="photo-frame">
-                        <div class="gallery-link">
-                            <img src="portrait.jpeg" alt="Portrait" onerror="this.style.display='none';">
-                            <div class="gallery-overlay"><span class="gallery-title">Portrait.</span><span class="gallery-desc">Croatia • 2024</span></div>
-                        </div>
+                    <div class="photo-frame" style="border: 1px solid black;">
+                        <img src="portrait.jpeg" alt="Portrait" onerror="this.style.display='none';">
+                    </div>
+                    <div style="text-align: center; margin-top: 15px; color: var(--black);">
+                        <span style="display:block; font-weight: 600; font-size: 1.2rem;">Portrait.</span>
+                        <span style="font-size: var(--size-small);">Croatia • 2024</span>
                     </div>
                 </div>
             </div>
@@ -268,21 +248,25 @@
             <h2>Selected work.</h2>
             <div class="content-text"><p>A collection of projects focused on digital products and brand identities.</p></div>
             <div class="work-grid">
-                <div class="photo-frame">
-                    <img src="work1.png" alt="Animations" onerror="this.style.display='none';">
-                    <div class="gallery-overlay">
-                        <span class="gallery-title">Animations.</span>
-                        <span class="gallery-desc">HTML • CSS • JS</span>
-                        <a href="https://martinvojtus.github.io" class="gallery-btn">VIEW</a>
+                <div class="project-card">
+                    <div class="card-visual">
+                        <img src="work1.png" alt="Animations" onerror="this.style.display='none';">
                     </div>
+                    <a href="https://martinvojtus.github.io" class="card-action-btn">
+                        <span class="action-title">Animations.</span>
+                        <span class="action-desc">HTML • CSS • JS</span>
+                        <span class="action-label">VIEW</span>
+                    </a>
                 </div>
-                <div class="photo-frame">
-                    <img src="work2.png" alt="Branding" onerror="this.style.display='none';">
-                    <div class="gallery-overlay">
-                        <span class="gallery-title">Branding.</span>
-                        <span class="gallery-desc">Logo • Ads • Graphics</span>
-                        <a href="work2.png" target="_blank" class="gallery-btn">VIEW</a>
+                <div class="project-card">
+                    <div class="card-visual">
+                        <img src="work2.png" alt="Branding" onerror="this.style.display='none';">
                     </div>
+                    <a href="work2.png" target="_blank" class="card-action-btn">
+                        <span class="action-title">Branding.</span>
+                        <span class="action-desc">Logo • Ads • Graphics</span>
+                        <span class="action-label">VIEW</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -298,13 +282,15 @@
                     </div>
                 </div>
                 <div class="portrait-container">
-                    <div class="photo-frame">
-                        <img src="IMG_3413.jpeg" alt="Photography" onerror="this.style.display='none';">
-                        <div class="gallery-overlay">
-                            <span class="gallery-title">Gallery.</span>
-                            <span class="gallery-desc">World through my eyes.</span>
-                            <a href="#" class="gallery-btn">VIEW</a>
+                    <div class="project-card">
+                        <div class="card-visual">
+                            <img src="IMG_3413.jpeg" alt="Photography" onerror="this.style.display='none';">
                         </div>
+                        <a href="#" class="card-action-btn">
+                            <span class="action-title">Gallery.</span>
+                            <span class="action-desc">World through my eyes.</span>
+                            <span class="action-label">ENTER</span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -336,7 +322,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.42 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.43 • martin vojtus • 2026</div>
     </footer>
 
     <script>
