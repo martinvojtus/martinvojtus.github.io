@@ -83,20 +83,23 @@
             padding: 2px; 
             box-sizing: border-box;
             
-            /* ✏️ UPRAVENÉ: Kompletné odstránenie highlightov */
-            -webkit-tap-highlight-color: transparent; 
+            /* ✏️ UPRAVENÉ: Maximálne odstránenie všetkých highlightov */
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+            -webkit-tap-highlight-color: transparent;
             -webkit-touch-callout: none;
+            -webkit-user-select: none;
             user-select: none;
             outline: none;
         }
 
-        /* ✏️ UPRAVENÉ: Vynútené odstránenie focusu */
+        /* ✏️ UPRAVENÉ: Špecifické pravidlo pre iOS focus ring */
         .theme-toggle:focus, 
         .theme-toggle:active,
         .theme-toggle:focus-visible {
             outline: none !important;
             box-shadow: none !important;
             background-color: transparent !important;
+            -webkit-focus-ring-color: transparent !important; /* Kľúčové pre Safari */
         }
 
         .toggle-circle {
@@ -302,7 +305,7 @@
             </div>
             
             <div class="header-right">
-                <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+                <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()" tabindex="-1">
                     <div class="toggle-circle"></div>
                 </div>
 
@@ -419,7 +422,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.51 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.52 • martin vojtus • 2026</div>
     </footer>
 
     <script>
