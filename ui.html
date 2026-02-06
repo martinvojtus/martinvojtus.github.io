@@ -15,16 +15,13 @@
             --content-width: 540px;
             --border-radius: 12px;
             --btn-height: 60px;
-            
-            /* Priehľadnosť pre header a nav (RGB hodnoty pre rgba) */
             --glass-bg: 255, 255, 255; 
         }
 
-        /* ✏️ DARK MODE DEFINÍCIA - Inverzia farieb */
         body.dark-mode {
             --black: #ffffff;
             --white: #000000;
-            --glass-bg: 0, 0, 0; /* Tmavé sklo */
+            --glass-bg: 0, 0, 0; 
         }
 
         @media (min-width: 768px) { :root { --content-width: 900px; } }
@@ -40,14 +37,14 @@
             line-height: 1.5;
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
-            transition: background-color 0.3s ease, color 0.3s ease; /* Plynulý prechod farieb */
+            transition: background-color 0.3s ease, color 0.3s ease; 
         }
 
         header {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 50px;
             display: flex; justify-content: center;
-            background: rgba(var(--glass-bg), 0.3); /* Použitie premennej pre glass efekt */
+            background: rgba(var(--glass-bg), 0.3);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             z-index: 2000;
@@ -62,11 +59,11 @@
             transition: max-width 0.4s ease;
         }
 
-        /* Kontajner pre pravú časť hlavičky (Toggle + Menu) */
+        /* ✏️ UPRAVENÉ: Menšia medzera medzi prvkami vpravo */
         .header-right {
             display: flex;
             align-items: center;
-            gap: 20px; /* Medzera medzi prepínačom a menu */
+            gap: 8px; /* Zmenšené z 20px na 8px */
         }
 
         .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
@@ -74,10 +71,10 @@
         .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); letter-spacing: 0.05em; white-space: nowrap; }
         .logo-text span { font-weight: 700; }
 
-        /* ✏️ NOVÝ DARK MODE TOGGLE (Pill Shape) */
+        /* ✏️ UPRAVENÉ: Užší toggle slider */
         .theme-toggle {
-            width: 44px;
-            height: 24px;
+            width: 36px; /* Zmenšené zo 44px */
+            height: 20px; /* Zmenšené z 24px pre elegantnejší vzhľad */
             border: 1px solid var(--black);
             border-radius: 50px;
             position: relative;
@@ -85,37 +82,35 @@
             transition: border-color 0.3s ease;
             display: flex;
             align-items: center;
-            padding: 2px;
+            padding: 2px; /* Padding vnútri */
             box-sizing: border-box;
         }
 
         .toggle-circle {
-            width: 18px;
-            height: 18px;
+            width: 14px; /* Zmenšené z 18px */
+            height: 14px;
             background-color: var(--black);
             border-radius: 50%;
             position: absolute;
-            left: 2px; /* Štartovacia pozícia (Light mode) */
+            left: 2px; 
             transition: transform 0.3s cubic-bezier(0.45, 0.05, 0.55, 0.95), background-color 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* Posun guličky v dark mode */
+        /* Prepočet posunu: 36px (width) - 4px (padding L+R) - 14px (circle) = 18px posun */
         body.dark-mode .toggle-circle {
-            transform: translateX(20px); /* Posun doprava */
+            transform: translateX(16px); 
         }
 
-        /* Ikony vnútri prepínača */
         .toggle-icon {
-            width: 10px;
-            height: 10px;
-            fill: var(--white); /* Ikona má opačnú farbu ako gulička */
+            width: 8px; /* Ikona prispôsobená guličke */
+            height: 8px;
+            fill: var(--white); 
             display: block;
         }
         
-        /* Skrývanie/zobrazovanie ikon */
         .icon-moon { display: none; }
         .icon-sun { display: block; }
 
@@ -182,14 +177,13 @@
         }
         @media (min-width: 600px) { .work-grid { grid-template-columns: 1fr 1fr; } }
 
-        /* KARTY PROJEKTOV */
         .project-card {
             position: relative;
             width: 100%; aspect-ratio: 3 / 4;
             border-radius: var(--border-radius);
             border: 1px solid var(--black);
             overflow: hidden;
-            background-color: var(--white); /* Pozadie karty sa tiež invertuje */
+            background-color: var(--white);
             transition: border-color 0.3s ease, background-color 0.3s ease;
         }
 
@@ -207,21 +201,15 @@
 
         .project-card::after {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            /* Gradient prechádza do aktuálnej farby pozadia (biela alebo čierna v dark mode) */
             background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, var(--white) 85%);
             z-index: 2; pointer-events: none;
             transition: background 0.3s ease;
         }
-        
-        /* V dark mode musíme upraviť gradient pseudo-elementu, aby išiel do čiernej (čo je v dark mode --white) */
-        /* Poznámka: Keďže --white sa v dark mode mení na #000000, gradient hore bude fungovať automaticky!
-           Ale pozor na rgba(255,255,255,0). V dark mode by to malo ísť z transparentnej čiernej.
-           Pre zjednodušenie a zachovanie logiky "invert" nechávame gradient do var(--white). */
 
         .card-text-overlay {
             position: absolute; bottom: var(--btn-height); left: 0; width: 100%;
             padding: 0 20px 20px 20px; box-sizing: border-box; text-align: center;
-            z-index: 3; color: var(--black); /* Text sa invertuje */
+            z-index: 3; color: var(--black); 
             transition: color 0.3s ease;
         }
         .gallery-title { font-size: var(--size-large); font-weight: 600; line-height: 1; margin-bottom: 5px; display: block; }
@@ -229,7 +217,7 @@
 
         .card-btn {
             position: absolute; bottom: 0; left: 0; width: 100%; height: var(--btn-height);
-            background: var(--black); color: var(--white); /* Tlačidlo: Čierne pozadie, biely text (v light) */
+            background: var(--black); color: var(--white); 
             display: flex; align-items: center; justify-content: center;
             text-decoration: none; font-size: var(--size-small); font-weight: 700;
             letter-spacing: 0.1em; text-transform: uppercase;
@@ -240,7 +228,6 @@
         .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; transition: color 0.3s ease; }
         .content-text p { margin-bottom: 1.5rem; }
 
-        /* FORMULÁR */
         .contact-form { margin-top: 0; max-width: 540px; width: 100%; }
         
         .form-group { margin-bottom: 25px; }
@@ -256,7 +243,7 @@
             padding: 15px; 
             outline: none;
             box-sizing: border-box; 
-            color: var(--black); /* Text inputu */
+            color: var(--black); 
             transition: border-color 0.3s ease, color 0.3s ease;
         }
 
@@ -280,7 +267,7 @@
             box-sizing: border-box;
             resize: vertical;
             min-height: 120px;
-            color: var(--black); /* Text v poli */
+            color: var(--black); 
             transition: color 0.3s ease;
         }
 
@@ -322,13 +309,8 @@
             <div class="header-right">
                 <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
                     <div class="toggle-circle">
-                        <svg class="toggle-icon icon-sun" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z" fill="currentColor"/>
-                            <path d="M12 2V4M12 20V22M4 12H2M22 12H20M19.07 4.93L17.66 6.34M6.34 17.66L4.93 19.07M19.07 19.07L17.66 17.66M6.34 6.34L4.93 4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                        <svg class="toggle-icon icon-moon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" fill="currentColor"/>
-                        </svg>
+                        <svg class="toggle-icon icon-sun" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z"/><path d="M12 2V4M12 20V22M4 12H2M22 12H20M19.07 4.93L17.66 6.34M6.34 17.66L4.93 19.07M19.07 19.07L17.66 17.66M6.34 6.34L4.93 4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                        <svg class="toggle-icon icon-moon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
                     </div>
                 </div>
 
@@ -445,7 +427,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.47 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.48 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -461,10 +443,8 @@
             closeMenu(); window.scrollTo(0, 0);
         }
 
-        // ✏️ NOVÁ FUNKCIA: Prepínanie témy
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
-            // Uloženie voľby do prehliadača
             if (document.body.classList.contains('dark-mode')) {
                 localStorage.setItem('theme', 'dark');
             } else {
@@ -472,7 +452,6 @@
             }
         }
 
-        // Načítanie témy pri štarte
         if (localStorage.getItem('theme') === 'dark') {
             document.body.classList.add('dark-mode');
         }
