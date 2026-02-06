@@ -82,6 +82,16 @@
             align-items: center;
             padding: 2px; 
             box-sizing: border-box;
+            /* ✏️ UPRAVENÉ: Odstránenie rámčeka pri kliknutí (focus/tap) */
+            -webkit-tap-highlight-color: transparent; 
+            outline: none;
+        }
+
+        /* Poistka pre focus stav */
+        .theme-toggle:focus, 
+        .theme-toggle:active {
+            outline: none;
+            box-shadow: none;
         }
 
         .toggle-circle {
@@ -404,7 +414,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.49 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.50 • martin vojtus • 2026</div>
     </footer>
 
     <script>
