@@ -28,6 +28,12 @@
 
         html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
+        /* ✏️ UPRAVENÉ: Globálne vypnutie highlightu pre celý web */
+        * {
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
             margin: 0; padding: 0;
             font-family: 'Space Grotesk', sans-serif;
@@ -83,23 +89,16 @@
             padding: 2px; 
             box-sizing: border-box;
             
-            /* ✏️ UPRAVENÉ: Maximálne odstránenie všetkých highlightov */
-            -webkit-tap-highlight-color: rgba(0,0,0,0);
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
+            /* Dvojitá poistka v CSS */
+            -webkit-tap-highlight-color: transparent !important;
+            outline: none !important;
             user-select: none;
-            outline: none;
         }
 
-        /* ✏️ UPRAVENÉ: Špecifické pravidlo pre iOS focus ring */
-        .theme-toggle:focus, 
-        .theme-toggle:active,
-        .theme-toggle:focus-visible {
+        /* Uistenie sa, že ani focus nič nespraví */
+        .theme-toggle:focus, .theme-toggle:active {
             outline: none !important;
-            box-shadow: none !important;
-            background-color: transparent !important;
-            -webkit-focus-ring-color: transparent !important; /* Kľúčové pre Safari */
+            background: transparent !important;
         }
 
         .toggle-circle {
@@ -305,7 +304,7 @@
             </div>
             
             <div class="header-right">
-                <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()" tabindex="-1">
+                <div class="theme-toggle" id="themeToggle" onclick="toggleTheme(); this.blur();">
                     <div class="toggle-circle"></div>
                 </div>
 
@@ -422,7 +421,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.52 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.53 • martin vojtus • 2026</div>
     </footer>
 
     <script>
