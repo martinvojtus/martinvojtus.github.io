@@ -123,14 +123,14 @@
         }
         .photo-frame img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); display: block; }
 
-        /* ✏️ UPRAVENÉ: Blur začína od 50% a je silnejší (30px) */
+        /* ✏️ UPRAVENÉ: Blur gradient od 0% do 100% */
         .photo-frame::after {
             content: '';
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            backdrop-filter: blur(30px); /* Zvýšené na 30px */
-            -webkit-mask-image: linear-gradient(to bottom, transparent 50%, black 100%); /* Začína na 50% */
-            mask-image: linear-gradient(to bottom, transparent 50%, black 100%);
+            backdrop-filter: blur(30px); 
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%); /* Od 0% */
+            mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
             z-index: 1;
             pointer-events: none;
         }
@@ -302,7 +302,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.39 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.40 • martin vojtus • 2026</div>
     </footer>
 
     <script>
