@@ -14,7 +14,7 @@
             --white: #ffffff;
             --content-width: 540px;
             --border-radius: 12px;
-            --pill-radius: 50px; /* Premenná pre Pill Shape */
+            --pill-radius: 50px;
         }
 
         @media (min-width: 768px) { :root { --content-width: 900px; } }
@@ -127,13 +127,10 @@
             width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); display: block;
         }
 
-        /* ✏️ UPRAVENÉ: Blur odstránený (prázdny blok, alebo zmazaný) */
-        
-        /* ✏️ UPRAVENÉ: Nový Gradient (0% -> 50% -> 100% čierna) */
+        /* ✏️ UPRAVENÉ: Gradient začína na 50% čiernej (0.5) a končí na 100% čiernej (1) */
         .project-card::after {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            /* Gradient: Hore transparent, v strede (50%) polovičná čierna, dole (100%) plná čierna */
-            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,1) 100%);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,1) 100%);
             z-index: 2; pointer-events: none;
         }
 
@@ -150,7 +147,6 @@
         .gallery-title { font-size: var(--size-large); font-weight: 600; line-height: 1; margin-bottom: 5px; display: block; color: var(--white); }
         .gallery-desc { font-size: var(--size-small); font-weight: 400; opacity: 0.8; display: block; color: var(--white); margin-bottom: 20px; }
 
-        /* Tlačidlo v karte (Pill) */
         .card-pill-btn {
             display: inline-flex; align-items: center; justify-content: center;
             background: var(--white); color: var(--black); 
@@ -171,7 +167,6 @@
         .form-group { margin-bottom: 25px; }
         .form-label { display: block; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em; }
         
-        /* ✏️ UPRAVENÉ: Pill shaped inputy */
         .form-input { 
             width: 100%; 
             border: 1px solid var(--black); 
@@ -181,7 +176,6 @@
             outline: none; box-sizing: border-box; 
         }
 
-        /* ✏️ UPRAVENÉ: Pill shaped textarea (zaoblenie 30px aby to vyzeralo dobre) */
         .form-textarea {
             width: 100%;
             border: 1px solid var(--black); 
@@ -192,12 +186,11 @@
             min-height: 120px; resize: vertical;
         }
 
-        /* ✏️ UPRAVENÉ: Oddelené tlačidlo v štýle Pill */
         .submit-btn {
             width: 100%; 
             background: var(--black); color: var(--white); 
             border: none; 
-            padding: 14px 32px; /* Rovnaký padding ako v kartách (výškovo) */
+            padding: 14px 32px; 
             font-family: inherit; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; 
             letter-spacing: 0.1em; cursor: pointer; margin-top: 0; transition: opacity 0.3s ease;
             border-radius: var(--pill-radius);
@@ -336,7 +329,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.48 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.49 • martin vojtus • 2026</div>
     </footer>
 
     <script>
