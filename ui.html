@@ -121,7 +121,6 @@
             border-radius: var(--border-radius);
             overflow: hidden;
             background-color: #ffffff;
-            /* ✏️ UPRAVENÉ: Pridaný 1px čierny rámik */
             border: 1px solid var(--black);
         }
 
@@ -129,7 +128,13 @@
             width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); display: block;
         }
 
-        /* ✏️ UPRAVENÉ: Gradient odstránený (celý blok .project-card::after vymazaný) */
+        /* ✏️ UPRAVENÉ: Pridaný biely gradient zhora nadol */
+        .project-card::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            /* Gradient: Biela z 0% opacity (hore) na 100% opacity (dole) */
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+            z-index: 2; pointer-events: none;
+        }
 
         .card-content-wrapper {
             position: absolute; bottom: 0; left: 0; width: 100%;
@@ -137,18 +142,15 @@
             box-sizing: border-box; 
             text-align: center;
             z-index: 3; 
-            /* ✏️ UPRAVENÉ: Farba textu na čiernu */
             color: var(--black); 
             display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
         }
 
-        /* ✏️ UPRAVENÉ: Farba textu na čiernu */
         .gallery-title { font-size: var(--size-large); font-weight: 600; line-height: 1; margin-bottom: 5px; display: block; color: var(--black); }
         .gallery-desc { font-size: var(--size-small); font-weight: 400; opacity: 0.8; display: block; color: var(--black); margin-bottom: 20px; }
 
         .card-pill-btn {
             display: inline-flex; align-items: center; justify-content: center;
-            /* ✏️ UPRAVENÉ: Čierne pozadie, biely text */
             background: var(--black); color: var(--white); 
             text-decoration: none; 
             font-size: var(--size-small); font-weight: 700;
@@ -329,7 +331,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.51 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.52 • martin vojtus • 2026</div>
     </footer>
 
     <script>
