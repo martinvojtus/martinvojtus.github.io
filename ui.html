@@ -15,24 +15,11 @@
             --content-width: 540px;
             --border-radius: 12px;
             --btn-height: 60px;
-            --glass-bg: 255, 255, 255; 
-        }
-
-        body.dark-mode {
-            --black: #ffffff;
-            --white: #000000;
-            --glass-bg: 0, 0, 0; 
         }
 
         @media (min-width: 768px) { :root { --content-width: 900px; } }
 
         html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-
-        /* Globálne vypnutie highlightov */
-        * {
-            -webkit-tap-highlight-color: rgba(0,0,0,0);
-            -webkit-tap-highlight-color: transparent;
-        }
 
         body {
             margin: 0; padding: 0;
@@ -43,18 +30,16 @@
             line-height: 1.5;
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
-            transition: background-color 0.3s ease, color 0.3s ease; 
         }
 
         header {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 50px;
             display: flex; justify-content: center;
-            background: rgba(var(--glass-bg), 0.3);
+            background: rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             z-index: 2000;
-            transition: background-color 0.3s ease;
         }
 
         .header-content {
@@ -65,76 +50,20 @@
             transition: max-width 0.4s ease;
         }
 
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 8px; 
-        }
-
         .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
-        .header-left svg { height: 24px; width: auto; display: block; transition: fill 0.3s ease; }
+        .header-left svg { height: 24px; width: auto; display: block; }
         .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); letter-spacing: 0.05em; white-space: nowrap; }
         .logo-text span { font-weight: 700; }
 
-        .theme-toggle {
-            width: 36px; 
-            height: 20px; 
-            border: 1px solid var(--black);
-            border-radius: 50px;
-            position: relative;
-            cursor: pointer;
-            transition: border-color 0.3s ease;
-            display: flex;
-            align-items: center;
-            padding: 2px; 
-            box-sizing: border-box;
-            
-            /* Hardvérové urýchlenie */
-            transform: translateZ(0);
-            -webkit-transform: translateZ(0);
-            backface-visibility: hidden;
-            
-            /* Odstránenie highlightov a výberu */
-            -webkit-tap-highlight-color: transparent; 
-            -webkit-touch-callout: none;
-            user-select: none;
-            -webkit-user-select: none;
-            outline: none;
-        }
-
-        .theme-toggle:focus, 
-        .theme-toggle:active,
-        .theme-toggle:focus-visible {
-            outline: none !important;
-            box-shadow: none !important;
-            background-color: transparent !important;
-            -webkit-focus-ring-color: transparent !important;
-        }
-
-        .toggle-circle {
-            width: 14px; 
-            height: 14px;
-            background-color: var(--black);
-            border-radius: 50%;
-            position: absolute;
-            left: 2px; 
-            transition: transform 0.3s cubic-bezier(0.45, 0.05, 0.55, 0.95), background-color 0.3s ease;
-            pointer-events: none; 
-        }
-
-        body.dark-mode .toggle-circle {
-            transform: translateX(16px); 
-        }
-
         .menu-toggle { width: 24px; height: 12px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; z-index: 2100; }
-        .line { width: 24px; height: 1px; background-color: var(--black); transition: transform 0.3s ease, background-color 0.3s ease; }
+        .line { width: 24px; height: 1px; background-color: var(--black); transition: transform 0.3s ease; }
         .menu-toggle.active .line:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
         .menu-toggle.active .line:nth-child(2) { transform: translateY(-5.5px) rotate(-45deg); }
 
         .nav-overlay {
             position: fixed; top: -100%; left: 0; width: 100%; 
-            background: rgba(var(--glass-bg), 0.3); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1), background-color 0.3s ease;
+            background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1);
             z-index: 1500; padding: 80px 0 40px 0; display: flex; flex-direction: column; align-items: center;
         }
         .nav-overlay.active { top: 0; }
@@ -145,7 +74,7 @@
             display: flex; flex-direction: column; gap: 25px; padding: 0 20px; box-sizing: border-box; 
         }
         
-        .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; transition: color 0.3s ease; }
+        .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; }
 
         main {
             padding: 65px 20px 0px; 
@@ -173,7 +102,7 @@
             #section-contact .section-grid { gap: 60px; } 
         }
 
-        h2 { font-size: var(--size-large); font-weight: 600; margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1; transition: color 0.3s ease; }
+        h2 { font-size: var(--size-large); font-weight: 600; margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1; }
 
         .work-grid {
             display: grid; 
@@ -185,14 +114,14 @@
         }
         @media (min-width: 600px) { .work-grid { grid-template-columns: 1fr 1fr; } }
 
+        /* KARTY PROJEKTOV */
         .project-card {
             position: relative;
             width: 100%; aspect-ratio: 3 / 4;
             border-radius: var(--border-radius);
             border: 1px solid var(--black);
             overflow: hidden;
-            background-color: var(--white);
-            transition: border-color 0.3s ease, background-color 0.3s ease;
+            background-color: #ffffff;
         }
 
         .card-image {
@@ -209,37 +138,36 @@
 
         .project-card::after {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, var(--white) 85%);
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 85%);
             z-index: 2; pointer-events: none;
-            transition: background 0.3s ease;
         }
 
         .card-text-overlay {
             position: absolute; bottom: var(--btn-height); left: 0; width: 100%;
             padding: 0 20px 20px 20px; box-sizing: border-box; text-align: center;
-            z-index: 3; color: var(--black); 
-            transition: color 0.3s ease;
+            z-index: 3; color: var(--black);
         }
         .gallery-title { font-size: var(--size-large); font-weight: 600; line-height: 1; margin-bottom: 5px; display: block; }
         .gallery-desc { font-size: var(--size-small); font-weight: 400; opacity: 1; display: block; }
 
         .card-btn {
             position: absolute; bottom: 0; left: 0; width: 100%; height: var(--btn-height);
-            background: var(--black); color: var(--white); 
+            background: var(--black); color: var(--white);
             display: flex; align-items: center; justify-content: center;
             text-decoration: none; font-size: var(--size-small); font-weight: 700;
             letter-spacing: 0.1em; text-transform: uppercase;
-            z-index: 4; transition: background-color 0.3s ease, color 0.3s ease;
+            z-index: 4; transition: background-color 0.3s ease;
         }
         .card-btn:hover { opacity: 0.9; }
 
-        .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; transition: color 0.3s ease; }
+        .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
         .content-text p { margin-bottom: 1.5rem; }
 
+        /* FORMULÁR */
         .contact-form { margin-top: 0; max-width: 540px; width: 100%; }
         
         .form-group { margin-bottom: 25px; }
-        .form-label { display: block; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em; transition: color 0.3s ease; }
+        .form-label { display: block; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em; }
         
         .form-input {
             width: 100%;
@@ -251,8 +179,6 @@
             padding: 15px; 
             outline: none;
             box-sizing: border-box; 
-            color: var(--black); 
-            transition: border-color 0.3s ease, color 0.3s ease;
         }
 
         .message-box-merged {
@@ -261,7 +187,6 @@
             border-radius: var(--border-radius);
             overflow: hidden;
             display: flex; flex-direction: column;
-            transition: border-color 0.3s ease;
         }
 
         .merged-textarea {
@@ -275,8 +200,6 @@
             box-sizing: border-box;
             resize: vertical;
             min-height: 120px;
-            color: var(--black); 
-            transition: color 0.3s ease;
         }
 
         .merged-btn {
@@ -288,7 +211,7 @@
             text-transform: uppercase; font-weight: 600;
             letter-spacing: 0.1em; cursor: pointer;
             border-radius: 0; 
-            transition: opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+            transition: opacity 0.3s ease;
         }
         .merged-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .merged-btn:hover:not(:disabled) { opacity: 0.8; }
@@ -298,9 +221,9 @@
             display: flex; flex-direction: column; align-items: center; transition: max-width 0.4s ease;
         }
         .footer-link-group { margin-bottom: 15px; text-align: center; display: flex; flex-direction: column; gap: 8px; }
-        .footer-link-group a { font-size: var(--size-small); font-weight: 400; color: var(--black); text-decoration: none; letter-spacing: 0.02em; transition: opacity 0.3s ease, color 0.3s ease; }
+        .footer-link-group a { font-size: var(--size-small); font-weight: 400; color: var(--black); text-decoration: none; letter-spacing: 0.02em; transition: opacity 0.3s ease; }
         .footer-link-group a:hover { opacity: 0.6; }
-        .footer-info { font-size: var(--size-small); color: var(--black); text-transform: uppercase; letter-spacing: 0.1em; text-align: center; transition: color 0.3s ease; }
+        .footer-info { font-size: var(--size-small); color: var(--black); text-transform: uppercase; letter-spacing: 0.1em; text-align: center; }
     </style>
 </head>
 <body>
@@ -309,18 +232,11 @@
         <div class="header-content">
             <div class="logo-link" onclick="showSection('about')">
                 <div class="header-left">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="935.31" height="810" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="935.31" height="810" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="#000000" /></g></svg>
                 </div>
                 <div class="logo-text"><span>martinvojtus</span> • space</div>
             </div>
-            
-            <div class="header-right">
-                <div class="theme-toggle" id="themeToggle" style="-webkit-tap-highlight-color: transparent;">
-                    <div class="toggle-circle"></div>
-                </div>
-
-                <div class="menu-toggle" id="menuToggle"><div class="line"></div><div class="line"></div></div>
-            </div>
+            <div class="menu-toggle" id="menuToggle"><div class="line"></div><div class="line"></div></div>
         </div>
     </header>
 
@@ -345,7 +261,7 @@
                     </div>
                 </div>
                 <div class="portrait-container">
-                    <div class="project-card" style="border: 1px solid var(--black);">
+                    <div class="project-card" style="border: 1px solid black;">
                         <img src="portrait.jpeg" class="card-image" alt="Portrait" onerror="this.style.display='none';">
                         <div class="card-text-overlay" style="bottom: 0;">
                             <span class="gallery-title">Portrait.</span>
@@ -432,7 +348,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.55 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.46 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -447,44 +363,6 @@
             document.getElementById('section-' + sectionId).classList.add('active');
             closeMenu(); window.scrollTo(0, 0);
         }
-
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            if (document.body.classList.contains('dark-mode')) {
-                localStorage.setItem('theme', 'dark');
-            } else {
-                localStorage.setItem('theme', 'light');
-            }
-        }
-
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-mode');
-        }
-
-        // ✏️ UPRAVENÉ: Spoľahlivejšie odstránenie rámčeka
-        const themeToggle = document.getElementById('themeToggle');
-        
-        // 1. Pre Desktop (Myš)
-        themeToggle.addEventListener('click', function(e) {
-            toggleTheme();
-            // Oneskorený blur pre istotu
-            setTimeout(() => {
-                this.blur();
-            }, 10);
-        });
-
-        // 2. Pre Mobil (Touch) - Zabráni vytvoreniu focus rámčeka
-        themeToggle.addEventListener('touchstart', function(e) {
-            e.preventDefault(); // Toto je kľúčové - zabráni vzniku "ghost click" a highlightu
-            e.stopPropagation();
-            toggleTheme();
-            
-            // Aj tu poistíme blurom
-            setTimeout(() => {
-                this.blur();
-            }, 10);
-        }, { passive: false });
-
 
         const form = document.querySelector('.contact-form');
         form.addEventListener('submit', function(e) {
