@@ -28,7 +28,7 @@
 
         html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
-        /* ✏️ UPRAVENÉ: Globálne vypnutie highlightu pre celý web */
+        /* Globálne vypnutie highlightov */
         * {
             -webkit-tap-highlight-color: rgba(0,0,0,0);
             -webkit-tap-highlight-color: transparent;
@@ -89,16 +89,26 @@
             padding: 2px; 
             box-sizing: border-box;
             
-            /* Dvojitá poistka v CSS */
-            -webkit-tap-highlight-color: transparent !important;
-            outline: none !important;
+            /* ✏️ UPRAVENÉ: Pridané hardvérové urýchlenie pre elimináciu artefaktov */
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            backface-visibility: hidden;
+            
+            /* Odstránenie highlightov */
+            -webkit-tap-highlight-color: transparent; 
+            -webkit-touch-callout: none;
             user-select: none;
+            -webkit-user-select: none;
+            outline: none;
         }
 
-        /* Uistenie sa, že ani focus nič nespraví */
-        .theme-toggle:focus, .theme-toggle:active {
+        .theme-toggle:focus, 
+        .theme-toggle:active,
+        .theme-toggle:focus-visible {
             outline: none !important;
-            background: transparent !important;
+            box-shadow: none !important;
+            background-color: transparent !important;
+            -webkit-focus-ring-color: transparent !important;
         }
 
         .toggle-circle {
@@ -109,6 +119,7 @@
             position: absolute;
             left: 2px; 
             transition: transform 0.3s cubic-bezier(0.45, 0.05, 0.55, 0.95), background-color 0.3s ease;
+            pointer-events: none; /* Kliknutie prejde na rodiča */
         }
 
         body.dark-mode .toggle-circle {
@@ -304,7 +315,7 @@
             </div>
             
             <div class="header-right">
-                <div class="theme-toggle" id="themeToggle" onclick="toggleTheme(); this.blur();">
+                <div class="theme-toggle" id="themeToggle">
                     <div class="toggle-circle"></div>
                 </div>
 
@@ -421,7 +432,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.53 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.54 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -449,6 +460,22 @@
         if (localStorage.getItem('theme') === 'dark') {
             document.body.classList.add('dark-mode');
         }
+
+        // ✏️ NOVÉ: Logika pre odstránenie highlightov na Mobile/iOS
+        const themeToggle = document.getElementById('themeToggle');
+        
+        // Pre Desktop: Funguje na click
+        themeToggle.addEventListener('click', function(e) {
+            toggleTheme();
+            this.blur(); // Odstráni focus
+        });
+
+        // Pre Mobil (Nuclear Option): Funguje na touchstart a zabráni default správaniu (highlight)
+        themeToggle.addEventListener('touchstart', function(e) {
+            e.preventDefault(); // Toto zabráni vykresleniu focus štvorca
+            toggleTheme();
+        }, { passive: false });
+
 
         const form = document.querySelector('.contact-form');
         form.addEventListener('submit', function(e) {
