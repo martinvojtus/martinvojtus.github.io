@@ -89,12 +89,12 @@
             padding: 2px; 
             box-sizing: border-box;
             
-            /* ✏️ UPRAVENÉ: Pridané hardvérové urýchlenie pre elimináciu artefaktov */
+            /* Hardvérové urýchlenie */
             transform: translateZ(0);
             -webkit-transform: translateZ(0);
             backface-visibility: hidden;
             
-            /* Odstránenie highlightov */
+            /* Odstránenie highlightov a výberu */
             -webkit-tap-highlight-color: transparent; 
             -webkit-touch-callout: none;
             user-select: none;
@@ -119,7 +119,7 @@
             position: absolute;
             left: 2px; 
             transition: transform 0.3s cubic-bezier(0.45, 0.05, 0.55, 0.95), background-color 0.3s ease;
-            pointer-events: none; /* Kliknutie prejde na rodiča */
+            pointer-events: none; 
         }
 
         body.dark-mode .toggle-circle {
@@ -315,7 +315,7 @@
             </div>
             
             <div class="header-right">
-                <div class="theme-toggle" id="themeToggle">
+                <div class="theme-toggle" id="themeToggle" style="-webkit-tap-highlight-color: transparent;">
                     <div class="toggle-circle"></div>
                 </div>
 
@@ -432,7 +432,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.54 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.55 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -461,19 +461,28 @@
             document.body.classList.add('dark-mode');
         }
 
-        // ✏️ NOVÉ: Logika pre odstránenie highlightov na Mobile/iOS
+        // ✏️ UPRAVENÉ: Spoľahlivejšie odstránenie rámčeka
         const themeToggle = document.getElementById('themeToggle');
         
-        // Pre Desktop: Funguje na click
+        // 1. Pre Desktop (Myš)
         themeToggle.addEventListener('click', function(e) {
             toggleTheme();
-            this.blur(); // Odstráni focus
+            // Oneskorený blur pre istotu
+            setTimeout(() => {
+                this.blur();
+            }, 10);
         });
 
-        // Pre Mobil (Nuclear Option): Funguje na touchstart a zabráni default správaniu (highlight)
+        // 2. Pre Mobil (Touch) - Zabráni vytvoreniu focus rámčeka
         themeToggle.addEventListener('touchstart', function(e) {
-            e.preventDefault(); // Toto zabráni vykresleniu focus štvorca
+            e.preventDefault(); // Toto je kľúčové - zabráni vzniku "ghost click" a highlightu
+            e.stopPropagation();
             toggleTheme();
+            
+            // Aj tu poistíme blurom
+            setTimeout(() => {
+                this.blur();
+            }, 10);
         }, { passive: false });
 
 
