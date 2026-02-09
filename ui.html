@@ -116,9 +116,11 @@
             font-family: inherit; font-size: var(--size-small); 
             padding: 15px; 
             outline: none; box-sizing: border-box;
-            color: var(--grey-50);
+            /* ✏️ UPRAVENÉ: Písaný text je teraz čierny */
+            color: var(--black);
         }
         
+        /* Placeholder ostáva šedý (50% čierna) */
         ::placeholder { color: var(--grey-50); opacity: 1; }
 
         .form-textarea {
@@ -130,7 +132,8 @@
             padding: 15px;
             outline: none; box-sizing: border-box;
             min-height: 120px; resize: vertical;
-            color: var(--grey-50);
+            /* ✏️ UPRAVENÉ: Písaný text je teraz čierny */
+            color: var(--black);
         }
 
         .submit-btn {
@@ -235,7 +238,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v1.5.7 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.5.8 • martin vojtus • 2026</div>
     </footer>
 
     <script>
