@@ -21,12 +21,14 @@
             --border-radius: 0px; 
         }
 
-        /* DARK MODE */
-        body.dark-mode {
-            --black: #ffffff;       
-            --white: #000000;       
-            --grey-50: rgba(255, 255, 255, 0.5); 
-            --glass-rgb: 0, 0, 0;   
+        /* ✏️ UPRAVENÉ: Natívna podpora systémového Dark Mode */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --black: #ffffff;       
+                --white: #000000;       
+                --grey-50: rgba(255, 255, 255, 0.5); 
+                --glass-rgb: 0, 0, 0;   
+            }
         }
 
         html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
@@ -196,8 +198,7 @@
             <a class="menu-link" onclick="showSection('about')"><span>About</span></a>
             <a class="menu-link" onclick="showSection('photography')"><span>iPhone photography</span></a>
             <a class="menu-link" onclick="showSection('contact')"><span>Contact</span></a>
-            <a class="menu-link" id="themeToggle" onclick="toggleTheme()">Dark mode</a>
-        </div>
+            </div>
     </nav>
 
     <main>
@@ -259,13 +260,12 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v1.6.1 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.6.2 • martin vojtus • 2026</div>
     </footer>
 
     <script>
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
-        const themeToggleBtn = document.getElementById('themeToggle');
 
         function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
         function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); }
@@ -276,45 +276,7 @@
             closeMenu(); window.scrollTo(0, 0);
         }
 
-        // ✏️ UPRAVENÉ: Inteligentné prepínanie (System vs Manual)
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-            if (savedTheme === 'dark') {
-                enableDark(true);
-            } else if (savedTheme === 'light') {
-                enableDark(false);
-            } else {
-                // Ak nie je uložená preferencia, riadime sa systémom
-                enableDark(systemDark);
-            }
-        }
-
-        function enableDark(shouldBeDark) {
-            if (shouldBeDark) {
-                document.body.classList.add('dark-mode');
-                themeToggleBtn.innerText = 'Light mode';
-            } else {
-                document.body.classList.remove('dark-mode');
-                themeToggleBtn.innerText = 'Dark mode';
-            }
-        }
-
-        function toggleTheme() {
-            const isCurrentlyDark = document.body.classList.contains('dark-mode');
-            
-            if (isCurrentlyDark) {
-                enableDark(false);
-                localStorage.setItem('theme', 'light');
-            } else {
-                enableDark(true);
-                localStorage.setItem('theme', 'dark');
-            }
-        }
-
-        // Spustiť pri štarte
-        initTheme();
+        // ✏️ UPRAVENÉ: Odstránená JS logika pre témy
 
         const form = document.querySelector('.contact-form');
         form.addEventListener('submit', function(e) {
