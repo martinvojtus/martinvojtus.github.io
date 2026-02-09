@@ -12,13 +12,9 @@
             --size-small: 1.0rem;
             --black: #000000;
             --white: #ffffff;
-            /* ✏️ UPRAVENÉ: Fixná šírka pre všetky zariadenia */
             --content-width: 540px; 
-            /* ✏️ UPRAVENÉ: Žiadne zaoblenie (0px) */
             --border-radius: 0px; 
         }
-
-        /* Odstránené zväčšovanie na 900px pre desktopy */
 
         html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
@@ -89,7 +85,6 @@
         .content-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ✏️ UPRAVENÉ: Vždy jeden stĺpec (žiadny grid vedľa seba) */
         .section-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -101,59 +96,13 @@
 
         h2 { font-size: var(--size-large); font-weight: 600; margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1; }
 
-        /* --- KARTY PROJEKTOV --- */
-        .project-card {
-            position: relative;
-            width: 100%; aspect-ratio: 3 / 4;
-            border-radius: var(--border-radius); /* 0px */
-            overflow: hidden;
-            background-color: #ffffff;
-            border: 1px solid var(--black);
-        }
-
-        .card-image {
-            width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); display: block;
-        }
-
-        /* Biely gradient zhora nadol (0% -> 100%) */
-        .project-card::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
-            z-index: 2; pointer-events: none;
-        }
-
-        .card-content-wrapper {
-            position: absolute; bottom: 0; left: 0; width: 100%;
-            padding: 30px 20px; 
-            box-sizing: border-box; 
-            text-align: center;
-            z-index: 3; 
-            color: var(--black); 
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-        }
-
-        .gallery-title { font-size: var(--size-large); font-weight: 600; line-height: 1; margin-bottom: 5px; display: block; color: var(--black); }
-        .gallery-desc { font-size: var(--size-small); font-weight: 400; opacity: 0.8; display: block; color: var(--black); margin-bottom: 20px; }
-
-        .card-pill-btn {
-            display: inline-flex; align-items: center; justify-content: center;
-            background: var(--black); color: var(--white); 
-            text-decoration: none; 
-            font-size: var(--size-small); font-weight: 700;
-            letter-spacing: 0.1em; text-transform: uppercase;
-            padding: 16px 32px; 
-            border-radius: var(--border-radius); /* 0px */
-            transition: opacity 0.3s ease;
-        }
-        .card-pill-btn:hover { opacity: 0.9; }
-
         .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; }
         .content-text p { margin-bottom: 1.5rem; }
 
         /* --- FORMULÁR --- */
         .contact-form { margin-top: 0; max-width: 540px; width: 100%; }
-        .form-group { margin-bottom: 25px; }
-        .form-label { display: block; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.05em; }
+        /* ✏️ UPRAVENÉ: Menší margin-bottom, keďže už nemáme labels */
+        .form-group { margin-bottom: 15px; }
         
         .form-input { 
             width: 100%; 
@@ -161,16 +110,21 @@
             border-radius: var(--border-radius); /* 0px */
             background: transparent; 
             font-family: inherit; font-size: var(--size-small); 
-            padding: 15px 25px; 
+            /* ✏️ UPRAVENÉ: Padding zmenšený z 25px na 15px pre krajší hranatý vzhľad */
+            padding: 15px; 
             outline: none; box-sizing: border-box; 
         }
+        
+        /* Placeholder styling pre lepšiu čitateľnosť/konzistenciu */
+        ::placeholder { color: rgba(0, 0, 0, 0.5); opacity: 1; }
 
         .form-textarea {
             width: 100%;
             border: 1px solid var(--black); 
             border-radius: var(--border-radius); /* 0px */
             background: transparent;
-            font-family: inherit; font-size: var(--size-small); padding: 15px 25px;
+            font-family: inherit; font-size: var(--size-small); 
+            padding: 15px;
             outline: none; box-sizing: border-box;
             min-height: 120px; resize: vertical;
         }
@@ -223,20 +177,10 @@
         <div id="section-about" class="content-section active">
             <div class="section-grid">
                 <div class="text-block">
-                    <h2>My space, my vision.</h2>
+                    <h2>About.</h2>
                     <div class="content-text">
-                        <p>A minimalist designer focused on functional beauty and clear communication.</p>
-                        <p>I believe that good design is as little design as possible. My approach is rooted in subtraction—removing the non-essential to reveal the core purpose of a product or brand.</p>
-                        <p>My work spans across UI/UX design, design systems, and art direction. I'm constantly exploring the intersection of technology and aesthetics.</p>
-                    </div>
-                </div>
-                <div class="portrait-container">
-                    <div class="project-card">
-                        <img src="portrait.jpeg" class="card-image" alt="Portrait" onerror="this.style.display='none';">
-                        <div class="card-content-wrapper">
-                            <span class="gallery-title">Portrait.</span>
-                            <span class="gallery-desc" style="margin-bottom: 0;">Croatia • 2024</span>
-                        </div>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                     </div>
                 </div>
             </div>
@@ -245,19 +189,10 @@
         <div id="section-photography" class="content-section">
             <div class="section-grid">
                 <div class="text-block">
-                    <h2>One tool for everything.</h2>
+                    <h2>iPhone photography.</h2>
                     <div class="content-text">
-                        <p>Just point and shoot. That simple. No further editing. Capture the moment as it is. No SLR. No extra weight. No problem.</p>
-                    </div>
-                </div>
-                <div class="portrait-container">
-                    <div class="project-card">
-                        <img src="IMG_3413.jpeg" class="card-image" alt="Photography" onerror="this.style.display='none';">
-                        <div class="card-content-wrapper">
-                            <span class="gallery-title">Gallery.</span>
-                            <span class="gallery-desc">World through my eyes.</span>
-                            <a href="#" class="card-pill-btn">ENTER</a>
-                        </div>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum. Cras venenatis euismod malesuada.</p>
+                        <p>Nullam ac odio sed libero sollicitudin commodo. Morbi non consequat metus, eget efficitur turpis. Aliquam erat volutpat.</p>
                     </div>
                 </div>
             </div>
@@ -275,11 +210,14 @@
                     <input type="hidden" name="_captcha" value="false">
                     <input type="hidden" name="_subject" value="New submission from martinvojtus.space">
                     
-                    <div class="form-group"><label class="form-label">Name</label><input type="text" name="name" class="form-input" placeholder="Charlie Harper" required></div>
-                    <div class="form-group"><label class="form-label">Email</label><input type="email" name="email" class="form-input" placeholder="charlie@example.com" required></div>
+                    <div class="form-group">
+                        <input type="text" name="name" class="form-input" placeholder="Name Surname" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="email" class="form-input" placeholder="email@example.com" required>
+                    </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Message</label>
                         <textarea name="message" class="form-textarea" placeholder="Tell me about your project…" required></textarea>
                     </div>
                     
@@ -294,7 +232,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.54 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.55 • martin vojtus • 2026</div>
     </footer>
 
     <script>
