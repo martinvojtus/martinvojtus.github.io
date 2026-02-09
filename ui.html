@@ -21,7 +21,7 @@
             --border-radius: 0px; 
         }
 
-        /* ✏️ UPRAVENÉ: Natívna podpora systémového Dark Mode */
+        /* DARK MODE (System) */
         @media (prefers-color-scheme: dark) {
             :root {
                 --black: #ffffff;       
@@ -196,7 +196,8 @@
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
             <a class="menu-link" onclick="showSection('about')"><span>About</span></a>
-            <a class="menu-link" onclick="showSection('photography')"><span>iPhone photography</span></a>
+            <a class="menu-link" onclick="showSection('work')"><span>Work</span></a>
+            <a class="menu-link" onclick="showSection('hobby')"><span>Hobby</span></a>
             <a class="menu-link" onclick="showSection('contact')"><span>Contact</span></a>
         </div>
     </nav>
@@ -214,10 +215,22 @@
             </div>
         </div>
 
-        <div id="section-photography" class="content-section">
+        <div id="section-work" class="content-section">
             <div class="section-grid">
                 <div class="text-block">
-                    <h2>iPhone photography.</h2>
+                    <h2>Work.</h2>
+                    <div class="content-text">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sed diam eget risus varius blandit sit amet non magna. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.</p>
+                        <p>Donec id elit non mi porta gravida at eget metus. Cras mattis consectetur purus sit amet fermentum. Vestibulum id ligula porta felis euismod semper.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-hobby" class="content-section">
+            <div class="section-grid">
+                <div class="text-block">
+                    <h2>Hobby.</h2>
                     <div class="content-text">
                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum. Cras venenatis euismod malesuada.</p>
                         <p>Nullam ac odio sed libero sollicitudin commodo. Morbi non consequat metus, eget efficitur turpis. Aliquam erat volutpat.</p>
@@ -257,7 +270,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v1.6.3 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.6.4 • martin vojtus • 2026</div>
     </footer>
 
     <script>
