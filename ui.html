@@ -12,14 +12,13 @@
             --size-small: 1.0rem;
             --black: #000000;
             --white: #ffffff;
-            --grey-50: rgba(0, 0, 0, 0.5); /* ✏️ NOVÁ: 50% čierna */
+            --grey-50: rgba(0, 0, 0, 0.5); 
             --content-width: 540px; 
             --border-radius: 0px; 
         }
 
         html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
-        /* ✏️ NOVÉ: Odstránenie prebliknutia (tap highlight) na mobile */
         * {
             -webkit-tap-highlight-color: transparent;
         }
@@ -117,7 +116,6 @@
             font-family: inherit; font-size: var(--size-small); 
             padding: 15px; 
             outline: none; box-sizing: border-box;
-            /* ✏️ UPRAVENÉ: Farba textu 50% čierna */
             color: var(--grey-50);
         }
         
@@ -132,7 +130,6 @@
             padding: 15px;
             outline: none; box-sizing: border-box;
             min-height: 120px; resize: vertical;
-            /* ✏️ UPRAVENÉ: Farba textu 50% čierna */
             color: var(--grey-50);
         }
 
@@ -144,27 +141,14 @@
             font-family: inherit; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; 
             letter-spacing: 0.1em; cursor: pointer; margin-top: 0; 
             border-radius: var(--border-radius);
-            /* ✏️ UPRAVENÉ: Odstránená transition (žiaden efekt) */
         }
         .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        /* ✏️ UPRAVENÉ: Odstránený hover efekt */
 
         footer {
             width: 100%; max-width: var(--content-width); padding: 15px 20px 30px; box-sizing: border-box;
             display: flex; flex-direction: column; align-items: center; transition: max-width 0.4s ease;
         }
-        .footer-link-group { margin-bottom: 15px; text-align: center; display: flex; flex-direction: column; gap: 8px; }
         
-        /* ✏️ UPRAVENÉ: 50% čierna pre odkazy v pätičke a žiadne efekty */
-        .footer-link-group a { 
-            font-size: var(--size-small); 
-            font-weight: 400; 
-            color: var(--grey-50); 
-            text-decoration: none; 
-            letter-spacing: 0.02em; 
-        }
-        
-        /* ✏️ UPRAVENÉ: 50% čierna pre info text */
         .footer-info { 
             font-size: var(--size-small); 
             color: var(--grey-50); 
@@ -251,11 +235,7 @@
     </main>
 
     <footer>
-        <div class="footer-link-group">
-            <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
-            <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
-        </div>
-        <div class="footer-info">build v1.1.56 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.5.7 • martin vojtus • 2026</div>
     </footer>
 
     <script>
