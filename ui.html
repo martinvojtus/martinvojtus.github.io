@@ -259,7 +259,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v1.6.0 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.6.1 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -276,20 +276,45 @@
             closeMenu(); window.scrollTo(0, 0);
         }
 
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            themeToggleBtn.innerText = isDark ? 'Light mode' : 'Dark mode';
+        // ✏️ UPRAVENÉ: Inteligentné prepínanie (System vs Manual)
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme === 'dark') {
+                enableDark(true);
+            } else if (savedTheme === 'light') {
+                enableDark(false);
+            } else {
+                // Ak nie je uložená preferencia, riadime sa systémom
+                enableDark(systemDark);
+            }
         }
 
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.body.classList.add('dark-mode');
-            themeToggleBtn.innerText = 'Light mode';
-        } else {
-            themeToggleBtn.innerText = 'Dark mode';
+        function enableDark(shouldBeDark) {
+            if (shouldBeDark) {
+                document.body.classList.add('dark-mode');
+                themeToggleBtn.innerText = 'Light mode';
+            } else {
+                document.body.classList.remove('dark-mode');
+                themeToggleBtn.innerText = 'Dark mode';
+            }
         }
+
+        function toggleTheme() {
+            const isCurrentlyDark = document.body.classList.contains('dark-mode');
+            
+            if (isCurrentlyDark) {
+                enableDark(false);
+                localStorage.setItem('theme', 'light');
+            } else {
+                enableDark(true);
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Spustiť pri štarte
+        initTheme();
 
         const form = document.querySelector('.contact-form');
         form.addEventListener('submit', function(e) {
