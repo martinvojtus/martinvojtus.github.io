@@ -12,11 +12,17 @@
             --size-small: 1.0rem;
             --black: #000000;
             --white: #ffffff;
+            --grey-50: rgba(0, 0, 0, 0.5); /* ✏️ NOVÁ: 50% čierna */
             --content-width: 540px; 
             --border-radius: 0px; 
         }
 
         html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+        /* ✏️ NOVÉ: Odstránenie prebliknutia (tap highlight) na mobile */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
 
         body {
             margin: 0; padding: 0;
@@ -101,32 +107,33 @@
 
         /* --- FORMULÁR --- */
         .contact-form { margin-top: 0; max-width: 540px; width: 100%; }
-        /* ✏️ UPRAVENÉ: Menší margin-bottom, keďže už nemáme labels */
         .form-group { margin-bottom: 15px; }
         
         .form-input { 
             width: 100%; 
             border: 1px solid var(--black); 
-            border-radius: var(--border-radius); /* 0px */
+            border-radius: var(--border-radius); 
             background: transparent; 
             font-family: inherit; font-size: var(--size-small); 
-            /* ✏️ UPRAVENÉ: Padding zmenšený z 25px na 15px pre krajší hranatý vzhľad */
             padding: 15px; 
-            outline: none; box-sizing: border-box; 
+            outline: none; box-sizing: border-box;
+            /* ✏️ UPRAVENÉ: Farba textu 50% čierna */
+            color: var(--grey-50);
         }
         
-        /* Placeholder styling pre lepšiu čitateľnosť/konzistenciu */
-        ::placeholder { color: rgba(0, 0, 0, 0.5); opacity: 1; }
+        ::placeholder { color: var(--grey-50); opacity: 1; }
 
         .form-textarea {
             width: 100%;
             border: 1px solid var(--black); 
-            border-radius: var(--border-radius); /* 0px */
+            border-radius: var(--border-radius); 
             background: transparent;
             font-family: inherit; font-size: var(--size-small); 
             padding: 15px;
             outline: none; box-sizing: border-box;
             min-height: 120px; resize: vertical;
+            /* ✏️ UPRAVENÉ: Farba textu 50% čierna */
+            color: var(--grey-50);
         }
 
         .submit-btn {
@@ -135,20 +142,36 @@
             border: none; 
             padding: 16px 32px; 
             font-family: inherit; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; 
-            letter-spacing: 0.1em; cursor: pointer; margin-top: 0; transition: opacity 0.3s ease;
-            border-radius: var(--border-radius); /* 0px */
+            letter-spacing: 0.1em; cursor: pointer; margin-top: 0; 
+            border-radius: var(--border-radius);
+            /* ✏️ UPRAVENÉ: Odstránená transition (žiaden efekt) */
         }
         .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .submit-btn:hover:not(:disabled) { opacity: 0.8; }
+        /* ✏️ UPRAVENÉ: Odstránený hover efekt */
 
         footer {
             width: 100%; max-width: var(--content-width); padding: 15px 20px 30px; box-sizing: border-box;
             display: flex; flex-direction: column; align-items: center; transition: max-width 0.4s ease;
         }
         .footer-link-group { margin-bottom: 15px; text-align: center; display: flex; flex-direction: column; gap: 8px; }
-        .footer-link-group a { font-size: var(--size-small); font-weight: 400; color: var(--black); text-decoration: none; letter-spacing: 0.02em; transition: opacity 0.3s ease; }
-        .footer-link-group a:hover { opacity: 0.6; }
-        .footer-info { font-size: var(--size-small); color: var(--black); text-transform: uppercase; letter-spacing: 0.1em; text-align: center; }
+        
+        /* ✏️ UPRAVENÉ: 50% čierna pre odkazy v pätičke a žiadne efekty */
+        .footer-link-group a { 
+            font-size: var(--size-small); 
+            font-weight: 400; 
+            color: var(--grey-50); 
+            text-decoration: none; 
+            letter-spacing: 0.02em; 
+        }
+        
+        /* ✏️ UPRAVENÉ: 50% čierna pre info text */
+        .footer-info { 
+            font-size: var(--size-small); 
+            color: var(--grey-50); 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em; 
+            text-align: center; 
+        }
     </style>
 </head>
 <body>
@@ -232,7 +255,7 @@
             <a href="https://www.cosmos.so/martinvojtus" target="_blank">Cosmos</a>
             <a href="mailto:martinvojtus@icloud.com">martinvojtus@icloud.com</a>
         </div>
-        <div class="footer-info">build v1.1.55 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.1.56 • martin vojtus • 2026</div>
     </footer>
 
     <script>
