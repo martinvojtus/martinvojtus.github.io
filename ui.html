@@ -223,51 +223,96 @@
         <div class="footer-info">build v1.7.1 • martin vojtus • 2026</div>
     </footer>
 
-    <script>
+        <script>
+        // 1. MENU A NAVIGÁCIA
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
-        function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
-        function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); }
+        
+        function toggleMenu() { 
+            menuToggle.classList.toggle('active'); 
+            navOverlay.classList.toggle('active'); 
+        }
+
+        function closeMenu() { 
+            menuToggle.classList.remove('active'); 
+            navOverlay.classList.remove('active'); 
+        }
+
         function showSection(sectionId) {
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
             document.getElementById('section-' + sectionId).classList.add('active');
-            closeMenu(); window.scrollTo(0, 0);
+            closeMenu(); 
+            window.scrollTo(0, 0);
         }
 
+        // 2. NAČÍTANIE STATUSOV Z DATABÁZY
         async function fetchStatuses() {
             const container = document.getElementById('status-container');
-            const API_URL = 'TVOJA_URL_ADRESA_API'; 
+            
+            // 👇 SEM VLOŽ SVOJU URL Z RENDERU (bez lomky na konci)
+            // Príklad: "https://mv-backend-abc.onrender.com"
+            const API_URL = "https://mv-backend-ak8l.onrender.com"; 
 
             try {
-                const response = await fetch(API_URL);
-                if (!response.ok) throw new Error();
+                // Skúsime stiahnuť dáta zo servera (+ /posts)
+                const response = await fetch(`${API_URL}/posts`);
+                
+                if (!response.ok) throw new Error("Server neodpovedá");
+                
                 const data = await response.json();
+                
+                // Ak je databáza prázdna
+                if (data.length === 0) {
+                    container.innerHTML = '<p class="loading-text">Zatiaľ žiadne statusy.</p>';
+                    return;
+                }
+
                 renderStatuses(data);
+
             } catch (error) {
-                const mockData = [
-                    { title: "Prvý status", body: "Toto je testovací status, ktorý sa neskôr nahradí tvojou databázou.", created_at: "11. FEB 2026" },
-                    { title: "Design Update", body: "Karty teraz používajú jemné priesvitné pozadie a modernú typografiu.", created_at: "10. FEB 2026" }
-                ];
-                renderStatuses(mockData);
+                console.error(error);
+                // Ak nastane chyba, vypíšeme ju červeným (aby si vedel, že niečo nejde)
+                container.innerHTML = `
+                    <div class="status-card" style="border-color: red;">
+                        <h3 class="status-title" style="color: red;">Nepodarilo sa načítať dáta</h3>
+                        <p class="status-text">Skontroluj, či máš správnu URL adresu v kóde.<br>Server možno spí, skús obnoviť stránku o minútu.</p>
+                    </div>
+                `;
             }
         }
 
+        // 3. VYKRESLENIE STATUSOV
         function renderStatuses(statuses) {
             const container = document.getElementById('status-container');
-            // ✏️ UPRAVENÉ: Generovanie tvojich tried
-            container.innerHTML = statuses.map(s => `
+            
+            container.innerHTML = statuses.map(s => {
+                // Formátovanie dátumu (napr. 11.2.2026)
+                // Backend posiela "at", nie "created_at"
+                const date = new Date(s.at).toLocaleDateString('sk-SK', {
+                    day: 'numeric', month: 'long', year: 'numeric'
+                }).toUpperCase();
+
+                return `
                 <div class="status-card">
-                    <span class="status-date">${s.created_at}</span>
+                    <span class="status-date">${date}</span>
                     <h3 class="status-title">${s.title}</h3>
-                    <div class="status-text">${s.body}</div>
+                    <div class="status-text">${s.text}</div> 
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
+        // Spustenie
         fetchStatuses();
 
+        // Event Listeners
         menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
-        document.addEventListener('click', (e) => { if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); });
+        document.addEventListener('click', (e) => { 
+            if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) {
+                closeMenu(); 
+            }
+        });
     </script>
+
 </body>
 </html>
