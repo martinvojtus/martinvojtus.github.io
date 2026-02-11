@@ -282,25 +282,33 @@
         }
 
         // 3. VYKRESLENIE STATUSOV
-        function renderStatuses(statuses) {
+                function renderStatuses(statuses) {
             const container = document.getElementById('status-container');
             
             container.innerHTML = statuses.map(s => {
-                // Formátovanie dátumu (napr. 11.2.2026)
-                // Backend posiela "at", nie "created_at"
-                const date = new Date(s.at).toLocaleDateString('sk-SK', {
+                // Vytvoríme dátumový objekt
+                const dateObj = new Date(s.at);
+                
+                // 1. Formát dátumu (napr. 11. FEBRUÁR 2026)
+                const date = dateObj.toLocaleDateString('sk-SK', {
                     day: 'numeric', month: 'long', year: 'numeric'
                 }).toUpperCase();
 
+                // 2. Formát času (napr. 14:30)
+                const time = dateObj.toLocaleTimeString('sk-SK', {
+                    hour: '2-digit', minute: '2-digit'
+                });
+
                 return `
                 <div class="status-card">
-                    <span class="status-date">${date}</span>
+                    <span class="status-date">${date} • ${time}</span>
                     <h3 class="status-title">${s.title}</h3>
                     <div class="status-text">${s.text}</div> 
                 </div>
                 `;
             }).join('');
         }
+
 
         // Spustenie
         fetchStatuses();
