@@ -156,7 +156,6 @@
         .loading-text {
             text-align: center;
             color: var(--grey-50);
-            font-style: italic;
         }
 
         /* --- FORMULÁR --- */
@@ -284,7 +283,7 @@
                     const updateObj = new Date(s.updated_at);
                     const updateDate = updateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
                     const updateTime = updateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-                    editedHtml = `<div style="font-size: 1rem; color: var(--grey-50); margin-top: 6px; font-style: italic;">(Edited: ${updateDate} • ${updateTime})</div>`;
+                    editedHtml = `<div style="font-size: 1rem; color: var(--grey-50); margin-top: 6px;">(Edited: ${updateDate} • ${updateTime})</div>`;
                 }
 
                 return `
