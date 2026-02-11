@@ -22,6 +22,8 @@
             --glass-rgb: 255, 255, 255; 
             --content-width: 540px; 
             --border-radius: 0px; 
+            --card-bg: rgba(0, 0, 0, 0.03);
+            --card-border: rgba(0, 0, 0, 0.1);
         }
 
         @media (prefers-color-scheme: dark) {
@@ -30,6 +32,8 @@
                 --white: #000000;       
                 --grey-50: rgba(255, 255, 255, 0.5); 
                 --glass-rgb: 0, 0, 0;   
+                --card-bg: rgba(255, 255, 255, 0.03);
+                --card-border: rgba(255, 255, 255, 0.1);
             }
         }
 
@@ -102,15 +106,56 @@
         .content-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        h2 { font-size: var(--size-large); font-weight: 600; margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1; }
+        /* ✏️ UPRAVENÉ: Tvoj CSS kód pre statusy */
+        .status-feed {
+            max-width: 600px;
+            margin: 0 auto; 
+            padding: 20px 0;
+        }
 
-        /* --- ŠTÝL STATUSOV VO FEEDE --- */
-        .status-container { display: flex; flex-direction: column; gap: 40px; margin-top: 20px; }
-        .status-item { border-bottom: 1px solid var(--black); padding-bottom: 20px; }
-        .status-item:last-child { border-bottom: none; }
-        .status-header { font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
-        .status-body { font-size: var(--size-small); margin-bottom: 12px; }
-        .status-time { font-size: 0.8rem; color: var(--grey-50); text-transform: uppercase; letter-spacing: 0.05em; }
+        .status-card {
+            background: var(--card-bg); 
+            border: 1px solid var(--card-border); 
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .status-card:hover {
+            transform: translateY(-2px); 
+            border-color: var(--grey-50);
+        }
+
+        .status-date {
+            font-size: 0.85rem;
+            color: var(--grey-50);
+            margin-bottom: 8px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            color: var(--black);
+        }
+
+        .status-text {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--black);
+            opacity: 0.8;
+            white-space: pre-line; 
+        }
+
+        .loading-text {
+            text-align: center;
+            color: var(--grey-50);
+            font-style: italic;
+        }
 
         /* --- FORMULÁR --- */
         .contact-form { margin-top: 0; max-width: 540px; width: 100%; }
@@ -157,9 +202,8 @@
 
     <main>
         <div id="section-feed" class="content-section active">
-            <h2>Feed.</h2>
-            <div id="status-list" class="status-container">
-                <div class="status-item">Načítavam statusy...</div>
+            <div id="status-container" class="status-feed">
+                <p class="loading-text">Načítavam najnovšie myšlienky...</p>
             </div>
         </div>
 
@@ -176,11 +220,10 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v1.7.0 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.7.1 • martin vojtus • 2026</div>
     </footer>
 
     <script>
-        // --- NAVIGÁCIA ---
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
         function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
@@ -191,41 +234,38 @@
             closeMenu(); window.scrollTo(0, 0);
         }
 
-        // --- NAČÍTANIE STATUSOV Z API ---
         async function fetchStatuses() {
-            const container = document.getElementById('status-list');
-            const API_URL = 'TVOJA_URL_ADRESA_API'; // SEM VLOŽ SVOJU URL
+            const container = document.getElementById('status-container');
+            const API_URL = 'TVOJA_URL_ADRESA_API'; 
 
             try {
-                // Ak ešte nemáš API, toto skončí chybou a prejde to na "catch" s ukážkou
                 const response = await fetch(API_URL);
+                if (!response.ok) throw new Error();
                 const data = await response.json();
                 renderStatuses(data);
             } catch (error) {
-                // UKÁŽKOVÉ DÁTA (kým nebude API pripojené)
                 const mockData = [
-                    { title: "Prvý status", body: "Toto je testovací status, ktorý sa neskôr nahradí tvojou databázou.", created_at: "Dnes, 12:45" },
-                    { title: "Nový build v1.7.0", body: "Dizajn bol vyčistený a pripravený na dynamický obsah.", created_at: "Včera, 19:30" }
+                    { title: "Prvý status", body: "Toto je testovací status, ktorý sa neskôr nahradí tvojou databázou.", created_at: "11. FEB 2026" },
+                    { title: "Design Update", body: "Karty teraz používajú jemné priesvitné pozadie a modernú typografiu.", created_at: "10. FEB 2026" }
                 ];
                 renderStatuses(mockData);
             }
         }
 
         function renderStatuses(statuses) {
-            const container = document.getElementById('status-list');
+            const container = document.getElementById('status-container');
+            // ✏️ UPRAVENÉ: Generovanie tvojich tried
             container.innerHTML = statuses.map(s => `
-                <div class="status-item">
-                    <div class="status-header">${s.title}</div>
-                    <div class="status-body">${s.body}</div>
-                    <div class="status-time">${s.created_at}</div>
+                <div class="status-card">
+                    <span class="status-date">${s.created_at}</span>
+                    <h3 class="status-title">${s.title}</h3>
+                    <div class="status-text">${s.body}</div>
                 </div>
             `).join('');
         }
 
-        // Spustiť načítanie pri štarte
         fetchStatuses();
 
-        // Ostatné eventy...
         menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
         document.addEventListener('click', (e) => { if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); });
     </script>
