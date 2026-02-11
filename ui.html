@@ -1,3 +1,5 @@
+Toto je nas stabilny finalny build frontend webu.
+
 <!DOCTYPE html>
 <html lang="sk">
 <head>
@@ -22,8 +24,8 @@
             --glass-rgb: 255, 255, 255; 
             --content-width: 540px; 
             --border-radius: 0px; 
-            --card-bg: transparent; 
-            --card-border: var(--black);
+            --card-bg: rgba(0, 0, 0, 0.03);
+            --card-border: rgba(0, 0, 0, 0.1);
         }
 
         @media (prefers-color-scheme: dark) {
@@ -32,8 +34,8 @@
                 --white: #000000;       
                 --grey-50: rgba(255, 255, 255, 0.5); 
                 --glass-rgb: 0, 0, 0;   
-                --card-bg: transparent;
-                --card-border: var(--black);
+                --card-bg: rgba(255, 255, 255, 0.03);
+                --card-border: rgba(255, 255, 255, 0.1);
             }
         }
 
@@ -106,82 +108,78 @@
         .content-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- STATUS FEED --- */
+        /* ✏️ UPRAVENÉ: Tvoj CSS kód pre statusy */
+                /* ✏️ AKTUALIZOVANÉ: Dizajn statusov podľa tvojich požiadaviek */
         .status-feed {
             max-width: 600px;
             margin: 0 auto; 
-            padding: 10px 0;
+            padding: 20px 0;
         }
 
         .status-card {
-            background: transparent; 
-            border: none;
-            border-bottom: 1px solid var(--black); /* Rám len zospodu */
-            border-radius: 0; /* Bez zaoblenia */
-            padding: 24px 0; /* Zmenšené vertikálne paddingy */
-            margin-bottom: 0; 
-            transition: none; /* Bez animácie */
+            background: var(--card-bg); 
+            border: 1px solid var(--card-border); 
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
         }
 
         .status-card:hover {
-            transform: none; /* Zrušený pohyb */
+            transform: translateY(-2px); 
+            border-color: var(--grey-50);
         }
 
         .status-date {
-            font-size: 1rem; 
+            font-size: 1rem; /* Zväčšené na 1rem */
             color: var(--grey-50);
-            margin-bottom: 4px; /* Zmenšená medzera pod dátumom */
+            margin-bottom: 8px;
             display: block;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
         .status-title {
-            font-size: 2rem; 
+            font-size: 2rem; /* Zväčšené na 2rem */
             font-weight: 700;
-            margin: 0 0 8px 0; /* Zmenšená medzera pod nadpisom */
+            margin: 0 0 12px 0;
             color: var(--black);
-            line-height: 1.1;
+            line-height: 1.2;
         }
 
         .status-text {
-            font-size: 1rem; 
-            line-height: 1.5;
+            font-size: 1rem; /* Nastavené na 1rem */
+            line-height: 1.6;
             color: var(--black);
             opacity: 0.8;
             white-space: pre-line; 
-            text-align: justify;
+            text-align: justify; /* Zarovnanie na obe strany */
         }
+
 
         .loading-text {
             text-align: center;
             color: var(--grey-50);
+            font-style: italic;
         }
 
         /* --- FORMULÁR --- */
-        .contact-form { margin-top: 20px; max-width: 540px; width: 100%; }
-        .form-group { margin-bottom: 25px; }
+        .contact-form { margin-top: 0; max-width: 540px; width: 100%; }
+        .form-group { margin-bottom: 15px; }
         .form-input, .form-textarea { 
-            width: 100%; 
-            border: none; 
-            border-bottom: 1px solid var(--black); /* Len spodný rám */
-            border-radius: 0; 
-            background: transparent; 
-            font-family: inherit; font-size: var(--size-small); 
-            padding: 12px 0; /* Padding len vertikálne */
-            outline: none; box-sizing: border-box; color: var(--black);
+            width: 100%; border: 1px solid var(--black); border-radius: 0; background: transparent; 
+            font-family: inherit; font-size: var(--size-small); padding: 15px; outline: none; box-sizing: border-box; color: var(--black);
         }
         ::placeholder { color: var(--grey-50); opacity: 1; }
-        .form-textarea { min-height: 100px; resize: vertical; }
+        .form-textarea { min-height: 120px; resize: vertical; }
         .submit-btn {
             width: 100%; background: var(--black); color: var(--white); border: none; padding: 16px 32px; 
             font-family: inherit; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; 
             letter-spacing: 0.1em; cursor: pointer;
-            margin-top: 10px;
         }
 
         footer {
-            width: 100%; max-width: var(--content-width); padding: 40px 20px 30px; box-sizing: border-box;
+            width: 100%; max-width: var(--content-width); padding: 15px 20px 30px; box-sizing: border-box;
             display: flex; flex-direction: column; align-items: center;
         }
         .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; letter-spacing: 0.1em; text-align: center; }
@@ -211,27 +209,28 @@
     <main>
         <div id="section-feed" class="content-section active">
             <div id="status-container" class="status-feed">
-                <p class="loading-text">Loading thoughts...</p>
+                <p class="loading-text">Načítavam najnovšie myšlienky...</p>
             </div>
         </div>
 
         <div id="section-contact" class="content-section">
-            <h2 style="font-size: 2rem; margin-bottom: 10px;">Contact.</h2>
+            <h2>Contact.</h2>
             <form class="contact-form" action="https://formsubmit.co/martinvojtus@icloud.com" method="POST">
                 <input type="hidden" name="_captcha" value="false">
                 <div class="form-group"><input type="text" name="name" class="form-input" placeholder="Name" required></div>
-                <div class="form-group"><input type="email" name="email" class="form-input" placeholder="Email" required></div>
-                <div class="form-group"><textarea name="message" class="form-textarea" placeholder="Message" required></textarea></div>
+                <div class="form-group"><input type="email" name="email" class="form-input" placeholder="email@example.com" required></div>
+                <div class="form-group"><textarea name="message" class="form-textarea" placeholder="Tell me about your project…" required></textarea></div>
                 <button type="submit" class="submit-btn">Send message</button>
             </form>
         </div>
     </main>
 
     <footer>
-        <div class="footer-info">build v1.8.0 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.7.1 • martin vojtus • 2026</div>
     </footer>
 
-    <script>
+        <script>
+        // 1. MENU A NAVIGÁCIA
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
         
@@ -252,38 +251,71 @@
             window.scrollTo(0, 0);
         }
 
+        // 2. NAČÍTANIE STATUSOV Z DATABÁZY
         async function fetchStatuses() {
             const container = document.getElementById('status-container');
+            
+            // 👇 SEM VLOŽ SVOJU URL Z RENDERU (bez lomky na konci)
+            // Príklad: "https://mv-backend-abc.onrender.com"
             const API_URL = "https://mv-backend-ak8l.onrender.com"; 
 
             try {
+                // Skúsime stiahnuť dáta zo servera (+ /posts)
                 const response = await fetch(`${API_URL}/posts`);
-                if (!response.ok) throw new Error();
+                
+                if (!response.ok) throw new Error("Server neodpovedá");
+                
                 const data = await response.json();
                 
+                // Ak je databáza prázdna
                 if (data.length === 0) {
-                    container.innerHTML = '<p class="loading-text">No posts yet.</p>';
+                    container.innerHTML = '<p class="loading-text">Zatiaľ žiadne statusy.</p>';
                     return;
                 }
+
                 renderStatuses(data);
+
             } catch (error) {
-                container.innerHTML = `<p style="color:red; text-align:center;">Failed to load data.</p>`;
+                console.error(error);
+                // Ak nastane chyba, vypíšeme ju červeným (aby si vedel, že niečo nejde)
+                container.innerHTML = `
+                    <div class="status-card" style="border-color: red;">
+                        <h3 class="status-title" style="color: red;">Nepodarilo sa načítať dáta</h3>
+                        <p class="status-text">Skontroluj, či máš správnu URL adresu v kóde.<br>Server možno spí, skús obnoviť stránku o minútu.</p>
+                    </div>
+                `;
             }
         }
 
-        function renderStatuses(statuses) {
+        // 3. VYKRESLENIE STATUSOV
+                                        function renderStatuses(statuses) {
             const container = document.getElementById('status-container');
+            
             container.innerHTML = statuses.map(s => {
                 const dateObj = new Date(s.at);
-                const date = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
-                const time = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                
+                const date = dateObj.toLocaleDateString('en-US', {
+                    day: 'numeric', month: 'long', year: 'numeric'
+                }).toUpperCase();
+                
+                const time = dateObj.toLocaleTimeString('en-US', {
+                    hour: '2-digit', minute: '2-digit', hour12: false 
+                });
 
                 let editedHtml = '';
                 if (s.updated_at) {
                     const updateObj = new Date(s.updated_at);
-                    const updateDate = updateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
-                    const updateTime = updateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-                    editedHtml = `<div style="font-size: 1rem; color: var(--grey-50); margin-top: 6px;">(Edited: ${updateDate} • ${updateTime})</div>`;
+                    const updateDate = updateObj.toLocaleDateString('en-US', {
+                         day: 'numeric', month: 'short'
+                    });
+                    const updateTime = updateObj.toLocaleTimeString('en-US', {
+                        hour: '2-digit', minute: '2-digit', hour12: false
+                    });
+                    
+                    // ZMENA: font-size nastavený na 1rem
+                    editedHtml = `<div style="font-size: 1rem; color: var(--grey-50); margin-top: 8px;">
+                        (Edited: ${updateDate} • ${updateTime})
+                    </div>`;
                 }
 
                 return `
@@ -297,11 +329,21 @@
             }).join('');
         }
 
+
+
+
+
+        // Spustenie
         fetchStatuses();
+
+        // Event Listeners
         menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
         document.addEventListener('click', (e) => { 
-            if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); 
+            if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) {
+                closeMenu(); 
+            }
         });
     </script>
+
 </body>
 </html>
