@@ -107,6 +107,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* ✏️ UPRAVENÉ: Tvoj CSS kód pre statusy */
+                /* ✏️ AKTUALIZOVANÉ: Dizajn statusov podľa tvojich požiadaviek */
         .status-feed {
             max-width: 600px;
             margin: 0 auto; 
@@ -128,7 +129,7 @@
         }
 
         .status-date {
-            font-size: 0.85rem;
+            font-size: 1rem; /* Zväčšené na 1rem */
             color: var(--grey-50);
             margin-bottom: 8px;
             display: block;
@@ -137,19 +138,22 @@
         }
 
         .status-title {
-            font-size: 1.4rem;
-            font-weight: 600;
+            font-size: 2rem; /* Zväčšené na 2rem */
+            font-weight: 700;
             margin: 0 0 12px 0;
             color: var(--black);
+            line-height: 1.2;
         }
 
         .status-text {
-            font-size: 1rem;
+            font-size: 1rem; /* Nastavené na 1rem */
             line-height: 1.6;
             color: var(--black);
             opacity: 0.8;
             white-space: pre-line; 
+            text-align: justify; /* Zarovnanie na obe strany */
         }
+
 
         .loading-text {
             text-align: center;
