@@ -286,13 +286,12 @@
         }
 
         // 3. VYKRESLENIE STATUSOV
-                                function renderStatuses(statuses) {
+                                        function renderStatuses(statuses) {
             const container = document.getElementById('status-container');
             
             container.innerHTML = statuses.map(s => {
                 const dateObj = new Date(s.at);
                 
-                // Formátovanie dátumu vytvorenia (Anglicky)
                 const date = dateObj.toLocaleDateString('en-US', {
                     day: 'numeric', month: 'long', year: 'numeric'
                 }).toUpperCase();
@@ -301,7 +300,6 @@
                     hour: '2-digit', minute: '2-digit', hour12: false 
                 });
 
-                // LOGIKA PRE "EDITED"
                 let editedHtml = '';
                 if (s.updated_at) {
                     const updateObj = new Date(s.updated_at);
@@ -311,8 +309,9 @@
                     const updateTime = updateObj.toLocaleTimeString('en-US', {
                         hour: '2-digit', minute: '2-digit', hour12: false
                     });
-                    // Toto sa zobrazí len ak bol status upravený
-                    editedHtml = `<div style="font-size: 0.75rem; color: #888; margin-top: 4px; font-style: italic;">
+                    
+                    // ZMENA: font-size nastavený na 1rem
+                    editedHtml = `<div style="font-size: 1rem; color: var(--grey-50); margin-top: 8px; font-style: italic;">
                         (Edited: ${updateDate} • ${updateTime})
                     </div>`;
                 }
@@ -327,6 +326,7 @@
                 `;
             }).join('');
         }
+
 
 
 
