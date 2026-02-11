@@ -282,21 +282,19 @@
         }
 
         // 3. VYKRESLENIE STATUSOV
-                function renderStatuses(statuses) {
+                        function renderStatuses(statuses) {
             const container = document.getElementById('status-container');
             
             container.innerHTML = statuses.map(s => {
-                // Vytvoríme dátumový objekt
                 const dateObj = new Date(s.at);
                 
-                // 1. Formát dátumu (napr. 11. FEBRUÁR 2026)
-                const date = dateObj.toLocaleDateString('sk-SK', {
+                // ZMENA: 'en-US' namiesto 'sk-SK'
+                const date = dateObj.toLocaleDateString('en-US', {
                     day: 'numeric', month: 'long', year: 'numeric'
                 }).toUpperCase();
 
-                // 2. Formát času (napr. 14:30)
-                const time = dateObj.toLocaleTimeString('sk-SK', {
-                    hour: '2-digit', minute: '2-digit'
+                const time = dateObj.toLocaleTimeString('en-US', {
+                    hour: '2-digit', minute: '2-digit', hour12: false 
                 });
 
                 return `
@@ -308,6 +306,7 @@
                 `;
             }).join('');
         }
+
 
 
         // Spustenie
