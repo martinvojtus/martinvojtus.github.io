@@ -7,28 +7,23 @@
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     
     <title>martinvojtus.space</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Fonty: 1rem = 16px */
             --size-large: 2.0rem;
             --size-small: 1.0rem;
-            
-            /* LIGHT MODE (Default) */
             --black: #000000;
             --white: #ffffff;
             --grey-50: rgba(0, 0, 0, 0.5);
             --glass-rgb: 255, 255, 255; 
-            
             --content-width: 540px; 
             --border-radius: 0px; 
         }
 
-        /* DARK MODE (System) */
         @media (prefers-color-scheme: dark) {
             :root {
                 --black: #ffffff;       
@@ -39,10 +34,7 @@
         }
 
         html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-
-        * {
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { -webkit-tap-highlight-color: transparent; }
 
         body {
             margin: 0; padding: 0;
@@ -64,19 +56,16 @@
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             z-index: 2000;
-            transition: background-color 0.3s ease;
         }
 
         .header-content {
             width: 100%; max-width: var(--content-width);
             height: 100%; display: flex; justify-content: space-between;
             align-items: center; padding: 0 20px; box-sizing: border-box;
-            position: relative;
-            transition: max-width 0.4s ease;
         }
 
         .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
-        .header-left svg { height: 24px; width: auto; display: block; transition: fill 0.3s ease; }
+        .header-left svg { height: 24px; width: auto; display: block; }
         .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); letter-spacing: 0.05em; white-space: nowrap; }
         .logo-text span { font-weight: 700; }
 
@@ -89,7 +78,7 @@
             position: fixed; top: -100%; left: 0; width: 100%; 
             background: rgba(var(--glass-rgb), 0.3); 
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1), background-color 0.3s ease;
+            transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1);
             z-index: 1500; padding: 80px 0 40px 0; display: flex; flex-direction: column; align-items: center;
         }
         .nav-overlay.active { top: 0; }
@@ -100,97 +89,56 @@
             display: flex; flex-direction: column; gap: 25px; padding: 0 20px; box-sizing: border-box; 
         }
         
-        .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; transition: color 0.3s ease; }
+        .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; }
 
         main {
             padding: 65px 20px 0px; 
             width: 100%; max-width: var(--content-width); 
             box-sizing: border-box;
             flex-grow: 1;
-            transition: max-width 0.4s ease;
         }
 
         .content-section { display: none; animation: fadeIn 0.4s ease; }
         .content-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .section-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-            width: 100%;
-        }
+        h2 { font-size: var(--size-large); font-weight: 600; margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1; }
 
-        #section-contact .section-grid { gap: 0px; } 
-
-        h2 { font-size: var(--size-large); font-weight: 600; margin: 0 0 25px 0; letter-spacing: -0.04em; line-height: 1.1; transition: color 0.3s ease; }
-
-        .content-text { font-size: var(--size-small); text-align: justify; hyphens: auto; transition: color 0.3s ease; }
-        .content-text p { margin-bottom: 1.5rem; }
+        /* --- ŠTÝL STATUSOV VO FEEDE --- */
+        .status-container { display: flex; flex-direction: column; gap: 40px; margin-top: 20px; }
+        .status-item { border-bottom: 1px solid var(--black); padding-bottom: 20px; }
+        .status-item:last-child { border-bottom: none; }
+        .status-header { font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
+        .status-body { font-size: var(--size-small); margin-bottom: 12px; }
+        .status-time { font-size: 0.8rem; color: var(--grey-50); text-transform: uppercase; letter-spacing: 0.05em; }
 
         /* --- FORMULÁR --- */
         .contact-form { margin-top: 0; max-width: 540px; width: 100%; }
         .form-group { margin-bottom: 15px; }
-        
-        .form-input { 
-            width: 100%; 
-            border: 1px solid var(--black); 
-            border-radius: var(--border-radius); 
-            background: transparent; 
-            font-family: inherit; font-size: var(--size-small); 
-            padding: 15px; 
-            outline: none; box-sizing: border-box;
-            color: var(--black);
-            transition: border-color 0.3s ease, color 0.3s ease;
+        .form-input, .form-textarea { 
+            width: 100%; border: 1px solid var(--black); border-radius: 0; background: transparent; 
+            font-family: inherit; font-size: var(--size-small); padding: 15px; outline: none; box-sizing: border-box; color: var(--black);
         }
-        
-        ::placeholder { color: var(--grey-50); opacity: 1; transition: color 0.3s ease; }
-
-        .form-textarea {
-            width: 100%;
-            border: 1px solid var(--black); 
-            border-radius: var(--border-radius); 
-            background: transparent;
-            font-family: inherit; font-size: var(--size-small); 
-            padding: 15px;
-            outline: none; box-sizing: border-box;
-            min-height: 120px; resize: vertical;
-            color: var(--black);
-            transition: border-color 0.3s ease, color 0.3s ease;
-        }
-
+        ::placeholder { color: var(--grey-50); opacity: 1; }
+        .form-textarea { min-height: 120px; resize: vertical; }
         .submit-btn {
-            width: 100%; 
-            background: var(--black); color: var(--white); 
-            border: none; 
-            padding: 16px 32px; 
+            width: 100%; background: var(--black); color: var(--white); border: none; padding: 16px 32px; 
             font-family: inherit; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; 
-            letter-spacing: 0.1em; cursor: pointer; margin-top: 0; 
-            border-radius: var(--border-radius);
-            transition: background-color 0.3s ease, color 0.3s ease;
+            letter-spacing: 0.1em; cursor: pointer;
         }
-        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         footer {
             width: 100%; max-width: var(--content-width); padding: 15px 20px 30px; box-sizing: border-box;
-            display: flex; flex-direction: column; align-items: center; transition: max-width 0.4s ease;
+            display: flex; flex-direction: column; align-items: center;
         }
-        
-        .footer-info { 
-            font-size: var(--size-small); 
-            color: var(--grey-50); 
-            text-transform: uppercase; 
-            letter-spacing: 0.1em; 
-            text-align: center; 
-            transition: color 0.3s ease;
-        }
+        .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; letter-spacing: 0.1em; text-align: center; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="header-content">
-            <div class="logo-link" onclick="showSection('about')">
+            <div class="logo-link" onclick="showSection('feed')">
                 <div class="header-left">
                     <svg xmlns="http://www.w3.org/2000/svg" width="935.31" height="810" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
                 </div>
@@ -202,136 +150,82 @@
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
-            <a class="menu-link" onclick="showSection('about')"><span>About</span></a>
-            <a class="menu-link" onclick="showSection('work')"><span>Work</span></a>
-            <a class="menu-link" onclick="showSection('hobby')"><span>Hobby</span></a>
+            <a class="menu-link" onclick="showSection('feed')"><span>Feed</span></a>
             <a class="menu-link" onclick="showSection('contact')"><span>Contact</span></a>
         </div>
     </nav>
 
     <main>
-        <div id="section-about" class="content-section active">
-            <div class="section-grid">
-                <div class="text-block">
-                    <h2>About.</h2>
-                    <div class="content-text">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-                        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="section-work" class="content-section">
-            <div class="section-grid">
-                <div class="text-block">
-                    <h2>Work.</h2>
-                    <div class="content-text">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sed diam eget risus varius blandit sit amet non magna. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.</p>
-                        <p>Donec id elit non mi porta gravida at eget metus. Cras mattis consectetur purus sit amet fermentum. Vestibulum id ligula porta felis euismod semper.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="section-hobby" class="content-section">
-            <div class="section-grid">
-                <div class="text-block">
-                    <h2>Hobby.</h2>
-                    <div class="content-text">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum. Cras venenatis euismod malesuada.</p>
-                        <p>Nullam ac odio sed libero sollicitudin commodo. Morbi non consequat metus, eget efficitur turpis. Aliquam erat volutpat.</p>
-                    </div>
-                </div>
+        <div id="section-feed" class="content-section active">
+            <h2>Feed.</h2>
+            <div id="status-list" class="status-container">
+                <div class="status-item">Načítavam statusy...</div>
             </div>
         </div>
 
         <div id="section-contact" class="content-section">
-            <div class="section-grid">
-                <div class="text-block">
-                    <h2>Let's work together.</h2>
-                    <div class="content-text">
-                        <p>Have a project in mind? I'm currently available for new opportunities. Send me a message and let's discuss how we can create something meaningful.</p>
-                    </div>
-                </div>
-                <form class="contact-form" action="https://formsubmit.co/martinvojtus@icloud.com" method="POST">
-                    <input type="hidden" name="_captcha" value="false">
-                    <input type="hidden" name="_subject" value="New submission from martinvojtus.space">
-                    
-                    <div class="form-group">
-                        <input type="text" name="name" class="form-input" placeholder="Name" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <input type="email" name="email" class="form-input" placeholder="email@example.com" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <textarea name="message" class="form-textarea" placeholder="Tell me about your project…" required></textarea>
-                    </div>
-                    
-                    <button type="submit" class="submit-btn">Send message</button>
-                </form>
-            </div>
+            <h2>Contact.</h2>
+            <form class="contact-form" action="https://formsubmit.co/martinvojtus@icloud.com" method="POST">
+                <input type="hidden" name="_captcha" value="false">
+                <div class="form-group"><input type="text" name="name" class="form-input" placeholder="Name" required></div>
+                <div class="form-group"><input type="email" name="email" class="form-input" placeholder="email@example.com" required></div>
+                <div class="form-group"><textarea name="message" class="form-textarea" placeholder="Tell me about your project…" required></textarea></div>
+                <button type="submit" class="submit-btn">Send message</button>
+            </form>
         </div>
     </main>
 
     <footer>
-        <div class="footer-info">build v1.6.6 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.7.0 • martin vojtus • 2026</div>
     </footer>
 
     <script>
+        // --- NAVIGÁCIA ---
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
-
         function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
         function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); }
-
         function showSection(sectionId) {
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
             document.getElementById('section-' + sectionId).classList.add('active');
             closeMenu(); window.scrollTo(0, 0);
         }
 
-        const form = document.querySelector('.contact-form');
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const btn = form.querySelector('.submit-btn');
-            const originalText = btn.innerText;
-            
-            btn.innerText = 'Sending...';
-            btn.disabled = true;
+        // --- NAČÍTANIE STATUSOV Z API ---
+        async function fetchStatuses() {
+            const container = document.getElementById('status-list');
+            const API_URL = 'TVOJA_URL_ADRESA_API'; // SEM VLOŽ SVOJU URL
 
-            fetch(form.action, {
-                method: "POST",
-                body: new FormData(form),
-                headers: { 'Accept': 'application/json' }
-            })
-            .then(response => {
-                if (response.ok) {
-                    btn.innerText = 'Message sent';
-                    form.reset();
-                    setTimeout(() => {
-                        btn.innerText = originalText;
-                        btn.disabled = false;
-                    }, 4000);
-                } else {
-                    btn.innerText = 'Error. Try again.';
-                    setTimeout(() => {
-                        btn.innerText = originalText;
-                        btn.disabled = false;
-                    }, 4000);
-                }
-            })
-            .catch(error => {
-                btn.innerText = 'Error. Connection problem.';
-                setTimeout(() => {
-                    btn.innerText = originalText;
-                    btn.disabled = false;
-                }, 4000);
-            });
-        });
+            try {
+                // Ak ešte nemáš API, toto skončí chybou a prejde to na "catch" s ukážkou
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                renderStatuses(data);
+            } catch (error) {
+                // UKÁŽKOVÉ DÁTA (kým nebude API pripojené)
+                const mockData = [
+                    { title: "Prvý status", body: "Toto je testovací status, ktorý sa neskôr nahradí tvojou databázou.", created_at: "Dnes, 12:45" },
+                    { title: "Nový build v1.7.0", body: "Dizajn bol vyčistený a pripravený na dynamický obsah.", created_at: "Včera, 19:30" }
+                ];
+                renderStatuses(mockData);
+            }
+        }
 
+        function renderStatuses(statuses) {
+            const container = document.getElementById('status-list');
+            container.innerHTML = statuses.map(s => `
+                <div class="status-item">
+                    <div class="status-header">${s.title}</div>
+                    <div class="status-body">${s.body}</div>
+                    <div class="status-time">${s.created_at}</div>
+                </div>
+            `).join('');
+        }
+
+        // Spustiť načítanie pri štarte
+        fetchStatuses();
+
+        // Ostatné eventy...
         menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
         document.addEventListener('click', (e) => { if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); });
     </script>
