@@ -282,30 +282,48 @@
         }
 
         // 3. VYKRESLENIE STATUSOV
-                        function renderStatuses(statuses) {
+                                function renderStatuses(statuses) {
             const container = document.getElementById('status-container');
             
             container.innerHTML = statuses.map(s => {
                 const dateObj = new Date(s.at);
                 
-                // ZMENA: 'en-US' namiesto 'sk-SK'
+                // Formátovanie dátumu vytvorenia (Anglicky)
                 const date = dateObj.toLocaleDateString('en-US', {
                     day: 'numeric', month: 'long', year: 'numeric'
                 }).toUpperCase();
-
+                
                 const time = dateObj.toLocaleTimeString('en-US', {
                     hour: '2-digit', minute: '2-digit', hour12: false 
                 });
+
+                // LOGIKA PRE "EDITED"
+                let editedHtml = '';
+                if (s.updated_at) {
+                    const updateObj = new Date(s.updated_at);
+                    const updateDate = updateObj.toLocaleDateString('en-US', {
+                         day: 'numeric', month: 'short'
+                    });
+                    const updateTime = updateObj.toLocaleTimeString('en-US', {
+                        hour: '2-digit', minute: '2-digit', hour12: false
+                    });
+                    // Toto sa zobrazí len ak bol status upravený
+                    editedHtml = `<div style="font-size: 0.75rem; color: #888; margin-top: 4px; font-style: italic;">
+                        (Edited: ${updateDate} • ${updateTime})
+                    </div>`;
+                }
 
                 return `
                 <div class="status-card">
                     <span class="status-date">${date} • ${time}</span>
                     <h3 class="status-title">${s.title}</h3>
                     <div class="status-text">${s.text}</div> 
+                    ${editedHtml}
                 </div>
                 `;
             }).join('');
         }
+
 
 
 
