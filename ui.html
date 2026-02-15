@@ -222,11 +222,10 @@
             color: var(--black); cursor: pointer; text-decoration: underline; padding: 0; margin-right: 15px;
         }
 
-        /* ✏️ ZMENA: Karta zoznamu upravená do jedného flexibilného riadku */
         .admin-card {
             border: 1px solid var(--black);
             border-radius: var(--border-radius);
-            padding: var(--input-padding); /* Rovnaká výška ako textové polia */
+            padding: var(--input-padding); 
             margin-bottom: var(--gap-item);
             display: flex;
             align-items: center;
@@ -328,7 +327,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.4.1 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.4.2 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -515,7 +514,7 @@
             }
         }
 
-        // ✏️ ZMENA: HTML štruktúra jednej karty príspevku v zozname (flexbox a jeden riadok)
+        // ✏️ ZMENA: Pridaný text "ID: " k číslu príspevku
         function renderAdminList() {
             const container = document.getElementById('admin-posts-container');
             if (globalPosts.length === 0) {
@@ -525,7 +524,7 @@
             container.innerHTML = globalPosts.map(p => `
                 <div class="admin-card">
                     <div style="display: flex; align-items: center; gap: 12px; overflow: hidden; flex-grow: 1;">
-                        <span style="color: var(--grey-50); font-size: var(--size-small); white-space: nowrap;">${p.id}${p.image_url ? ' 🖼️' : ''}</span>
+                        <span style="color: var(--grey-50); font-size: var(--size-small); white-space: nowrap;">ID: ${p.id}${p.image_url ? ' 🖼️' : ''}</span>
                         <span style="font-weight: 700; font-size: var(--size-small); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.title}</span>
                     </div>
                     <div style="display: flex; gap: 15px; flex-shrink: 0; margin-left: 10px;">
