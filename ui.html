@@ -144,7 +144,6 @@
             line-height: 1.1;
         }
 
-        /* ✏️ NOVÉ: Štýl pre obrázky vo feede */
         .status-image {
             width: 100%;
             height: auto;
@@ -168,7 +167,7 @@
             padding-top: 10px;
         }
 
-        /* --- FORMULÁRE (Contact + Admin) --- */
+        /* --- FORMULÁRE --- */
         .contact-form { margin-top: 20px; max-width: 540px; width: 100%; }
         .form-group { margin-bottom: 25px; }
         .form-input, .form-textarea { 
@@ -184,7 +183,6 @@
         ::placeholder { color: var(--grey-50); opacity: 1; }
         .form-textarea { min-height: 100px; resize: vertical; }
         
-        /* ✏️ NOVÉ: Prispôsobenie políčka pre súbor */
         input[type="file"] {
             color: var(--grey-50);
             padding: 12px 0;
@@ -273,6 +271,12 @@
 
                 <form id="editor-form" class="contact-form" onsubmit="handlePublish(event)">
                     <div class="form-group"><input type="text" id="edit-title" class="form-input" placeholder="Title" required></div>
+                    
+                    <div id="current-image-container" style="display: none; margin-bottom: 15px; font-size: 0.9rem; align-items: center;">
+                        <span style="color: var(--grey-50);">Attached image </span>
+                        <button type="button" class="admin-action-btn" style="color: red; margin-left: 15px;" onclick="flagImageForRemoval()">Remove</button>
+                    </div>
+
                     <div class="form-group"><input type="file" id="edit-image" class="form-input" accept="image/*"></div>
                     <div class="form-group"><textarea id="edit-text" class="form-textarea" placeholder="Content" required></textarea></div>
                     <p id="admin-msg" style="font-size: 0.9rem; margin: 5px 0;"></p>
@@ -287,7 +291,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.0.0 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.1.0 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -295,7 +299,8 @@
         let secretKey = ""; 
         let editingId = null;
         let globalPosts = [];
-        let currentImageUrl = null; // Uchováva obrázok pri editácii
+        let currentImageUrl = null; 
+        let removeImageFlag = false; // ✏️ NOVÉ: Sleduje, či chceme zmazať fotku
 
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
@@ -344,7 +349,6 @@
                 editedHtml = `<div style="font-size: 1rem; color: var(--grey-50); margin-top: 6px;">(Edited: ${updateDate} • ${updateTime})</div>`;
             }
 
-            // ✏️ NOVÉ: Zobrazenie obrázka, ak existuje
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image">` : '';
 
             return `
@@ -375,6 +379,13 @@
             cancelEdit();
         }
 
+        // ✏️ NOVÁ FUNKCIA: Označí obrázok na odstránenie
+        function flagImageForRemoval() {
+            removeImageFlag = true;
+            currentImageUrl = null;
+            document.getElementById('current-image-container').style.display = 'none';
+        }
+
         async function handlePublish(e) {
             e.preventDefault();
             const title = document.getElementById('edit-title').value;
@@ -387,7 +398,11 @@
 
             let finalImageUrl = currentImageUrl;
 
-            // ✏️ NOVÉ: Logika pre nahratie obrázka na server
+            // ✏️ NOVÁ LOGIKA: Ak sme klikli na Remove a nevybrali novú fotku
+            if (removeImageFlag && !imageFile) {
+                finalImageUrl = null; 
+            }
+
             if (imageFile) {
                 const formData = new FormData();
                 formData.append("file", imageFile);
@@ -399,9 +414,7 @@
                         body: formData
                     });
 
-                    if (uploadRes.status === 401) {
-                        throw new Error("Unauthorized");
-                    }
+                    if (uploadRes.status === 401) throw new Error("Unauthorized");
                     if (!uploadRes.ok) throw new Error("Upload failed");
 
                     const uploadData = await uploadRes.json();
@@ -480,9 +493,19 @@
             if(!post) return;
             editingId = id;
             currentImageUrl = post.image_url || null;
+            removeImageFlag = false; // Reset flagu
+
             document.getElementById('edit-title').value = post.title;
             document.getElementById('edit-text').value = post.text;
-            document.getElementById('edit-image').value = ""; // Vyčistíme input, ak by tam bol starý výber
+            document.getElementById('edit-image').value = ""; 
+
+            // ✏️ NOVÁ LOGIKA: Zobrazíme tlačidlo na vymazanie fotky, ak ju status má
+            if (post.image_url) {
+                document.getElementById('current-image-container').style.display = 'flex';
+            } else {
+                document.getElementById('current-image-container').style.display = 'none';
+            }
+
             document.getElementById('publish-btn').innerText = "Save Changes";
             document.getElementById('cancel-btn').style.display = "block";
             window.scrollTo(0, document.getElementById('section-admin').offsetTop);
@@ -491,9 +514,13 @@
         function cancelEdit() {
             editingId = null;
             currentImageUrl = null;
+            removeImageFlag = false;
+
             document.getElementById('edit-title').value = "";
             document.getElementById('edit-text').value = "";
             document.getElementById('edit-image').value = "";
+            document.getElementById('current-image-container').style.display = 'none';
+            
             document.getElementById('publish-btn').innerText = "Publish";
             document.getElementById('cancel-btn').style.display = "none";
         }
