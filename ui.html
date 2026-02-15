@@ -23,7 +23,6 @@
             --glass-rgb: 255, 255, 255; 
             --content-width: 540px; 
             
-            /* 📐 NOVÉ: Prísna symetria celého UI */
             --border-radius: 12px; 
             --gap-item: 24px; 
             --input-padding: 16px; 
@@ -172,7 +171,8 @@
         .contact-form { margin-top: 0; max-width: 540px; width: 100%; }
         .form-group { margin-bottom: var(--gap-item); }
         
-        .form-input, .form-textarea, input[type="file"], .submit-btn { 
+        /* ✏️ ZMENA: Zjednotenie všetkých boxov */
+        .form-input, .form-textarea, .submit-btn { 
             width: 100%; 
             border: 1px solid var(--black); 
             border-radius: var(--border-radius); 
@@ -188,18 +188,6 @@
         
         ::placeholder { color: var(--grey-50); opacity: 1; }
         .form-textarea { min-height: 120px; resize: vertical; }
-
-        input[type="file"]::file-selector-button {
-            border: 1px solid var(--black);
-            background: transparent;
-            color: var(--black);
-            font-family: inherit;
-            font-size: 0.9rem;
-            padding: 4px 12px;
-            border-radius: calc(var(--border-radius) - 4px);
-            margin-right: 12px;
-            cursor: pointer;
-        }
 
         .submit-btn {
             background: var(--black); 
@@ -299,7 +287,14 @@
                         <button type="button" class="admin-action-btn" style="color: red; margin-left: 15px;" onclick="flagImageForRemoval()">Remove</button>
                     </div>
 
-                    <div class="form-group"><input type="file" id="edit-image" class="form-input" accept="image/*"></div>
+                    <div class="form-group">
+                        <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateFileName()">
+                        <div class="form-input" style="display: flex; align-items: center; cursor: pointer; overflow: hidden;" onclick="document.getElementById('edit-image').click()">
+                            <span class="admin-action-btn" style="margin: 0 15px 0 0; pointer-events: none;">Choose file</span>
+                            <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">No file chosen</span>
+                        </div>
+                    </div>
+
                     <div class="form-group"><textarea id="edit-text" class="form-textarea" placeholder="Content" required></textarea></div>
                     
                     <p id="admin-msg" style="font-size: 0.9rem; margin: 0 0 10px 0;"></p>
@@ -315,7 +310,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.3.0 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.3.1 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -407,6 +402,19 @@
             removeImageFlag = true;
             currentImageUrl = null;
             document.getElementById('current-image-container').style.display = 'none';
+        }
+
+        // ✏️ NOVÁ FUNKCIA: Upravuje text pri vybratí súboru
+        function updateFileName() {
+            const input = document.getElementById('edit-image');
+            const display = document.getElementById('file-name-display');
+            if (input.files && input.files.length > 0) {
+                display.innerText = input.files[0].name;
+                display.style.color = "var(--black)";
+            } else {
+                display.innerText = "No file chosen";
+                display.style.color = "var(--grey-50)";
+            }
         }
 
         async function handlePublish(e) {
@@ -520,6 +528,10 @@
             document.getElementById('edit-title').value = post.title;
             document.getElementById('edit-text').value = post.text;
             document.getElementById('edit-image').value = ""; 
+            
+            // Reset vizuálneho poľa pre súbor
+            document.getElementById('file-name-display').innerText = "No file chosen";
+            document.getElementById('file-name-display').style.color = "var(--grey-50)";
 
             if (post.image_url) {
                 document.getElementById('current-image-container').style.display = 'flex';
@@ -541,6 +553,9 @@
             document.getElementById('edit-text').value = "";
             document.getElementById('edit-image').value = "";
             document.getElementById('current-image-container').style.display = 'none';
+            
+            document.getElementById('file-name-display').innerText = "No file chosen";
+            document.getElementById('file-name-display').style.color = "var(--grey-50)";
             
             document.getElementById('publish-btn').innerText = "Publish";
             document.getElementById('cancel-btn-container').style.display = "none";
