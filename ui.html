@@ -96,7 +96,8 @@
         .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; }
 
         main {
-            padding: 65px 20px 0px; 
+            /* ✏️ ZMENA: Zmenšený horný padding z 65px na 60px pre tesnejší kontakt s hlavičkou */
+            padding: 60px 20px 0px; 
             width: 100%; max-width: var(--content-width); 
             box-sizing: border-box;
             flex-grow: 1;
@@ -110,7 +111,8 @@
         .status-feed {
             max-width: 600px;
             margin: 0 auto; 
-            padding: 10px 0;
+            /* ✏️ ZMENA: Zrušený zbytočný vnútorný horný padding kontajnera */
+            padding: 0; 
         }
 
         .status-card {
@@ -121,6 +123,11 @@
             padding: 24px 0; 
             margin-bottom: 0; 
             transition: none; 
+        }
+
+        /* ✏️ ZMENA: Úplne prvý status vo feede nebude mať hornú medzeru */
+        .status-card:first-child {
+            padding-top: 5px;
         }
 
         .status-date {
@@ -152,6 +159,7 @@
         .loading-text {
             text-align: center;
             color: var(--grey-50);
+            padding-top: 10px;
         }
 
         /* --- FORMULÁRE (Contact + Admin) --- */
@@ -265,7 +273,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v1.9.0 • martin vojtus • 2026</div>
+        <div class="footer-info">build v1.9.1 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -303,7 +311,6 @@
                     container.innerHTML = globalPosts.map(s => renderSinglePost(s)).join('');
                 }
                 
-                // Ak sme v admine, prekreslime aj spravcu
                 if (secretKey) renderAdminList();
                 
             } catch (error) {
@@ -334,14 +341,11 @@
         // 3. ADMIN LOGIKA
         function handleLogin(e) {
             e.preventDefault();
-            const pwd = document.getElementById('admin-pass').value;
-            // Skusime maly test - zavolame public feed, len aby sme nastavili kluc
-            // Backend overuje heslo az pri zapise, takze tu len ulozime do pamate
-            secretKey = pwd;
+            secretKey = document.getElementById('admin-pass').value;
             document.getElementById('admin-login-view').style.display = 'none';
             document.getElementById('admin-dashboard-view').style.display = 'block';
             document.getElementById('login-error').style.display = 'none';
-            fetchStatuses(); // Nacitame data pre editor
+            fetchStatuses(); 
         }
 
         function handleLogout() {
@@ -389,7 +393,7 @@
                 setTimeout(() => { msgBox.innerText = ""; }, 3000);
                 
                 cancelEdit();
-                fetchStatuses(); // Obnovi feed vsade
+                fetchStatuses(); 
 
             } catch (err) {
                 msgBox.style.color = "red";
@@ -455,7 +459,6 @@
             }
         }
 
-        // Init
         fetchStatuses();
         menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
         document.addEventListener('click', (e) => { 
