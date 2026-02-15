@@ -19,12 +19,14 @@
             --black: #000000;
             --white: #ffffff;
             --grey-50: rgba(0, 0, 0, 0.5);
-            --divider: rgba(0, 0, 0, 0.12); /* ✏️ ZMENA: Super jemná 12% linka */
+            --divider: rgba(0, 0, 0, 0.12);
             --glass-rgb: 255, 255, 255; 
             --content-width: 540px; 
             
+            /* 📐 NOVÉ: Prísna symetria celého UI */
             --border-radius: 12px; 
-            --gap-item: 24px;
+            --gap-item: 24px; 
+            --input-padding: 16px; 
         }
 
         @media (prefers-color-scheme: dark) {
@@ -32,7 +34,7 @@
                 --black: #ffffff;       
                 --white: #000000;       
                 --grey-50: rgba(255, 255, 255, 0.5); 
-                --divider: rgba(255, 255, 255, 0.12); /* ✏️ ZMENA: Jemná linka v Dark Mode */
+                --divider: rgba(255, 255, 255, 0.12); 
                 --glass-rgb: 0, 0, 0;   
             }
         }
@@ -90,7 +92,7 @@
         .menu-items { 
             width: 100%; 
             max-width: var(--content-width); 
-            display: flex; flex-direction: column; gap: 25px; padding: 0 20px; 
+            display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 20px; 
         }
         
         .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; }
@@ -109,30 +111,25 @@
         .status-feed {
             max-width: 600px;
             margin: 0 auto; 
-            padding: 0 0 20px 0; 
+            padding: 0 0 var(--gap-item) 0; 
         }
 
         .status-card {
             background: transparent; 
             border: none;
-            border-bottom: 1px solid var(--divider); /* ✏️ ZMENA: Aplikovaná nová farba linky */
+            border-bottom: 1px solid var(--divider); 
             border-radius: 0; 
-            padding: 30px 0; 
+            padding: var(--gap-item) 0; 
             margin-bottom: 0; 
         }
 
-        .status-card:first-child {
-            padding-top: 0;
-        }
-
-        .status-card:last-child {
-            border-bottom: none;
-        }
+        .status-card:first-child { padding-top: 0; }
+        .status-card:last-child { border-bottom: none; }
 
         .status-date {
             font-size: 1rem; 
             color: var(--grey-50);
-            margin-bottom: 6px; 
+            margin-bottom: 8px; 
             display: block;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -141,7 +138,7 @@
         .status-title {
             font-size: 2rem; 
             font-weight: 700;
-            margin: 0 0 16px 0; 
+            margin: 0 0 var(--gap-item) 0; 
             color: var(--black);
             line-height: 1.1;
         }
@@ -152,12 +149,12 @@
             object-fit: cover;
             border-radius: var(--border-radius);
             display: block;
-            margin: 0 0 16px 0;
+            margin: 0 0 var(--gap-item) 0;
             border: none;
         }
 
         .status-text {
-            font-size: 1rem; 
+            font-size: var(--size-small); 
             line-height: 1.5;
             color: var(--black);
             opacity: 0.8;
@@ -172,38 +169,50 @@
         }
 
         /* --- FORMULÁRE --- */
-        .contact-form { margin-top: 10px; max-width: 540px; width: 100%; }
-        .form-group { margin-bottom: 15px; }
+        .contact-form { margin-top: 0; max-width: 540px; width: 100%; }
+        .form-group { margin-bottom: var(--gap-item); }
         
-        .form-input, .form-textarea { 
+        .form-input, .form-textarea, input[type="file"], .submit-btn { 
             width: 100%; 
             border: 1px solid var(--black); 
             border-radius: var(--border-radius); 
             background: transparent; 
-            font-family: inherit; font-size: var(--size-small); 
-            padding: 14px 16px; 
-            outline: none; color: var(--black);
+            font-family: inherit; 
+            font-size: var(--size-small); 
+            padding: var(--input-padding); 
+            outline: none; 
+            color: var(--black);
+            box-sizing: border-box;
+            display: block;
         }
         
         ::placeholder { color: var(--grey-50); opacity: 1; }
         .form-textarea { min-height: 120px; resize: vertical; }
-        
-        input[type="file"] {
-            color: var(--grey-50);
-            padding: 12px 16px;
+
+        input[type="file"]::file-selector-button {
+            border: 1px solid var(--black);
+            background: transparent;
+            color: var(--black);
+            font-family: inherit;
+            font-size: 0.9rem;
+            padding: 4px 12px;
+            border-radius: calc(var(--border-radius) - 4px);
+            margin-right: 12px;
+            cursor: pointer;
         }
 
         .submit-btn {
-            width: 100%; background: var(--black); color: var(--white); 
-            border: 1px solid var(--black); border-radius: var(--border-radius); 
-            padding: 16px 32px; font-family: inherit; font-size: var(--size-small); 
-            text-transform: uppercase; font-weight: 600; letter-spacing: 0.1em; cursor: pointer;
-            margin-top: 5px;
+            background: var(--black); 
+            color: var(--white); 
+            text-transform: uppercase; 
+            font-weight: 700; 
+            letter-spacing: 0.1em; 
+            cursor: pointer;
         }
         
         .secondary-btn {
-            background: transparent; color: var(--black); border: 1px solid var(--black);
-            margin-top: 10px;
+            background: transparent; 
+            color: var(--black); 
         }
 
         .admin-action-btn {
@@ -214,8 +223,8 @@
         .admin-card {
             border: 1px solid var(--black);
             border-radius: var(--border-radius);
-            padding: 20px;
-            margin-bottom: 15px;
+            padding: var(--gap-item);
+            margin-bottom: var(--gap-item);
         }
 
         footer {
@@ -255,7 +264,7 @@
         </div>
 
         <div id="section-contact" class="content-section">
-            <h2 style="font-size: 2rem; margin-bottom: 20px;">Contact.</h2>
+            <h2 style="font-size: 2rem; margin: 0 0 var(--gap-item) 0;">Contact.</h2>
             <form class="contact-form" action="https://formsubmit.co/martinvojtus@icloud.com" method="POST">
                 <input type="hidden" name="_captcha" value="false">
                 <div class="form-group"><input type="text" name="name" class="form-input" placeholder="Name" required></div>
@@ -266,18 +275,18 @@
         </div>
 
         <div id="section-admin" class="content-section">
-            <h2 style="font-size: 2rem; margin-bottom: 20px;">Admin.</h2>
+            <h2 style="font-size: 2rem; margin: 0 0 var(--gap-item) 0;">Admin.</h2>
             
             <div id="admin-login-view">
                 <form id="login-form" class="contact-form" onsubmit="handleLogin(event)">
                     <div class="form-group"><input type="password" id="admin-pass" class="form-input" placeholder="Password" required></div>
-                    <p id="login-error" style="color: red; font-size: 0.9rem; display: none; padding-left: 5px;">Invalid password.</p>
+                    <p id="login-error" style="color: red; font-size: 0.9rem; display: none; margin-top: -10px; margin-bottom: 15px;">Invalid password.</p>
                     <button type="submit" class="submit-btn">Login</button>
                 </form>
             </div>
 
             <div id="admin-dashboard-view" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 10px; margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--gap-item);">
                     <h3 style="font-size: 1.4rem; margin: 0;">Editor.</h3>
                     <button onclick="handleLogout()" class="admin-action-btn" style="margin: 0;">Logout</button>
                 </div>
@@ -285,26 +294,28 @@
                 <form id="editor-form" class="contact-form" onsubmit="handlePublish(event)">
                     <div class="form-group"><input type="text" id="edit-title" class="form-input" placeholder="Title" required></div>
                     
-                    <div id="current-image-container" style="display: none; margin-bottom: 15px; font-size: 0.9rem; align-items: center; padding-left: 5px;">
+                    <div id="current-image-container" style="display: none; margin-bottom: var(--gap-item); font-size: 0.9rem; align-items: center;">
                         <span style="color: var(--grey-50);">Attached image </span>
                         <button type="button" class="admin-action-btn" style="color: red; margin-left: 15px;" onclick="flagImageForRemoval()">Remove</button>
                     </div>
 
                     <div class="form-group"><input type="file" id="edit-image" class="form-input" accept="image/*"></div>
                     <div class="form-group"><textarea id="edit-text" class="form-textarea" placeholder="Content" required></textarea></div>
-                    <p id="admin-msg" style="font-size: 0.9rem; margin: 5px 0 10px 5px;"></p>
-                    <button type="submit" id="publish-btn" class="submit-btn">Publish</button>
-                    <button type="button" id="cancel-btn" class="submit-btn secondary-btn" style="display: none;" onclick="cancelEdit()">Cancel Edit</button>
+                    
+                    <p id="admin-msg" style="font-size: 0.9rem; margin: 0 0 10px 0;"></p>
+                    
+                    <div class="form-group"><button type="submit" id="publish-btn" class="submit-btn">Publish</button></div>
+                    <div class="form-group" id="cancel-btn-container" style="display: none;"><button type="button" id="cancel-btn" class="submit-btn secondary-btn" onclick="cancelEdit()">Cancel Edit</button></div>
                 </form>
 
-                <h3 style="font-size: 1.4rem; margin-top: 50px; margin-bottom: 20px;">Manage.</h3>
+                <h3 style="font-size: 1.4rem; margin: 50px 0 var(--gap-item) 0;">Manage.</h3>
                 <div id="admin-posts-container" class="status-feed" style="padding: 0;"></div>
             </div>
         </div>
     </main>
 
     <footer>
-        <div class="footer-info">build v2.2.2 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.3.0 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -517,7 +528,7 @@
             }
 
             document.getElementById('publish-btn').innerText = "Save Changes";
-            document.getElementById('cancel-btn').style.display = "block";
+            document.getElementById('cancel-btn-container').style.display = "block";
             window.scrollTo(0, document.getElementById('section-admin').offsetTop);
         }
 
@@ -532,7 +543,7 @@
             document.getElementById('current-image-container').style.display = 'none';
             
             document.getElementById('publish-btn').innerText = "Publish";
-            document.getElementById('cancel-btn').style.display = "none";
+            document.getElementById('cancel-btn-container').style.display = "none";
         }
 
         async function deletePost(id) {
