@@ -19,6 +19,7 @@
             --black: #000000;
             --white: #ffffff;
             --grey-50: rgba(0, 0, 0, 0.5);
+            --divider: rgba(0, 0, 0, 0.12); /* ✏️ ZMENA: Super jemná 12% linka */
             --glass-rgb: 255, 255, 255; 
             --content-width: 540px; 
             
@@ -31,6 +32,7 @@
                 --black: #ffffff;       
                 --white: #000000;       
                 --grey-50: rgba(255, 255, 255, 0.5); 
+                --divider: rgba(255, 255, 255, 0.12); /* ✏️ ZMENA: Jemná linka v Dark Mode */
                 --glass-rgb: 0, 0, 0;   
             }
         }
@@ -110,11 +112,10 @@
             padding: 0 0 20px 0; 
         }
 
-        /* ✏️ ZMENA: Vzdušný kontajner s oddelovacou linkou s 0.5 opacitou */
         .status-card {
             background: transparent; 
             border: none;
-            border-bottom: 1px solid var(--grey-50); 
+            border-bottom: 1px solid var(--divider); /* ✏️ ZMENA: Aplikovaná nová farba linky */
             border-radius: 0; 
             padding: 30px 0; 
             margin-bottom: 0; 
@@ -145,7 +146,6 @@
             line-height: 1.1;
         }
 
-        /* ✏️ ZMENA: Obrázok čistý, zaoblený, bez rámika */
         .status-image {
             width: 100%;
             aspect-ratio: 1 / 1;
@@ -171,7 +171,7 @@
             padding-top: 10px;
         }
 
-        /* --- FORMULÁRE (Contact & Admin) --- */
+        /* --- FORMULÁRE --- */
         .contact-form { margin-top: 10px; max-width: 540px; width: 100%; }
         .form-group { margin-bottom: 15px; }
         
@@ -211,7 +211,6 @@
             color: var(--black); cursor: pointer; text-decoration: underline; padding: 0; margin-right: 15px;
         }
 
-        /* ✏️ ZMENA: Špeciálna trieda pre zoznam postov v Admine, aby zostal v kontajneroch */
         .admin-card {
             border: 1px solid var(--black);
             border-radius: var(--border-radius);
@@ -305,7 +304,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.2.1 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.2.2 • martin vojtus • 2026</div>
     </footer>
 
     <script>
