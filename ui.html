@@ -96,7 +96,6 @@
         .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; }
 
         main {
-            /* ✏️ ZMENA: Zmenšený horný padding z 65px na 60px pre tesnejší kontakt s hlavičkou */
             padding: 60px 20px 0px; 
             width: 100%; max-width: var(--content-width); 
             box-sizing: border-box;
@@ -111,7 +110,6 @@
         .status-feed {
             max-width: 600px;
             margin: 0 auto; 
-            /* ✏️ ZMENA: Zrušený zbytočný vnútorný horný padding kontajnera */
             padding: 0; 
         }
 
@@ -125,7 +123,6 @@
             transition: none; 
         }
 
-        /* ✏️ ZMENA: Úplne prvý status vo feede nebude mať hornú medzeru */
         .status-card:first-child {
             padding-top: 5px;
         }
@@ -142,9 +139,18 @@
         .status-title {
             font-size: 2rem; 
             font-weight: 700;
-            margin: 0 0 8px 0; 
+            margin: 0 0 12px 0; 
             color: var(--black);
             line-height: 1.1;
+        }
+
+        /* ✏️ NOVÉ: Štýl pre obrázky vo feede */
+        .status-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 0 12px 0;
+            object-fit: cover;
         }
 
         .status-text {
@@ -177,6 +183,13 @@
         }
         ::placeholder { color: var(--grey-50); opacity: 1; }
         .form-textarea { min-height: 100px; resize: vertical; }
+        
+        /* ✏️ NOVÉ: Prispôsobenie políčka pre súbor */
+        input[type="file"] {
+            color: var(--grey-50);
+            padding: 12px 0;
+        }
+
         .submit-btn {
             width: 100%; background: var(--black); color: var(--white); border: none; padding: 16px 32px; 
             font-family: inherit; font-size: var(--size-small); text-transform: uppercase; font-weight: 600; 
@@ -260,6 +273,7 @@
 
                 <form id="editor-form" class="contact-form" onsubmit="handlePublish(event)">
                     <div class="form-group"><input type="text" id="edit-title" class="form-input" placeholder="Title" required></div>
+                    <div class="form-group"><input type="file" id="edit-image" class="form-input" accept="image/*"></div>
                     <div class="form-group"><textarea id="edit-text" class="form-textarea" placeholder="Content" required></textarea></div>
                     <p id="admin-msg" style="font-size: 0.9rem; margin: 5px 0;"></p>
                     <button type="submit" id="publish-btn" class="submit-btn">Publish</button>
@@ -273,7 +287,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v1.9.1 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.0.0 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -281,8 +295,8 @@
         let secretKey = ""; 
         let editingId = null;
         let globalPosts = [];
+        let currentImageUrl = null; // Uchováva obrázok pri editácii
 
-        // 1. MENU
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
         
@@ -297,7 +311,6 @@
             if(sectionId === 'feed') fetchStatuses();
         }
 
-        // 2. PUBLIC FEED
         async function fetchStatuses() {
             const container = document.getElementById('status-container');
             try {
@@ -322,6 +335,7 @@
             const dateObj = new Date(s.at);
             const date = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
             const time = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+            
             let editedHtml = '';
             if (s.updated_at) {
                 const updateObj = new Date(s.updated_at);
@@ -329,16 +343,20 @@
                 const updateTime = updateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
                 editedHtml = `<div style="font-size: 1rem; color: var(--grey-50); margin-top: 6px;">(Edited: ${updateDate} • ${updateTime})</div>`;
             }
+
+            // ✏️ NOVÉ: Zobrazenie obrázka, ak existuje
+            const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image">` : '';
+
             return `
             <div class="status-card">
                 <span class="status-date">${date} • ${time}</span>
                 <h3 class="status-title">${s.title}</h3>
+                ${imageHtml}
                 <div class="status-text">${s.text}</div> 
                 ${editedHtml}
             </div>`;
         }
 
-        // 3. ADMIN LOGIKA
         function handleLogin(e) {
             e.preventDefault();
             secretKey = document.getElementById('admin-pass').value;
@@ -361,9 +379,45 @@
             e.preventDefault();
             const title = document.getElementById('edit-title').value;
             const text = document.getElementById('edit-text').value;
+            const imageFile = document.getElementById('edit-image').files[0];
             const msgBox = document.getElementById('admin-msg');
+            
             msgBox.style.color = "var(--black)";
-            msgBox.innerText = "Saving...";
+            msgBox.innerText = imageFile ? "Uploading image..." : "Saving post...";
+
+            let finalImageUrl = currentImageUrl;
+
+            // ✏️ NOVÉ: Logika pre nahratie obrázka na server
+            if (imageFile) {
+                const formData = new FormData();
+                formData.append("file", imageFile);
+
+                try {
+                    const uploadRes = await fetch(`${API_URL}/upload-image`, {
+                        method: "POST",
+                        headers: { "x-admin-password": secretKey },
+                        body: formData
+                    });
+
+                    if (uploadRes.status === 401) {
+                        throw new Error("Unauthorized");
+                    }
+                    if (!uploadRes.ok) throw new Error("Upload failed");
+
+                    const uploadData = await uploadRes.json();
+                    finalImageUrl = uploadData.image_url;
+                    msgBox.innerText = "Saving post...";
+                } catch (err) {
+                    if (err.message === "Unauthorized") {
+                        handleLogout();
+                        document.getElementById('login-error').style.display = 'block';
+                    } else {
+                        msgBox.style.color = "red";
+                        msgBox.innerText = "Error uploading image.";
+                    }
+                    return;
+                }
+            }
 
             const method = editingId ? "PUT" : "POST";
             const endpoint = editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`;
@@ -375,7 +429,7 @@
                         "Content-Type": "application/json",
                         "x-admin-password": secretKey 
                     },
-                    body: JSON.stringify({ title, text })
+                    body: JSON.stringify({ title: title, text: text, image_url: finalImageUrl })
                 });
 
                 if (res.status === 401) {
@@ -416,7 +470,7 @@
                             <button onclick="deletePost(${p.id})" class="admin-action-btn" style="color: red;">Delete</button>
                         </div>
                     </div>
-                    <span class="status-date" style="margin-top: 5px; font-size: 0.85rem;">ID: ${p.id}</span>
+                    <span class="status-date" style="margin-top: 5px; font-size: 0.85rem;">ID: ${p.id} ${p.image_url ? '• 🖼️' : ''}</span>
                 </div>
             `).join('');
         }
@@ -425,8 +479,10 @@
             const post = globalPosts.find(p => p.id === id);
             if(!post) return;
             editingId = id;
+            currentImageUrl = post.image_url || null;
             document.getElementById('edit-title').value = post.title;
             document.getElementById('edit-text').value = post.text;
+            document.getElementById('edit-image').value = ""; // Vyčistíme input, ak by tam bol starý výber
             document.getElementById('publish-btn').innerText = "Save Changes";
             document.getElementById('cancel-btn').style.display = "block";
             window.scrollTo(0, document.getElementById('section-admin').offsetTop);
@@ -434,8 +490,10 @@
 
         function cancelEdit() {
             editingId = null;
+            currentImageUrl = null;
             document.getElementById('edit-title').value = "";
             document.getElementById('edit-text').value = "";
+            document.getElementById('edit-image').value = "";
             document.getElementById('publish-btn').innerText = "Publish";
             document.getElementById('cancel-btn').style.display = "none";
         }
