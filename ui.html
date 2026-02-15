@@ -14,8 +14,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
+            /* 📐 NOVÉ: Iba dve veľkosti písma na celom webe */
             --size-large: 2.0rem;
             --size-small: 1.0rem;
+            
             --black: #000000;
             --white: #ffffff;
             --grey-50: rgba(0, 0, 0, 0.5);
@@ -126,7 +128,7 @@
         .status-card:last-child { border-bottom: none; }
 
         .status-date {
-            font-size: 1rem; 
+            font-size: var(--size-small); 
             color: var(--grey-50);
             margin-bottom: 8px; 
             display: block;
@@ -135,7 +137,7 @@
         }
 
         .status-title {
-            font-size: 2rem; 
+            font-size: var(--size-large); 
             font-weight: 700;
             margin: 0 0 var(--gap-item) 0; 
             color: var(--black);
@@ -163,6 +165,7 @@
 
         .loading-text {
             text-align: center;
+            font-size: var(--size-small);
             color: var(--grey-50);
             padding-top: 10px;
         }
@@ -171,7 +174,6 @@
         .contact-form { margin-top: 0; max-width: 540px; width: 100%; }
         .form-group { margin-bottom: var(--gap-item); }
         
-        /* ✏️ ZMENA: Zjednotenie všetkých boxov */
         .form-input, .form-textarea, .submit-btn { 
             width: 100%; 
             border: 1px solid var(--black); 
@@ -189,6 +191,18 @@
         ::placeholder { color: var(--grey-50); opacity: 1; }
         .form-textarea { min-height: 120px; resize: vertical; }
 
+        input[type="file"]::file-selector-button {
+            border: 1px solid var(--black);
+            background: transparent;
+            color: var(--black);
+            font-family: inherit;
+            font-size: var(--size-small);
+            padding: 4px 12px;
+            border-radius: calc(var(--border-radius) - 4px);
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
         .submit-btn {
             background: var(--black); 
             color: var(--white); 
@@ -204,7 +218,8 @@
         }
 
         .admin-action-btn {
-            background: transparent; border: none; font-family: inherit; font-size: 0.9rem;
+            background: transparent; border: none; font-family: inherit; 
+            font-size: var(--size-small);
             color: var(--black); cursor: pointer; text-decoration: underline; padding: 0; margin-right: 15px;
         }
 
@@ -252,7 +267,7 @@
         </div>
 
         <div id="section-contact" class="content-section">
-            <h2 style="font-size: 2rem; margin: 0 0 var(--gap-item) 0;">Contact.</h2>
+            <h2 style="font-size: var(--size-large); margin: 0 0 var(--gap-item) 0;">Contact.</h2>
             <form class="contact-form" action="https://formsubmit.co/martinvojtus@icloud.com" method="POST">
                 <input type="hidden" name="_captcha" value="false">
                 <div class="form-group"><input type="text" name="name" class="form-input" placeholder="Name" required></div>
@@ -263,26 +278,26 @@
         </div>
 
         <div id="section-admin" class="content-section">
-            <h2 style="font-size: 2rem; margin: 0 0 var(--gap-item) 0;">Admin.</h2>
+            <h2 style="font-size: var(--size-large); margin: 0 0 var(--gap-item) 0;">Admin.</h2>
             
             <div id="admin-login-view">
                 <form id="login-form" class="contact-form" onsubmit="handleLogin(event)">
                     <div class="form-group"><input type="password" id="admin-pass" class="form-input" placeholder="Password" required></div>
-                    <p id="login-error" style="color: red; font-size: 0.9rem; display: none; margin-top: -10px; margin-bottom: 15px;">Invalid password.</p>
+                    <p id="login-error" style="color: red; font-size: var(--size-small); display: none; margin-top: -10px; margin-bottom: 15px;">Invalid password.</p>
                     <button type="submit" class="submit-btn">Login</button>
                 </form>
             </div>
 
             <div id="admin-dashboard-view" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--gap-item);">
-                    <h3 style="font-size: 1.4rem; margin: 0;">Editor.</h3>
+                    <h3 style="font-size: var(--size-small); font-weight: 700; margin: 0;">Editor.</h3>
                     <button onclick="handleLogout()" class="admin-action-btn" style="margin: 0;">Logout</button>
                 </div>
 
                 <form id="editor-form" class="contact-form" onsubmit="handlePublish(event)">
                     <div class="form-group"><input type="text" id="edit-title" class="form-input" placeholder="Title" required></div>
                     
-                    <div id="current-image-container" style="display: none; margin-bottom: var(--gap-item); font-size: 0.9rem; align-items: center;">
+                    <div id="current-image-container" style="display: none; margin-bottom: var(--gap-item); font-size: var(--size-small); align-items: center;">
                         <span style="color: var(--grey-50);">Attached image </span>
                         <button type="button" class="admin-action-btn" style="color: red; margin-left: 15px;" onclick="flagImageForRemoval()">Remove</button>
                     </div>
@@ -291,26 +306,26 @@
                         <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateFileName()">
                         <div class="form-input" style="display: flex; align-items: center; cursor: pointer; overflow: hidden;" onclick="document.getElementById('edit-image').click()">
                             <span class="admin-action-btn" style="margin: 0 15px 0 0; pointer-events: none;">Choose file</span>
-                            <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">No file chosen</span>
+                            <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small);">No file chosen</span>
                         </div>
                     </div>
 
                     <div class="form-group"><textarea id="edit-text" class="form-textarea" placeholder="Content" required></textarea></div>
                     
-                    <p id="admin-msg" style="font-size: 0.9rem; margin: 0 0 10px 0;"></p>
+                    <p id="admin-msg" style="font-size: var(--size-small); margin: 0 0 10px 0;"></p>
                     
                     <div class="form-group"><button type="submit" id="publish-btn" class="submit-btn">Publish</button></div>
                     <div class="form-group" id="cancel-btn-container" style="display: none;"><button type="button" id="cancel-btn" class="submit-btn secondary-btn" onclick="cancelEdit()">Cancel Edit</button></div>
                 </form>
 
-                <h3 style="font-size: 1.4rem; margin: 50px 0 var(--gap-item) 0;">Manage.</h3>
+                <h3 style="font-size: var(--size-small); font-weight: 700; margin: 50px 0 var(--gap-item) 0;">Manage.</h3>
                 <div id="admin-posts-container" class="status-feed" style="padding: 0;"></div>
             </div>
         </div>
     </main>
 
     <footer>
-        <div class="footer-info">build v2.3.1 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.4.0 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -365,7 +380,7 @@
                 const updateObj = new Date(s.updated_at);
                 const updateDate = updateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
                 const updateTime = updateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-                editedHtml = `<div style="font-size: 0.9rem; color: var(--grey-50); margin-top: 12px;">(Edited: ${updateDate} • ${updateTime})</div>`;
+                editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin-top: 12px;">(Edited: ${updateDate} • ${updateTime})</div>`;
             }
 
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image">` : '';
@@ -404,7 +419,6 @@
             document.getElementById('current-image-container').style.display = 'none';
         }
 
-        // ✏️ NOVÁ FUNKCIA: Upravuje text pri vybratí súboru
         function updateFileName() {
             const input = document.getElementById('edit-image');
             const display = document.getElementById('file-name-display');
@@ -507,13 +521,13 @@
             container.innerHTML = globalPosts.map(p => `
                 <div class="admin-card">
                     <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                        <h4 style="margin: 0; font-size: 1.2rem;">${p.title}</h4>
+                        <h4 style="margin: 0; font-size: var(--size-small); font-weight: 700;">${p.title}</h4>
                         <div>
                             <button onclick="startEdit(${p.id})" class="admin-action-btn">Edit</button>
                             <button onclick="deletePost(${p.id})" class="admin-action-btn" style="color: red; margin-right: 0;">Delete</button>
                         </div>
                     </div>
-                    <span class="status-date" style="margin-top: 8px; margin-bottom: 0; font-size: 0.85rem;">ID: ${p.id} ${p.image_url ? '• 🖼️' : ''}</span>
+                    <span class="status-date" style="margin-top: 8px; margin-bottom: 0; font-size: var(--size-small);">ID: ${p.id} ${p.image_url ? '• 🖼️' : ''}</span>
                 </div>
             `).join('');
         }
@@ -529,7 +543,6 @@
             document.getElementById('edit-text').value = post.text;
             document.getElementById('edit-image').value = ""; 
             
-            // Reset vizuálneho poľa pre súbor
             document.getElementById('file-name-display').innerText = "No file chosen";
             document.getElementById('file-name-display').style.color = "var(--grey-50)";
 
