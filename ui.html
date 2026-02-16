@@ -191,7 +191,7 @@
             color: var(--black);
             box-sizing: border-box;
             display: block;
-            transition: all 0.3s ease; /* Pre plynulé zmeny na tlačidlách */
+            transition: all 0.3s ease; 
         }
         
         ::placeholder { color: var(--grey-50); opacity: 1; }
@@ -339,7 +339,7 @@
                 <div id="admin-manage-view" style="display: none;">
                     
                     <div class="form-group" style="margin-bottom: 30px;">
-                        <button type="button" id="delete-all-btn" class="submit-btn" style="background: #ff3b30; border-color: #ff3b30; color: #ffffff;" onclick="handleDeleteAllClick()">Delete All Posts</button>
+                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="background: #ff3b30; border-color: #ff3b30; color: #000000;" onclick="handleDeleteAllClick()">Delete All Posts</button>
                     </div>
                     
                     <div id="admin-posts-container" class="status-feed" style="padding: 0;"></div>
@@ -356,7 +356,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.7.1 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.7.2 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -376,8 +376,10 @@
         const adminPostsPerPage = 10;
         let currentAdminPosts = [];
         
-        // ⏱️ ZMENA: Premenná pre inteligentné odpočítavanie tlačidla
+        // ⏱️ ZMENA: Premenné pre logiku odpočítavania
         let deleteConfirmTimeout;
+        let deleteCountdownInterval;
+        let countdownValue = 5;
 
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
@@ -552,6 +554,7 @@
             document.getElementById('admin-dashboard-view').style.display = 'none';
             document.getElementById('admin-login-view').style.display = 'block';
             cancelEdit();
+            resetDeleteButton(); // Reset tlačidla pri odhlásení
         }
 
         function flagImageForRemoval() {
@@ -816,32 +819,57 @@
             }
         }
 
-        // 🚨 ZMENA: Logika inteligentného tlačidla Delete All
+        // 🚨 ZMENA: Trojfázová logika tlačidla
+        function resetDeleteButton() {
+            const btn = document.getElementById('delete-all-btn');
+            btn.dataset.state = "0";
+            btn.innerText = "Delete All Posts";
+            btn.style.opacity = "1";
+            btn.disabled = false;
+        }
+
         function handleDeleteAllClick() {
             const btn = document.getElementById('delete-all-btn');
-            
-            if (btn.dataset.confirm === "true") {
-                // Konfirmované po druhom kliknutí, spúšťame mazanie
-                btn.dataset.confirm = "false";
-                btn.innerText = "Deleting everything...";
-                btn.style.opacity = "0.7";
-                btn.disabled = true;
-                executeDeleteAll();
-            } else {
-                // Prvý klik: meníme stav na čakajúci na potvrdenie
-                btn.dataset.confirm = "true";
+            const state = btn.dataset.state || "0";
+
+            if (state === "0") {
+                // 1. KLIK: Pýta si potvrdenie
+                btn.dataset.state = "1";
                 btn.innerText = "Are you sure? Click to confirm";
                 
                 clearTimeout(deleteConfirmTimeout);
                 deleteConfirmTimeout = setTimeout(() => {
-                    // Ak používateľ neklikne znova do 3 sekúnd, vrátime to späť
-                    btn.dataset.confirm = "false";
-                    btn.innerText = "Delete All Posts";
+                    resetDeleteButton();
                 }, 3000);
+                
+            } else if (state === "1") {
+                // 2. KLIK: Spúšťa odpočítavanie
+                clearTimeout(deleteConfirmTimeout);
+                btn.dataset.state = "2";
+                countdownValue = 5;
+                btn.innerText = `Deleting in ${countdownValue}... Click to cancel`;
+                
+                deleteCountdownInterval = setInterval(() => {
+                    countdownValue--;
+                    if (countdownValue > 0) {
+                        btn.innerText = `Deleting in ${countdownValue}... Click to cancel`;
+                    } else {
+                        // ČAS VYPRŠAL: Spúšťa sa mazanie
+                        clearInterval(deleteCountdownInterval);
+                        btn.innerText = "Deleting everything...";
+                        btn.style.opacity = "0.7";
+                        btn.disabled = true;
+                        executeDeleteAll();
+                    }
+                }, 1000);
+                
+            } else if (state === "2") {
+                // 3. KLIK (počas odpočítavania): Ruší celú akciu
+                clearInterval(deleteCountdownInterval);
+                resetDeleteButton();
             }
         }
 
-        // Separátna funkcia na samotný výkon mazania
         async function executeDeleteAll() {
             try {
                 let deleting = true;
@@ -866,11 +894,7 @@
             } catch(e) {
                 alert("An error occurred while deleting all posts.");
             } finally {
-                const btn = document.getElementById('delete-all-btn');
-                btn.innerText = "Delete All Posts";
-                btn.style.opacity = "1";
-                btn.disabled = false;
-                btn.dataset.confirm = "false";
+                resetDeleteButton();
             }
         }
 
