@@ -338,8 +338,8 @@
 
                 <div id="admin-manage-view" style="display: none;">
                     
-                    <div class="form-group" style="margin-bottom: 30px;">
-                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="background: #ff3b30; border-color: #ff3b30; color: #000000;" onclick="handleDeleteAllClick()">Delete All Posts</button>
+                    <div class="form-group">
+                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="background: #ff3b30; border: 1px solid var(--black); color: var(--black);" onclick="handleDeleteAllClick()">Delete All Posts</button>
                     </div>
                     
                     <div id="admin-posts-container" class="status-feed" style="padding: 0;"></div>
@@ -356,7 +356,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.7.2 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.7.3 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -376,7 +376,6 @@
         const adminPostsPerPage = 10;
         let currentAdminPosts = [];
         
-        // ⏱️ ZMENA: Premenné pre logiku odpočítavania
         let deleteConfirmTimeout;
         let deleteCountdownInterval;
         let countdownValue = 5;
@@ -554,7 +553,7 @@
             document.getElementById('admin-dashboard-view').style.display = 'none';
             document.getElementById('admin-login-view').style.display = 'block';
             cancelEdit();
-            resetDeleteButton(); // Reset tlačidla pri odhlásení
+            resetDeleteButton(); 
         }
 
         function flagImageForRemoval() {
@@ -819,7 +818,6 @@
             }
         }
 
-        // 🚨 ZMENA: Trojfázová logika tlačidla
         function resetDeleteButton() {
             const btn = document.getElementById('delete-all-btn');
             btn.dataset.state = "0";
@@ -833,7 +831,6 @@
             const state = btn.dataset.state || "0";
 
             if (state === "0") {
-                // 1. KLIK: Pýta si potvrdenie
                 btn.dataset.state = "1";
                 btn.innerText = "Are you sure? Click to confirm";
                 
@@ -843,7 +840,6 @@
                 }, 3000);
                 
             } else if (state === "1") {
-                // 2. KLIK: Spúšťa odpočítavanie
                 clearTimeout(deleteConfirmTimeout);
                 btn.dataset.state = "2";
                 countdownValue = 5;
@@ -854,7 +850,6 @@
                     if (countdownValue > 0) {
                         btn.innerText = `Deleting in ${countdownValue}... Click to cancel`;
                     } else {
-                        // ČAS VYPRŠAL: Spúšťa sa mazanie
                         clearInterval(deleteCountdownInterval);
                         btn.innerText = "Deleting everything...";
                         btn.style.opacity = "0.7";
@@ -864,7 +859,6 @@
                 }, 1000);
                 
             } else if (state === "2") {
-                // 3. KLIK (počas odpočítavania): Ruší celú akciu
                 clearInterval(deleteCountdownInterval);
                 resetDeleteButton();
             }
