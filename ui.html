@@ -147,10 +147,10 @@
             line-height: 1.1;
         }
 
+        /* ✏️ ZMENA: Fotky si držia originálny pomer strán */
         .status-image {
             width: 100%;
-            aspect-ratio: 1 / 1;
-            object-fit: cover;
+            height: auto; 
             border-radius: var(--border-radius);
             display: block;
             margin: 0 0 16px 0;
@@ -323,7 +323,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.5.5 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.5.6 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -419,7 +419,6 @@
             document.getElementById('current-image-container').style.display = 'none';
         }
 
-        // ✏️ ZMENA: Zobrazenie / Skrytie tlačidla Remove
         function updateFileName() {
             const input = document.getElementById('edit-image');
             const display = document.getElementById('file-name-display');
@@ -428,20 +427,19 @@
             if (input.files && input.files.length > 0) {
                 display.innerText = input.files[0].name;
                 display.style.color = "var(--black)";
-                clearBtn.style.display = "block"; // Zobraz tlačidlo Remove
+                clearBtn.style.display = "block"; 
             } else {
                 display.innerText = "(Optional)";
                 display.style.color = "var(--grey-50)";
-                clearBtn.style.display = "none";  // Skry tlačidlo Remove
+                clearBtn.style.display = "none";  
             }
         }
 
-        // ✏️ NOVÁ FUNKCIA: Vyčistenie súboru po kliknutí na Remove
         function clearSelectedFile(e) {
-            e.stopPropagation(); // Zabráni opätovnému otvoreniu výberu fotiek
+            e.stopPropagation(); 
             const input = document.getElementById('edit-image');
-            input.value = ""; // Vymaže zvolenú fotku
-            updateFileName(); // Aktualizuje text späť na (Optional)
+            input.value = ""; 
+            updateFileName(); 
         }
 
         async function handlePublish(e) {
