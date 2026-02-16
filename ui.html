@@ -362,7 +362,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.7.4 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.7.5 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -402,7 +402,6 @@
             }
         }
 
-        // 🔐 ZMENA: Funkcia na kontrolu uloženého hesla pri štarte
         function checkSavedLogin() {
             const savedKey = localStorage.getItem('adminSecretKey');
             if (savedKey) {
@@ -559,7 +558,6 @@
             secretKey = document.getElementById('admin-pass').value;
             const rememberMe = document.getElementById('remember-me').checked;
             
-            // 🔐 ZMENA: Ak je checkbox aktívny, ulož heslo do localStorage
             if (rememberMe) {
                 localStorage.setItem('adminSecretKey', secretKey);
             }
@@ -574,7 +572,6 @@
             secretKey = "";
             editingId = null;
             
-            // 🔐 ZMENA: Prihlásenie sa vymaže aj z pamäte zariadenia
             localStorage.removeItem('adminSecretKey');
 
             document.getElementById('admin-pass').value = '';
@@ -614,12 +611,14 @@
             updateFileName(); 
         }
 
+        // 🚀 ZMENA: Animované Publikovanie s presmerovaním
         async function handlePublish(e) {
             e.preventDefault();
             const title = document.getElementById('edit-title').value.trim();
             const text = document.getElementById('edit-text').value.trim();
             const imageFile = document.getElementById('edit-image').files[0];
             const msgBox = document.getElementById('admin-msg');
+            const publishBtn = document.getElementById('publish-btn');
             
             let hasImage = !!imageFile || (currentImageUrl && !removeImageFlag);
             if (!text && !hasImage) {
@@ -628,7 +627,10 @@
                 return;
             }
 
-            msgBox.style.color = "var(--black)";
+            msgBox.innerText = "";
+            publishBtn.disabled = true;
+            publishBtn.style.opacity = "0.7";
+
             let finalImageUrl = currentImageUrl;
 
             if (removeImageFlag && !imageFile) {
@@ -636,14 +638,14 @@
             }
 
             if (imageFile) {
-                msgBox.innerText = "Compressing image...";
+                publishBtn.innerText = "Compressing...";
                 const compressedFile = await compressImage(imageFile);
                 
                 const formData = new FormData();
                 formData.append("file", compressedFile);
 
                 try {
-                    msgBox.innerText = "Uploading image...";
+                    publishBtn.innerText = "Uploading...";
                     const uploadRes = await fetch(`${API_URL}/upload-image`, {
                         method: "POST",
                         headers: { "x-admin-password": secretKey },
@@ -655,7 +657,7 @@
 
                     const uploadData = await uploadRes.json();
                     finalImageUrl = uploadData.image_url;
-                    msgBox.innerText = "Saving post...";
+                    publishBtn.innerText = "Saving...";
                 } catch (err) {
                     if (err.message === "Unauthorized") {
                         handleLogout();
@@ -664,10 +666,13 @@
                         msgBox.style.color = "red";
                         msgBox.innerText = "Error uploading image.";
                     }
+                    publishBtn.disabled = false;
+                    publishBtn.style.opacity = "1";
+                    publishBtn.innerText = editingId ? "Save Changes" : "Publish";
                     return;
                 }
             } else {
-                msgBox.innerText = "Saving post...";
+                publishBtn.innerText = "Saving...";
             }
 
             const method = editingId ? "PUT" : "POST";
@@ -688,21 +693,36 @@
                     msgBox.innerText = "Unauthorized. Wrong password.";
                     handleLogout();
                     document.getElementById('login-error').style.display = 'block';
+                    publishBtn.disabled = false;
+                    publishBtn.style.opacity = "1";
+                    publishBtn.innerText = editingId ? "Save Changes" : "Publish";
                     return;
                 }
 
                 if (!res.ok) throw new Error();
 
-                msgBox.style.color = "green";
-                msgBox.innerText = editingId ? "Updated." : "Published.";
-                setTimeout(() => { msgBox.innerText = ""; }, 3000);
+                // 🟢 ZELENÝ STAV ÚSPECHU
+                publishBtn.style.opacity = "1";
+                publishBtn.style.background = "#34C759"; 
+                publishBtn.style.borderColor = "#34C759";
+                publishBtn.style.color = "#ffffff";
+                publishBtn.innerText = editingId ? "Updated." : "Published.";
                 
-                cancelEdit();
-                fetchStatuses(true); 
+                // Načítanie nového feedu na pozadí, kým sa užívateľ pozerá na zelené tlačidlo
+                await fetchStatuses(true); 
+
+                // Počkáme 1.5 sekundy a presmerujeme
+                setTimeout(() => {
+                    cancelEdit(); // Vyčistí formulár a resetne tlačidlo na čierny 'Publish'
+                    showSection('feed'); // Presmerovanie na feed
+                }, 1500);
 
             } catch (err) {
                 msgBox.style.color = "red";
                 msgBox.innerText = "Connection error.";
+                publishBtn.disabled = false;
+                publishBtn.style.opacity = "1";
+                publishBtn.innerText = editingId ? "Save Changes" : "Publish";
             }
         }
 
@@ -823,7 +843,12 @@
             document.getElementById('file-name-display').style.color = "var(--grey-50)";
             document.getElementById('clear-file-btn').style.display = "none";
             
-            document.getElementById('publish-btn').innerText = "Publish";
+            // Re-nastavenie zruší aj zelenú farbu (ak by bola aplikovaná)
+            const publishBtn = document.getElementById('publish-btn');
+            publishBtn.innerText = "Publish";
+            publishBtn.style.background = "var(--black)";
+            publishBtn.style.borderColor = "var(--black)";
+            publishBtn.style.color = "var(--white)";
             document.getElementById('cancel-btn-container').style.display = "none";
         }
 
@@ -921,9 +946,8 @@
             }
         }
 
-        // Úvodné spustenie
         fetchStatuses(true);
-        checkSavedLogin(); // Skontroluje, či sme uložili heslo
+        checkSavedLogin(); 
         
         menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
         document.addEventListener('click', (e) => { 
