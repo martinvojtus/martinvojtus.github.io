@@ -54,7 +54,6 @@
             line-height: 1.5;
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
-            transition: background-color 0.3s ease, color 0.3s ease; 
         }
 
         header {
@@ -79,7 +78,7 @@
         .logo-text span { font-weight: 700; }
 
         .menu-toggle { width: 24px; height: 12px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; z-index: 2100; }
-        .line { width: 24px; height: 1px; background-color: var(--black); transition: transform 0.3s ease, background-color 0.3s ease; }
+        .line { width: 24px; height: 1px; background-color: var(--black); transition: transform 0.3s ease; }
         .menu-toggle.active .line:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
         .menu-toggle.active .line:nth-child(2) { transform: translateY(-5.5px) rotate(-45deg); }
 
@@ -191,7 +190,6 @@
             color: var(--black);
             box-sizing: border-box;
             display: block;
-            transition: all 0.3s ease; 
         }
         
         ::placeholder { color: var(--grey-50); opacity: 1; }
@@ -271,8 +269,7 @@
 
     <main>
         <div id="section-feed" class="content-section active">
-            <div id="status-container" class="status-feed">
-                </div>
+            <div id="status-container" class="status-feed"></div>
             <div id="loading-indicator" class="loading-text">Loading thoughts...</div>
         </div>
 
@@ -293,12 +290,10 @@
             <div id="admin-login-view">
                 <form id="login-form" class="contact-form" onsubmit="handleLogin(event)">
                     <div class="form-group"><input type="password" id="admin-pass" class="form-input" placeholder="Password" required></div>
-                    
                     <div class="form-group" style="display: flex; align-items: center; gap: 8px; margin-top: -10px;">
                         <input type="checkbox" id="remember-me" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--black);">
                         <label for="remember-me" style="font-size: var(--size-small); color: var(--grey-50); cursor: pointer; user-select: none;">Stay logged in</label>
                     </div>
-
                     <p id="login-error" style="color: red; font-size: var(--size-small); display: none; margin-top: -10px; margin-bottom: 15px;">Invalid password.</p>
                     <button type="submit" class="submit-btn">Login</button>
                 </form>
@@ -316,12 +311,10 @@
                 <div id="admin-editor-view">
                     <form id="editor-form" class="contact-form" onsubmit="handlePublish(event)">
                         <div class="form-group"><input type="text" id="edit-title" class="form-input" placeholder="Title (Optional)"></div>
-                        
                         <div id="current-image-container" style="display: none; margin-bottom: var(--gap-item); font-size: var(--size-small); align-items: center;">
                             <span style="color: var(--grey-50);">Attached image </span>
                             <button type="button" class="admin-action-btn admin-action-link" style="color: red; margin-left: 15px;" onclick="flagImageForRemoval()">Remove</button>
                         </div>
-
                         <div class="form-group">
                             <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateFileName()">
                             <div class="form-input" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; overflow: hidden;" onclick="document.getElementById('edit-image').click()">
@@ -332,37 +325,30 @@
                                 <button type="button" id="clear-file-btn" class="admin-action-btn admin-action-link" style="color: red; margin: 0; display: none; padding: 0;" onclick="clearSelectedFile(event)">Remove</button>
                             </div>
                         </div>
-
                         <div class="form-group"><textarea id="edit-text" class="form-textarea" placeholder="Content (Optional if image attached)"></textarea></div>
-                        
                         <p id="admin-msg" style="font-size: var(--size-small); margin: 0 0 10px 0;"></p>
-                        
                         <div class="form-group"><button type="submit" id="publish-btn" class="submit-btn">Publish</button></div>
                         <div class="form-group" id="cancel-btn-container" style="display: none;"><button type="button" id="cancel-btn" class="submit-btn secondary-btn" onclick="cancelEdit()">Cancel Edit</button></div>
                     </form>
                 </div>
 
                 <div id="admin-manage-view" style="display: none;">
-                    
                     <div class="form-group" style="margin-bottom: var(--gap-item);">
                         <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="background: var(--black); border: 1px solid var(--black); color: #ff3b30;" onclick="handleDeleteAllClick()">Delete All Posts</button>
                     </div>
-                    
                     <div id="admin-posts-container" class="status-feed" style="padding: 0;"></div>
-                    
                     <div id="admin-pagination-controls" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; display: none;">
                         <button id="admin-prev-btn" onclick="changeAdminPage(-1)" class="admin-action-btn admin-action-link" style="margin: 0;">Prev</button>
                         <span id="admin-page-info" style="font-size: var(--size-small); color: var(--grey-50);"></span>
                         <button id="admin-next-btn" onclick="changeAdminPage(1)" class="admin-action-btn admin-action-link" style="margin: 0;">Next</button>
                     </div>
                 </div>
-
             </div>
         </div>
     </main>
 
     <footer>
-        <div class="footer-info">build v2.7.6 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.7.7 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -410,20 +396,18 @@
         }
 
         function switchAdminTab(tab) {
+            const editorBtn = document.getElementById('tab-editor');
+            const manageBtn = document.getElementById('tab-manage');
             if (tab === 'editor') {
                 document.getElementById('admin-editor-view').style.display = 'block';
                 document.getElementById('admin-manage-view').style.display = 'none';
-                document.getElementById('tab-editor').style.fontWeight = '700';
-                document.getElementById('tab-editor').style.color = 'var(--black)';
-                document.getElementById('tab-manage').style.fontWeight = '400';
-                document.getElementById('tab-manage').style.color = 'var(--grey-50)';
+                editorBtn.style.fontWeight = '700'; editorBtn.style.color = 'var(--black)';
+                manageBtn.style.fontWeight = '400'; manageBtn.style.color = 'var(--grey-50)';
             } else {
                 document.getElementById('admin-editor-view').style.display = 'none';
                 document.getElementById('admin-manage-view').style.display = 'block';
-                document.getElementById('tab-manage').style.fontWeight = '700';
-                document.getElementById('tab-manage').style.color = 'var(--black)';
-                document.getElementById('tab-editor').style.fontWeight = '400';
-                document.getElementById('tab-editor').style.color = 'var(--grey-50)';
+                manageBtn.style.fontWeight = '700'; manageBtn.style.color = 'var(--black)';
+                editorBtn.style.fontWeight = '400'; editorBtn.style.color = 'var(--grey-50)';
                 fetchAdminPosts(1); 
             }
         }
@@ -444,19 +428,11 @@
                     img.src = event.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
-                        }
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        canvas.toBlob(blob => {
-                            resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
-                        }, 'image/jpeg', quality);
+                        let width = img.width; let height = img.height;
+                        if (width > maxWidth) { height = Math.round((height * maxWidth) / width); width = maxWidth; }
+                        canvas.width = width; canvas.height = height;
+                        const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+                        canvas.toBlob(blob => { resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() })); }, 'image/jpeg', quality);
                     };
                 };
             });
@@ -464,9 +440,7 @@
 
         async function fetchStatuses(reset = false) {
             if (reset) {
-                currentOffset = 0;
-                hasMorePosts = true;
-                globalPosts = [];
+                currentOffset = 0; hasMorePosts = true; globalPosts = [];
                 document.getElementById('status-container').innerHTML = '';
                 document.getElementById('loading-indicator').style.display = 'block';
             }
@@ -478,12 +452,8 @@
                 const response = await fetch(`${API_URL}/posts?skip=${currentOffset}&limit=${postsLimit}`);
                 if (!response.ok) throw new Error();
                 const newPosts = await response.json();
-                if (newPosts.length < postsLimit) {
-                    hasMorePosts = false;
-                    loader.style.display = 'none';
-                }
-                currentOffset += newPosts.length;
-                globalPosts = globalPosts.concat(newPosts);
+                if (newPosts.length < postsLimit) { hasMorePosts = false; loader.style.display = 'none'; }
+                currentOffset += newPosts.length; globalPosts = globalPosts.concat(newPosts);
                 if (reset && globalPosts.length === 0) {
                     container.innerHTML = '<p class="loading-text">No posts yet.</p>';
                     loader.style.display = 'none';
@@ -508,13 +478,7 @@
             const dateObj = new Date(s.at);
             const date = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
             const time = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-            let editedHtml = '';
-            if (s.updated_at) {
-                const updateObj = new Date(s.updated_at);
-                const updateDate = updateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
-                const updateTime = updateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-                editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin-top: 12px;">(Edited: ${updateDate} • ${updateTime})</div>`;
-            }
+            let editedHtml = s.updated_at ? `<div style="font-size: var(--size-small); color: var(--grey-50); margin-top: 12px;">(Edited)</div>` : '';
             const titleHtml = (s.title && s.title.trim() !== "") ? `<h3 class="status-title">${s.title}</h3>` : '';
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image" loading="lazy">` : '';
             const textHtml = (s.text && s.text.trim() !== "") ? `<div class="status-text">${linkify(s.text)}</div>` : '';
@@ -532,42 +496,25 @@
         }
 
         function handleLogout() {
-            secretKey = ""; editingId = null;
-            localStorage.removeItem('adminSecretKey');
-            document.getElementById('admin-pass').value = '';
-            document.getElementById('remember-me').checked = false;
+            secretKey = ""; editingId = null; localStorage.removeItem('adminSecretKey');
+            document.getElementById('admin-pass').value = ''; document.getElementById('remember-me').checked = false;
             document.getElementById('admin-dashboard-view').style.display = 'none';
             document.getElementById('admin-login-view').style.display = 'block';
             cancelEdit(); resetDeleteButton(); 
         }
 
-        function flagImageForRemoval() {
-            removeImageFlag = true; currentImageUrl = null;
-            document.getElementById('current-image-container').style.display = 'none';
-        }
+        function flagImageForRemoval() { removeImageFlag = true; currentImageUrl = null; document.getElementById('current-image-container').style.display = 'none'; }
 
         function updateFileName() {
             const input = document.getElementById('edit-image');
             const display = document.getElementById('file-name-display');
             const clearBtn = document.getElementById('clear-file-btn');
-            if (input.files && input.files.length > 0) {
-                display.innerText = input.files[0].name;
-                display.style.color = "var(--black)";
-                clearBtn.style.display = "block"; 
-            } else {
-                display.innerText = "(Optional)";
-                display.style.color = "var(--grey-50)";
-                clearBtn.style.display = "none";  
-            }
+            if (input.files && input.files.length > 0) { display.innerText = input.files[0].name; display.style.color = "var(--black)"; clearBtn.style.display = "block"; 
+            } else { display.innerText = "(Optional)"; display.style.color = "var(--grey-50)"; clearBtn.style.display = "none"; }
         }
 
-        function clearSelectedFile(e) {
-            e.stopPropagation(); 
-            const input = document.getElementById('edit-image');
-            input.value = ""; updateFileName(); 
-        }
+        function clearSelectedFile(e) { e.stopPropagation(); document.getElementById('edit-image').value = ""; updateFileName(); }
 
-        // 🚀 ZMENA: Len zelený text a odomknutie tlačidla
         async function handlePublish(e) {
             e.preventDefault();
             const title = document.getElementById('edit-title').value.trim();
@@ -576,93 +523,54 @@
             const msgBox = document.getElementById('admin-msg');
             const publishBtn = document.getElementById('publish-btn');
             
-            let hasImage = !!imageFile || (currentImageUrl && !removeImageFlag);
-            if (!text && !hasImage) {
-                msgBox.style.color = "red";
-                msgBox.innerText = "Post must contain at least text or an image.";
-                return;
+            if (!text && !(imageFile || (currentImageUrl && !removeImageFlag))) {
+                msgBox.style.color = "red"; msgBox.innerText = "Post must contain at least text or an image."; return;
             }
 
-            msgBox.innerText = "";
-            publishBtn.disabled = true;
-            publishBtn.style.opacity = "0.7";
-
-            let finalImageUrl = currentImageUrl;
-            if (removeImageFlag && !imageFile) finalImageUrl = null;
+            msgBox.innerText = ""; publishBtn.disabled = true;
+            let finalImageUrl = currentImageUrl; if (removeImageFlag && !imageFile) finalImageUrl = null;
 
             if (imageFile) {
                 publishBtn.innerText = "Compressing...";
                 const compressedFile = await compressImage(imageFile);
-                const formData = new FormData();
-                formData.append("file", compressedFile);
+                const formData = new FormData(); formData.append("file", compressedFile);
                 try {
                     publishBtn.innerText = "Uploading...";
-                    const uploadRes = await fetch(`${API_URL}/upload-image`, {
-                        method: "POST",
-                        headers: { "x-admin-password": secretKey },
-                        body: formData
-                    });
+                    const uploadRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
                     if (uploadRes.status === 401) throw new Error("Unauthorized");
-                    if (!uploadRes.ok) throw new Error("Upload failed");
                     const uploadData = await uploadRes.json();
                     finalImageUrl = uploadData.image_url;
                 } catch (err) {
-                    msgBox.style.color = "red";
-                    msgBox.innerText = err.message === "Unauthorized" ? "Session expired." : "Error uploading image.";
-                    publishBtn.disabled = false; publishBtn.style.opacity = "1";
-                    publishBtn.innerText = editingId ? "Save Changes" : "Publish";
-                    return;
+                    msgBox.style.color = "red"; msgBox.innerText = "Error uploading.";
+                    publishBtn.disabled = false; publishBtn.innerText = editingId ? "Save Changes" : "Publish"; return;
                 }
             }
 
             publishBtn.innerText = "Saving...";
             const method = editingId ? "PUT" : "POST";
             const endpoint = editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`;
-
             try {
-                const res = await fetch(endpoint, {
-                    method: method,
-                    headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                    body: JSON.stringify({ title: title, text: text, image_url: finalImageUrl })
-                });
-
+                const res = await fetch(endpoint, { method: method, headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify({ title, text, image_url: finalImageUrl }) });
                 if (res.status === 401) throw new Error("Unauthorized");
-                if (!res.ok) throw new Error();
-
-                // 🟢 ZMENA: Len zelený TEXT, pozadie ostáva čierne
-                publishBtn.style.opacity = "1";
-                publishBtn.style.color = "#34C759"; 
-                publishBtn.innerText = editingId ? "Updated." : "Published.";
-                
+                publishBtn.style.color = "#34C759"; publishBtn.innerText = editingId ? "Updated." : "Published.";
                 await fetchStatuses(true); 
-
-                setTimeout(() => {
-                    cancelEdit(); // Resetuje stavy aj zámok tlačidla
-                    showSection('feed'); 
-                }, 1500);
-
+                setTimeout(() => { cancelEdit(); showSection('feed'); }, 1500);
             } catch (err) {
-                msgBox.style.color = "red";
-                msgBox.innerText = "Connection error.";
-                publishBtn.disabled = false;
-                publishBtn.style.opacity = "1";
-                publishBtn.innerText = editingId ? "Save Changes" : "Publish";
+                msgBox.style.color = "red"; msgBox.innerText = "Error.";
+                publishBtn.disabled = false; publishBtn.innerText = editingId ? "Save Changes" : "Publish";
             }
         }
 
         async function fetchAdminPosts(page) {
-            adminCurrentPage = page;
-            const skip = (page - 1) * adminPostsPerPage;
+            adminCurrentPage = page; const skip = (page - 1) * adminPostsPerPage;
             const container = document.getElementById('admin-posts-container');
             const paginationControls = document.getElementById('admin-pagination-controls');
-            container.innerHTML = '<p class="loading-text">Loading...</p>';
-            paginationControls.style.display = 'none';
+            container.innerHTML = '<p class="loading-text">Loading...</p>'; paginationControls.style.display = 'none';
             try {
                 const res = await fetch(`${API_URL}/posts?skip=${skip}&limit=${adminPostsPerPage}`);
                 if (res.status === 401) { handleLogout(); return; }
-                currentAdminPosts = await res.json();
-                renderAdminList();
-            } catch (e) { container.innerHTML = '<p class="loading-text" style="color:red;">Error loading posts.</p>'; }
+                currentAdminPosts = await res.json(); renderAdminList();
+            } catch (e) { container.innerHTML = '<p class="loading-text" style="color:red;">Error.</p>'; }
         }
 
         function changeAdminPage(dir) { fetchAdminPosts(adminCurrentPage + dir); }
@@ -670,17 +578,12 @@
         function renderAdminList() {
             const container = document.getElementById('admin-posts-container');
             const paginationControls = document.getElementById('admin-pagination-controls');
-            if (currentAdminPosts.length === 0 && adminCurrentPage === 1) {
-                container.innerHTML = '<p class="loading-text">No posts found.</p>';
-                paginationControls.style.display = 'none'; return;
-            }
+            if (currentAdminPosts.length === 0 && adminCurrentPage === 1) { container.innerHTML = '<p class="loading-text">No posts.</p>'; return; }
             if (currentAdminPosts.length === 0 && adminCurrentPage > 1) { fetchAdminPosts(adminCurrentPage - 1); return; }
             container.innerHTML = currentAdminPosts.map(p => {
                 let displayTitle = p.title || (p.text ? p.text.substring(0, 30) + '...' : 'Photo post');
-                const thumbHtml = p.image_url ? `<img src="${p.image_url}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" alt="thumb" loading="lazy">` : '';
-                const d = new Date(p.at);
-                const postDate = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.`;
-                return `<div class="admin-card"><div style="display: flex; align-items: center; gap: 10px; overflow: hidden; flex-grow: 1;"><span style="color: var(--grey-50); font-size: var(--size-small); white-space: nowrap; flex-shrink: 0;">ID: ${p.id}</span><span style="color: var(--grey-50); font-size: var(--size-small); white-space: nowrap; flex-shrink: 0;">• ${postDate}</span>${thumbHtml}<span style="font-weight: 700; font-size: var(--size-small); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${displayTitle}</span></div><div style="display: flex; gap: 15px; flex-shrink: 0; margin-left: 10px;"><button onclick="startEdit(${p.id})" class="admin-action-btn admin-action-link" style="margin: 0;">Edit</button><button onclick="deletePost(${p.id})" class="admin-action-btn admin-action-link" style="color: red; margin: 0;">Delete</button></div></div>`;
+                const d = new Date(p.at); const postDate = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.`;
+                return `<div class="admin-card"><div style="display: flex; align-items: center; gap: 10px; overflow: hidden; flex-grow: 1;"><span style="color: var(--grey-50); font-size: var(--size-small);">ID: ${p.id} • ${postDate}</span><span style="font-weight: 700; font-size: var(--size-small); overflow: hidden; text-overflow: ellipsis;">${displayTitle}</span></div><div style="display: flex; gap: 15px;"><button onclick="startEdit(${p.id})" class="admin-action-btn admin-action-link">Edit</button><button onclick="deletePost(${p.id})" class="admin-action-btn admin-action-link" style="color: red;">Delete</button></div></div>`;
             }).join('');
             document.getElementById('admin-page-info').innerText = `Page ${adminCurrentPage}`;
             document.getElementById('admin-prev-btn').style.visibility = adminCurrentPage > 1 ? 'visible' : 'hidden';
@@ -689,38 +592,22 @@
         }
 
         function startEdit(id) {
-            const post = currentAdminPosts.find(p => p.id === id);
-            if(!post) return;
-            editingId = id; currentImageUrl = post.image_url || null; removeImageFlag = false; 
+            const post = currentAdminPosts.find(p => p.id === id); if(!post) return;
+            editingId = id; currentImageUrl = post.image_url; removeImageFlag = false; 
             document.getElementById('edit-title').value = post.title || "";
             document.getElementById('edit-text').value = post.text || "";
-            document.getElementById('edit-image').value = ""; 
-            document.getElementById('file-name-display').innerText = "(Optional)";
-            document.getElementById('file-name-display').style.color = "var(--grey-50)";
-            document.getElementById('clear-file-btn').style.display = "none";
             document.getElementById('current-image-container').style.display = post.image_url ? 'flex' : 'none';
             document.getElementById('publish-btn').innerText = "Save Changes";
             document.getElementById('cancel-btn-container').style.display = "block";
             switchAdminTab('editor');
         }
 
-        // 🚀 ZMENA: Re-aktivácia tlačidla pridaná sem
         function cancelEdit() {
             editingId = null; currentImageUrl = null; removeImageFlag = false;
-            document.getElementById('edit-title').value = "";
-            document.getElementById('edit-text').value = "";
-            document.getElementById('edit-image').value = "";
-            document.getElementById('current-image-container').style.display = 'none';
-            document.getElementById('file-name-display').innerText = "(Optional)";
-            document.getElementById('file-name-display').style.color = "var(--grey-50)";
-            document.getElementById('clear-file-btn').style.display = "none";
-            
+            document.getElementById('edit-title').value = ""; document.getElementById('edit-text').value = "";
+            document.getElementById('edit-image').value = ""; document.getElementById('current-image-container').style.display = 'none';
             const publishBtn = document.getElementById('publish-btn');
-            publishBtn.disabled = false; // <--- DÔLEŽITÉ: Odomknutie pre ďalší post
-            publishBtn.innerText = "Publish";
-            publishBtn.style.background = "var(--black)";
-            publishBtn.style.borderColor = "var(--black)";
-            publishBtn.style.color = "var(--white)";
+            publishBtn.disabled = false; publishBtn.innerText = "Publish"; publishBtn.style.color = "var(--white)";
             document.getElementById('cancel-btn-container').style.display = "none";
         }
 
@@ -735,7 +622,7 @@
 
         function resetDeleteButton() {
             const btn = document.getElementById('delete-all-btn');
-            btn.dataset.state = "0"; btn.innerText = "Delete All Posts"; btn.style.opacity = "1"; btn.disabled = false;
+            btn.dataset.state = "0"; btn.innerText = "Delete All Posts"; btn.disabled = false;
         }
 
         function handleDeleteAllClick() {
@@ -743,15 +630,14 @@
             const state = btn.dataset.state || "0";
             if (state === "0") {
                 btn.dataset.state = "1"; btn.innerText = "Are you sure? Click to confirm";
-                clearTimeout(deleteConfirmTimeout);
-                deleteConfirmTimeout = setTimeout(() => { resetDeleteButton(); }, 3000);
+                clearTimeout(deleteConfirmTimeout); deleteConfirmTimeout = setTimeout(() => { resetDeleteButton(); }, 3000);
             } else if (state === "1") {
                 clearTimeout(deleteConfirmTimeout); btn.dataset.state = "2"; countdownValue = 5;
                 btn.innerText = `Deleting in ${countdownValue}... Click to cancel`;
                 deleteCountdownInterval = setInterval(() => {
                     countdownValue--;
                     if (countdownValue > 0) btn.innerText = `Deleting in ${countdownValue}... Click to cancel`;
-                    else { clearInterval(deleteCountdownInterval); btn.innerText = "Deleting everything..."; btn.style.opacity = "0.7"; btn.disabled = true; executeDeleteAll(); }
+                    else { clearInterval(deleteCountdownInterval); btn.innerText = "Deleting everything..."; btn.disabled = true; executeDeleteAll(); }
                 }, 1000);
             } else if (state === "2") { clearInterval(deleteCountdownInterval); resetDeleteButton(); }
         }
@@ -760,8 +646,7 @@
             try {
                 let deleting = true;
                 while(deleting) {
-                    const res = await fetch(`${API_URL}/posts?skip=0&limit=50`);
-                    const posts = await res.json();
+                    const res = await fetch(`${API_URL}/posts?skip=0&limit=50`); const posts = await res.json();
                     if (posts.length === 0) { deleting = false; break; }
                     for (const p of posts) await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
                 }
@@ -771,9 +656,7 @@
 
         fetchStatuses(true); checkSavedLogin(); 
         menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
-        document.addEventListener('click', (e) => { 
-            if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); 
-        });
+        document.addEventListener('click', (e) => { if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); });
     </script>
 </body>
 </html>
