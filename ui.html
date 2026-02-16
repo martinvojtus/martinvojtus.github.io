@@ -611,7 +611,6 @@
             updateFileName(); 
         }
 
-        // 🚀 ZMENA: Animované Publikovanie s presmerovaním
         async function handlePublish(e) {
             e.preventDefault();
             const title = document.getElementById('edit-title').value.trim();
@@ -701,11 +700,9 @@
 
                 if (!res.ok) throw new Error();
 
-                // 🟢 ZELENÝ STAV ÚSPECHU
+                // 🟢 ZELENÝ STAV ÚSPECHU (Len text mení farbu)
                 publishBtn.style.opacity = "1";
-                publishBtn.style.background = "#34C759"; 
-                publishBtn.style.borderColor = "#34C759";
-                publishBtn.style.color = "#ffffff";
+                publishBtn.style.color = "#34C759";
                 publishBtn.innerText = editingId ? "Updated." : "Published.";
                 
                 // Načítanie nového feedu na pozadí, kým sa užívateľ pozerá na zelené tlačidlo
@@ -713,7 +710,7 @@
 
                 // Počkáme 1.5 sekundy a presmerujeme
                 setTimeout(() => {
-                    cancelEdit(); // Vyčistí formulár a resetne tlačidlo na čierny 'Publish'
+                    cancelEdit(); // Vyčistí formulár a resetne tlačidlo
                     showSection('feed'); // Presmerovanie na feed
                 }, 1500);
 
@@ -843,12 +840,13 @@
             document.getElementById('file-name-display').style.color = "var(--grey-50)";
             document.getElementById('clear-file-btn').style.display = "none";
             
-            // Re-nastavenie zruší aj zelenú farbu (ak by bola aplikovaná)
+            // Re-nastavenie zruší aj zelenú farbu (ak by bola aplikovaná) a odomkne tlačidlo
             const publishBtn = document.getElementById('publish-btn');
+            publishBtn.disabled = false; // 🔓 Odomknutie tlačidla pre ďalší príspevok
             publishBtn.innerText = "Publish";
             publishBtn.style.background = "var(--black)";
             publishBtn.style.borderColor = "var(--black)";
-            publishBtn.style.color = "var(--white)";
+            publishBtn.style.color = "var(--white)"; // Návrat k bielemu textu
             document.getElementById('cancel-btn-container').style.display = "none";
         }
 
