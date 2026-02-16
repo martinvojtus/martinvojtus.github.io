@@ -156,6 +156,15 @@
             border: none;
         }
 
+        /* Nový štýl pre zarámovaný text */
+        .status-text-box {
+            background-color: var(--white);
+            border: 1px solid var(--black);
+            border-radius: var(--border-radius);
+            padding: var(--input-padding);
+            margin-bottom: 12px;
+        }
+
         .status-text {
             font-size: var(--size-small); 
             line-height: 1.5;
@@ -300,7 +309,7 @@
                         <label for="remember-me" style="font-size: var(--size-small); color: var(--grey-50); cursor: pointer; user-select: none;">Stay logged in</label>
                     </div>
 
-                    <p id="login-error" style="color: red; font-size: var(--size-small); display: none; margin-top: -10px; margin-bottom: 15px;">Invalid password.</p>
+                    <p id="login-error" style="color: var(--black); font-weight: 700; font-size: var(--size-small); display: none; margin-top: -10px; margin-bottom: 15px;">Invalid password.</p>
                     <button type="submit" class="submit-btn">Login</button>
                 </form>
             </div>
@@ -320,7 +329,7 @@
                         
                         <div id="current-image-container" style="display: none; margin-bottom: var(--gap-item); font-size: var(--size-small); align-items: center;">
                             <span style="color: var(--grey-50);">Attached image </span>
-                            <button type="button" class="admin-action-btn admin-action-link" style="color: red; margin-left: 15px;" onclick="flagImageForRemoval()">Remove</button>
+                            <button type="button" class="admin-action-btn admin-action-link" style="color: var(--black); font-weight: 700; margin-left: 15px;" onclick="flagImageForRemoval()">Remove</button>
                         </div>
 
                         <div class="form-group">
@@ -330,7 +339,7 @@
                                     <span class="admin-action-btn admin-action-link" style="margin: 0 15px 0 0; pointer-events: none;">Upload image</span>
                                     <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small);">(Optional)</span>
                                 </div>
-                                <button type="button" id="clear-file-btn" class="admin-action-btn admin-action-link" style="color: red; margin: 0; display: none; padding: 0;" onclick="clearSelectedFile(event)">Remove</button>
+                                <button type="button" id="clear-file-btn" class="admin-action-btn admin-action-link" style="color: var(--black); font-weight: 700; margin: 0; display: none; padding: 0;" onclick="clearSelectedFile(event)">Remove</button>
                             </div>
                         </div>
 
@@ -346,7 +355,7 @@
                 <div id="admin-manage-view" style="display: none;">
                     
                     <div class="form-group" style="margin-bottom: var(--gap-item);">
-                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="background: var(--black); border: 1px solid var(--black); color: #ff3b30;" onclick="handleDeleteAllClick()">Delete All Posts</button>
+                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="background: var(--black); border: 1px solid var(--black); color: var(--white);" onclick="handleDeleteAllClick()">Delete All Posts</button>
                     </div>
                     
                     <div id="admin-posts-container" class="status-feed" style="padding: 0;"></div>
@@ -363,7 +372,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.8.2 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.8.3 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -512,7 +521,7 @@
                 }
                 
             } catch (error) {
-                if (reset) container.innerHTML = `<p style="color:red; text-align:center;">Failed to load data.</p>`;
+                if (reset) container.innerHTML = `<p style="color:var(--black); font-weight:700; text-align:center;">Failed to load data.</p>`;
                 loader.style.display = 'none';
             } finally {
                 isLoading = false;
@@ -542,7 +551,14 @@
 
             const titleHtml = (s.title && s.title.trim() !== "") ? `<h3 class="status-title">${s.title}</h3>` : '';
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image" loading="lazy">` : '';
-            const textHtml = (s.text && s.text.trim() !== "") ? `<div class="status-text">${linkify(s.text)}</div>` : '';
+            
+            let textHtml = '';
+            if (s.text && s.text.trim() !== "") {
+                textHtml = `
+                <div class="status-text-box">
+                    <div class="status-text">${linkify(s.text)}</div>
+                </div>`;
+            }
 
             return `
             <div class="status-card">
@@ -622,7 +638,8 @@
             
             let hasImage = !!imageFile || (currentImageUrl && !removeImageFlag);
             if (!text && !hasImage) {
-                msgBox.style.color = "red";
+                msgBox.style.color = "var(--black)";
+                msgBox.style.fontWeight = "700";
                 msgBox.innerText = "Post must contain at least text or an image.";
                 return;
             }
@@ -662,7 +679,8 @@
                         handleLogout();
                         document.getElementById('login-error').style.display = 'block';
                     } else {
-                        msgBox.style.color = "red";
+                        msgBox.style.color = "var(--black)";
+                        msgBox.style.fontWeight = "700";
                         msgBox.innerText = "Error uploading image.";
                     }
                     publishBtn.disabled = false;
@@ -687,7 +705,8 @@
                 });
 
                 if (res.status === 401) {
-                    msgBox.style.color = "red";
+                    msgBox.style.color = "var(--black)";
+                    msgBox.style.fontWeight = "700";
                     msgBox.innerText = "Unauthorized. Wrong password.";
                     handleLogout();
                     document.getElementById('login-error').style.display = 'block';
@@ -698,18 +717,20 @@
 
                 if (!res.ok) throw new Error();
 
-                publishBtn.style.color = "#34C759";
+                publishBtn.style.color = "var(--white)";
                 publishBtn.innerText = editingId ? "Updated." : "Published.";
                 
                 await fetchStatuses(true); 
 
                 setTimeout(() => {
+                    document.activeElement.blur(); 
                     cancelEdit(); 
                     showSection('feed'); 
                 }, 1500);
 
             } catch (err) {
-                msgBox.style.color = "red";
+                msgBox.style.color = "var(--black)";
+                msgBox.style.fontWeight = "700";
                 msgBox.innerText = "Connection error.";
                 publishBtn.disabled = false;
                 publishBtn.innerText = editingId ? "Save Changes" : "Publish";
@@ -734,7 +755,7 @@
                 currentAdminPosts = await res.json();
                 renderAdminList();
             } catch (e) {
-                container.innerHTML = '<p class="loading-text" style="color:red;">Error loading posts.</p>';
+                container.innerHTML = '<p class="loading-text" style="color:var(--black); font-weight:700;">Error loading posts.</p>';
             }
         }
 
@@ -780,7 +801,7 @@
                     </div>
                     <div style="display: flex; gap: 15px; flex-shrink: 0; margin-left: 10px;">
                         <button onclick="startEdit(${p.id})" class="admin-action-btn admin-action-link" style="margin: 0;">Edit</button>
-                        <button id="del-btn-${p.id}" onclick="handleDeleteSingle(${p.id})" class="admin-action-btn admin-action-link" style="color: red; margin: 0;">Delete</button>
+                        <button id="del-btn-${p.id}" onclick="handleDeleteSingle(${p.id})" class="admin-action-btn admin-action-link" style="color: var(--black); margin: 0;">Delete</button>
                     </div>
                 </div>
                 `;
