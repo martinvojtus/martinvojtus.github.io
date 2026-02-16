@@ -156,15 +156,6 @@
             border: none;
         }
 
-        /* Upravený štýl pre textový box (soft pozadie, bez rámika) */
-        .status-text-box {
-            background-color: var(--divider);
-            border: none;
-            border-radius: var(--border-radius);
-            padding: var(--input-padding);
-            margin-bottom: 12px;
-        }
-
         .status-text {
             font-size: var(--size-small); 
             line-height: 1.5;
@@ -281,6 +272,14 @@
     <main>
         <div id="section-feed" class="content-section active">
             <h2 style="font-size: var(--size-large); margin: 0 0 var(--gap-item) 0;">Feed.</h2>
+            
+            <div id="quick-post-container" style="display: none; margin-bottom: var(--gap-item);">
+                <form onsubmit="handleQuickPost(event)" style="display: flex; gap: 10px; width: 100%;">
+                    <input type="text" id="quick-text" class="form-input" placeholder="Quick thought..." required style="flex-grow: 1;">
+                    <button type="submit" id="quick-btn" class="submit-btn" style="width: auto; padding: 0 20px;">Post</button>
+                </form>
+            </div>
+
             <div id="status-container" class="status-feed">
                 </div>
             <div id="loading-indicator" class="loading-text">Loading...</div>
@@ -347,7 +346,7 @@
                         
                         <p id="admin-msg" style="font-size: var(--size-small); margin: 0 0 10px 0;"></p>
                         
-                        <div class="form-group"><button type="submit" id="publish-btn" class="submit-btn">Publish</button></div>
+                        <div class="form-group"><button type="submit" id="publish-btn" class="submit-btn" style="background: transparent; color: var(--black);">Publish</button></div>
                         <div class="form-group" id="cancel-btn-container" style="display: none;"><button type="button" id="cancel-btn" class="submit-btn secondary-btn" onclick="cancelEdit()">Cancel Edit</button></div>
                     </form>
                 </div>
@@ -355,7 +354,7 @@
                 <div id="admin-manage-view" style="display: none;">
                     
                     <div class="form-group" style="margin-bottom: var(--gap-item);">
-                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="background: var(--black); border: 1px solid var(--black); color: var(--white);" onclick="handleDeleteAllClick()">Delete All Posts</button>
+                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="background: var(--black); border: 1px solid var(--black); color: #FF4500;" onclick="handleDeleteAllClick()">Delete All Posts</button>
                     </div>
                     
                     <div id="admin-posts-container" class="status-feed" style="padding: 0;"></div>
@@ -372,7 +371,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.8.4 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.8.5 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -418,6 +417,7 @@
                 secretKey = savedKey;
                 document.getElementById('admin-login-view').style.display = 'none';
                 document.getElementById('admin-dashboard-view').style.display = 'block';
+                document.getElementById('quick-post-container').style.display = 'block'; // Zobrazí Quick Post
                 switchAdminTab('editor');
             }
         }
@@ -536,6 +536,7 @@
             }
         });
 
+        // Návrat k čistému textu bez boxu
         function renderSinglePost(s) {
             const dateObj = new Date(s.at);
             const date = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
@@ -554,10 +555,7 @@
             
             let textHtml = '';
             if (s.text && s.text.trim() !== "") {
-                textHtml = `
-                <div class="status-text-box">
-                    <div class="status-text">${linkify(s.text)}</div>
-                </div>`;
+                textHtml = `<div class="status-text">${linkify(s.text)}</div>`;
             }
 
             return `
@@ -581,6 +579,7 @@
 
             document.getElementById('admin-login-view').style.display = 'none';
             document.getElementById('admin-dashboard-view').style.display = 'block';
+            document.getElementById('quick-post-container').style.display = 'block'; // Zobrazí Quick Post
             document.getElementById('login-error').style.display = 'none';
             switchAdminTab('editor'); 
         }
@@ -595,6 +594,7 @@
             document.getElementById('remember-me').checked = false;
             document.getElementById('admin-dashboard-view').style.display = 'none';
             document.getElementById('admin-login-view').style.display = 'block';
+            document.getElementById('quick-post-container').style.display = 'none'; // Skryje Quick Post
             cancelEdit();
             resetDeleteButton(); 
         }
@@ -717,7 +717,7 @@
 
                 if (!res.ok) throw new Error();
 
-                publishBtn.style.color = "var(--white)";
+                publishBtn.style.color = "#00E676"; // Neónovo tyrkysová
                 publishBtn.innerText = editingId ? "Updated." : "Published.";
                 
                 await fetchStatuses(true); 
@@ -734,6 +734,61 @@
                 msgBox.innerText = "Connection error.";
                 publishBtn.disabled = false;
                 publishBtn.innerText = editingId ? "Save Changes" : "Publish";
+            }
+        }
+
+        // --- Rýchly Post (Quick Post) Logika ---
+        async function handleQuickPost(e) {
+            e.preventDefault();
+            const text = document.getElementById('quick-text').value.trim();
+            const btn = document.getElementById('quick-btn');
+            if(!text) return;
+            
+            btn.disabled = true;
+            btn.innerText = "...";
+            
+            try {
+                const res = await fetch(`${API_URL}/posts`, {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "x-admin-password": secretKey 
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+
+                if (res.status === 401) {
+                    handleLogout();
+                    showSection('admin');
+                    document.getElementById('login-error').style.display = 'block';
+                    btn.disabled = false;
+                    btn.innerText = "Post";
+                    return;
+                }
+
+                if(!res.ok) throw new Error();
+
+                document.getElementById('quick-text').value = "";
+                btn.style.color = "#00E676"; // Neónovo tyrkysová pri úspechu
+                btn.innerText = "✔";
+                
+                await fetchStatuses(true);
+                
+                setTimeout(() => {
+                    btn.style.color = "var(--white)"; // Návrat do normálu
+                    btn.innerText = "Post";
+                    btn.disabled = false;
+                    document.activeElement.blur();
+                }, 1500);
+
+            } catch(err) {
+                btn.style.color = "red";
+                btn.innerText = "Error";
+                setTimeout(() => {
+                    btn.style.color = "var(--white)";
+                    btn.innerText = "Post";
+                    btn.disabled = false;
+                }, 1500);
             }
         }
 
@@ -801,7 +856,7 @@
                     </div>
                     <div style="display: flex; gap: 15px; flex-shrink: 0; margin-left: 10px;">
                         <button onclick="startEdit(${p.id})" class="admin-action-btn admin-action-link" style="margin: 0;">Edit</button>
-                        <button id="del-btn-${p.id}" onclick="handleDeleteSingle(${p.id})" class="admin-action-btn admin-action-link" style="color: var(--black); margin: 0;">Delete</button>
+                        <button id="del-btn-${p.id}" onclick="handleDeleteSingle(${p.id})" class="admin-action-btn admin-action-link" style="color: #ff3b30; margin: 0;">Delete</button>
                     </div>
                 </div>
                 `;
@@ -857,9 +912,7 @@
             const publishBtn = document.getElementById('publish-btn');
             publishBtn.disabled = false;
             publishBtn.innerText = "Publish";
-            publishBtn.style.background = "var(--black)";
-            publishBtn.style.borderColor = "var(--black)";
-            publishBtn.style.color = "var(--white)";
+            publishBtn.style.color = "var(--black)";
             document.getElementById('cancel-btn-container').style.display = "none";
         }
 
