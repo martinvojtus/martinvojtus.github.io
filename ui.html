@@ -215,7 +215,6 @@
             background: transparent; border: none; font-family: inherit; 
             font-size: var(--size-small);
             color: var(--black); cursor: pointer; padding: 0; margin-right: 15px;
-            transition: all 0.2s ease;
         }
         
         .admin-action-link {
@@ -363,7 +362,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.7.8 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.7.9 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -698,7 +697,6 @@
 
                 if (!res.ok) throw new Error();
 
-                // ZELENÝ STAV ÚSPECHU
                 publishBtn.style.color = "#34C759";
                 publishBtn.innerText = editingId ? "Updated." : "Published.";
                 
@@ -743,7 +741,6 @@
             fetchAdminPosts(adminCurrentPage + dir);
         }
 
-        // 🚨 ZMENA: Renderovanie tlačidla Delete na "Smart Button"
         function renderAdminList() {
             const container = document.getElementById('admin-posts-container');
             const paginationControls = document.getElementById('admin-pagination-controls');
@@ -844,12 +841,11 @@
             document.getElementById('cancel-btn-container').style.display = "none";
         }
 
-        // 🚨 ZMENA: Nová funkcia na Inline Mazanie s potvrdením
+        // 🚨 ZMENA: Namiesto "Sure?" je tu "Confirm" bez hrubého písma
         async function handleDeleteSingle(id) {
             const btn = document.getElementById(`del-btn-${id}`);
             
             if (btn.dataset.confirm === "true") {
-                // Druhý klik - spúšťa sa mazanie
                 clearTimeout(btn.timeoutId);
                 btn.innerText = "Deleting...";
                 btn.disabled = true;
@@ -874,16 +870,14 @@
                     btn.dataset.confirm = "false";
                 }
             } else {
-                // Prvý klik - spýta sa na potvrdenie
                 btn.dataset.confirm = "true";
-                btn.innerText = "Sure?";
-                btn.style.fontWeight = "700";
+                btn.innerText = "Confirm"; // Zmena textu na intuitívne Confirm
+                btn.style.fontWeight = "400"; // Žiadne hrubé písmo
                 
                 btn.timeoutId = setTimeout(() => {
                     if (document.getElementById(`del-btn-${id}`)) {
                         btn.dataset.confirm = "false";
                         btn.innerText = "Delete";
-                        btn.style.fontWeight = "400";
                     }
                 }, 3000);
             }
