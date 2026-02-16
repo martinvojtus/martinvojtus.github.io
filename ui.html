@@ -362,7 +362,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.8.0 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.8.1 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -392,16 +392,24 @@
         function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
         function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); }
         
-        // 🍏 ZMENA: Safari scroll fix
+        // 🍏 ZMENA: Agresívny Safari Scroll Fix
         function showSection(sectionId) {
+            // Vypneme plynulé scrollovanie pre okamžitý skok
+            document.documentElement.style.scrollBehavior = 'auto';
+            
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
             document.getElementById('section-' + sectionId).classList.add('active');
             closeMenu(); 
-            window.scrollTo(0, 0);
             
-            // Bezpečnostná poistka pre Safari po vykreslení DOM-u
+            // Okamžitý skok na vrch (pokryje všetky prehliadače)
+            window.scrollTo(0, 0);
+            document.body.scrollTop = 0; 
+            document.documentElement.scrollTop = 0;
+            
+            // Po prekreslení vrátime plynulé scrollovanie späť
             setTimeout(() => {
                 window.scrollTo(0, 0);
+                document.documentElement.style.scrollBehavior = 'smooth';
             }, 50);
         }
 
@@ -706,7 +714,7 @@
                 await fetchStatuses(true); 
 
                 setTimeout(() => {
-                    document.activeElement.blur(); // Odstráni focus z tlačidla pre Safari
+                    document.activeElement.blur(); 
                     cancelEdit(); 
                     showSection('feed'); 
                 }, 1500);
