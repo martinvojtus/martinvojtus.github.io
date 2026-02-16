@@ -215,6 +215,7 @@
             background: transparent; border: none; font-family: inherit; 
             font-size: var(--size-small);
             color: var(--black); cursor: pointer; padding: 0; margin-right: 15px;
+            transition: all 0.2s ease;
         }
         
         .admin-action-link {
@@ -362,7 +363,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.7.5 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.7.8 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -628,7 +629,6 @@
 
             msgBox.innerText = "";
             publishBtn.disabled = true;
-            publishBtn.style.opacity = "0.7";
 
             let finalImageUrl = currentImageUrl;
 
@@ -666,7 +666,6 @@
                         msgBox.innerText = "Error uploading image.";
                     }
                     publishBtn.disabled = false;
-                    publishBtn.style.opacity = "1";
                     publishBtn.innerText = editingId ? "Save Changes" : "Publish";
                     return;
                 }
@@ -693,32 +692,27 @@
                     handleLogout();
                     document.getElementById('login-error').style.display = 'block';
                     publishBtn.disabled = false;
-                    publishBtn.style.opacity = "1";
                     publishBtn.innerText = editingId ? "Save Changes" : "Publish";
                     return;
                 }
 
                 if (!res.ok) throw new Error();
 
-                // 🟢 ZELENÝ STAV ÚSPECHU (Len text mení farbu)
-                publishBtn.style.opacity = "1";
+                // ZELENÝ STAV ÚSPECHU
                 publishBtn.style.color = "#34C759";
                 publishBtn.innerText = editingId ? "Updated." : "Published.";
                 
-                // Načítanie nového feedu na pozadí, kým sa užívateľ pozerá na zelené tlačidlo
                 await fetchStatuses(true); 
 
-                // Počkáme 1.5 sekundy a presmerujeme
                 setTimeout(() => {
-                    cancelEdit(); // Vyčistí formulár a resetne tlačidlo
-                    showSection('feed'); // Presmerovanie na feed
+                    cancelEdit(); 
+                    showSection('feed'); 
                 }, 1500);
 
             } catch (err) {
                 msgBox.style.color = "red";
                 msgBox.innerText = "Connection error.";
                 publishBtn.disabled = false;
-                publishBtn.style.opacity = "1";
                 publishBtn.innerText = editingId ? "Save Changes" : "Publish";
             }
         }
@@ -749,6 +743,7 @@
             fetchAdminPosts(adminCurrentPage + dir);
         }
 
+        // 🚨 ZMENA: Renderovanie tlačidla Delete na "Smart Button"
         function renderAdminList() {
             const container = document.getElementById('admin-posts-container');
             const paginationControls = document.getElementById('admin-pagination-controls');
@@ -787,7 +782,7 @@
                     </div>
                     <div style="display: flex; gap: 15px; flex-shrink: 0; margin-left: 10px;">
                         <button onclick="startEdit(${p.id})" class="admin-action-btn admin-action-link" style="margin: 0;">Edit</button>
-                        <button onclick="deletePost(${p.id})" class="admin-action-btn admin-action-link" style="color: red; margin: 0;">Delete</button>
+                        <button id="del-btn-${p.id}" onclick="handleDeleteSingle(${p.id})" class="admin-action-btn admin-action-link" style="color: red; margin: 0;">Delete</button>
                     </div>
                 </div>
                 `;
@@ -840,33 +835,57 @@
             document.getElementById('file-name-display').style.color = "var(--grey-50)";
             document.getElementById('clear-file-btn').style.display = "none";
             
-            // Re-nastavenie zruší aj zelenú farbu (ak by bola aplikovaná) a odomkne tlačidlo
             const publishBtn = document.getElementById('publish-btn');
-            publishBtn.disabled = false; // 🔓 Odomknutie tlačidla pre ďalší príspevok
+            publishBtn.disabled = false;
             publishBtn.innerText = "Publish";
             publishBtn.style.background = "var(--black)";
             publishBtn.style.borderColor = "var(--black)";
-            publishBtn.style.color = "var(--white)"; // Návrat k bielemu textu
+            publishBtn.style.color = "var(--white)";
             document.getElementById('cancel-btn-container').style.display = "none";
         }
 
-        async function deletePost(id) {
-            if(!confirm("Are you sure you want to delete this post?")) return;
-            try {
-                const res = await fetch(`${API_URL}/posts/${id}`, {
-                    method: "DELETE",
-                    headers: { "x-admin-password": secretKey }
-                });
+        // 🚨 ZMENA: Nová funkcia na Inline Mazanie s potvrdením
+        async function handleDeleteSingle(id) {
+            const btn = document.getElementById(`del-btn-${id}`);
+            
+            if (btn.dataset.confirm === "true") {
+                // Druhý klik - spúšťa sa mazanie
+                clearTimeout(btn.timeoutId);
+                btn.innerText = "Deleting...";
+                btn.disabled = true;
                 
-                if (res.status === 401) {
-                    handleLogout();
-                    document.getElementById('login-error').style.display = 'block';
-                    return;
+                try {
+                    const res = await fetch(`${API_URL}/posts/${id}`, {
+                        method: "DELETE",
+                        headers: { "x-admin-password": secretKey }
+                    });
+                    
+                    if (res.status === 401) {
+                        handleLogout();
+                        document.getElementById('login-error').style.display = 'block';
+                        return;
+                    }
+                    fetchStatuses(true); 
+                    fetchAdminPosts(adminCurrentPage); 
+                } catch(e) {
+                    alert("Error deleting post.");
+                    btn.innerText = "Delete";
+                    btn.disabled = false;
+                    btn.dataset.confirm = "false";
                 }
-                fetchStatuses(true); 
-                fetchAdminPosts(adminCurrentPage); 
-            } catch(e) {
-                alert("Error deleting post.");
+            } else {
+                // Prvý klik - spýta sa na potvrdenie
+                btn.dataset.confirm = "true";
+                btn.innerText = "Sure?";
+                btn.style.fontWeight = "700";
+                
+                btn.timeoutId = setTimeout(() => {
+                    if (document.getElementById(`del-btn-${id}`)) {
+                        btn.dataset.confirm = "false";
+                        btn.innerText = "Delete";
+                        btn.style.fontWeight = "400";
+                    }
+                }, 3000);
             }
         }
 
@@ -874,7 +893,6 @@
             const btn = document.getElementById('delete-all-btn');
             btn.dataset.state = "0";
             btn.innerText = "Delete All Posts";
-            btn.style.opacity = "1";
             btn.disabled = false;
         }
 
@@ -904,7 +922,6 @@
                     } else {
                         clearInterval(deleteCountdownInterval);
                         btn.innerText = "Deleting everything...";
-                        btn.style.opacity = "0.7";
                         btn.disabled = true;
                         executeDeleteAll();
                     }
