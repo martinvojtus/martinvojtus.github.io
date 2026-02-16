@@ -191,6 +191,7 @@
             color: var(--black);
             box-sizing: border-box;
             display: block;
+            transition: all 0.3s ease; /* Pre plynulé zmeny na tlačidlách */
         }
         
         ::placeholder { color: var(--grey-50); opacity: 1; }
@@ -230,7 +231,6 @@
             justify-content: space-between;
         }
 
-        /* 🗂️ NOVÉ: Štýly pre záložky (Tabs) */
         .admin-tabs {
             display: flex; 
             justify-content: space-between; 
@@ -337,8 +337,9 @@
                 </div>
 
                 <div id="admin-manage-view" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--gap-item);">
-                        <button onclick="deleteAllPosts()" class="admin-action-btn admin-action-link" style="color: red; margin: 0; font-weight: 700;">Delete All Posts</button>
+                    
+                    <div class="form-group" style="margin-bottom: 30px;">
+                        <button type="button" id="delete-all-btn" class="submit-btn" style="background: #ff3b30; border-color: #ff3b30; color: #ffffff;" onclick="handleDeleteAllClick()">Delete All Posts</button>
                     </div>
                     
                     <div id="admin-posts-container" class="status-feed" style="padding: 0;"></div>
@@ -355,7 +356,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.7.0 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.7.1 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -366,16 +367,17 @@
         let currentImageUrl = null; 
         let removeImageFlag = false; 
 
-        // ⏳ Parametre pre Infinite Scroll (Feed)
         let currentOffset = 0;
         const postsLimit = 10;
         let isLoading = false;
         let hasMorePosts = true;
 
-        // 📄 Parametre pre stránkovanie (Admin Manage)
         let adminCurrentPage = 1;
         const adminPostsPerPage = 10;
         let currentAdminPosts = [];
+        
+        // ⏱️ ZMENA: Premenná pre inteligentné odpočítavanie tlačidla
+        let deleteConfirmTimeout;
 
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
@@ -393,7 +395,6 @@
             }
         }
 
-        // 🗂️ Prepínanie záložiek v Admine
         function switchAdminTab(tab) {
             if (tab === 'editor') {
                 document.getElementById('admin-editor-view').style.display = 'block';
@@ -409,7 +410,7 @@
                 document.getElementById('tab-manage').style.color = 'var(--black)';
                 document.getElementById('tab-editor').style.fontWeight = '400';
                 document.getElementById('tab-editor').style.color = 'var(--grey-50)';
-                fetchAdminPosts(1); // Načíta vždy prvú stranu po prepnutí
+                fetchAdminPosts(1); 
             }
         }
 
@@ -674,7 +675,6 @@
             }
         }
 
-        // 📄 Samostatný Fetch pre Admina (Stránkovanie)
         async function fetchAdminPosts(page) {
             adminCurrentPage = page;
             const skip = (page - 1) * adminPostsPerPage;
@@ -711,7 +711,6 @@
                 return;
             }
 
-            // Auto-fallback ak sme zmazali posledný post na strane 2+
             if (currentAdminPosts.length === 0 && adminCurrentPage > 1) {
                 fetchAdminPosts(adminCurrentPage - 1);
                 return;
@@ -727,7 +726,6 @@
                     ? `<img src="${p.image_url}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" alt="thumb" loading="lazy">` 
                     : '';
 
-                // 🗓️ ZMENA: Dátum nahratia vložený pre dokonalé lícovanie do riadku (formát napr. 16.02.)
                 const d = new Date(p.at);
                 const postDate = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.`;
 
@@ -754,7 +752,6 @@
         }
 
         function startEdit(id) {
-            // Hľadáme v aktuálnych spravovaných postoch
             const post = currentAdminPosts.find(p => p.id === id);
             if(!post) return;
             editingId = id;
@@ -778,7 +775,6 @@
             document.getElementById('publish-btn').innerText = "Save Changes";
             document.getElementById('cancel-btn-container').style.display = "block";
             
-            // Po stlačení "Edit" ho prepneme späť do Editor tabu
             switchAdminTab('editor');
         }
 
@@ -814,26 +810,42 @@
                     return;
                 }
                 fetchStatuses(true); 
-                fetchAdminPosts(adminCurrentPage); // Osvieži len tú jednu stránku v Manage
+                fetchAdminPosts(adminCurrentPage); 
             } catch(e) {
                 alert("Error deleting post.");
             }
         }
 
-        // 🚨 Nebezpečná funkcia na zmazanie úplne všetkého
-        async function deleteAllPosts() {
-            if(!confirm("⚠️ WARNING: Are you sure you want to delete ALL posts? This action CANNOT be undone!")) return;
-            if(!confirm("DOUBLE CHECK: This will wipe your entire database and all images. Proceed?")) return;
+        // 🚨 ZMENA: Logika inteligentného tlačidla Delete All
+        function handleDeleteAllClick() {
+            const btn = document.getElementById('delete-all-btn');
             
-            const btn = document.querySelector('#admin-manage-view button[onclick="deleteAllPosts()"]');
-            const originalText = btn.innerText;
-            btn.innerText = "Deleting everything...";
-            btn.disabled = true;
+            if (btn.dataset.confirm === "true") {
+                // Konfirmované po druhom kliknutí, spúšťame mazanie
+                btn.dataset.confirm = "false";
+                btn.innerText = "Deleting everything...";
+                btn.style.opacity = "0.7";
+                btn.disabled = true;
+                executeDeleteAll();
+            } else {
+                // Prvý klik: meníme stav na čakajúci na potvrdenie
+                btn.dataset.confirm = "true";
+                btn.innerText = "Are you sure? Click to confirm";
+                
+                clearTimeout(deleteConfirmTimeout);
+                deleteConfirmTimeout = setTimeout(() => {
+                    // Ak používateľ neklikne znova do 3 sekúnd, vrátime to späť
+                    btn.dataset.confirm = "false";
+                    btn.innerText = "Delete All Posts";
+                }, 3000);
+            }
+        }
 
+        // Separátna funkcia na samotný výkon mazania
+        async function executeDeleteAll() {
             try {
                 let deleting = true;
                 while(deleting) {
-                    // Berie 50 postov naraz
                     const res = await fetch(`${API_URL}/posts?skip=0&limit=50`);
                     const posts = await res.json();
                     
@@ -842,7 +854,6 @@
                         break;
                     }
                     
-                    // Bezpečne cykluje cez backend
                     for (const p of posts) {
                         await fetch(`${API_URL}/posts/${p.id}`, { 
                             method: "DELETE", 
@@ -855,8 +866,11 @@
             } catch(e) {
                 alert("An error occurred while deleting all posts.");
             } finally {
-                btn.innerText = originalText;
+                const btn = document.getElementById('delete-all-btn');
+                btn.innerText = "Delete All Posts";
+                btn.style.opacity = "1";
                 btn.disabled = false;
+                btn.dataset.confirm = "false";
             }
         }
 
