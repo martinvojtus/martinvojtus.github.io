@@ -300,8 +300,8 @@
                     <div class="form-group">
                         <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateFileName()">
                         <div class="form-input" style="display: flex; align-items: center; cursor: pointer; overflow: hidden;" onclick="document.getElementById('edit-image').click()">
-                            <span class="admin-action-btn" style="margin: 0 15px 0 0; pointer-events: none;">Choose image</span>
-                            <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small);">No image selected (Optional)</span>
+                            <span class="admin-action-btn" style="margin: 0 15px 0 0; pointer-events: none;">Image</span>
+                            <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small);">(Optional)</span>
                         </div>
                     </div>
 
@@ -320,7 +320,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.5.3 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.5.4 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -424,7 +424,7 @@
                 display.style.color = "var(--black)";
             } else {
                 // ✏️ ZMENA v JS pre reset výberu
-                display.innerText = "No image selected (Optional)";
+                display.innerText = "(Optional)";
                 display.style.color = "var(--grey-50)";
             }
         }
@@ -561,7 +561,7 @@
             document.getElementById('edit-image').value = ""; 
             
             // ✏️ ZMENA v JS pre reset výberu
-            document.getElementById('file-name-display').innerText = "No image selected (Optional)";
+            document.getElementById('file-name-display').innerText = "(Optional)";
             document.getElementById('file-name-display').style.color = "var(--grey-50)";
 
             if (post.image_url) {
@@ -586,7 +586,7 @@
             document.getElementById('current-image-container').style.display = 'none';
             
             // ✏️ ZMENA v JS pre reset výberu
-            document.getElementById('file-name-display').innerText = "No image selected (Optional)";
+            document.getElementById('file-name-display').innerText = "(Optional)";
             document.getElementById('file-name-display').style.color = "var(--grey-50)";
             
             document.getElementById('publish-btn').innerText = "Publish";
