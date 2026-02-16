@@ -147,7 +147,6 @@
             line-height: 1.1;
         }
 
-        /* ✏️ ZMENA: Fotky si držia originálny pomer strán */
         .status-image {
             width: 100%;
             height: auto; 
@@ -165,6 +164,7 @@
             white-space: pre-line; 
             text-align: justify;
             margin-bottom: 0;
+            word-wrap: break-word;
         }
 
         .loading-text {
@@ -172,6 +172,7 @@
             font-size: var(--size-small);
             color: var(--grey-50);
             padding-top: 10px;
+            margin-bottom: 30px;
         }
 
         /* --- FORMULÁRE --- */
@@ -257,8 +258,8 @@
     <main>
         <div id="section-feed" class="content-section active">
             <div id="status-container" class="status-feed">
-                <p class="loading-text">Loading thoughts...</p>
-            </div>
+                </div>
+            <div id="loading-indicator" class="loading-text">Loading thoughts...</div>
         </div>
 
         <div id="section-contact" class="content-section">
@@ -323,7 +324,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.5.6 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.6.0 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -333,6 +334,12 @@
         let globalPosts = [];
         let currentImageUrl = null; 
         let removeImageFlag = false; 
+
+        // ⏳ Parametre pre Infinite Scroll
+        let currentOffset = 0;
+        const postsLimit = 10;
+        let isLoading = false;
+        let hasMorePosts = true;
 
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
@@ -345,28 +352,111 @@
             document.getElementById('section-' + sectionId).classList.add('active');
             closeMenu(); 
             window.scrollTo(0, 0);
-            if(sectionId === 'feed') fetchStatuses();
+            if(sectionId === 'feed') {
+                window.scrollTo(0, 0);
+            }
         }
 
-        async function fetchStatuses() {
+        // 🔗 Funkcia pre automatické odkazy
+        function linkify(text) {
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return text.replace(urlRegex, function(url) {
+                return '<a href="' + url + '" target="_blank" style="color: inherit; text-decoration: underline;">' + url + '</a>';
+            });
+        }
+
+        // 🗜️ Funkcia pre kompresiu obrázkov pred odoslaním
+        function compressImage(file, maxWidth = 1200, quality = 0.8) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = event => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        canvas.toBlob(blob => {
+                            resolve(new File([blob], file.name, {
+                                type: 'image/jpeg',
+                                lastModified: Date.now()
+                            }));
+                        }, 'image/jpeg', quality);
+                    };
+                };
+            });
+        }
+
+        // ⏳ Nový, inteligentný Fetch s podporou scrollovania
+        async function fetchStatuses(reset = false) {
+            if (reset) {
+                currentOffset = 0;
+                hasMorePosts = true;
+                globalPosts = [];
+                document.getElementById('status-container').innerHTML = '';
+                document.getElementById('loading-indicator').style.display = 'block';
+            }
+
+            if (isLoading || !hasMorePosts) return;
+            isLoading = true;
+
             const container = document.getElementById('status-container');
+            const loader = document.getElementById('loading-indicator');
+
             try {
-                const response = await fetch(`${API_URL}/posts`);
+                const response = await fetch(`${API_URL}/posts?skip=${currentOffset}&limit=${postsLimit}`);
                 if (!response.ok) throw new Error();
-                globalPosts = await response.json();
+                const newPosts = await response.json();
                 
-                if (globalPosts.length === 0) {
+                if (newPosts.length < postsLimit) {
+                    hasMorePosts = false;
+                    loader.style.display = 'none';
+                }
+
+                currentOffset += newPosts.length;
+                globalPosts = globalPosts.concat(newPosts);
+                
+                if (reset && globalPosts.length === 0) {
                     container.innerHTML = '<p class="loading-text">No posts yet.</p>';
+                    loader.style.display = 'none';
                 } else {
-                    container.innerHTML = globalPosts.map(s => renderSinglePost(s)).join('');
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = newPosts.map(s => renderSinglePost(s)).join('');
+                    while(tempDiv.firstChild) {
+                        container.appendChild(tempDiv.firstChild);
+                    }
                 }
                 
                 if (secretKey) renderAdminList();
                 
             } catch (error) {
-                container.innerHTML = `<p style="color:red; text-align:center;">Failed to load data.</p>`;
+                if (reset) container.innerHTML = `<p style="color:red; text-align:center;">Failed to load data.</p>`;
+                loader.style.display = 'none';
+            } finally {
+                isLoading = false;
             }
         }
+
+        // ⬇️ Event listener pre scrollovanie na koniec stránky
+        window.addEventListener('scroll', () => {
+            if (document.getElementById('section-feed').classList.contains('active')) {
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+                    fetchStatuses();
+                }
+            }
+        });
 
         function renderSinglePost(s) {
             const dateObj = new Date(s.at);
@@ -382,8 +472,10 @@
             }
 
             const titleHtml = (s.title && s.title.trim() !== "") ? `<h3 class="status-title">${s.title}</h3>` : '';
-            const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image">` : '';
-            const textHtml = (s.text && s.text.trim() !== "") ? `<div class="status-text">${s.text}</div>` : '';
+            // ⏳ ZMENA: Pridaný parameter loading="lazy"
+            const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image" loading="lazy">` : '';
+            // 🔗 ZMENA: Aplikácia Auto-Linker funkcie na text
+            const textHtml = (s.text && s.text.trim() !== "") ? `<div class="status-text">${linkify(s.text)}</div>` : '';
 
             return `
             <div class="status-card">
@@ -401,7 +493,7 @@
             document.getElementById('admin-login-view').style.display = 'none';
             document.getElementById('admin-dashboard-view').style.display = 'block';
             document.getElementById('login-error').style.display = 'none';
-            fetchStatuses(); 
+            renderAdminList();
         }
 
         function handleLogout() {
@@ -457,8 +549,6 @@
             }
 
             msgBox.style.color = "var(--black)";
-            msgBox.innerText = imageFile ? "Uploading image..." : "Saving post...";
-
             let finalImageUrl = currentImageUrl;
 
             if (removeImageFlag && !imageFile) {
@@ -466,10 +556,15 @@
             }
 
             if (imageFile) {
+                msgBox.innerText = "Compressing image...";
+                // 🗜️ ZMENA: Spustenie kompresie pred odoslaním
+                const compressedFile = await compressImage(imageFile);
+                
                 const formData = new FormData();
-                formData.append("file", imageFile);
+                formData.append("file", compressedFile);
 
                 try {
+                    msgBox.innerText = "Uploading image...";
                     const uploadRes = await fetch(`${API_URL}/upload-image`, {
                         method: "POST",
                         headers: { "x-admin-password": secretKey },
@@ -492,6 +587,8 @@
                     }
                     return;
                 }
+            } else {
+                msgBox.innerText = "Saving post...";
             }
 
             const method = editingId ? "PUT" : "POST";
@@ -522,7 +619,7 @@
                 setTimeout(() => { msgBox.innerText = ""; }, 3000);
                 
                 cancelEdit();
-                fetchStatuses(); 
+                fetchStatuses(true); // 🔄 ZMENA: Kompletný reštart feedu, aby ukázalo najnovšie posty
 
             } catch (err) {
                 msgBox.style.color = "red";
@@ -543,7 +640,7 @@
                 }
 
                 const thumbHtml = p.image_url 
-                    ? `<img src="${p.image_url}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" alt="thumb">` 
+                    ? `<img src="${p.image_url}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" alt="thumb" loading="lazy">` 
                     : '';
 
                 return `
@@ -619,13 +716,15 @@
                     document.getElementById('login-error').style.display = 'block';
                     return;
                 }
-                fetchStatuses();
+                fetchStatuses(true); // 🔄 ZMENA: Reštart feedu po zmazaní
             } catch(e) {
                 alert("Error deleting post.");
             }
         }
 
-        fetchStatuses();
+        // Úvodný štart webu
+        fetchStatuses(true);
+        
         menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
         document.addEventListener('click', (e) => { 
             if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); 
