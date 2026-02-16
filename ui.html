@@ -271,9 +271,10 @@
 
     <main>
         <div id="section-feed" class="content-section active">
+            <h2 style="font-size: var(--size-large); margin: 0 0 var(--gap-item) 0;">Feed.</h2>
             <div id="status-container" class="status-feed">
                 </div>
-            <div id="loading-indicator" class="loading-text">Loading thoughts...</div>
+            <div id="loading-indicator" class="loading-text">Loading...</div>
         </div>
 
         <div id="section-contact" class="content-section">
@@ -362,7 +363,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.8.1 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.8.2 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -392,25 +393,14 @@
         function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
         function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); }
         
-        // 🍏 ZMENA: Agresívny Safari Scroll Fix
         function showSection(sectionId) {
-            // Vypneme plynulé scrollovanie pre okamžitý skok
-            document.documentElement.style.scrollBehavior = 'auto';
-            
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
             document.getElementById('section-' + sectionId).classList.add('active');
             closeMenu(); 
-            
-            // Okamžitý skok na vrch (pokryje všetky prehliadače)
             window.scrollTo(0, 0);
-            document.body.scrollTop = 0; 
-            document.documentElement.scrollTop = 0;
-            
-            // Po prekreslení vrátime plynulé scrollovanie späť
-            setTimeout(() => {
+            if(sectionId === 'feed') {
                 window.scrollTo(0, 0);
-                document.documentElement.style.scrollBehavior = 'smooth';
-            }, 50);
+            }
         }
 
         function checkSavedLogin() {
@@ -714,7 +704,6 @@
                 await fetchStatuses(true); 
 
                 setTimeout(() => {
-                    document.activeElement.blur(); 
                     cancelEdit(); 
                     showSection('feed'); 
                 }, 1500);
