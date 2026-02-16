@@ -213,7 +213,11 @@
         .admin-action-btn {
             background: transparent; border: none; font-family: inherit; 
             font-size: var(--size-small);
-            color: var(--black); cursor: pointer; text-decoration: underline; padding: 0; margin-right: 15px;
+            color: var(--black); cursor: pointer; padding: 0; margin-right: 15px;
+        }
+        
+        .admin-action-link {
+            text-decoration: underline;
         }
 
         .admin-card {
@@ -224,6 +228,16 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+        }
+
+        /* 🗂️ NOVÉ: Štýly pre záložky (Tabs) */
+        .admin-tabs {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: baseline; 
+            border-bottom: 1px solid var(--divider); 
+            padding-bottom: 16px; 
+            margin-bottom: var(--gap-item);
         }
 
         footer {
@@ -285,46 +299,63 @@
             </div>
 
             <div id="admin-dashboard-view" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--gap-item);">
-                    <h3 style="font-size: var(--size-small); font-weight: 700; margin: 0;">Editor.</h3>
-                    <button onclick="handleLogout()" class="admin-action-btn" style="margin: 0;">Logout</button>
+                <div class="admin-tabs">
+                    <div style="display: flex; gap: 20px;">
+                        <button id="tab-editor" onclick="switchAdminTab('editor')" class="admin-action-btn" style="font-weight: 700; color: var(--black); margin: 0;">Editor.</button>
+                        <button id="tab-manage" onclick="switchAdminTab('manage')" class="admin-action-btn" style="color: var(--grey-50); margin: 0;">Manage.</button>
+                    </div>
+                    <button onclick="handleLogout()" class="admin-action-btn admin-action-link" style="margin: 0;">Logout</button>
                 </div>
 
-                <form id="editor-form" class="contact-form" onsubmit="handlePublish(event)">
-                    <div class="form-group"><input type="text" id="edit-title" class="form-input" placeholder="Title (Optional)"></div>
-                    
-                    <div id="current-image-container" style="display: none; margin-bottom: var(--gap-item); font-size: var(--size-small); align-items: center;">
-                        <span style="color: var(--grey-50);">Attached image </span>
-                        <button type="button" class="admin-action-btn" style="color: red; margin-left: 15px;" onclick="flagImageForRemoval()">Remove</button>
-                    </div>
-
-                    <div class="form-group">
-                        <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateFileName()">
-                        <div class="form-input" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; overflow: hidden;" onclick="document.getElementById('edit-image').click()">
-                            <div style="display: flex; align-items: center; overflow: hidden;">
-                                <span class="admin-action-btn" style="margin: 0 15px 0 0; pointer-events: none;">Image</span>
-                                <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small);">(Optional)</span>
-                            </div>
-                            <button type="button" id="clear-file-btn" class="admin-action-btn" style="color: red; margin: 0; display: none; padding: 0;" onclick="clearSelectedFile(event)">Remove</button>
+                <div id="admin-editor-view">
+                    <form id="editor-form" class="contact-form" onsubmit="handlePublish(event)">
+                        <div class="form-group"><input type="text" id="edit-title" class="form-input" placeholder="Title (Optional)"></div>
+                        
+                        <div id="current-image-container" style="display: none; margin-bottom: var(--gap-item); font-size: var(--size-small); align-items: center;">
+                            <span style="color: var(--grey-50);">Attached image </span>
+                            <button type="button" class="admin-action-btn admin-action-link" style="color: red; margin-left: 15px;" onclick="flagImageForRemoval()">Remove</button>
                         </div>
+
+                        <div class="form-group">
+                            <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateFileName()">
+                            <div class="form-input" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; overflow: hidden;" onclick="document.getElementById('edit-image').click()">
+                                <div style="display: flex; align-items: center; overflow: hidden;">
+                                    <span class="admin-action-btn admin-action-link" style="margin: 0 15px 0 0; pointer-events: none;">Image</span>
+                                    <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small);">(Optional)</span>
+                                </div>
+                                <button type="button" id="clear-file-btn" class="admin-action-btn admin-action-link" style="color: red; margin: 0; display: none; padding: 0;" onclick="clearSelectedFile(event)">Remove</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group"><textarea id="edit-text" class="form-textarea" placeholder="Content (Optional if image attached)"></textarea></div>
+                        
+                        <p id="admin-msg" style="font-size: var(--size-small); margin: 0 0 10px 0;"></p>
+                        
+                        <div class="form-group"><button type="submit" id="publish-btn" class="submit-btn">Publish</button></div>
+                        <div class="form-group" id="cancel-btn-container" style="display: none;"><button type="button" id="cancel-btn" class="submit-btn secondary-btn" onclick="cancelEdit()">Cancel Edit</button></div>
+                    </form>
+                </div>
+
+                <div id="admin-manage-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--gap-item);">
+                        <button onclick="deleteAllPosts()" class="admin-action-btn admin-action-link" style="color: red; margin: 0; font-weight: 700;">Delete All Posts</button>
                     </div>
-
-                    <div class="form-group"><textarea id="edit-text" class="form-textarea" placeholder="Content (Optional if image attached)"></textarea></div>
                     
-                    <p id="admin-msg" style="font-size: var(--size-small); margin: 0 0 10px 0;"></p>
+                    <div id="admin-posts-container" class="status-feed" style="padding: 0;"></div>
                     
-                    <div class="form-group"><button type="submit" id="publish-btn" class="submit-btn">Publish</button></div>
-                    <div class="form-group" id="cancel-btn-container" style="display: none;"><button type="button" id="cancel-btn" class="submit-btn secondary-btn" onclick="cancelEdit()">Cancel Edit</button></div>
-                </form>
+                    <div id="admin-pagination-controls" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; display: none;">
+                        <button id="admin-prev-btn" onclick="changeAdminPage(-1)" class="admin-action-btn admin-action-link" style="margin: 0;">Prev</button>
+                        <span id="admin-page-info" style="font-size: var(--size-small); color: var(--grey-50);"></span>
+                        <button id="admin-next-btn" onclick="changeAdminPage(1)" class="admin-action-btn admin-action-link" style="margin: 0;">Next</button>
+                    </div>
+                </div>
 
-                <h3 style="font-size: var(--size-small); font-weight: 700; margin: 50px 0 var(--gap-item) 0;">Manage.</h3>
-                <div id="admin-posts-container" class="status-feed" style="padding: 0;"></div>
             </div>
         </div>
     </main>
 
     <footer>
-        <div class="footer-info">build v2.6.0 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.7.0 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -335,11 +366,16 @@
         let currentImageUrl = null; 
         let removeImageFlag = false; 
 
-        // ⏳ Parametre pre Infinite Scroll
+        // ⏳ Parametre pre Infinite Scroll (Feed)
         let currentOffset = 0;
         const postsLimit = 10;
         let isLoading = false;
         let hasMorePosts = true;
+
+        // 📄 Parametre pre stránkovanie (Admin Manage)
+        let adminCurrentPage = 1;
+        const adminPostsPerPage = 10;
+        let currentAdminPosts = [];
 
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
@@ -357,7 +393,26 @@
             }
         }
 
-        // 🔗 Funkcia pre automatické odkazy
+        // 🗂️ Prepínanie záložiek v Admine
+        function switchAdminTab(tab) {
+            if (tab === 'editor') {
+                document.getElementById('admin-editor-view').style.display = 'block';
+                document.getElementById('admin-manage-view').style.display = 'none';
+                document.getElementById('tab-editor').style.fontWeight = '700';
+                document.getElementById('tab-editor').style.color = 'var(--black)';
+                document.getElementById('tab-manage').style.fontWeight = '400';
+                document.getElementById('tab-manage').style.color = 'var(--grey-50)';
+            } else {
+                document.getElementById('admin-editor-view').style.display = 'none';
+                document.getElementById('admin-manage-view').style.display = 'block';
+                document.getElementById('tab-manage').style.fontWeight = '700';
+                document.getElementById('tab-manage').style.color = 'var(--black)';
+                document.getElementById('tab-editor').style.fontWeight = '400';
+                document.getElementById('tab-editor').style.color = 'var(--grey-50)';
+                fetchAdminPosts(1); // Načíta vždy prvú stranu po prepnutí
+            }
+        }
+
         function linkify(text) {
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             return text.replace(urlRegex, function(url) {
@@ -365,7 +420,6 @@
             });
         }
 
-        // 🗜️ Funkcia pre kompresiu obrázkov pred odoslaním
         function compressImage(file, maxWidth = 1200, quality = 0.8) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -399,7 +453,6 @@
             });
         }
 
-        // ⏳ Nový, inteligentný Fetch s podporou scrollovania
         async function fetchStatuses(reset = false) {
             if (reset) {
                 currentOffset = 0;
@@ -439,8 +492,6 @@
                     }
                 }
                 
-                if (secretKey) renderAdminList();
-                
             } catch (error) {
                 if (reset) container.innerHTML = `<p style="color:red; text-align:center;">Failed to load data.</p>`;
                 loader.style.display = 'none';
@@ -449,7 +500,6 @@
             }
         }
 
-        // ⬇️ Event listener pre scrollovanie na koniec stránky
         window.addEventListener('scroll', () => {
             if (document.getElementById('section-feed').classList.contains('active')) {
                 if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
@@ -472,9 +522,7 @@
             }
 
             const titleHtml = (s.title && s.title.trim() !== "") ? `<h3 class="status-title">${s.title}</h3>` : '';
-            // ⏳ ZMENA: Pridaný parameter loading="lazy"
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image" loading="lazy">` : '';
-            // 🔗 ZMENA: Aplikácia Auto-Linker funkcie na text
             const textHtml = (s.text && s.text.trim() !== "") ? `<div class="status-text">${linkify(s.text)}</div>` : '';
 
             return `
@@ -493,7 +541,7 @@
             document.getElementById('admin-login-view').style.display = 'none';
             document.getElementById('admin-dashboard-view').style.display = 'block';
             document.getElementById('login-error').style.display = 'none';
-            renderAdminList();
+            switchAdminTab('editor'); 
         }
 
         function handleLogout() {
@@ -557,7 +605,6 @@
 
             if (imageFile) {
                 msgBox.innerText = "Compressing image...";
-                // 🗜️ ZMENA: Spustenie kompresie pred odoslaním
                 const compressedFile = await compressImage(imageFile);
                 
                 const formData = new FormData();
@@ -619,7 +666,7 @@
                 setTimeout(() => { msgBox.innerText = ""; }, 3000);
                 
                 cancelEdit();
-                fetchStatuses(true); // 🔄 ZMENA: Kompletný reštart feedu, aby ukázalo najnovšie posty
+                fetchStatuses(true); 
 
             } catch (err) {
                 msgBox.style.color = "red";
@@ -627,13 +674,50 @@
             }
         }
 
+        // 📄 Samostatný Fetch pre Admina (Stránkovanie)
+        async function fetchAdminPosts(page) {
+            adminCurrentPage = page;
+            const skip = (page - 1) * adminPostsPerPage;
+            const container = document.getElementById('admin-posts-container');
+            const paginationControls = document.getElementById('admin-pagination-controls');
+            
+            container.innerHTML = '<p class="loading-text">Loading...</p>';
+            paginationControls.style.display = 'none';
+            
+            try {
+                const res = await fetch(`${API_URL}/posts?skip=${skip}&limit=${adminPostsPerPage}`);
+                if (res.status === 401) {
+                    handleLogout();
+                    return;
+                }
+                currentAdminPosts = await res.json();
+                renderAdminList();
+            } catch (e) {
+                container.innerHTML = '<p class="loading-text" style="color:red;">Error loading posts.</p>';
+            }
+        }
+
+        function changeAdminPage(dir) {
+            fetchAdminPosts(adminCurrentPage + dir);
+        }
+
         function renderAdminList() {
             const container = document.getElementById('admin-posts-container');
-            if (globalPosts.length === 0) {
+            const paginationControls = document.getElementById('admin-pagination-controls');
+            
+            if (currentAdminPosts.length === 0 && adminCurrentPage === 1) {
                 container.innerHTML = '<p class="loading-text">No posts found.</p>';
+                paginationControls.style.display = 'none';
                 return;
             }
-            container.innerHTML = globalPosts.map(p => {
+
+            // Auto-fallback ak sme zmazali posledný post na strane 2+
+            if (currentAdminPosts.length === 0 && adminCurrentPage > 1) {
+                fetchAdminPosts(adminCurrentPage - 1);
+                return;
+            }
+
+            container.innerHTML = currentAdminPosts.map(p => {
                 let displayTitle = p.title;
                 if (!displayTitle || displayTitle.trim() === "") {
                     displayTitle = p.text ? p.text.substring(0, 30) + (p.text.length > 30 ? '...' : '') : 'Photo post';
@@ -643,24 +727,35 @@
                     ? `<img src="${p.image_url}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" alt="thumb" loading="lazy">` 
                     : '';
 
+                // 🗓️ ZMENA: Dátum nahratia vložený pre dokonalé lícovanie do riadku (formát napr. 16.02.)
+                const d = new Date(p.at);
+                const postDate = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.`;
+
                 return `
                 <div class="admin-card">
-                    <div style="display: flex; align-items: center; gap: 12px; overflow: hidden; flex-grow: 1;">
-                        <span style="color: var(--grey-50); font-size: var(--size-small); white-space: nowrap;">ID: ${p.id}</span>
+                    <div style="display: flex; align-items: center; gap: 10px; overflow: hidden; flex-grow: 1;">
+                        <span style="color: var(--grey-50); font-size: var(--size-small); white-space: nowrap; flex-shrink: 0;">ID: ${p.id}</span>
+                        <span style="color: var(--grey-50); font-size: var(--size-small); white-space: nowrap; flex-shrink: 0;">• ${postDate}</span>
                         ${thumbHtml}
                         <span style="font-weight: 700; font-size: var(--size-small); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${displayTitle}</span>
                     </div>
                     <div style="display: flex; gap: 15px; flex-shrink: 0; margin-left: 10px;">
-                        <button onclick="startEdit(${p.id})" class="admin-action-btn" style="margin: 0;">Edit</button>
-                        <button onclick="deletePost(${p.id})" class="admin-action-btn" style="color: red; margin: 0;">Delete</button>
+                        <button onclick="startEdit(${p.id})" class="admin-action-btn admin-action-link" style="margin: 0;">Edit</button>
+                        <button onclick="deletePost(${p.id})" class="admin-action-btn admin-action-link" style="color: red; margin: 0;">Delete</button>
                     </div>
                 </div>
                 `;
             }).join('');
+
+            document.getElementById('admin-page-info').innerText = `Page ${adminCurrentPage}`;
+            document.getElementById('admin-prev-btn').style.visibility = adminCurrentPage > 1 ? 'visible' : 'hidden';
+            document.getElementById('admin-next-btn').style.visibility = currentAdminPosts.length === adminPostsPerPage ? 'visible' : 'hidden';
+            paginationControls.style.display = 'flex';
         }
 
         function startEdit(id) {
-            const post = globalPosts.find(p => p.id === id);
+            // Hľadáme v aktuálnych spravovaných postoch
+            const post = currentAdminPosts.find(p => p.id === id);
             if(!post) return;
             editingId = id;
             currentImageUrl = post.image_url || null;
@@ -682,7 +777,9 @@
 
             document.getElementById('publish-btn').innerText = "Save Changes";
             document.getElementById('cancel-btn-container').style.display = "block";
-            window.scrollTo(0, document.getElementById('section-admin').offsetTop);
+            
+            // Po stlačení "Edit" ho prepneme späť do Editor tabu
+            switchAdminTab('editor');
         }
 
         function cancelEdit() {
@@ -716,13 +813,53 @@
                     document.getElementById('login-error').style.display = 'block';
                     return;
                 }
-                fetchStatuses(true); // 🔄 ZMENA: Reštart feedu po zmazaní
+                fetchStatuses(true); 
+                fetchAdminPosts(adminCurrentPage); // Osvieži len tú jednu stránku v Manage
             } catch(e) {
                 alert("Error deleting post.");
             }
         }
 
-        // Úvodný štart webu
+        // 🚨 Nebezpečná funkcia na zmazanie úplne všetkého
+        async function deleteAllPosts() {
+            if(!confirm("⚠️ WARNING: Are you sure you want to delete ALL posts? This action CANNOT be undone!")) return;
+            if(!confirm("DOUBLE CHECK: This will wipe your entire database and all images. Proceed?")) return;
+            
+            const btn = document.querySelector('#admin-manage-view button[onclick="deleteAllPosts()"]');
+            const originalText = btn.innerText;
+            btn.innerText = "Deleting everything...";
+            btn.disabled = true;
+
+            try {
+                let deleting = true;
+                while(deleting) {
+                    // Berie 50 postov naraz
+                    const res = await fetch(`${API_URL}/posts?skip=0&limit=50`);
+                    const posts = await res.json();
+                    
+                    if (posts.length === 0) {
+                        deleting = false;
+                        break;
+                    }
+                    
+                    // Bezpečne cykluje cez backend
+                    for (const p of posts) {
+                        await fetch(`${API_URL}/posts/${p.id}`, { 
+                            method: "DELETE", 
+                            headers: { "x-admin-password": secretKey } 
+                        });
+                    }
+                }
+                fetchStatuses(true);
+                fetchAdminPosts(1);
+            } catch(e) {
+                alert("An error occurred while deleting all posts.");
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
         fetchStatuses(true);
         
         menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
