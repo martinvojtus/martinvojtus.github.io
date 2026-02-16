@@ -195,18 +195,6 @@
         ::placeholder { color: var(--grey-50); opacity: 1; }
         .form-textarea { min-height: 120px; resize: vertical; }
 
-        input[type="file"]::file-selector-button {
-            border: 1px solid var(--black);
-            background: transparent;
-            color: var(--black);
-            font-family: inherit;
-            font-size: var(--size-small);
-            padding: 4px 12px;
-            border-radius: calc(var(--border-radius) - 4px);
-            margin-right: 12px;
-            cursor: pointer;
-        }
-
         .submit-btn {
             background: var(--black); 
             color: var(--white); 
@@ -312,8 +300,8 @@
                     <div class="form-group">
                         <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateFileName()">
                         <div class="form-input" style="display: flex; align-items: center; cursor: pointer; overflow: hidden;" onclick="document.getElementById('edit-image').click()">
-                            <span class="admin-action-btn" style="margin: 0 15px 0 0; pointer-events: none;">Choose file</span>
-                            <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small);">No file chosen</span>
+                            <span class="admin-action-btn" style="margin: 0 15px 0 0; pointer-events: none;">Choose image</span>
+                            <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small);">No image selected (Optional)</span>
                         </div>
                     </div>
 
@@ -332,7 +320,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.5.2 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.5.3 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -435,7 +423,8 @@
                 display.innerText = input.files[0].name;
                 display.style.color = "var(--black)";
             } else {
-                display.innerText = "No file chosen";
+                // ✏️ ZMENA v JS pre reset výberu
+                display.innerText = "No image selected (Optional)";
                 display.style.color = "var(--grey-50)";
             }
         }
@@ -540,7 +529,6 @@
                     displayTitle = p.text ? p.text.substring(0, 30) + (p.text.length > 30 ? '...' : '') : 'Photo post';
                 }
 
-                // ✏️ ZMENA: Odstránený rámik (border) z miniatúry
                 const thumbHtml = p.image_url 
                     ? `<img src="${p.image_url}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" alt="thumb">` 
                     : '';
@@ -572,7 +560,8 @@
             document.getElementById('edit-text').value = post.text || "";
             document.getElementById('edit-image').value = ""; 
             
-            document.getElementById('file-name-display').innerText = "No file chosen";
+            // ✏️ ZMENA v JS pre reset výberu
+            document.getElementById('file-name-display').innerText = "No image selected (Optional)";
             document.getElementById('file-name-display').style.color = "var(--grey-50)";
 
             if (post.image_url) {
@@ -596,7 +585,8 @@
             document.getElementById('edit-image').value = "";
             document.getElementById('current-image-container').style.display = 'none';
             
-            document.getElementById('file-name-display').innerText = "No file chosen";
+            // ✏️ ZMENA v JS pre reset výberu
+            document.getElementById('file-name-display').innerText = "No image selected (Optional)";
             document.getElementById('file-name-display').style.color = "var(--grey-50)";
             
             document.getElementById('publish-btn').innerText = "Publish";
