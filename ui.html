@@ -332,7 +332,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.5.1 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.5.2 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -540,9 +540,9 @@
                     displayTitle = p.text ? p.text.substring(0, 30) + (p.text.length > 30 ? '...' : '') : 'Photo post';
                 }
 
-                // ✏️ NOVÉ: Renderovanie skutočnej zmenšenej fotky z tvojho servera
+                // ✏️ ZMENA: Odstránený rámik (border) z miniatúry
                 const thumbHtml = p.image_url 
-                    ? `<img src="${p.image_url}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; flex-shrink: 0; border: 1px solid var(--divider);" alt="thumb">` 
+                    ? `<img src="${p.image_url}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" alt="thumb">` 
                     : '';
 
                 return `
