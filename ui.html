@@ -362,7 +362,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.7.5 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.7.6 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -397,9 +397,6 @@
             document.getElementById('section-' + sectionId).classList.add('active');
             closeMenu(); 
             window.scrollTo(0, 0);
-            if(sectionId === 'feed') {
-                window.scrollTo(0, 0);
-            }
         }
 
         function checkSavedLogin() {
@@ -449,22 +446,16 @@
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-
                         if (width > maxWidth) {
                             height = Math.round((height * maxWidth) / width);
                             width = maxWidth;
                         }
-
                         canvas.width = width;
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-
                         canvas.toBlob(blob => {
-                            resolve(new File([blob], file.name, {
-                                type: 'image/jpeg',
-                                lastModified: Date.now()
-                            }));
+                            resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
                         }, 'image/jpeg', quality);
                     };
                 };
@@ -479,50 +470,37 @@
                 document.getElementById('status-container').innerHTML = '';
                 document.getElementById('loading-indicator').style.display = 'block';
             }
-
             if (isLoading || !hasMorePosts) return;
             isLoading = true;
-
             const container = document.getElementById('status-container');
             const loader = document.getElementById('loading-indicator');
-
             try {
                 const response = await fetch(`${API_URL}/posts?skip=${currentOffset}&limit=${postsLimit}`);
                 if (!response.ok) throw new Error();
                 const newPosts = await response.json();
-                
                 if (newPosts.length < postsLimit) {
                     hasMorePosts = false;
                     loader.style.display = 'none';
                 }
-
                 currentOffset += newPosts.length;
                 globalPosts = globalPosts.concat(newPosts);
-                
                 if (reset && globalPosts.length === 0) {
                     container.innerHTML = '<p class="loading-text">No posts yet.</p>';
                     loader.style.display = 'none';
                 } else {
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = newPosts.map(s => renderSinglePost(s)).join('');
-                    while(tempDiv.firstChild) {
-                        container.appendChild(tempDiv.firstChild);
-                    }
+                    while(tempDiv.firstChild) container.appendChild(tempDiv.firstChild);
                 }
-                
             } catch (error) {
                 if (reset) container.innerHTML = `<p style="color:red; text-align:center;">Failed to load data.</p>`;
                 loader.style.display = 'none';
-            } finally {
-                isLoading = false;
-            }
+            } finally { isLoading = false; }
         }
 
         window.addEventListener('scroll', () => {
             if (document.getElementById('section-feed').classList.contains('active')) {
-                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
-                    fetchStatuses();
-                }
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses();
             }
         });
 
@@ -530,7 +508,6 @@
             const dateObj = new Date(s.at);
             const date = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
             const time = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-            
             let editedHtml = '';
             if (s.updated_at) {
                 const updateObj = new Date(s.updated_at);
@@ -538,30 +515,16 @@
                 const updateTime = updateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
                 editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin-top: 12px;">(Edited: ${updateDate} • ${updateTime})</div>`;
             }
-
             const titleHtml = (s.title && s.title.trim() !== "") ? `<h3 class="status-title">${s.title}</h3>` : '';
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image" loading="lazy">` : '';
             const textHtml = (s.text && s.text.trim() !== "") ? `<div class="status-text">${linkify(s.text)}</div>` : '';
-
-            return `
-            <div class="status-card">
-                <span class="status-date">${date} • ${time}</span>
-                ${titleHtml}
-                ${imageHtml}
-                ${textHtml}
-                ${editedHtml}
-            </div>`;
+            return `<div class="status-card"><span class="status-date">${date} • ${time}</span>${titleHtml}${imageHtml}${textHtml}${editedHtml}</div>`;
         }
 
         function handleLogin(e) {
             e.preventDefault();
             secretKey = document.getElementById('admin-pass').value;
-            const rememberMe = document.getElementById('remember-me').checked;
-            
-            if (rememberMe) {
-                localStorage.setItem('adminSecretKey', secretKey);
-            }
-
+            if (document.getElementById('remember-me').checked) localStorage.setItem('adminSecretKey', secretKey);
             document.getElementById('admin-login-view').style.display = 'none';
             document.getElementById('admin-dashboard-view').style.display = 'block';
             document.getElementById('login-error').style.display = 'none';
@@ -569,22 +532,17 @@
         }
 
         function handleLogout() {
-            secretKey = "";
-            editingId = null;
-            
+            secretKey = ""; editingId = null;
             localStorage.removeItem('adminSecretKey');
-
             document.getElementById('admin-pass').value = '';
             document.getElementById('remember-me').checked = false;
             document.getElementById('admin-dashboard-view').style.display = 'none';
             document.getElementById('admin-login-view').style.display = 'block';
-            cancelEdit();
-            resetDeleteButton(); 
+            cancelEdit(); resetDeleteButton(); 
         }
 
         function flagImageForRemoval() {
-            removeImageFlag = true;
-            currentImageUrl = null;
+            removeImageFlag = true; currentImageUrl = null;
             document.getElementById('current-image-container').style.display = 'none';
         }
 
@@ -592,7 +550,6 @@
             const input = document.getElementById('edit-image');
             const display = document.getElementById('file-name-display');
             const clearBtn = document.getElementById('clear-file-btn');
-            
             if (input.files && input.files.length > 0) {
                 display.innerText = input.files[0].name;
                 display.style.color = "var(--black)";
@@ -607,11 +564,10 @@
         function clearSelectedFile(e) {
             e.stopPropagation(); 
             const input = document.getElementById('edit-image');
-            input.value = ""; 
-            updateFileName(); 
+            input.value = ""; updateFileName(); 
         }
 
-        // 🚀 ZMENA: Animované Publikovanie s presmerovaním
+        // 🚀 ZMENA: Len zelený text a odomknutie tlačidla
         async function handlePublish(e) {
             e.preventDefault();
             const title = document.getElementById('edit-title').value.trim();
@@ -632,18 +588,13 @@
             publishBtn.style.opacity = "0.7";
 
             let finalImageUrl = currentImageUrl;
-
-            if (removeImageFlag && !imageFile) {
-                finalImageUrl = null; 
-            }
+            if (removeImageFlag && !imageFile) finalImageUrl = null;
 
             if (imageFile) {
                 publishBtn.innerText = "Compressing...";
                 const compressedFile = await compressImage(imageFile);
-                
                 const formData = new FormData();
                 formData.append("file", compressedFile);
-
                 try {
                     publishBtn.innerText = "Uploading...";
                     const uploadRes = await fetch(`${API_URL}/upload-image`, {
@@ -651,70 +602,43 @@
                         headers: { "x-admin-password": secretKey },
                         body: formData
                     });
-
                     if (uploadRes.status === 401) throw new Error("Unauthorized");
                     if (!uploadRes.ok) throw new Error("Upload failed");
-
                     const uploadData = await uploadRes.json();
                     finalImageUrl = uploadData.image_url;
-                    publishBtn.innerText = "Saving...";
                 } catch (err) {
-                    if (err.message === "Unauthorized") {
-                        handleLogout();
-                        document.getElementById('login-error').style.display = 'block';
-                    } else {
-                        msgBox.style.color = "red";
-                        msgBox.innerText = "Error uploading image.";
-                    }
-                    publishBtn.disabled = false;
-                    publishBtn.style.opacity = "1";
+                    msgBox.style.color = "red";
+                    msgBox.innerText = err.message === "Unauthorized" ? "Session expired." : "Error uploading image.";
+                    publishBtn.disabled = false; publishBtn.style.opacity = "1";
                     publishBtn.innerText = editingId ? "Save Changes" : "Publish";
                     return;
                 }
-            } else {
-                publishBtn.innerText = "Saving...";
             }
 
+            publishBtn.innerText = "Saving...";
             const method = editingId ? "PUT" : "POST";
             const endpoint = editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`;
 
             try {
                 const res = await fetch(endpoint, {
                     method: method,
-                    headers: { 
-                        "Content-Type": "application/json",
-                        "x-admin-password": secretKey 
-                    },
+                    headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
                     body: JSON.stringify({ title: title, text: text, image_url: finalImageUrl })
                 });
 
-                if (res.status === 401) {
-                    msgBox.style.color = "red";
-                    msgBox.innerText = "Unauthorized. Wrong password.";
-                    handleLogout();
-                    document.getElementById('login-error').style.display = 'block';
-                    publishBtn.disabled = false;
-                    publishBtn.style.opacity = "1";
-                    publishBtn.innerText = editingId ? "Save Changes" : "Publish";
-                    return;
-                }
-
+                if (res.status === 401) throw new Error("Unauthorized");
                 if (!res.ok) throw new Error();
 
-                // 🟢 ZELENÝ STAV ÚSPECHU
+                // 🟢 ZMENA: Len zelený TEXT, pozadie ostáva čierne
                 publishBtn.style.opacity = "1";
-                publishBtn.style.background = "#34C759"; 
-                publishBtn.style.borderColor = "#34C759";
-                publishBtn.style.color = "#ffffff";
+                publishBtn.style.color = "#34C759"; 
                 publishBtn.innerText = editingId ? "Updated." : "Published.";
                 
-                // Načítanie nového feedu na pozadí, kým sa užívateľ pozerá na zelené tlačidlo
                 await fetchStatuses(true); 
 
-                // Počkáme 1.5 sekundy a presmerujeme
                 setTimeout(() => {
-                    cancelEdit(); // Vyčistí formulár a resetne tlačidlo na čierny 'Publish'
-                    showSection('feed'); // Presmerovanie na feed
+                    cancelEdit(); // Resetuje stavy aj zámok tlačidla
+                    showSection('feed'); 
                 }, 1500);
 
             } catch (err) {
@@ -731,71 +655,33 @@
             const skip = (page - 1) * adminPostsPerPage;
             const container = document.getElementById('admin-posts-container');
             const paginationControls = document.getElementById('admin-pagination-controls');
-            
             container.innerHTML = '<p class="loading-text">Loading...</p>';
             paginationControls.style.display = 'none';
-            
             try {
                 const res = await fetch(`${API_URL}/posts?skip=${skip}&limit=${adminPostsPerPage}`);
-                if (res.status === 401) {
-                    handleLogout();
-                    return;
-                }
+                if (res.status === 401) { handleLogout(); return; }
                 currentAdminPosts = await res.json();
                 renderAdminList();
-            } catch (e) {
-                container.innerHTML = '<p class="loading-text" style="color:red;">Error loading posts.</p>';
-            }
+            } catch (e) { container.innerHTML = '<p class="loading-text" style="color:red;">Error loading posts.</p>'; }
         }
 
-        function changeAdminPage(dir) {
-            fetchAdminPosts(adminCurrentPage + dir);
-        }
+        function changeAdminPage(dir) { fetchAdminPosts(adminCurrentPage + dir); }
 
         function renderAdminList() {
             const container = document.getElementById('admin-posts-container');
             const paginationControls = document.getElementById('admin-pagination-controls');
-            
             if (currentAdminPosts.length === 0 && adminCurrentPage === 1) {
                 container.innerHTML = '<p class="loading-text">No posts found.</p>';
-                paginationControls.style.display = 'none';
-                return;
+                paginationControls.style.display = 'none'; return;
             }
-
-            if (currentAdminPosts.length === 0 && adminCurrentPage > 1) {
-                fetchAdminPosts(adminCurrentPage - 1);
-                return;
-            }
-
+            if (currentAdminPosts.length === 0 && adminCurrentPage > 1) { fetchAdminPosts(adminCurrentPage - 1); return; }
             container.innerHTML = currentAdminPosts.map(p => {
-                let displayTitle = p.title;
-                if (!displayTitle || displayTitle.trim() === "") {
-                    displayTitle = p.text ? p.text.substring(0, 30) + (p.text.length > 30 ? '...' : '') : 'Photo post';
-                }
-
-                const thumbHtml = p.image_url 
-                    ? `<img src="${p.image_url}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" alt="thumb" loading="lazy">` 
-                    : '';
-
+                let displayTitle = p.title || (p.text ? p.text.substring(0, 30) + '...' : 'Photo post');
+                const thumbHtml = p.image_url ? `<img src="${p.image_url}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" alt="thumb" loading="lazy">` : '';
                 const d = new Date(p.at);
                 const postDate = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.`;
-
-                return `
-                <div class="admin-card">
-                    <div style="display: flex; align-items: center; gap: 10px; overflow: hidden; flex-grow: 1;">
-                        <span style="color: var(--grey-50); font-size: var(--size-small); white-space: nowrap; flex-shrink: 0;">ID: ${p.id}</span>
-                        <span style="color: var(--grey-50); font-size: var(--size-small); white-space: nowrap; flex-shrink: 0;">• ${postDate}</span>
-                        ${thumbHtml}
-                        <span style="font-weight: 700; font-size: var(--size-small); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${displayTitle}</span>
-                    </div>
-                    <div style="display: flex; gap: 15px; flex-shrink: 0; margin-left: 10px;">
-                        <button onclick="startEdit(${p.id})" class="admin-action-btn admin-action-link" style="margin: 0;">Edit</button>
-                        <button onclick="deletePost(${p.id})" class="admin-action-btn admin-action-link" style="color: red; margin: 0;">Delete</button>
-                    </div>
-                </div>
-                `;
+                return `<div class="admin-card"><div style="display: flex; align-items: center; gap: 10px; overflow: hidden; flex-grow: 1;"><span style="color: var(--grey-50); font-size: var(--size-small); white-space: nowrap; flex-shrink: 0;">ID: ${p.id}</span><span style="color: var(--grey-50); font-size: var(--size-small); white-space: nowrap; flex-shrink: 0;">• ${postDate}</span>${thumbHtml}<span style="font-weight: 700; font-size: var(--size-small); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${displayTitle}</span></div><div style="display: flex; gap: 15px; flex-shrink: 0; margin-left: 10px;"><button onclick="startEdit(${p.id})" class="admin-action-btn admin-action-link" style="margin: 0;">Edit</button><button onclick="deletePost(${p.id})" class="admin-action-btn admin-action-link" style="color: red; margin: 0;">Delete</button></div></div>`;
             }).join('');
-
             document.getElementById('admin-page-info').innerText = `Page ${adminCurrentPage}`;
             document.getElementById('admin-prev-btn').style.visibility = adminCurrentPage > 1 ? 'visible' : 'hidden';
             document.getElementById('admin-next-btn').style.visibility = currentAdminPosts.length === adminPostsPerPage ? 'visible' : 'hidden';
@@ -805,46 +691,32 @@
         function startEdit(id) {
             const post = currentAdminPosts.find(p => p.id === id);
             if(!post) return;
-            editingId = id;
-            currentImageUrl = post.image_url || null;
-            removeImageFlag = false; 
-
+            editingId = id; currentImageUrl = post.image_url || null; removeImageFlag = false; 
             document.getElementById('edit-title').value = post.title || "";
             document.getElementById('edit-text').value = post.text || "";
             document.getElementById('edit-image').value = ""; 
-            
             document.getElementById('file-name-display').innerText = "(Optional)";
             document.getElementById('file-name-display').style.color = "var(--grey-50)";
             document.getElementById('clear-file-btn').style.display = "none";
-
-            if (post.image_url) {
-                document.getElementById('current-image-container').style.display = 'flex';
-            } else {
-                document.getElementById('current-image-container').style.display = 'none';
-            }
-
+            document.getElementById('current-image-container').style.display = post.image_url ? 'flex' : 'none';
             document.getElementById('publish-btn').innerText = "Save Changes";
             document.getElementById('cancel-btn-container').style.display = "block";
-            
             switchAdminTab('editor');
         }
 
+        // 🚀 ZMENA: Re-aktivácia tlačidla pridaná sem
         function cancelEdit() {
-            editingId = null;
-            currentImageUrl = null;
-            removeImageFlag = false;
-
+            editingId = null; currentImageUrl = null; removeImageFlag = false;
             document.getElementById('edit-title').value = "";
             document.getElementById('edit-text').value = "";
             document.getElementById('edit-image').value = "";
             document.getElementById('current-image-container').style.display = 'none';
-            
             document.getElementById('file-name-display').innerText = "(Optional)";
             document.getElementById('file-name-display').style.color = "var(--grey-50)";
             document.getElementById('clear-file-btn').style.display = "none";
             
-            // Re-nastavenie zruší aj zelenú farbu (ak by bola aplikovaná)
             const publishBtn = document.getElementById('publish-btn');
+            publishBtn.disabled = false; // <--- DÔLEŽITÉ: Odomknutie pre ďalší post
             publishBtn.innerText = "Publish";
             publishBtn.style.background = "var(--black)";
             publishBtn.style.borderColor = "var(--black)";
@@ -853,69 +725,35 @@
         }
 
         async function deletePost(id) {
-            if(!confirm("Are you sure you want to delete this post?")) return;
+            if(!confirm("Are you sure?")) return;
             try {
-                const res = await fetch(`${API_URL}/posts/${id}`, {
-                    method: "DELETE",
-                    headers: { "x-admin-password": secretKey }
-                });
-                
-                if (res.status === 401) {
-                    handleLogout();
-                    document.getElementById('login-error').style.display = 'block';
-                    return;
-                }
-                fetchStatuses(true); 
-                fetchAdminPosts(adminCurrentPage); 
-            } catch(e) {
-                alert("Error deleting post.");
-            }
+                const res = await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
+                if (res.status === 401) { handleLogout(); return; }
+                fetchStatuses(true); fetchAdminPosts(adminCurrentPage); 
+            } catch(e) { alert("Error."); }
         }
 
         function resetDeleteButton() {
             const btn = document.getElementById('delete-all-btn');
-            btn.dataset.state = "0";
-            btn.innerText = "Delete All Posts";
-            btn.style.opacity = "1";
-            btn.disabled = false;
+            btn.dataset.state = "0"; btn.innerText = "Delete All Posts"; btn.style.opacity = "1"; btn.disabled = false;
         }
 
         function handleDeleteAllClick() {
             const btn = document.getElementById('delete-all-btn');
             const state = btn.dataset.state || "0";
-
             if (state === "0") {
-                btn.dataset.state = "1";
-                btn.innerText = "Are you sure? Click to confirm";
-                
+                btn.dataset.state = "1"; btn.innerText = "Are you sure? Click to confirm";
                 clearTimeout(deleteConfirmTimeout);
-                deleteConfirmTimeout = setTimeout(() => {
-                    resetDeleteButton();
-                }, 3000);
-                
+                deleteConfirmTimeout = setTimeout(() => { resetDeleteButton(); }, 3000);
             } else if (state === "1") {
-                clearTimeout(deleteConfirmTimeout);
-                btn.dataset.state = "2";
-                countdownValue = 5;
+                clearTimeout(deleteConfirmTimeout); btn.dataset.state = "2"; countdownValue = 5;
                 btn.innerText = `Deleting in ${countdownValue}... Click to cancel`;
-                
                 deleteCountdownInterval = setInterval(() => {
                     countdownValue--;
-                    if (countdownValue > 0) {
-                        btn.innerText = `Deleting in ${countdownValue}... Click to cancel`;
-                    } else {
-                        clearInterval(deleteCountdownInterval);
-                        btn.innerText = "Deleting everything...";
-                        btn.style.opacity = "0.7";
-                        btn.disabled = true;
-                        executeDeleteAll();
-                    }
+                    if (countdownValue > 0) btn.innerText = `Deleting in ${countdownValue}... Click to cancel`;
+                    else { clearInterval(deleteCountdownInterval); btn.innerText = "Deleting everything..."; btn.style.opacity = "0.7"; btn.disabled = true; executeDeleteAll(); }
                 }, 1000);
-                
-            } else if (state === "2") {
-                clearInterval(deleteCountdownInterval);
-                resetDeleteButton();
-            }
+            } else if (state === "2") { clearInterval(deleteCountdownInterval); resetDeleteButton(); }
         }
 
         async function executeDeleteAll() {
@@ -924,31 +762,14 @@
                 while(deleting) {
                     const res = await fetch(`${API_URL}/posts?skip=0&limit=50`);
                     const posts = await res.json();
-                    
-                    if (posts.length === 0) {
-                        deleting = false;
-                        break;
-                    }
-                    
-                    for (const p of posts) {
-                        await fetch(`${API_URL}/posts/${p.id}`, { 
-                            method: "DELETE", 
-                            headers: { "x-admin-password": secretKey } 
-                        });
-                    }
+                    if (posts.length === 0) { deleting = false; break; }
+                    for (const p of posts) await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
                 }
-                fetchStatuses(true);
-                fetchAdminPosts(1);
-            } catch(e) {
-                alert("An error occurred while deleting all posts.");
-            } finally {
-                resetDeleteButton();
-            }
+                fetchStatuses(true); fetchAdminPosts(1);
+            } catch(e) { alert("Error."); } finally { resetDeleteButton(); }
         }
 
-        fetchStatuses(true);
-        checkSavedLogin(); 
-        
+        fetchStatuses(true); checkSavedLogin(); 
         menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
         document.addEventListener('click', (e) => { 
             if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); 
