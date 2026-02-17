@@ -254,9 +254,7 @@
             </div>
 
             <div id="menu-admin-section" style="display: none; flex-direction: column; gap: 15px;">
-                <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="margin-bottom: 0;" onclick="handleDeleteAllClick()">Delete All Posts</button>
-                <div style="width: 100%; height: 1px; background-color: var(--divider); margin: 5px 0;"></div>
-                <button onclick="handleLogout()" class="admin-action-btn admin-action-link" style="margin: 0; text-align: left; font-weight: 700;">Logout</button>
+                <button onclick="handleLogout()" class="admin-action-btn admin-action-link" style="margin: 0; text-align: left; font-weight: 400;">Logout</button>
             </div>
         </div>
     </nav>
@@ -272,8 +270,16 @@
                         <input type="text" id="quick-text" placeholder="Quick thought..." required style="flex-grow: 1; border: none; background: transparent; padding: var(--input-padding); color: var(--black); font-family: inherit; font-size: var(--size-small); outline: none;">
                         <button type="submit" id="quick-btn" style="width: 120px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: none; background: var(--black); color: var(--white); font-family: inherit; font-size: var(--size-small); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease;">Post</button>
                     </form>
-                    <div style="text-align: right; margin-top: 10px;">
-                        <button type="button" class="admin-action-btn admin-action-link" style="margin: 0; color: var(--grey-50);" onclick="toggleAdvancedEditor(true)">+ Add image or title</button>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn secondary-btn" style="flex-grow: 1; margin: 0; padding: 12px; display: flex; align-items: center; justify-content: center;" onclick="handleDeleteAllClick()">Delete All Posts</button>
+                        
+                        <button type="button" class="submit-btn" style="width: 120px; flex-shrink: 0; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
@@ -312,7 +318,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.9.0 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.9.1 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -373,7 +379,7 @@
             
             if (rememberMe) localStorage.setItem('adminSecretKey', secretKey);
             
-            passInput.value = ''; // vyčistíme po prihlásení
+            passInput.value = ''; 
             activateAdminUI();
             closeMenu();
         }
