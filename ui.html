@@ -30,6 +30,9 @@
              
             /* ABSOLUTE 12px SYSTEM SPACING */
             --gap-item: 12px; 
+            
+            /* UNIFIED LETTER SPACING */
+            --letter-spacing: 0.05em;
 
             --glass-opacity: 0.6; 
             --glass-blur: 25px;   
@@ -51,6 +54,7 @@
             box-sizing: border-box; 
             font-weight: 400; 
             font-family: 'Space Grotesk', sans-serif; 
+            letter-spacing: var(--letter-spacing); /* APPLIED GLOBALLY */
         }
 
         body {
@@ -87,7 +91,7 @@
 
         .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
         .header-left svg { height: 24px; width: auto; display: block; }
-        .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); letter-spacing: 0.05em; white-space: nowrap; margin: 0; }
+        .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; }
 
         .menu-toggle { width: 24px; height: 12px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; z-index: 2100; }
         .line { width: 24px; height: 1px; background-color: var(--black); transition: transform 0.3s ease, background-color 0.3s ease; }
@@ -113,7 +117,7 @@
             display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); 
         }
         
-        .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; display: inline-block; padding: 0; border: none; background: transparent; text-align: left; margin: 0; }
+        .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; display: inline-block; padding: 0; border: none; background: transparent; text-align: left; margin: 0; }
 
         main {
             padding: calc(48px + var(--gap-item)) var(--gap-item) var(--gap-item); 
@@ -145,7 +149,7 @@
         .status-card:first-child { padding-top: 0; }
         .status-card:last-child { border-bottom: none; }
 
-        .status-date { font-size: var(--size-small); color: var(--grey-50); display: block; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+        .status-date { font-size: var(--size-small); color: var(--grey-50); display: block; text-transform: uppercase; margin: 0; }
         .status-title { font-size: var(--size-large); margin: 0; color: var(--black); }
         .status-image { width: 100%; height: auto; border-radius: var(--border-radius); display: block; margin: 0; border: none; }
         .status-text { font-size: var(--size-small); color: var(--black); opacity: 0.8; white-space: pre-line; text-align: justify; margin: 0; word-wrap: break-word; }
@@ -167,7 +171,7 @@
         }
 
         .submit-btn {
-            background: var(--black); color: var(--white); text-transform: uppercase; letter-spacing: 0.1em; 
+            background: var(--black); color: var(--white); text-transform: uppercase; 
             cursor: pointer; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .secondary-btn { background: transparent; color: var(--black); }
@@ -183,7 +187,7 @@
         .checkbox-wrapper input:checked ~ .checkmark::after { display: block; }
         .checkbox-label-text { font-size: var(--size-small); color: var(--black); margin: 0; }
 
-        .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; letter-spacing: 0.1em; text-align: left; margin: 0; }
+        .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; text-align: left; margin: 0; }
     </style>
 </head>
 <body>
@@ -209,7 +213,7 @@
             <div id="menu-login-section">
                 <form onsubmit="handleLogin(event)" style="display: flex; height: 40px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent; margin: 0; gap: 0;">
                     <input type="password" id="admin-pass" placeholder="Password..." required style="flex-grow: 1; height: 100%; border: none; background: transparent; padding: 0 var(--gap-item); color: var(--black); outline: none; font-size: var(--size-small); margin: 0;">
-                    <button type="submit" id="login-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: var(--size-small); margin: 0;">LOG IN</button>
+                    <button type="submit" id="login-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: var(--size-small); margin: 0;">LOG IN</button>
                 </form>
                 
                 <label class="checkbox-wrapper">
@@ -225,7 +229,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.0.13 • 2026</div>
+            <div class="footer-info">build v3.0.14 • 2026</div>
         </div>
     </nav>
 
@@ -238,7 +242,7 @@
                 <div id="quick-post-wrapper">
                     <form onsubmit="handleQuickPost(event)" style="display: flex; height: 40px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent; margin: 0; gap: 0;">
                         <input type="text" id="quick-text" placeholder="Quick thought..." required style="flex-grow: 1; height: 100%; border: none; background: transparent; padding: 0 var(--gap-item); color: var(--black); outline: none; font-size: var(--size-small); margin: 0;">
-                        <button type="submit" id="quick-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: var(--size-small); margin: 0;">POST</button>
+                        <button type="submit" id="quick-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: var(--size-small); margin: 0;">POST</button>
                     </form>
                     
                     <div style="display: flex; gap: var(--gap-item); height: 40px; margin: 0;">
