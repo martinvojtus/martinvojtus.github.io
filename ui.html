@@ -133,7 +133,6 @@
         .status-date {
             font-size: var(--size-small); 
             color: var(--grey-50);
-            margin-bottom: 12px; 
             display: block;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -273,7 +272,7 @@
         <div id="section-feed" class="content-section active">
             <h2 style="font-size: var(--size-large); margin: 0 0 var(--gap-item) 0;">Feed.</h2>
             
-            <div id="quick-post-container" style="display: none; margin-bottom: var(--gap-item);">
+            <div id="quick-post-container" style="display: none; margin-bottom: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider);">
                 <form onsubmit="handleQuickPost(event)" style="display: flex; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent;">
                     
                     <input type="text" id="quick-text" placeholder="Quick thought..." required style="flex-grow: 1; border: none; background: transparent; padding: var(--input-padding); color: var(--black); font-family: inherit; font-size: var(--size-small); outline: none;">
@@ -374,7 +373,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.8.11 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.8.12 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -411,6 +410,19 @@
             window.scrollTo(0, 0);
             if(sectionId === 'feed') {
                 window.scrollTo(0, 0);
+            }
+        }
+
+        // --- Nová funkcia na rýchly refresh Feedu po prihlásení/odhlásení ---
+        function refreshFeedUI() {
+            const container = document.getElementById('status-container');
+            if (globalPosts.length > 0) {
+                container.innerHTML = '';
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = globalPosts.map(s => renderSinglePost(s)).join('');
+                while(tempDiv.firstChild) {
+                    container.appendChild(tempDiv.firstChild);
+                }
             }
         }
 
@@ -560,9 +572,22 @@
                 textHtml = `<div class="status-text">${linkify(s.text)}</div>`;
             }
 
+            // Nové Inline Admin funkcie vo Feede
+            let adminActionsHtml = '';
+            if (secretKey) {
+                adminActionsHtml = `
+                <div style="display: flex; gap: 15px; align-items: baseline;">
+                    <button onclick="showSection('admin'); startEdit(${s.id});" class="admin-action-btn admin-action-link" style="margin: 0; padding: 0;">Edit</button>
+                    <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn admin-action-link" style="color: var(--black); margin: 0; padding: 0;">Delete</button>
+                </div>`;
+            }
+
             return `
             <div class="status-card">
-                <span class="status-date">${date} • ${time}</span>
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
+                    <span class="status-date" style="margin-bottom: 0;">${date} • ${time}</span>
+                    ${adminActionsHtml}
+                </div>
                 ${titleHtml}
                 ${imageHtml}
                 ${textHtml}
@@ -584,6 +609,7 @@
             document.getElementById('quick-post-container').style.display = 'block'; 
             document.getElementById('login-error').style.display = 'none';
             switchAdminTab('editor'); 
+            refreshFeedUI(); // Aktualizuje Feed s Admin tlačidlami
         }
 
         function handleLogout() {
@@ -599,6 +625,7 @@
             document.getElementById('quick-post-container').style.display = 'none'; 
             cancelEdit();
             resetDeleteButton(); 
+            refreshFeedUI(); // Skryje Admin tlačidlá z Feedu
         }
 
         function flagImageForRemoval() {
@@ -866,8 +893,10 @@
             paginationControls.style.display = 'flex';
         }
 
+        // --- Upravený startEdit, aby vedel zobrať dáta aj priamo z Feedu (z globalPosts) ---
         function startEdit(id) {
-            const post = currentAdminPosts.find(p => p.id === id);
+            // Skúsi nájsť v currentAdminPosts (Manage tab) alebo v globalPosts (Feed tab)
+            const post = currentAdminPosts.find(p => p.id === id) || globalPosts.find(p => p.id === id);
             if(!post) return;
             editingId = id;
             currentImageUrl = post.image_url || null;
@@ -913,6 +942,7 @@
             document.getElementById('cancel-btn-container').style.display = "none";
         }
 
+        // Pôvodné mazanie v záložke Manage
         async function handleDeleteSingle(id) {
             const btn = document.getElementById(`del-btn-${id}`);
             
@@ -947,6 +977,51 @@
                 
                 btn.timeoutId = setTimeout(() => {
                     if (document.getElementById(`del-btn-${id}`)) {
+                        btn.dataset.confirm = "false";
+                        btn.innerText = "Delete";
+                    }
+                }, 3000);
+            }
+        }
+
+        // --- Nové mazanie príspevkov priamo z Feedu ---
+        async function handleDeleteFeed(id) {
+            const btn = document.getElementById(`feed-del-btn-${id}`);
+            
+            if (btn.dataset.confirm === "true") {
+                clearTimeout(btn.timeoutId);
+                btn.innerText = "Deleting...";
+                btn.disabled = true;
+                
+                try {
+                    const res = await fetch(`${API_URL}/posts/${id}`, {
+                        method: "DELETE",
+                        headers: { "x-admin-password": secretKey }
+                    });
+                    
+                    if (res.status === 401) {
+                        handleLogout();
+                        document.getElementById('login-error').style.display = 'block';
+                        return;
+                    }
+                    fetchStatuses(true); 
+                    // Ak má náhodou otvorenú aj stránku manage, tak refreshneme aj tú
+                    if(document.getElementById('admin-manage-view').style.display === 'block') {
+                        fetchAdminPosts(adminCurrentPage);
+                    }
+                } catch(e) {
+                    alert("Error deleting post.");
+                    btn.innerText = "Delete";
+                    btn.disabled = false;
+                    btn.dataset.confirm = "false";
+                }
+            } else {
+                btn.dataset.confirm = "true";
+                btn.innerText = "Confirm";
+                btn.style.fontWeight = "400";
+                
+                btn.timeoutId = setTimeout(() => {
+                    if (document.getElementById(`feed-del-btn-${id}`)) {
                         btn.dataset.confirm = "false";
                         btn.innerText = "Delete";
                     }
