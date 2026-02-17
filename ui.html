@@ -332,12 +332,12 @@
             </div>
 
             <div id="menu-admin-section" style="display: none;">
-                <button onclick="handleLogout()" class="menu-link" style="text-decoration: underline; text-transform: uppercase;">LOGOUT</button>
+                <button onclick="handleLogout()" class="menu-link" style="text-decoration: underline;">Logout</button>
             </div>
             
             <div style="width: 100%; height: 1px; background-color: var(--divider); margin: var(--gap-item) 0;"></div>
 
-            <div class="footer-info">build v2.10.4 • 2026</div>
+            <div class="footer-info">build v2.10.5 • 2026</div>
         </div>
     </nav>
 
@@ -371,15 +371,15 @@
                         
                         <div id="current-image-container" style="display: none; margin-bottom: var(--gap-item); font-size: var(--size-small); align-items: center;">
                             <span style="color: var(--grey-50);">Attached image </span>
-                            <button type="button" class="admin-action-btn admin-action-link" style="color: var(--black); margin-left: 15px; text-transform: uppercase;">REMOVE</button>
+                            <button type="button" class="admin-action-btn admin-action-link" style="color: var(--black); margin-left: 15px;">Remove</button>
                         </div>
 
                         <div class="form-group">
                             <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateFileName()">
                             <div class="form-input" style="cursor: pointer;" onclick="document.getElementById('edit-image').click()">
-                                <span class="admin-action-btn admin-action-link" style="margin: 0 15px 0 0; pointer-events: none; text-transform: uppercase;">UPLOAD IMAGE</span>
+                                <span class="admin-action-btn admin-action-link" style="margin: 0 15px 0 0; pointer-events: none;">Upload image</span>
                                 <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small);">(Optional)</span>
-                                <button type="button" id="clear-file-btn" class="admin-action-btn admin-action-link" style="color: var(--black); margin: 0; display: none; padding: 0; flex-shrink: 0; text-transform: uppercase;">REMOVE</button>
+                                <button type="button" id="clear-file-btn" class="admin-action-btn admin-action-link" style="color: var(--black); margin: 0; display: none; padding: 0; flex-shrink: 0;">Remove</button>
                             </div>
                         </div>
 
@@ -566,7 +566,7 @@
                 const updateObj = new Date(s.updated_at);
                 const updateDate = updateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
                 const updateTime = updateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-                editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin-top: 12px;">(EDITED: ${updateDate.toUpperCase()} • ${updateTime})</div>`;
+                editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin-top: 12px;">(Edited: ${updateDate} • ${updateTime})</div>`;
             }
             const titleHtml = (s.title && s.title.trim() !== "") ? `<h3 class="status-title">${s.title}</h3>` : '';
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image" loading="lazy">` : '';
@@ -575,8 +575,8 @@
             if (secretKey) {
                 adminActionsHtml = `
                 <div style="display: flex; gap: 15px; align-items: baseline;">
-                    <button onclick="startEdit(${s.id});" class="admin-action-btn admin-action-link" style="margin: 0; padding: 0; text-transform: uppercase;">EDIT</button>
-                    <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn admin-action-link" style="color: var(--black); margin: 0; padding: 0; text-transform: uppercase;">DELETE</button>
+                    <button onclick="startEdit(${s.id});" class="admin-action-btn admin-action-link" style="margin: 0; padding: 0;">Edit</button>
+                    <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn admin-action-link" style="color: var(--black); margin: 0; padding: 0;">Delete</button>
                 </div>`;
             }
             return `
