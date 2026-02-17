@@ -96,20 +96,16 @@
         .menu-items { 
             width: 100%; 
             max-width: var(--content-width); 
-            display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 20px; 
+            display: flex; flex-direction: column; padding: 0 20px; 
         }
         
-        .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; }
+        .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; display: inline-block; padding: 10px 0; }
 
         main {
             padding: 70px 20px 0px; 
             width: 100%; max-width: var(--content-width); 
             flex-grow: 1;
         }
-
-        .content-section { display: none; animation: fadeIn 0.4s ease; }
-        .content-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- STATUS FEED --- */
         .status-feed {
@@ -175,7 +171,6 @@
         }
 
         /* --- FORMULÁRE --- */
-        .contact-form { margin-top: 0; max-width: 540px; width: 100%; }
         .form-group { margin-bottom: var(--gap-item); }
         
         .form-input, .form-textarea, .submit-btn { 
@@ -220,30 +215,6 @@
             text-decoration: underline;
         }
 
-        /* Vylepšený dizajn Manage riadku bez rámčeka */
-        .admin-card {
-            border: none;
-            border-bottom: 1px solid var(--divider);
-            padding: 16px 0; 
-            margin-bottom: 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .admin-card:last-child {
-            border-bottom: none;
-        }
-
-        .admin-tabs {
-            display: flex; 
-            justify-content: space-between; 
-            align-items: baseline; 
-            border-bottom: 1px solid var(--divider); 
-            padding-bottom: 16px; 
-            margin-bottom: var(--gap-item);
-        }
-
         footer {
             width: 100%; max-width: var(--content-width); padding: 40px 20px 30px; 
             display: flex; flex-direction: column; align-items: center;
@@ -255,7 +226,7 @@
 
     <header>
         <div class="header-content">
-            <div class="logo-link" onclick="showSection('feed')">
+            <div class="logo-link" onclick="window.scrollTo(0,0)">
                 <div class="header-left">
                     <svg xmlns="http://www.w3.org/2000/svg" width="935.31" height="810" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
                 </div>
@@ -267,70 +238,47 @@
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
-            <a class="menu-link" onclick="showSection('feed')"><span>Feed</span></a>
-            <a class="menu-link" onclick="showSection('contact')"><span>Contact</span></a>
-            <a class="menu-link" onclick="showSection('admin')"><span>Admin</span></a>
+            <a class="menu-link" onclick="window.scrollTo(0,0); closeMenu();"><span>Feed</span></a>
+            
+            <div style="width: 100%; height: 1px; background-color: var(--divider); margin: 10px 0 20px 0;"></div>
+            
+            <div id="menu-login-section">
+                <form onsubmit="handleLogin(event)" style="display: flex; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent;">
+                    <input type="password" id="admin-pass" placeholder="Password..." required style="flex-grow: 1; border: none; background: transparent; padding: var(--input-padding); color: var(--black); font-family: inherit; font-size: var(--size-small); outline: none;">
+                    <button type="submit" id="login-btn" style="width: 120px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: none; background: var(--black); color: var(--white); font-family: inherit; font-size: var(--size-small); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease;">Log In</button>
+                </form>
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 15px;">
+                    <input type="checkbox" id="remember-me" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--black);">
+                    <label for="remember-me" style="font-size: var(--size-small); color: var(--black); cursor: pointer; user-select: none;">Stay logged in</label>
+                </div>
+            </div>
+
+            <div id="menu-admin-section" style="display: none; flex-direction: column; gap: 15px;">
+                <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="margin-bottom: 0;" onclick="handleDeleteAllClick()">Delete All Posts</button>
+                <div style="width: 100%; height: 1px; background-color: var(--divider); margin: 5px 0;"></div>
+                <button onclick="handleLogout()" class="admin-action-btn admin-action-link" style="margin: 0; text-align: left; font-weight: 700;">Logout</button>
+            </div>
         </div>
     </nav>
 
     <main>
-        <div id="section-feed" class="content-section active">
+        <div id="section-feed">
             <h2 style="font-size: var(--size-large); margin: 0 0 var(--gap-item) 0;">Feed.</h2>
             
-            <div id="quick-post-container" style="display: none; margin-bottom: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider);">
-                <form onsubmit="handleQuickPost(event)" style="display: flex; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent;">
-                    
-                    <input type="text" id="quick-text" placeholder="Quick thought..." required style="flex-grow: 1; border: none; background: transparent; padding: var(--input-padding); color: var(--black); font-family: inherit; font-size: var(--size-small); outline: none;">
-                    
-                    <button type="submit" id="quick-btn" style="width: 120px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: none; background: var(--black); color: var(--white); font-family: inherit; font-size: var(--size-small); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease;">Post</button>
-                    
-                </form>
-            </div>
-
-            <div id="status-container" class="status-feed">
-                </div>
-            <div id="loading-indicator" class="loading-text">Loading...</div>
-        </div>
-
-        <div id="section-contact" class="content-section">
-            <h2 style="font-size: var(--size-large); margin: 0 0 var(--gap-item) 0;">Contact.</h2>
-            <form class="contact-form" action="https://formsubmit.co/martinvojtus@icloud.com" method="POST">
-                <input type="hidden" name="_captcha" value="false">
-                <div class="form-group"><input type="text" name="name" class="form-input" placeholder="Name" required></div>
-                <div class="form-group"><input type="email" name="email" class="form-input" placeholder="Email" required></div>
-                <div class="form-group"><textarea name="message" class="form-textarea" placeholder="Message" required></textarea></div>
-                <button type="submit" class="submit-btn">Send message</button>
-            </form>
-        </div>
-
-        <div id="section-admin" class="content-section">
-            <h2 style="font-size: var(--size-large); margin: 0 0 var(--gap-item) 0;">Admin.</h2>
-            
-            <div id="admin-login-view">
-                <form id="login-form" class="contact-form" onsubmit="handleLogin(event)">
-                    <div class="form-group"><input type="password" id="admin-pass" class="form-input" placeholder="Password" required></div>
-                    
-                    <div class="form-group" style="display: flex; align-items: center; gap: 8px; margin-top: -10px;">
-                        <input type="checkbox" id="remember-me" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--black);">
-                        <label for="remember-me" style="font-size: var(--size-small); color: var(--grey-50); cursor: pointer; user-select: none;">Stay logged in</label>
+            <div id="feed-admin-zone" style="display: none; margin-bottom: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider);">
+                
+                <div id="quick-post-wrapper">
+                    <form onsubmit="handleQuickPost(event)" style="display: flex; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent;">
+                        <input type="text" id="quick-text" placeholder="Quick thought..." required style="flex-grow: 1; border: none; background: transparent; padding: var(--input-padding); color: var(--black); font-family: inherit; font-size: var(--size-small); outline: none;">
+                        <button type="submit" id="quick-btn" style="width: 120px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: none; background: var(--black); color: var(--white); font-family: inherit; font-size: var(--size-small); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease;">Post</button>
+                    </form>
+                    <div style="text-align: right; margin-top: 10px;">
+                        <button type="button" class="admin-action-btn admin-action-link" style="margin: 0; color: var(--grey-50);" onclick="toggleAdvancedEditor(true)">+ Add image or title</button>
                     </div>
-
-                    <p id="login-error" style="color: var(--black); font-weight: 700; font-size: var(--size-small); display: none; margin-top: -10px; margin-bottom: 15px;">Invalid password.</p>
-                    <button type="submit" class="submit-btn">Login</button>
-                </form>
-            </div>
-
-            <div id="admin-dashboard-view" style="display: none;">
-                <div class="admin-tabs">
-                    <div style="display: flex; gap: 20px;">
-                        <button id="tab-editor" onclick="switchAdminTab('editor')" class="admin-action-btn" style="font-weight: 700; color: var(--black); margin: 0;">Editor.</button>
-                        <button id="tab-manage" onclick="switchAdminTab('manage')" class="admin-action-btn" style="color: var(--grey-50); margin: 0;">Manage.</button>
-                    </div>
-                    <button onclick="handleLogout()" class="admin-action-btn admin-action-link" style="margin: 0;">Logout</button>
                 </div>
 
-                <div id="admin-editor-view">
-                    <form id="editor-form" class="contact-form" onsubmit="handlePublish(event)">
+                <div id="full-editor-wrapper" style="display: none;">
+                    <form id="editor-form" onsubmit="handlePublish(event)" style="width: 100%;">
                         <div class="form-group"><input type="text" id="edit-title" class="form-input" placeholder="Title (Optional)"></div>
                         
                         <div id="current-image-container" style="display: none; margin-bottom: var(--gap-item); font-size: var(--size-small); align-items: center;">
@@ -351,32 +299,20 @@
 
                         <div class="form-group"><textarea id="edit-text" class="form-textarea" placeholder="Content (Optional if image attached)"></textarea></div>
                         
-                        <div class="form-group"><button type="submit" id="publish-btn" class="submit-btn">Publish</button></div>
-                        <div class="form-group" id="cancel-btn-container" style="display: none;"><button type="button" id="cancel-btn" class="submit-btn secondary-btn" onclick="cancelEdit()">Cancel Edit</button></div>
+                        <div class="form-group" style="margin-bottom: 12px;"><button type="submit" id="publish-btn" class="submit-btn">Publish</button></div>
+                        <div class="form-group" style="margin-bottom: 0;"><button type="button" id="cancel-btn" class="submit-btn secondary-btn" onclick="toggleAdvancedEditor(false)">Cancel</button></div>
                     </form>
                 </div>
 
-                <div id="admin-manage-view" style="display: none;">
-                    
-                    <div class="form-group" style="margin-bottom: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider);">
-                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" onclick="handleDeleteAllClick()">Delete All Posts</button>
-                    </div>
-                    
-                    <div id="admin-posts-container" class="status-feed" style="padding: 0;"></div>
-                    
-                    <div id="admin-pagination-controls" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; display: none;">
-                        <button id="admin-prev-btn" onclick="changeAdminPage(-1)" class="admin-action-btn admin-action-link" style="margin: 0;">Prev</button>
-                        <span id="admin-page-info" style="font-size: var(--size-small); color: var(--grey-50);"></span>
-                        <button id="admin-next-btn" onclick="changeAdminPage(1)" class="admin-action-btn admin-action-link" style="margin: 0;">Next</button>
-                    </div>
-                </div>
-
             </div>
+
+            <div id="status-container" class="status-feed"></div>
+            <div id="loading-indicator" class="loading-text">Loading...</div>
         </div>
     </main>
 
     <footer>
-        <div class="footer-info">build v2.8.14 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.9.0 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -391,10 +327,6 @@
         const postsLimit = 10;
         let isLoading = false;
         let hasMorePosts = true;
-
-        let adminCurrentPage = 1;
-        const adminPostsPerPage = 10;
-        let currentAdminPosts = [];
         
         let deleteConfirmTimeout;
         let deleteCountdownInterval;
@@ -403,17 +335,71 @@
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
         
-        function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
-        function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); }
-        
-        function showSection(sectionId) {
-            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-            document.getElementById('section-' + sectionId).classList.add('active');
-            closeMenu(); 
-            window.scrollTo(0, 0);
-            if(sectionId === 'feed') {
-                window.scrollTo(0, 0);
+        function toggleMenu(forceOpen = false) { 
+            if(forceOpen) {
+                menuToggle.classList.add('active'); 
+                navOverlay.classList.add('active');
+            } else {
+                menuToggle.classList.toggle('active'); 
+                navOverlay.classList.toggle('active'); 
             }
+        }
+        function closeMenu() { 
+            menuToggle.classList.remove('active'); 
+            navOverlay.classList.remove('active'); 
+        }
+
+        // --- Bezpečnosť a UI prepínanie ---
+        function checkSavedLogin() {
+            const savedKey = localStorage.getItem('adminSecretKey');
+            if (savedKey) {
+                secretKey = savedKey;
+                activateAdminUI();
+            }
+        }
+
+        function activateAdminUI() {
+            document.getElementById('menu-login-section').style.display = 'none';
+            document.getElementById('menu-admin-section').style.display = 'flex';
+            document.getElementById('feed-admin-zone').style.display = 'block';
+            refreshFeedUI();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const passInput = document.getElementById('admin-pass');
+            secretKey = passInput.value;
+            const rememberMe = document.getElementById('remember-me').checked;
+            
+            if (rememberMe) localStorage.setItem('adminSecretKey', secretKey);
+            
+            passInput.value = ''; // vyčistíme po prihlásení
+            activateAdminUI();
+            closeMenu();
+        }
+
+        function handleLogout() {
+            secretKey = "";
+            localStorage.removeItem('adminSecretKey');
+
+            document.getElementById('menu-admin-section').style.display = 'none';
+            document.getElementById('menu-login-section').style.display = 'block';
+            document.getElementById('feed-admin-zone').style.display = 'none';
+            
+            document.getElementById('remember-me').checked = false;
+            
+            toggleAdvancedEditor(false);
+            resetDeleteButton(); 
+            refreshFeedUI();
+            closeMenu(); 
+        }
+
+        function handleUnauthorized() {
+            handleLogout();
+            toggleMenu(true); 
+            const passInput = document.getElementById('admin-pass');
+            passInput.placeholder = "Invalid password.";
+            setTimeout(() => { passInput.placeholder = "Password..."; }, 3000);
         }
 
         function refreshFeedUI() {
@@ -428,36 +414,7 @@
             }
         }
 
-        function checkSavedLogin() {
-            const savedKey = localStorage.getItem('adminSecretKey');
-            if (savedKey) {
-                secretKey = savedKey;
-                document.getElementById('admin-login-view').style.display = 'none';
-                document.getElementById('admin-dashboard-view').style.display = 'block';
-                document.getElementById('quick-post-container').style.display = 'block'; 
-                switchAdminTab('editor');
-            }
-        }
-
-        function switchAdminTab(tab) {
-            if (tab === 'editor') {
-                document.getElementById('admin-editor-view').style.display = 'block';
-                document.getElementById('admin-manage-view').style.display = 'none';
-                document.getElementById('tab-editor').style.fontWeight = '700';
-                document.getElementById('tab-editor').style.color = 'var(--black)';
-                document.getElementById('tab-manage').style.fontWeight = '400';
-                document.getElementById('tab-manage').style.color = 'var(--grey-50)';
-            } else {
-                document.getElementById('admin-editor-view').style.display = 'none';
-                document.getElementById('admin-manage-view').style.display = 'block';
-                document.getElementById('tab-manage').style.fontWeight = '700';
-                document.getElementById('tab-manage').style.color = 'var(--black)';
-                document.getElementById('tab-editor').style.fontWeight = '400';
-                document.getElementById('tab-editor').style.color = 'var(--grey-50)';
-                fetchAdminPosts(1); 
-            }
-        }
-
+        // --- Nástroje ---
         function linkify(text) {
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             return text.replace(urlRegex, function(url) {
@@ -476,28 +433,17 @@
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
+                        if (width > maxWidth) { height = Math.round((height * maxWidth) / width); width = maxWidth; }
+                        canvas.width = width; canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-
-                        canvas.toBlob(blob => {
-                            resolve(new File([blob], file.name, {
-                                type: 'image/jpeg',
-                                lastModified: Date.now()
-                            }));
-                        }, 'image/jpeg', quality);
+                        canvas.toBlob(blob => { resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() })); }, 'image/jpeg', quality);
                     };
                 };
             });
         }
 
+        // --- Načítanie Feedov ---
         async function fetchStatuses(reset = false) {
             if (reset) {
                 currentOffset = 0;
@@ -506,10 +452,8 @@
                 document.getElementById('status-container').innerHTML = '';
                 document.getElementById('loading-indicator').style.display = 'block';
             }
-
             if (isLoading || !hasMorePosts) return;
             isLoading = true;
-
             const container = document.getElementById('status-container');
             const loader = document.getElementById('loading-indicator');
 
@@ -518,11 +462,7 @@
                 if (!response.ok) throw new Error();
                 const newPosts = await response.json();
                 
-                if (newPosts.length < postsLimit) {
-                    hasMorePosts = false;
-                    loader.style.display = 'none';
-                }
-
+                if (newPosts.length < postsLimit) { hasMorePosts = false; loader.style.display = 'none'; }
                 currentOffset += newPosts.length;
                 globalPosts = globalPosts.concat(newPosts);
                 
@@ -532,11 +472,8 @@
                 } else {
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = newPosts.map(s => renderSinglePost(s)).join('');
-                    while(tempDiv.firstChild) {
-                        container.appendChild(tempDiv.firstChild);
-                    }
+                    while(tempDiv.firstChild) container.appendChild(tempDiv.firstChild);
                 }
-                
             } catch (error) {
                 if (reset) container.innerHTML = `<p style="color:var(--black); font-weight:700; text-align:center;">Failed to load data.</p>`;
                 loader.style.display = 'none';
@@ -546,11 +483,7 @@
         }
 
         window.addEventListener('scroll', () => {
-            if (document.getElementById('section-feed').classList.contains('active')) {
-                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
-                    fetchStatuses();
-                }
-            }
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses();
         });
 
         function renderSinglePost(s) {
@@ -568,17 +501,13 @@
 
             const titleHtml = (s.title && s.title.trim() !== "") ? `<h3 class="status-title">${s.title}</h3>` : '';
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image" loading="lazy">` : '';
-            
-            let textHtml = '';
-            if (s.text && s.text.trim() !== "") {
-                textHtml = `<div class="status-text">${linkify(s.text)}</div>`;
-            }
+            let textHtml = (s.text && s.text.trim() !== "") ? `<div class="status-text">${linkify(s.text)}</div>` : '';
 
             let adminActionsHtml = '';
             if (secretKey) {
                 adminActionsHtml = `
                 <div style="display: flex; gap: 15px; align-items: baseline;">
-                    <button onclick="showSection('admin'); startEdit(${s.id});" class="admin-action-btn admin-action-link" style="margin: 0; padding: 0;">Edit</button>
+                    <button onclick="startEdit(${s.id});" class="admin-action-btn admin-action-link" style="margin: 0; padding: 0;">Edit</button>
                     <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn admin-action-link" style="color: var(--black); margin: 0; padding: 0;">Delete</button>
                 </div>`;
             }
@@ -596,37 +525,59 @@
             </div>`;
         }
 
-        function handleLogin(e) {
-            e.preventDefault();
-            secretKey = document.getElementById('admin-pass').value;
-            const rememberMe = document.getElementById('remember-me').checked;
+        // --- Logika Editora ---
+        function toggleAdvancedEditor(show) {
+            const qWrapper = document.getElementById('quick-post-wrapper');
+            const fWrapper = document.getElementById('full-editor-wrapper');
             
-            if (rememberMe) {
-                localStorage.setItem('adminSecretKey', secretKey);
-            }
+            if (show) {
+                qWrapper.style.display = 'none';
+                fWrapper.style.display = 'block';
+            } else {
+                editingId = null;
+                currentImageUrl = null;
+                removeImageFlag = false;
 
-            document.getElementById('admin-login-view').style.display = 'none';
-            document.getElementById('admin-dashboard-view').style.display = 'block';
-            document.getElementById('quick-post-container').style.display = 'block'; 
-            document.getElementById('login-error').style.display = 'none';
-            switchAdminTab('editor'); 
-            refreshFeedUI(); 
+                document.getElementById('edit-title').value = "";
+                document.getElementById('edit-text').value = "";
+                document.getElementById('edit-image').value = "";
+                document.getElementById('current-image-container').style.display = 'none';
+                document.getElementById('file-name-display').innerText = "(Optional)";
+                document.getElementById('file-name-display').style.color = "var(--grey-50)";
+                document.getElementById('clear-file-btn').style.display = "none";
+                
+                const publishBtn = document.getElementById('publish-btn');
+                publishBtn.disabled = false;
+                publishBtn.innerText = "Publish";
+
+                qWrapper.style.display = 'block';
+                fWrapper.style.display = 'none';
+            }
         }
 
-        function handleLogout() {
-            secretKey = "";
-            editingId = null;
+        function startEdit(id) {
+            const post = globalPosts.find(p => p.id === id);
+            if(!post) return;
             
-            localStorage.removeItem('adminSecretKey');
+            editingId = id;
+            currentImageUrl = post.image_url || null;
+            removeImageFlag = false; 
 
-            document.getElementById('admin-pass').value = '';
-            document.getElementById('remember-me').checked = false;
-            document.getElementById('admin-dashboard-view').style.display = 'none';
-            document.getElementById('admin-login-view').style.display = 'block';
-            document.getElementById('quick-post-container').style.display = 'none'; 
-            cancelEdit();
-            resetDeleteButton(); 
-            refreshFeedUI(); 
+            document.getElementById('edit-title').value = post.title || "";
+            document.getElementById('edit-text').value = post.text || "";
+            document.getElementById('edit-image').value = ""; 
+            
+            document.getElementById('file-name-display').innerText = "(Optional)";
+            document.getElementById('file-name-display').style.color = "var(--grey-50)";
+            document.getElementById('clear-file-btn').style.display = "none";
+
+            if (post.image_url) document.getElementById('current-image-container').style.display = 'flex';
+            else document.getElementById('current-image-container').style.display = 'none';
+
+            document.getElementById('publish-btn').innerText = "Save Changes";
+            
+            toggleAdvancedEditor(true);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function flagImageForRemoval() {
@@ -653,8 +604,7 @@
 
         function clearSelectedFile(e) {
             e.stopPropagation(); 
-            const input = document.getElementById('edit-image');
-            input.value = ""; 
+            document.getElementById('edit-image').value = ""; 
             updateFileName(); 
         }
 
@@ -671,53 +621,32 @@
             if (!text && !hasImage) {
                 publishBtn.innerText = "Add text or image.";
                 publishBtn.disabled = true;
-                setTimeout(() => {
-                    publishBtn.innerText = originalBtnText;
-                    publishBtn.disabled = false;
-                }, 2000);
+                setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 2000);
                 return;
             }
 
             publishBtn.disabled = true;
-
             let finalImageUrl = currentImageUrl;
-
-            if (removeImageFlag && !imageFile) {
-                finalImageUrl = null; 
-            }
+            if (removeImageFlag && !imageFile) finalImageUrl = null; 
 
             if (imageFile) {
                 publishBtn.innerText = "Compressing...";
                 const compressedFile = await compressImage(imageFile);
-                
                 const formData = new FormData();
                 formData.append("file", compressedFile);
 
                 try {
                     publishBtn.innerText = "Uploading...";
-                    const uploadRes = await fetch(`${API_URL}/upload-image`, {
-                        method: "POST",
-                        headers: { "x-admin-password": secretKey },
-                        body: formData
-                    });
-
+                    const uploadRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
                     if (uploadRes.status === 401) throw new Error("Unauthorized");
                     if (!uploadRes.ok) throw new Error("Upload failed");
-
                     const uploadData = await uploadRes.json();
                     finalImageUrl = uploadData.image_url;
                     publishBtn.innerText = "Saving...";
                 } catch (err) {
-                    if (err.message === "Unauthorized") {
-                        handleLogout();
-                        document.getElementById('login-error').style.display = 'block';
-                    } else {
-                        publishBtn.innerText = "Upload Error!";
-                        setTimeout(() => {
-                            publishBtn.innerText = originalBtnText;
-                            publishBtn.disabled = false;
-                        }, 2000);
-                    }
+                    if (err.message === "Unauthorized") return handleUnauthorized();
+                    publishBtn.innerText = "Upload Error!";
+                    setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 2000);
                     return;
                 }
             } else {
@@ -730,39 +659,19 @@
             try {
                 const res = await fetch(endpoint, {
                     method: method,
-                    headers: { 
-                        "Content-Type": "application/json",
-                        "x-admin-password": secretKey 
-                    },
+                    headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
                     body: JSON.stringify({ title: title, text: text, image_url: finalImageUrl })
                 });
 
-                if (res.status === 401) {
-                    handleLogout();
-                    document.getElementById('login-error').style.display = 'block';
-                    publishBtn.innerText = originalBtnText;
-                    publishBtn.disabled = false;
-                    return;
-                }
-
+                if (res.status === 401) return handleUnauthorized();
                 if (!res.ok) throw new Error();
 
                 publishBtn.innerText = editingId ? "Updated." : "Published.";
-                
                 await fetchStatuses(true); 
-
-                setTimeout(() => {
-                    document.activeElement.blur(); 
-                    cancelEdit(); 
-                    showSection('feed'); 
-                }, 1500);
-
+                setTimeout(() => { document.activeElement.blur(); toggleAdvancedEditor(false); }, 1500);
             } catch (err) {
                 publishBtn.innerText = "Connection Error!";
-                setTimeout(() => {
-                    publishBtn.innerText = originalBtnText;
-                    publishBtn.disabled = false;
-                }, 2000);
+                setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 2000);
             }
         }
 
@@ -773,264 +682,55 @@
             const btn = document.getElementById('quick-btn');
 
             if(!text) return;
-            
             btn.disabled = true;
             btn.innerText = "...";
             
             try {
                 const res = await fetch(`${API_URL}/posts`, {
                     method: "POST",
-                    headers: { 
-                        "Content-Type": "application/json",
-                        "x-admin-password": secretKey 
-                    },
+                    headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
                     body: JSON.stringify({ title: "", text: text, image_url: null })
                 });
 
-                if (res.status === 401) {
-                    handleLogout();
-                    showSection('admin');
-                    document.getElementById('login-error').style.display = 'block';
-                    btn.disabled = false;
-                    btn.innerText = "Post";
-                    return;
-                }
-
+                if (res.status === 401) return handleUnauthorized();
                 if(!res.ok) throw new Error();
 
                 inputField.value = "";
                 btn.innerText = "Posted.";
-                
                 await fetchStatuses(true);
                 
-                setTimeout(() => {
-                    btn.innerText = "Post";
-                    btn.disabled = false;
-                    document.activeElement.blur();
-                }, 1500);
-
+                setTimeout(() => { btn.innerText = "Post"; btn.disabled = false; document.activeElement.blur(); }, 1500);
             } catch(err) {
                 btn.innerText = "Error.";
-                setTimeout(() => {
-                    btn.innerText = "Post";
-                    btn.disabled = false;
-                }, 1500);
-            }
-        }
-
-        async function fetchAdminPosts(page) {
-            adminCurrentPage = page;
-            const skip = (page - 1) * adminPostsPerPage;
-            const container = document.getElementById('admin-posts-container');
-            const paginationControls = document.getElementById('admin-pagination-controls');
-            
-            container.innerHTML = '<p class="loading-text">Loading...</p>';
-            paginationControls.style.display = 'none';
-            
-            try {
-                const res = await fetch(`${API_URL}/posts?skip=${skip}&limit=${adminPostsPerPage}`);
-                if (res.status === 401) {
-                    handleLogout();
-                    return;
-                }
-                currentAdminPosts = await res.json();
-                renderAdminList();
-            } catch (e) {
-                container.innerHTML = '<p class="loading-text" style="color:var(--black); font-weight:700;">Error loading posts.</p>';
-            }
-        }
-
-        function changeAdminPage(dir) {
-            fetchAdminPosts(adminCurrentPage + dir);
-        }
-
-        function renderAdminList() {
-            const container = document.getElementById('admin-posts-container');
-            const paginationControls = document.getElementById('admin-pagination-controls');
-            
-            if (currentAdminPosts.length === 0 && adminCurrentPage === 1) {
-                container.innerHTML = '<p class="loading-text">No posts found.</p>';
-                paginationControls.style.display = 'none';
-                return;
-            }
-
-            if (currentAdminPosts.length === 0 && adminCurrentPage > 1) {
-                fetchAdminPosts(adminCurrentPage - 1);
-                return;
-            }
-
-            container.innerHTML = currentAdminPosts.map(p => {
-                let displayTitle = p.title;
-                if (!displayTitle || displayTitle.trim() === "") {
-                    displayTitle = p.text ? p.text.substring(0, 30) + (p.text.length > 30 ? '...' : '') : 'Photo post';
-                }
-
-                const thumbHtml = p.image_url 
-                    ? `<img src="${p.image_url}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" alt="thumb" loading="lazy">` 
-                    : '';
-
-                // Nové formátovanie dátumu na štýl FEB 17, 2026
-                const d = new Date(p.at);
-                const postDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
-
-                return `
-                <div class="admin-card">
-                    <div style="display: flex; align-items: center; gap: 10px; overflow: hidden; flex-grow: 1;">
-                        <span style="color: var(--grey-50); font-size: var(--size-small); white-space: nowrap; flex-shrink: 0;">ID: ${p.id}</span>
-                        <span style="color: var(--grey-50); font-size: var(--size-small); white-space: nowrap; flex-shrink: 0;">• ${postDate}</span>
-                        ${thumbHtml}
-                        <span style="font-weight: 700; font-size: var(--size-small); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${displayTitle}</span>
-                    </div>
-                    <div style="display: flex; gap: 15px; flex-shrink: 0; margin-left: 10px;">
-                        <button onclick="startEdit(${p.id})" class="admin-action-btn admin-action-link" style="margin: 0;">Edit</button>
-                        <button id="del-btn-${p.id}" onclick="handleDeleteSingle(${p.id})" class="admin-action-btn admin-action-link" style="color: var(--black); margin: 0;">Delete</button>
-                    </div>
-                </div>
-                `;
-            }).join('');
-
-            document.getElementById('admin-page-info').innerText = `Page ${adminCurrentPage}`;
-            document.getElementById('admin-prev-btn').style.visibility = adminCurrentPage > 1 ? 'visible' : 'hidden';
-            document.getElementById('admin-next-btn').style.visibility = currentAdminPosts.length === adminPostsPerPage ? 'visible' : 'hidden';
-            paginationControls.style.display = 'flex';
-        }
-
-        function startEdit(id) {
-            const post = currentAdminPosts.find(p => p.id === id) || globalPosts.find(p => p.id === id);
-            if(!post) return;
-            editingId = id;
-            currentImageUrl = post.image_url || null;
-            removeImageFlag = false; 
-
-            document.getElementById('edit-title').value = post.title || "";
-            document.getElementById('edit-text').value = post.text || "";
-            document.getElementById('edit-image').value = ""; 
-            
-            document.getElementById('file-name-display').innerText = "(Optional)";
-            document.getElementById('file-name-display').style.color = "var(--grey-50)";
-            document.getElementById('clear-file-btn').style.display = "none";
-
-            if (post.image_url) {
-                document.getElementById('current-image-container').style.display = 'flex';
-            } else {
-                document.getElementById('current-image-container').style.display = 'none';
-            }
-
-            document.getElementById('publish-btn').innerText = "Save Changes";
-            document.getElementById('cancel-btn-container').style.display = "block";
-            
-            switchAdminTab('editor');
-        }
-
-        function cancelEdit() {
-            editingId = null;
-            currentImageUrl = null;
-            removeImageFlag = false;
-
-            document.getElementById('edit-title').value = "";
-            document.getElementById('edit-text').value = "";
-            document.getElementById('edit-image').value = "";
-            document.getElementById('current-image-container').style.display = 'none';
-            
-            document.getElementById('file-name-display').innerText = "(Optional)";
-            document.getElementById('file-name-display').style.color = "var(--grey-50)";
-            document.getElementById('clear-file-btn').style.display = "none";
-            
-            const publishBtn = document.getElementById('publish-btn');
-            publishBtn.disabled = false;
-            publishBtn.innerText = "Publish";
-            document.getElementById('cancel-btn-container').style.display = "none";
-        }
-
-        async function handleDeleteSingle(id) {
-            const btn = document.getElementById(`del-btn-${id}`);
-            
-            if (btn.dataset.confirm === "true") {
-                clearTimeout(btn.timeoutId);
-                btn.innerText = "Deleting...";
-                btn.disabled = true;
-                
-                try {
-                    const res = await fetch(`${API_URL}/posts/${id}`, {
-                        method: "DELETE",
-                        headers: { "x-admin-password": secretKey }
-                    });
-                    
-                    if (res.status === 401) {
-                        handleLogout();
-                        document.getElementById('login-error').style.display = 'block';
-                        return;
-                    }
-                    fetchStatuses(true); 
-                    fetchAdminPosts(adminCurrentPage); 
-                } catch(e) {
-                    alert("Error deleting post.");
-                    btn.innerText = "Delete";
-                    btn.disabled = false;
-                    btn.dataset.confirm = "false";
-                }
-            } else {
-                btn.dataset.confirm = "true";
-                btn.innerText = "Confirm";
-                btn.style.fontWeight = "400";
-                
-                btn.timeoutId = setTimeout(() => {
-                    if (document.getElementById(`del-btn-${id}`)) {
-                        btn.dataset.confirm = "false";
-                        btn.innerText = "Delete";
-                    }
-                }, 3000);
+                setTimeout(() => { btn.innerText = "Post"; btn.disabled = false; }, 1500);
             }
         }
 
         async function handleDeleteFeed(id) {
             const btn = document.getElementById(`feed-del-btn-${id}`);
-            
             if (btn.dataset.confirm === "true") {
                 clearTimeout(btn.timeoutId);
                 btn.innerText = "Deleting...";
                 btn.disabled = true;
-                
                 try {
-                    const res = await fetch(`${API_URL}/posts/${id}`, {
-                        method: "DELETE",
-                        headers: { "x-admin-password": secretKey }
-                    });
-                    
-                    if (res.status === 401) {
-                        handleLogout();
-                        document.getElementById('login-error').style.display = 'block';
-                        return;
-                    }
+                    const res = await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
+                    if (res.status === 401) return handleUnauthorized();
                     fetchStatuses(true); 
-                    if(document.getElementById('admin-manage-view').style.display === 'block') {
-                        fetchAdminPosts(adminCurrentPage);
-                    }
                 } catch(e) {
                     alert("Error deleting post.");
-                    btn.innerText = "Delete";
-                    btn.disabled = false;
-                    btn.dataset.confirm = "false";
+                    btn.innerText = "Delete"; btn.disabled = false; btn.dataset.confirm = "false";
                 }
             } else {
-                btn.dataset.confirm = "true";
-                btn.innerText = "Confirm";
-                btn.style.fontWeight = "400";
-                
+                btn.dataset.confirm = "true"; btn.innerText = "Confirm"; btn.style.fontWeight = "400";
                 btn.timeoutId = setTimeout(() => {
-                    if (document.getElementById(`feed-del-btn-${id}`)) {
-                        btn.dataset.confirm = "false";
-                        btn.innerText = "Delete";
-                    }
+                    if (document.getElementById(`feed-del-btn-${id}`)) { btn.dataset.confirm = "false"; btn.innerText = "Delete"; }
                 }, 3000);
             }
         }
 
         function resetDeleteButton() {
             const btn = document.getElementById('delete-all-btn');
-            btn.dataset.state = "0";
-            btn.innerText = "Delete All Posts";
-            btn.disabled = false;
+            btn.dataset.state = "0"; btn.innerText = "Delete All Posts"; btn.disabled = false;
         }
 
         function handleDeleteAllClick() {
@@ -1038,35 +738,24 @@
             const state = btn.dataset.state || "0";
 
             if (state === "0") {
-                btn.dataset.state = "1";
-                btn.innerText = "Are you sure? Click to confirm";
-                
+                btn.dataset.state = "1"; btn.innerText = "Are you sure? Click to confirm";
                 clearTimeout(deleteConfirmTimeout);
-                deleteConfirmTimeout = setTimeout(() => {
-                    resetDeleteButton();
-                }, 3000);
-                
+                deleteConfirmTimeout = setTimeout(() => resetDeleteButton(), 3000);
             } else if (state === "1") {
                 clearTimeout(deleteConfirmTimeout);
-                btn.dataset.state = "2";
-                countdownValue = 5;
+                btn.dataset.state = "2"; countdownValue = 5;
                 btn.innerText = `Deleting in ${countdownValue}... Click to cancel`;
-                
                 deleteCountdownInterval = setInterval(() => {
                     countdownValue--;
-                    if (countdownValue > 0) {
-                        btn.innerText = `Deleting in ${countdownValue}... Click to cancel`;
-                    } else {
+                    if (countdownValue > 0) btn.innerText = `Deleting in ${countdownValue}... Click to cancel`;
+                    else {
                         clearInterval(deleteCountdownInterval);
-                        btn.innerText = "Deleting everything...";
-                        btn.disabled = true;
+                        btn.innerText = "Deleting everything..."; btn.disabled = true;
                         executeDeleteAll();
                     }
                 }, 1000);
-                
             } else if (state === "2") {
-                clearInterval(deleteCountdownInterval);
-                resetDeleteButton();
+                clearInterval(deleteCountdownInterval); resetDeleteButton();
             }
         }
 
@@ -1076,25 +765,16 @@
                 while(deleting) {
                     const res = await fetch(`${API_URL}/posts?skip=0&limit=50`);
                     const posts = await res.json();
-                    
-                    if (posts.length === 0) {
-                        deleting = false;
-                        break;
-                    }
-                    
+                    if (posts.length === 0) { deleting = false; break; }
                     for (const p of posts) {
-                        await fetch(`${API_URL}/posts/${p.id}`, { 
-                            method: "DELETE", 
-                            headers: { "x-admin-password": secretKey } 
-                        });
+                        await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
                     }
                 }
                 fetchStatuses(true);
-                fetchAdminPosts(1);
             } catch(e) {
                 alert("An error occurred while deleting all posts.");
             } finally {
-                resetDeleteButton();
+                resetDeleteButton(); closeMenu();
             }
         }
 
