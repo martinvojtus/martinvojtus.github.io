@@ -220,14 +220,19 @@
             text-decoration: underline;
         }
 
+        /* Vylepšený dizajn Manage riadku bez rámčeka */
         .admin-card {
-            border: 1px solid var(--black);
-            border-radius: var(--border-radius);
-            padding: var(--input-padding); 
-            margin-bottom: var(--gap-item);
+            border: none;
+            border-bottom: 1px solid var(--divider);
+            padding: 16px 0; 
+            margin-bottom: 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
+        }
+
+        .admin-card:last-child {
+            border-bottom: none;
         }
 
         .admin-tabs {
@@ -353,7 +358,7 @@
 
                 <div id="admin-manage-view" style="display: none;">
                     
-                    <div class="form-group" style="margin-bottom: var(--gap-item);">
+                    <div class="form-group" style="margin-bottom: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider);">
                         <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" onclick="handleDeleteAllClick()">Delete All Posts</button>
                     </div>
                     
@@ -371,7 +376,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.8.13 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.8.14 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -653,7 +658,6 @@
             updateFileName(); 
         }
 
-        // --- Logika s notifikáciami priamo v tlačidle ---
         async function handlePublish(e) {
             e.preventDefault();
             const title = document.getElementById('edit-title').value.trim();
@@ -664,7 +668,6 @@
             
             let hasImage = !!imageFile || (currentImageUrl && !removeImageFlag);
             
-            // Kontrola prázdneho poľa - Notifikácia v tlačidle
             if (!text && !hasImage) {
                 publishBtn.innerText = "Add text or image.";
                 publishBtn.disabled = true;
@@ -709,7 +712,6 @@
                         handleLogout();
                         document.getElementById('login-error').style.display = 'block';
                     } else {
-                        // Upload Error v tlačidle
                         publishBtn.innerText = "Upload Error!";
                         setTimeout(() => {
                             publishBtn.innerText = originalBtnText;
@@ -756,7 +758,6 @@
                 }, 1500);
 
             } catch (err) {
-                // Connection Error v tlačidle
                 publishBtn.innerText = "Connection Error!";
                 setTimeout(() => {
                     publishBtn.innerText = originalBtnText;
@@ -868,8 +869,9 @@
                     ? `<img src="${p.image_url}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" alt="thumb" loading="lazy">` 
                     : '';
 
+                // Nové formátovanie dátumu na štýl FEB 17, 2026
                 const d = new Date(p.at);
-                const postDate = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.`;
+                const postDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
 
                 return `
                 <div class="admin-card">
