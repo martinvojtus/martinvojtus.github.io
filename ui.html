@@ -271,10 +271,10 @@
                         <button type="submit" id="quick-btn" style="width: 120px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: none; background: var(--black); color: var(--white); font-family: inherit; font-size: var(--size-small); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease;">Post</button>
                     </form>
                     
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn secondary-btn" style="flex-grow: 1; margin: 0; padding: 12px; display: flex; align-items: center; justify-content: center;" onclick="handleDeleteAllClick()">Delete All Posts</button>
+                    <div style="display: flex; gap: 10px; margin-top: var(--gap-item);">
+                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="flex-grow: 1; margin: 0; display: flex; align-items: center; justify-content: center;" onclick="handleDeleteAllClick()">Delete All Posts</button>
                         
-                        <button type="button" class="submit-btn" style="width: 120px; flex-shrink: 0; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
+                        <button type="button" class="submit-btn" style="width: 120px; flex-shrink: 0; margin: 0; display: flex; align-items: center; justify-content: center;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -318,7 +318,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.9.1 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.9.2 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -744,7 +744,7 @@
             const state = btn.dataset.state || "0";
 
             if (state === "0") {
-                btn.dataset.state = "1"; btn.innerText = "Are you sure? Click to confirm";
+                btn.dataset.state = "1"; btn.innerText = "Click to confirm";
                 clearTimeout(deleteConfirmTimeout);
                 deleteConfirmTimeout = setTimeout(() => resetDeleteButton(), 3000);
             } else if (state === "1") {
