@@ -80,20 +80,26 @@
         .menu-toggle.active .line:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
         .menu-toggle.active .line:nth-child(2) { transform: translateY(-5.5px) rotate(-45deg); }
 
+        /* UPRAVENÉ MENU: height auto */
         .nav-overlay {
-            position: fixed; top: -100%; left: 0; width: 100%; height: 100vh;
+            position: fixed; top: -100%; left: 0; width: 100%; 
+            height: auto;
+            max-height: 90vh;
+            overflow-y: auto;
             background: rgba(var(--glass-rgb), var(--glass-opacity));
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
             transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1);
-            z-index: 1500; padding: 80px 0 0 0; display: flex; flex-direction: column; align-items: center;
+            z-index: 1500; 
+            padding: 70px 0 20px 0; 
+            display: flex; flex-direction: column; align-items: center;
+            border-bottom: 1px solid var(--divider);
         }
         .nav-overlay.active { top: 0; }
         
         .menu-items { 
             width: 100%; 
             max-width: var(--content-width); 
-            height: 100%;
             display: flex; flex-direction: column; padding: 0 20px; 
         }
         
@@ -273,7 +279,6 @@
         .checkbox-wrapper input:checked ~ .checkmark {
             background-color: var(--black);
         }
-        /* Ostrá biela fajočka vykreslená cez CSS */
         .checkmark::after {
             content: "";
             position: absolute;
@@ -335,9 +340,9 @@
                 <button onclick="handleLogout()" class="admin-action-btn admin-action-link" style="margin: 0; text-align: left;">Logout</button>
             </div>
             
-            <div style="margin-top: auto; padding-bottom: 40px; width: 100%;">
+            <div style="margin-top: 40px; padding-bottom: 20px; width: 100%;">
                 <div style="width: 100%; height: 1px; background-color: var(--divider); margin: 0 0 20px 0;"></div>
-                <div class="footer-info">build v2.9.8 • martin vojtus • 2026</div>
+                <div class="footer-info">build v2.9.9 • 2026</div>
             </div>
         </div>
     </nav>
