@@ -240,15 +240,6 @@
             margin-bottom: var(--gap-item);
         }
 
-        /* Nová animácia letu smerom nadol */
-        .send-icon {
-            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
-        }
-        .send-icon.fly-away {
-            transform: translateY(15px);
-            opacity: 0;
-        }
-
         footer {
             width: 100%; max-width: var(--content-width); padding: 40px 20px 30px; 
             display: flex; flex-direction: column; align-items: center;
@@ -283,14 +274,12 @@
             <h2 style="font-size: var(--size-large); margin: 0 0 var(--gap-item) 0;">Feed.</h2>
             
             <div id="quick-post-container" style="display: none; margin-bottom: var(--gap-item);">
-                <form onsubmit="handleQuickPost(event)" style="position: relative; width: 100%; display: flex; align-items: center;">
-                    <input type="text" id="quick-text" class="form-input" placeholder="Quick thought..." required style="width: 100%; padding-right: 48px;">
-                    <button type="submit" id="quick-btn" aria-label="Post" style="position: absolute; right: 6px; background: transparent; border: none; padding: 8px; cursor: pointer; color: var(--black); display: flex; align-items: center; justify-content: center; outline: none;">
-                        <svg id="quick-icon" class="send-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter">
-                            <line x1="12" y1="3" x2="12" y2="21"></line>
-                            <polyline points="6 15 12 21 18 15"></polyline>
-                        </svg>
-                    </button>
+                <form onsubmit="handleQuickPost(event)" style="display: flex; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent;">
+                    
+                    <input type="text" id="quick-text" placeholder="Quick thought..." required style="flex-grow: 1; border: none; background: transparent; padding: var(--input-padding); color: var(--black); font-family: inherit; font-size: var(--size-small); outline: none;">
+                    
+                    <button type="submit" id="quick-btn" style="border: none; background: var(--black); color: var(--white); padding: 0 24px; font-family: inherit; font-size: var(--size-small); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease;">Post</button>
+                    
                 </form>
             </div>
 
@@ -385,7 +374,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.8.9 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.8.10 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -749,17 +738,17 @@
             }
         }
 
+        // --- Logika zjednoteného Quick Postu ---
         async function handleQuickPost(e) {
             e.preventDefault();
             const inputField = document.getElementById('quick-text');
             const text = inputField.value.trim();
             const btn = document.getElementById('quick-btn');
-            const icon = document.getElementById('quick-icon');
 
             if(!text) return;
             
             btn.disabled = true;
-            icon.classList.add('fly-away');
+            btn.innerText = "...";
             
             try {
                 const res = await fetch(`${API_URL}/posts`, {
@@ -776,29 +765,27 @@
                     showSection('admin');
                     document.getElementById('login-error').style.display = 'block';
                     btn.disabled = false;
-                    icon.classList.remove('fly-away');
+                    btn.innerText = "Post";
                     return;
                 }
 
                 if(!res.ok) throw new Error();
 
                 inputField.value = "";
-                inputField.placeholder = "Posted.";
+                btn.innerText = "Posted.";
                 
                 await fetchStatuses(true);
                 
                 setTimeout(() => {
-                    inputField.placeholder = "Quick thought...";
-                    icon.classList.remove('fly-away');
+                    btn.innerText = "Post";
                     btn.disabled = false;
                     document.activeElement.blur();
                 }, 1500);
 
             } catch(err) {
-                inputField.placeholder = "Error.";
+                btn.innerText = "Error.";
                 setTimeout(() => {
-                    inputField.placeholder = "Quick thought...";
-                    icon.classList.remove('fly-away');
+                    btn.innerText = "Post";
                     btn.disabled = false;
                 }, 1500);
             }
