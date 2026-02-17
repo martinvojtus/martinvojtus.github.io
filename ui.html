@@ -25,7 +25,6 @@
             --content-width: 540px; 
             
             --border-radius: 12px; 
-            /* UNIFIED 12px SYSTEM SPACING */
             --gap-item: 12px; 
 
             --glass-opacity: 0.6; 
@@ -101,200 +100,77 @@
         .menu-items { 
             width: 100%; 
             max-width: var(--content-width); 
-            display: flex; flex-direction: column; padding: 0 var(--gap-item); 
+            display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); 
         }
         
-        .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; display: inline-block; padding: var(--gap-item) 0; border: none; background: transparent; text-align: left; }
+        .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; display: inline-block; padding: 0; border: none; background: transparent; text-align: left; margin: 0; }
 
         main {
             padding: calc(50px + var(--gap-item)) var(--gap-item) var(--gap-item); 
             width: 100%; max-width: var(--content-width); 
-            flex-grow: 1;
+            flex-grow: 1; display: flex; flex-direction: column; gap: var(--gap-item);
         }
 
+        #section-feed { display: flex; flex-direction: column; gap: var(--gap-item); }
+        #feed-admin-zone { display: flex; flex-direction: column; gap: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider); }
+        #quick-post-wrapper { display: flex; flex-direction: column; gap: var(--gap-item); }
+        #editor-form { display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; }
+        #menu-login-section { display: flex; flex-direction: column; gap: var(--gap-item); }
+        #menu-admin-section { display: flex; flex-direction: column; gap: var(--gap-item); }
+
         .status-feed {
-            max-width: 600px;
+            max-width: 600px; width: 100%;
             margin: 0 auto; 
-            padding: 0 0 var(--gap-item) 0; 
+            display: flex; flex-direction: column; gap: var(--gap-item);
         }
 
         .status-card {
-            background: transparent; 
-            border: none;
+            background: transparent; border: none;
             border-bottom: 1px solid var(--divider); 
             border-radius: 0; 
-            padding: var(--gap-item) 0; 
-            margin-bottom: 0; 
+            padding: 0 0 var(--gap-item) 0; margin: 0;
+            display: flex; flex-direction: column; gap: var(--gap-item);
         }
-
-        .status-card:first-child { padding-top: 0; }
         .status-card:last-child { border-bottom: none; }
 
-        .status-date {
-            font-size: var(--size-small); 
-            color: var(--grey-50);
-            display: block;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        .status-date { font-size: var(--size-small); color: var(--grey-50); display: block; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+        .status-title { font-size: var(--size-large); margin: 0; color: var(--black); line-height: 1.1; }
+        .status-image { width: 100%; height: auto; border-radius: var(--border-radius); display: block; margin: 0; border: none; }
+        .status-text { font-size: var(--size-small); line-height: 1.5; color: var(--black); opacity: 0.8; white-space: pre-line; text-align: justify; margin: 0; word-wrap: break-word; }
+        .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); margin: 0; padding: 0; }
 
-        .status-title {
-            font-size: var(--size-large); 
-            margin: 0 0 var(--gap-item) 0; 
-            color: var(--black);
-            line-height: 1.1;
-        }
-
-        .status-image {
-            width: 100%;
-            height: auto; 
-            border-radius: var(--border-radius);
-            display: block;
-            margin: 0 0 var(--gap-item) 0;
-            border: none;
-        }
-
-        .status-text {
-            font-size: var(--size-small); 
-            line-height: 1.5;
-            color: var(--black);
-            opacity: 0.8;
-            white-space: pre-line; 
-            text-align: justify;
-            margin-bottom: 0;
-            word-wrap: break-word;
-        }
-
-        .loading-text {
-            text-align: center;
-            font-size: var(--size-small);
-            color: var(--grey-50);
-            padding-top: var(--gap-item);
-            margin-bottom: var(--gap-item);
-        }
-
-        .form-group { margin-bottom: var(--gap-item); }
-        
         .form-input, .submit-btn { 
-            width: 100%; 
-            height: 56px; 
-            border: 1px solid var(--black); 
-            border-radius: var(--border-radius); 
-            background: transparent; 
-            font-size: var(--size-small); 
-            padding: 0 var(--gap-item); 
-            outline: none; 
-            color: var(--black);
-            box-sizing: border-box;
-            display: block;
-            transition: all 0.3s ease; 
-            margin: 0;
+            width: 100%; height: 40px; border: 1px solid var(--black); border-radius: var(--border-radius); 
+            background: transparent; font-size: var(--size-small); padding: 0 var(--gap-item); 
+            outline: none; color: var(--black); box-sizing: border-box; display: flex; margin: 0; align-items: center;
         }
-        
         ::placeholder { color: var(--grey-50); opacity: 1; }
         
-        div.form-input {
-            display: flex;
-            align-items: center;
-        }
-
         .form-textarea { 
-            width: 100%; 
-            border: 1px solid var(--black); 
-            border-radius: var(--border-radius); 
-            background: transparent; 
-            font-size: var(--size-small); 
-            padding: var(--gap-item); 
-            outline: none; 
-            color: var(--black);
-            box-sizing: border-box;
-            display: block;
-            transition: all 0.3s ease; 
-            min-height: 120px; 
-            resize: vertical; 
-            margin: 0;
+            width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); 
+            background: transparent; font-size: var(--size-small); padding: var(--gap-item); 
+            outline: none; color: var(--black); box-sizing: border-box; display: block; 
+            transition: all 0.3s ease; min-height: 80px; resize: vertical; margin: 0;
         }
 
         .submit-btn {
-            background: var(--black); 
-            color: var(--white); 
-            text-transform: uppercase; 
-            letter-spacing: 0.1em; 
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            white-space: nowrap; 
-            overflow: hidden;
-            text-overflow: ellipsis;
+            background: var(--black); color: var(--white); text-transform: uppercase; letter-spacing: 0.1em; 
+            cursor: pointer; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        
-        .secondary-btn {
-            background: transparent; 
-            color: var(--black); 
-        }
+        .secondary-btn { background: transparent; color: var(--black); }
 
-        .admin-action-btn {
-            background: transparent; border: none; 
-            font-size: var(--size-small);
-            color: var(--black); cursor: pointer; padding: 0; margin-right: var(--gap-item);
-        }
-        
-        .admin-action-link {
-            text-decoration: underline;
-        }
+        .admin-action-btn { background: transparent; border: none; font-size: var(--size-small); color: var(--black); cursor: pointer; padding: 0; margin: 0; }
+        .admin-action-link { text-decoration: underline; }
 
-        .checkbox-wrapper {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--gap-item);
-            cursor: pointer;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .checkbox-wrapper input {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-            height: 0;
-            width: 0;
-        }
-        .checkmark {
-            position: relative;
-            height: 20px;
-            width: 20px;
-            background-color: transparent;
-            border: 1px solid var(--black);
-            border-radius: 6px; 
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .checkbox-wrapper input:checked ~ .checkmark {
-            background-color: var(--black);
-        }
-        .checkmark::after {
-            content: "";
-            position: absolute;
-            display: none;
-            width: 4px;
-            height: 9px;
-            border: solid var(--white);
-            border-width: 0 1.5px 1.5px 0;
-            transform: rotate(45deg);
-            margin-bottom: 2px;
-        }
-        .checkbox-wrapper input:checked ~ .checkmark::after {
-            display: block;
-        }
-        .checkbox-label-text {
-            font-size: var(--size-small);
-            color: var(--black);
-        }
+        .checkbox-wrapper { display: inline-flex; align-items: center; gap: var(--gap-item); cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; margin: 0; }
+        .checkbox-wrapper input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+        .checkmark { position: relative; height: 20px; width: 20px; background-color: transparent; border: 1px solid var(--black); border-radius: 6px; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .checkbox-wrapper input:checked ~ .checkmark { background-color: var(--black); }
+        .checkmark::after { content: ""; position: absolute; display: none; width: 4px; height: 9px; border: solid var(--white); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); margin-bottom: 2px; }
+        .checkbox-wrapper input:checked ~ .checkmark::after { display: block; }
+        .checkbox-label-text { font-size: var(--size-small); color: var(--black); margin: 0; }
 
-        .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; letter-spacing: 0.1em; text-align: left; }
+        .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; letter-spacing: 0.1em; text-align: left; margin: 0; }
     </style>
 </head>
 <body>
@@ -315,46 +191,44 @@
         <div class="menu-items">
             <a class="menu-link" onclick="window.scrollTo(0,0); closeMenu();"><span>Feed</span></a>
             
-            <div style="width: 100%; height: 1px; background-color: var(--divider); margin: var(--gap-item) 0;"></div>
+            <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
             
             <div id="menu-login-section">
-                <form onsubmit="handleLogin(event)" style="display: flex; height: 56px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent;">
-                    <input type="password" id="admin-pass" placeholder="Password..." required style="flex-grow: 1; height: 100%; border: none; background: transparent; padding: 0 var(--gap-item); color: var(--black); outline: none; font-size: var(--size-small);">
-                    <button type="submit" id="login-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: var(--size-small);">LOG IN</button>
+                <form onsubmit="handleLogin(event)" style="display: flex; height: 40px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent; margin: 0;">
+                    <input type="password" id="admin-pass" placeholder="Password..." required style="flex-grow: 1; height: 100%; border: none; background: transparent; padding: 0 var(--gap-item); color: var(--black); outline: none; font-size: var(--size-small); margin: 0;">
+                    <button type="submit" id="login-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: var(--size-small); margin: 0;">LOG IN</button>
                 </form>
                 
-                <div style="margin-top: var(--gap-item);">
-                    <label class="checkbox-wrapper">
-                        <input type="checkbox" id="remember-me">
-                        <span class="checkmark"></span>
-                        <span class="checkbox-label-text">Stay logged in</span>
-                    </label>
-                </div>
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="remember-me">
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label-text">Stay logged in</span>
+                </label>
             </div>
 
             <div id="menu-admin-section" style="display: none;">
                 <button onclick="handleLogout()" class="menu-link" style="text-decoration: underline;">Logout</button>
             </div>
             
-            <div style="width: 100%; height: 1px; background-color: var(--divider); margin: var(--gap-item) 0;"></div>
+            <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.0.9 • 2026</div>
+            <div class="footer-info">build v3.0.10 • 2026</div>
         </div>
     </nav>
 
     <main>
         <div id="section-feed">
-            <h2 style="font-size: var(--size-large); margin: 0 0 var(--gap-item) 0;">Feed.</h2>
+            <h2 style="font-size: var(--size-large); margin: 0;">Feed.</h2>
             
-            <div id="feed-admin-zone" style="display: none; margin-bottom: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider);">
+            <div id="feed-admin-zone" style="display: none;">
                 
                 <div id="quick-post-wrapper">
-                    <form onsubmit="handleQuickPost(event)" style="display: flex; height: 56px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent;">
-                        <input type="text" id="quick-text" placeholder="Quick thought..." required style="flex-grow: 1; height: 100%; border: none; background: transparent; padding: 0 var(--gap-item); color: var(--black); outline: none; font-size: var(--size-small);">
-                        <button type="submit" id="quick-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: var(--size-small);">POST</button>
+                    <form onsubmit="handleQuickPost(event)" style="display: flex; height: 40px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent; margin: 0;">
+                        <input type="text" id="quick-text" placeholder="Quick thought..." required style="flex-grow: 1; height: 100%; border: none; background: transparent; padding: 0 var(--gap-item); color: var(--black); outline: none; font-size: var(--size-small); margin: 0;">
+                        <button type="submit" id="quick-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: var(--size-small); margin: 0;">POST</button>
                     </form>
                     
-                    <div style="display: flex; gap: var(--gap-item); margin-top: var(--gap-item); height: 56px;">
+                    <div style="display: flex; gap: var(--gap-item); height: 40px; margin: 0;">
                         <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="flex-grow: 1; height: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
                         
                         <button type="button" id="add-adv-btn" class="submit-btn" style="width: 120px; flex-shrink: 0; height: 100%; margin: 0; padding: 0;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
@@ -367,27 +241,25 @@
                 </div>
 
                 <div id="full-editor-wrapper" style="display: none;">
-                    <form id="editor-form" onsubmit="handlePublish(event)" style="width: 100%;">
-                        <div class="form-group"><input type="text" id="edit-title" class="form-input" placeholder="Title (Optional)"></div>
+                    <form id="editor-form" onsubmit="handlePublish(event)">
+                        <input type="text" id="edit-title" class="form-input" placeholder="Title (Optional)">
                         
-                        <div id="current-image-container" style="display: none; margin-bottom: var(--gap-item); font-size: var(--size-small); align-items: center;">
+                        <div id="current-image-container" style="display: none; font-size: var(--size-small); align-items: center; gap: var(--gap-item); margin: 0;">
                             <span style="color: var(--grey-50);">Attached image </span>
-                            <button type="button" class="admin-action-btn admin-action-link" style="color: var(--black); margin-left: var(--gap-item);">Remove</button>
+                            <button type="button" class="admin-action-btn admin-action-link" style="color: var(--black);" onclick="flagImageForRemoval()">Remove</button>
                         </div>
 
-                        <div class="form-group">
-                            <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateFileName()">
-                            <div class="form-input" style="cursor: pointer;" onclick="document.getElementById('edit-image').click()">
-                                <span class="admin-action-btn admin-action-link" style="margin: 0 var(--gap-item) 0 0; pointer-events: none;">Upload image</span>
-                                <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small);">(Optional)</span>
-                                <button type="button" id="clear-file-btn" class="admin-action-btn admin-action-link" style="color: var(--black); margin: 0; display: none; padding: 0; flex-shrink: 0;">Remove</button>
-                            </div>
+                        <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateFileName()">
+                        <div class="form-input" style="cursor: pointer;" onclick="document.getElementById('edit-image').click()">
+                            <span class="admin-action-btn admin-action-link" style="pointer-events: none; white-space: nowrap;">Upload image</span>
+                            <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); margin-left: var(--gap-item);">(Optional)</span>
+                            <button type="button" id="clear-file-btn" class="admin-action-btn admin-action-link" style="color: var(--black); display: none; padding: 0; flex-shrink: 0; margin-left: var(--gap-item);" onclick="clearSelectedFile(event)">Remove</button>
                         </div>
 
-                        <div class="form-group"><textarea id="edit-text" class="form-textarea" placeholder="Content (Optional if image attached)"></textarea></div>
+                        <textarea id="edit-text" class="form-textarea" placeholder="Content (Optional if image attached)"></textarea>
                         
-                        <div class="form-group"><button type="submit" id="publish-btn" class="submit-btn">PUBLISH</button></div>
-                        <div class="form-group" style="margin-bottom: 0;"><button type="button" id="cancel-btn" class="submit-btn secondary-btn" onclick="toggleAdvancedEditor(false)">CANCEL</button></div>
+                        <button type="submit" id="publish-btn" class="submit-btn">PUBLISH</button>
+                        <button type="button" id="cancel-btn" class="submit-btn secondary-btn" onclick="toggleAdvancedEditor(false)">CANCEL</button>
                     </form>
                 </div>
 
@@ -442,8 +314,8 @@
 
         function activateAdminUI() {
             document.getElementById('menu-login-section').style.display = 'none';
-            document.getElementById('menu-admin-section').style.display = 'block';
-            document.getElementById('feed-admin-zone').style.display = 'block';
+            document.getElementById('menu-admin-section').style.display = 'flex';
+            document.getElementById('feed-admin-zone').style.display = 'flex';
             refreshFeedUI();
         }
 
@@ -462,7 +334,7 @@
             secretKey = "";
             localStorage.removeItem('adminSecretKey');
             document.getElementById('menu-admin-section').style.display = 'none';
-            document.getElementById('menu-login-section').style.display = 'block';
+            document.getElementById('menu-login-section').style.display = 'flex';
             document.getElementById('feed-admin-zone').style.display = 'none';
             document.getElementById('remember-me').checked = false;
             toggleAdvancedEditor(false);
@@ -548,7 +420,7 @@
                     while(tempDiv.firstChild) container.appendChild(tempDiv.firstChild);
                 }
             } catch (error) {
-                if (reset) container.innerHTML = `<p style="color:var(--black); text-align:center;">Failed to load data.</p>`;
+                if (reset) container.innerHTML = `<p class="loading-text">Failed to load data.</p>`;
                 loader.style.display = 'none';
             } finally {
                 isLoading = false;
@@ -568,7 +440,7 @@
                 const updateObj = new Date(s.updated_at);
                 const updateDate = updateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
                 const updateTime = updateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-                editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin-top: var(--gap-item);">EDITED: ${updateDate.toUpperCase()} • ${updateTime}</div>`;
+                editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin: 0;">EDITED: ${updateDate.toUpperCase()} • ${updateTime}</div>`;
             }
             const titleHtml = (s.title && s.title.trim() !== "") ? `<h3 class="status-title">${s.title}</h3>` : '';
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image" loading="lazy">` : '';
@@ -576,15 +448,15 @@
             let adminActionsHtml = '';
             if (secretKey) {
                 adminActionsHtml = `
-                <div style="display: flex; gap: var(--gap-item); align-items: baseline;">
-                    <button onclick="startEdit(${s.id});" class="admin-action-btn admin-action-link" style="margin: 0; padding: 0;">Edit</button>
-                    <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn admin-action-link" style="color: var(--black); margin: 0; padding: 0;">Delete</button>
+                <div style="display: flex; gap: var(--gap-item); align-items: baseline; margin: 0;">
+                    <button onclick="startEdit(${s.id});" class="admin-action-btn admin-action-link">Edit</button>
+                    <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn admin-action-link">Delete</button>
                 </div>`;
             }
             return `
             <div class="status-card">
-                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--gap-item);">
-                    <span class="status-date" style="margin-bottom: 0;">${date} • ${time}</span>
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin: 0;">
+                    <span class="status-date">${date} • ${time}</span>
                     ${adminActionsHtml}
                 </div>
                 ${titleHtml}
@@ -599,7 +471,7 @@
             const fWrapper = document.getElementById('full-editor-wrapper');
             if (show) {
                 qWrapper.style.display = 'none';
-                fWrapper.style.display = 'block';
+                fWrapper.style.display = 'flex';
             } else {
                 editingId = null; currentImageUrl = null; removeImageFlag = false;
                 document.getElementById('edit-title').value = "";
@@ -611,7 +483,7 @@
                 document.getElementById('clear-file-btn').style.display = "none";
                 const publishBtn = document.getElementById('publish-btn');
                 publishBtn.disabled = false; publishBtn.innerText = "PUBLISH";
-                qWrapper.style.display = 'block'; fWrapper.style.display = 'none';
+                qWrapper.style.display = 'flex'; fWrapper.style.display = 'none';
             }
         }
 
