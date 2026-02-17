@@ -240,12 +240,12 @@
             margin-bottom: var(--gap-item);
         }
 
-        /* Nové štýly pre animáciu Quick Post šípky */
+        /* Nová animácia letu smerom nadol */
         .send-icon {
             transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
         }
         .send-icon.fly-away {
-            transform: translate(15px, -15px) scale(0.8);
+            transform: translateY(15px);
             opacity: 0;
         }
 
@@ -286,9 +286,9 @@
                 <form onsubmit="handleQuickPost(event)" style="position: relative; width: 100%; display: flex; align-items: center;">
                     <input type="text" id="quick-text" class="form-input" placeholder="Quick thought..." required style="width: 100%; padding-right: 48px;">
                     <button type="submit" id="quick-btn" aria-label="Post" style="position: absolute; right: 6px; background: transparent; border: none; padding: 8px; cursor: pointer; color: var(--black); display: flex; align-items: center; justify-content: center; outline: none;">
-                        <svg id="quick-icon" class="send-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="7" y1="17" x2="17" y2="7"></line>
-                            <polyline points="7 7 17 7 17 17"></polyline>
+                        <svg id="quick-icon" class="send-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter">
+                            <line x1="12" y1="3" x2="12" y2="21"></line>
+                            <polyline points="6 15 12 21 18 15"></polyline>
                         </svg>
                     </button>
                 </form>
@@ -385,7 +385,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.8.8 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.8.9 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -730,7 +730,6 @@
 
                 if (!res.ok) throw new Error();
 
-                // Návrat k B&W logike
                 publishBtn.innerText = editingId ? "Updated." : "Published.";
                 
                 await fetchStatuses(true); 
@@ -750,7 +749,6 @@
             }
         }
 
-        // --- Logika a animácia Quick Postu ---
         async function handleQuickPost(e) {
             e.preventDefault();
             const inputField = document.getElementById('quick-text');
@@ -761,7 +759,7 @@
             if(!text) return;
             
             btn.disabled = true;
-            icon.classList.add('fly-away'); // Spustí animáciu "odletu"
+            icon.classList.add('fly-away');
             
             try {
                 const res = await fetch(`${API_URL}/posts`, {
@@ -785,13 +783,13 @@
                 if(!res.ok) throw new Error();
 
                 inputField.value = "";
-                inputField.placeholder = "Posted."; // Namiesto fajky to napíše do inputu
+                inputField.placeholder = "Posted.";
                 
                 await fetchStatuses(true);
                 
                 setTimeout(() => {
                     inputField.placeholder = "Quick thought...";
-                    icon.classList.remove('fly-away'); // Vráti šípku späť
+                    icon.classList.remove('fly-away');
                     btn.disabled = false;
                     document.activeElement.blur();
                 }, 1500);
@@ -926,7 +924,6 @@
             const publishBtn = document.getElementById('publish-btn');
             publishBtn.disabled = false;
             publishBtn.innerText = "Publish";
-            publishBtn.style.color = "var(--white)";
             document.getElementById('cancel-btn-container').style.display = "none";
         }
 
