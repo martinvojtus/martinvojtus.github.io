@@ -14,9 +14,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* STRICT 2 FONT SIZES ONLY */
-            --size-large: 2.0rem;
-            --size-small: 1.0rem;
+            /* STRICT 2 FONT SIZES ONLY (Base 16px) */
+            --size-large: 2.25rem;  /* 36px */
+            --size-small: 1.125rem; /* 18px */
             
             --black: #000000;
             --white: #ffffff;
@@ -25,11 +25,9 @@
             --glass-rgb: 255, 255, 255; 
             --content-width: 540px; 
             
-            /* PILL SHAPE RADIUS (Half of the 40px input height) */
-            --border-radius: 20px;
-             
-            /* ABSOLUTE 12px SYSTEM SPACING */
-            --gap-item: 12px; 
+            /* ABSOLUTE 18px SYSTEM RADIUS & SPACING */
+            --border-radius: 18px; 
+            --gap-item: 18px; 
             
             /* UNIFIED LETTER SPACING */
             --letter-spacing: 0.05em;
@@ -54,14 +52,14 @@
             box-sizing: border-box; 
             font-weight: 400; 
             font-family: 'Space Grotesk', sans-serif; 
-            letter-spacing: var(--letter-spacing); /* APPLIED GLOBALLY */
+            letter-spacing: var(--letter-spacing); 
         }
 
         body {
             margin: 0; padding: 0;
             background-color: var(--white);
             color: var(--black);
-            line-height: 1.5; /* Only applies to regular paragraphs now */
+            line-height: 1.5; 
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
             transition: background-color 0.3s ease, color 0.3s ease; 
@@ -76,7 +74,7 @@
             position: fixed; top: 0; left: 0;
             width: 100%; 
             display: flex; justify-content: center;
-            padding: var(--gap-item) 0; /* Header now strictly follows 12px rule */
+            padding: var(--gap-item) 0; 
             background: rgba(var(--glass-rgb), var(--glass-opacity));
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
@@ -106,7 +104,8 @@
             -webkit-backdrop-filter: blur(var(--glass-blur));
             transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1);
             z-index: 1500; 
-            padding: calc(48px + var(--gap-item)) 0 var(--gap-item) 0; 
+            /* Header height: 18px top gap + 24px svg + 18px bot gap = 60px */
+            padding: calc(60px + var(--gap-item)) 0 var(--gap-item) 0; 
             display: flex; flex-direction: column; align-items: center;
         }
         .nav-overlay.active { top: 0; }
@@ -120,7 +119,7 @@
         .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; display: inline-block; padding: 0; border: none; background: transparent; text-align: left; margin: 0; }
 
         main {
-            padding: calc(48px + var(--gap-item)) var(--gap-item) var(--gap-item); 
+            padding: calc(60px + var(--gap-item)) var(--gap-item) var(--gap-item); 
             width: 100%; max-width: var(--content-width); 
             flex-grow: 1; display: flex; flex-direction: column; gap: var(--gap-item);
         }
@@ -156,7 +155,7 @@
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); margin: 0; padding: var(--gap-item) 0; line-height: 1; }
 
         .form-input, .submit-btn { 
-            width: 100%; height: 40px; border: 1px solid var(--black); border-radius: var(--border-radius); 
+            width: 100%; height: 54px; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; color: var(--black); box-sizing: border-box; display: flex; margin: 0; align-items: center;
             gap: var(--gap-item);
@@ -167,7 +166,7 @@
             width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: var(--gap-item); 
             outline: none; color: var(--black); box-sizing: border-box; display: block; 
-            transition: all 0.3s ease; min-height: 80px; resize: vertical; margin: 0;
+            transition: all 0.3s ease; min-height: 90px; resize: vertical; margin: 0;
         }
 
         .submit-btn {
@@ -181,9 +180,9 @@
 
         .checkbox-wrapper { display: inline-flex; align-items: center; gap: var(--gap-item); cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; margin: 0; }
         .checkbox-wrapper input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
-        .checkmark { position: relative; height: 20px; width: 20px; background-color: transparent; border: 1px solid var(--black); border-radius: 6px; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin: 0; }
+        .checkmark { position: relative; height: 18px; width: 18px; background-color: transparent; border: 1px solid var(--black); border-radius: 4.5px; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin: 0; }
         .checkbox-wrapper input:checked ~ .checkmark { background-color: var(--black); }
-        .checkmark::after { content: ""; position: absolute; display: none; width: 4px; height: 9px; border: solid var(--white); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); margin-bottom: 2px; }
+        .checkmark::after { content: ""; position: absolute; display: none; width: 4px; height: 8px; border: solid var(--white); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); margin-bottom: 2px; }
         .checkbox-wrapper input:checked ~ .checkmark::after { display: block; }
         .checkbox-label-text { font-size: var(--size-small); color: var(--black); margin: 0; }
 
@@ -211,7 +210,7 @@
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
             
             <div id="menu-login-section">
-                <form onsubmit="handleLogin(event)" style="display: flex; height: 40px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent; margin: 0; gap: 0;">
+                <form onsubmit="handleLogin(event)" style="display: flex; height: 54px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent; margin: 0; gap: 0;">
                     <input type="password" id="admin-pass" placeholder="Password..." required style="flex-grow: 1; height: 100%; border: none; background: transparent; padding: 0 var(--gap-item); color: var(--black); outline: none; font-size: var(--size-small); margin: 0;">
                     <button type="submit" id="login-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: var(--size-small); margin: 0;">LOG IN</button>
                 </form>
@@ -229,7 +228,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.0.14 • 2026</div>
+            <div class="footer-info">build v3.0.15 • 2026</div>
         </div>
     </nav>
 
@@ -240,12 +239,12 @@
             <div id="feed-admin-zone" style="display: none;">
                 
                 <div id="quick-post-wrapper">
-                    <form onsubmit="handleQuickPost(event)" style="display: flex; height: 40px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent; margin: 0; gap: 0;">
+                    <form onsubmit="handleQuickPost(event)" style="display: flex; height: 54px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent; margin: 0; gap: 0;">
                         <input type="text" id="quick-text" placeholder="Quick thought..." required style="flex-grow: 1; height: 100%; border: none; background: transparent; padding: 0 var(--gap-item); color: var(--black); outline: none; font-size: var(--size-small); margin: 0;">
                         <button type="submit" id="quick-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: var(--size-small); margin: 0;">POST</button>
                     </form>
                     
-                    <div style="display: flex; gap: var(--gap-item); height: 40px; margin: 0;">
+                    <div style="display: flex; gap: var(--gap-item); height: 54px; margin: 0;">
                         <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="flex-grow: 1; height: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
                         
                         <button type="button" id="add-adv-btn" class="submit-btn" style="width: 120px; flex-shrink: 0; height: 100%; margin: 0; padding: 0;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
@@ -540,6 +539,11 @@
             e.stopPropagation(); 
             document.getElementById('edit-image').value = ""; 
             updateFileName(); 
+        }
+
+        function flagImageForRemoval() {
+            removeImageFlag = true;
+            document.getElementById('current-image-container').style.display = 'none';
         }
 
         async function handlePublish(e) {
