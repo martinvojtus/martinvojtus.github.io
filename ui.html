@@ -42,7 +42,6 @@
         }
 
         html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-        /* Vynútenie jedného fontu pre úplne všetko */
         * { 
             -webkit-tap-highlight-color: transparent; 
             box-sizing: border-box; 
@@ -112,7 +111,6 @@
             flex-grow: 1;
         }
 
-        /* --- STATUS FEED --- */
         .status-feed {
             max-width: 600px;
             margin: 0 auto; 
@@ -174,7 +172,6 @@
             margin-bottom: 30px;
         }
 
-        /* --- FORMULÁRE --- */
         .form-group { margin-bottom: var(--gap-item); }
         
         .form-input, .submit-btn { 
@@ -246,7 +243,6 @@
             text-decoration: underline;
         }
 
-        /* --- CUSTOM CHECKBOX --- */
         .checkbox-wrapper {
             display: inline-flex;
             align-items: center;
@@ -322,8 +318,8 @@
             
             <div id="menu-login-section">
                 <form onsubmit="handleLogin(event)" style="display: flex; height: 56px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent;">
-                    <input type="password" id="admin-pass" placeholder="Password..." required style="flex-grow: 1; height: 100%; border: none; background: transparent; padding: 0 16px; color: var(--black); outline: none;">
-                    <button type="submit" id="login-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center;">Log In</button>
+                    <input type="password" id="admin-pass" placeholder="Password..." required style="flex-grow: 1; height: 100%; border: none; background: transparent; padding: 0 16px; color: var(--black); outline: none; font-size: var(--size-small);">
+                    <button type="submit" id="login-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: var(--size-small);">LOG IN</button>
                 </form>
                 
                 <div style="margin-top: 15px;">
@@ -336,12 +332,12 @@
             </div>
 
             <div id="menu-admin-section" style="display: none;">
-                <button onclick="handleLogout()" class="menu-link" style="text-decoration: underline;">Logout</button>
+                <button onclick="handleLogout()" class="menu-link" style="text-decoration: underline; text-transform: uppercase;">LOGOUT</button>
             </div>
             
             <div style="width: 100%; height: 1px; background-color: var(--divider); margin: var(--gap-item) 0;"></div>
 
-            <div class="footer-info">build v2.10.3 • 2026</div>
+            <div class="footer-info">build v2.10.4 • 2026</div>
         </div>
     </nav>
 
@@ -353,12 +349,12 @@
                 
                 <div id="quick-post-wrapper">
                     <form onsubmit="handleQuickPost(event)" style="display: flex; height: 56px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent;">
-                        <input type="text" id="quick-text" placeholder="Quick thought..." required style="flex-grow: 1; height: 100%; border: none; background: transparent; padding: 0 16px; color: var(--black); outline: none;">
-                        <button type="submit" id="quick-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center;">Post</button>
+                        <input type="text" id="quick-text" placeholder="Quick thought..." required style="flex-grow: 1; height: 100%; border: none; background: transparent; padding: 0 16px; color: var(--black); outline: none; font-size: var(--size-small);">
+                        <button type="submit" id="quick-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: var(--size-small);">POST</button>
                     </form>
                     
                     <div style="display: flex; gap: 10px; margin-top: var(--gap-item); height: 56px;">
-                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="flex-grow: 1; height: 100%; margin: 0;" onclick="handleDeleteAllClick()">Delete All Posts</button>
+                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="flex-grow: 1; height: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
                         
                         <button type="button" id="add-adv-btn" class="submit-btn" style="width: 120px; flex-shrink: 0; height: 100%; margin: 0; padding: 0;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter">
@@ -375,29 +371,29 @@
                         
                         <div id="current-image-container" style="display: none; margin-bottom: var(--gap-item); font-size: var(--size-small); align-items: center;">
                             <span style="color: var(--grey-50);">Attached image </span>
-                            <button type="button" class="admin-action-btn admin-action-link" style="color: var(--black); margin-left: 15px;" onclick="flagImageForRemoval()">Remove</button>
+                            <button type="button" class="admin-action-btn admin-action-link" style="color: var(--black); margin-left: 15px; text-transform: uppercase;">REMOVE</button>
                         </div>
 
                         <div class="form-group">
                             <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateFileName()">
                             <div class="form-input" style="cursor: pointer;" onclick="document.getElementById('edit-image').click()">
-                                <span class="admin-action-btn admin-action-link" style="margin: 0 15px 0 0; pointer-events: none;">Upload image</span>
+                                <span class="admin-action-btn admin-action-link" style="margin: 0 15px 0 0; pointer-events: none; text-transform: uppercase;">UPLOAD IMAGE</span>
                                 <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small);">(Optional)</span>
-                                <button type="button" id="clear-file-btn" class="admin-action-btn admin-action-link" style="color: var(--black); margin: 0; display: none; padding: 0; flex-shrink: 0;" onclick="clearSelectedFile(event)">Remove</button>
+                                <button type="button" id="clear-file-btn" class="admin-action-btn admin-action-link" style="color: var(--black); margin: 0; display: none; padding: 0; flex-shrink: 0; text-transform: uppercase;">REMOVE</button>
                             </div>
                         </div>
 
                         <div class="form-group"><textarea id="edit-text" class="form-textarea" placeholder="Content (Optional if image attached)"></textarea></div>
                         
-                        <div class="form-group"><button type="submit" id="publish-btn" class="submit-btn">Publish</button></div>
-                        <div class="form-group" style="margin-bottom: 0;"><button type="button" id="cancel-btn" class="submit-btn secondary-btn" onclick="toggleAdvancedEditor(false)">Cancel</button></div>
+                        <div class="form-group"><button type="submit" id="publish-btn" class="submit-btn">PUBLISH</button></div>
+                        <div class="form-group" style="margin-bottom: 0;"><button type="button" id="cancel-btn" class="submit-btn secondary-btn" onclick="toggleAdvancedEditor(false)">CANCEL</button></div>
                     </form>
                 </div>
 
             </div>
 
             <div id="status-container" class="status-feed"></div>
-            <div id="loading-indicator" class="loading-text">Loading...</div>
+            <div id="loading-indicator" class="loading-text">LOADING...</div>
         </div>
     </main>
 
@@ -478,7 +474,7 @@
             handleLogout();
             toggleMenu(true); 
             const passInput = document.getElementById('admin-pass');
-            passInput.placeholder = "Invalid password.";
+            passInput.placeholder = "INVALID PASSWORD.";
             setTimeout(() => { passInput.placeholder = "Password..."; }, 3000);
         }
 
@@ -542,7 +538,7 @@
                 currentOffset += newPosts.length;
                 globalPosts = globalPosts.concat(newPosts);
                 if (reset && globalPosts.length === 0) {
-                    container.innerHTML = '<p class="loading-text">No posts yet.</p>';
+                    container.innerHTML = '<p class="loading-text">NO POSTS YET.</p>';
                     loader.style.display = 'none';
                 } else {
                     const tempDiv = document.createElement('div');
@@ -550,7 +546,7 @@
                     while(tempDiv.firstChild) container.appendChild(tempDiv.firstChild);
                 }
             } catch (error) {
-                if (reset) container.innerHTML = `<p style="color:var(--black); text-align:center;">Failed to load data.</p>`;
+                if (reset) container.innerHTML = `<p style="color:var(--black); text-align:center;">FAILED TO LOAD DATA.</p>`;
                 loader.style.display = 'none';
             } finally {
                 isLoading = false;
@@ -570,7 +566,7 @@
                 const updateObj = new Date(s.updated_at);
                 const updateDate = updateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
                 const updateTime = updateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-                editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin-top: 12px;">(Edited: ${updateDate} • ${updateTime})</div>`;
+                editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin-top: 12px;">(EDITED: ${updateDate.toUpperCase()} • ${updateTime})</div>`;
             }
             const titleHtml = (s.title && s.title.trim() !== "") ? `<h3 class="status-title">${s.title}</h3>` : '';
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image" loading="lazy">` : '';
@@ -579,8 +575,8 @@
             if (secretKey) {
                 adminActionsHtml = `
                 <div style="display: flex; gap: 15px; align-items: baseline;">
-                    <button onclick="startEdit(${s.id});" class="admin-action-btn admin-action-link" style="margin: 0; padding: 0;">Edit</button>
-                    <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn admin-action-link" style="color: var(--black); margin: 0; padding: 0;">Delete</button>
+                    <button onclick="startEdit(${s.id});" class="admin-action-btn admin-action-link" style="margin: 0; padding: 0; text-transform: uppercase;">EDIT</button>
+                    <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn admin-action-link" style="color: var(--black); margin: 0; padding: 0; text-transform: uppercase;">DELETE</button>
                 </div>`;
             }
             return `
@@ -612,7 +608,7 @@
                 document.getElementById('file-name-display').style.color = "var(--grey-50)";
                 document.getElementById('clear-file-btn').style.display = "none";
                 const publishBtn = document.getElementById('publish-btn');
-                publishBtn.disabled = false; publishBtn.innerText = "Publish";
+                publishBtn.disabled = false; publishBtn.innerText = "PUBLISH";
                 qWrapper.style.display = 'block'; fWrapper.style.display = 'none';
             }
         }
@@ -629,14 +625,9 @@
             document.getElementById('clear-file-btn').style.display = "none";
             if (post.image_url) document.getElementById('current-image-container').style.display = 'flex';
             else document.getElementById('current-image-container').style.display = 'none';
-            document.getElementById('publish-btn').innerText = "Save Changes";
+            document.getElementById('publish-btn').innerText = "SAVE CHANGES";
             toggleAdvancedEditor(true);
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function flagImageForRemoval() {
-            removeImageFlag = true; currentImageUrl = null;
-            document.getElementById('current-image-container').style.display = 'none';
         }
 
         function updateFileName() {
@@ -669,7 +660,7 @@
             const originalBtnText = publishBtn.innerText;
             let hasImage = !!imageFile || (currentImageUrl && !removeImageFlag);
             if (!text && !hasImage) {
-                publishBtn.innerText = "Add text or image.";
+                publishBtn.innerText = "ADD TEXT OR IMAGE.";
                 publishBtn.disabled = true;
                 setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 2000);
                 return;
@@ -678,25 +669,25 @@
             let finalImageUrl = currentImageUrl;
             if (removeImageFlag && !imageFile) finalImageUrl = null; 
             if (imageFile) {
-                publishBtn.innerText = "Compressing...";
+                publishBtn.innerText = "COMPRESSING...";
                 const compressedFile = await compressImage(imageFile);
                 const formData = new FormData();
                 formData.append("file", compressedFile);
                 try {
-                    publishBtn.innerText = "Uploading...";
+                    publishBtn.innerText = "UPLOADING...";
                     const uploadRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
                     if (uploadRes.status === 401) throw new Error("Unauthorized");
                     if (!uploadRes.ok) throw new Error("Upload failed");
                     const uploadData = await uploadRes.json();
                     finalImageUrl = uploadData.image_url;
-                    publishBtn.innerText = "Saving...";
+                    publishBtn.innerText = "SAVING...";
                 } catch (err) {
                     if (err.message === "Unauthorized") return handleUnauthorized();
-                    publishBtn.innerText = "Upload Error!";
+                    publishBtn.innerText = "UPLOAD ERROR!";
                     setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 2000);
                     return;
                 }
-            } else { publishBtn.innerText = "Saving..."; }
+            } else { publishBtn.innerText = "SAVING..."; }
             const method = editingId ? "PUT" : "POST";
             const endpoint = editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`;
             try {
@@ -707,11 +698,11 @@
                 });
                 if (res.status === 401) return handleUnauthorized();
                 if (!res.ok) throw new Error();
-                publishBtn.innerText = editingId ? "Updated." : "Published.";
+                publishBtn.innerText = editingId ? "UPDATED." : "PUBLISHED.";
                 await fetchStatuses(true); 
                 setTimeout(() => { document.activeElement.blur(); toggleAdvancedEditor(false); }, 1500);
             } catch (err) {
-                publishBtn.innerText = "Connection Error!";
+                publishBtn.innerText = "CONNECTION ERROR!";
                 setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 2000);
             }
         }
@@ -731,12 +722,12 @@
                 });
                 if (res.status === 401) return handleUnauthorized();
                 if(!res.ok) throw new Error();
-                inputField.value = ""; btn.innerText = "Posted.";
+                inputField.value = ""; btn.innerText = "POSTED.";
                 await fetchStatuses(true);
-                setTimeout(() => { btn.innerText = "Post"; btn.disabled = false; document.activeElement.blur(); }, 1500);
+                setTimeout(() => { btn.innerText = "POST"; btn.disabled = false; document.activeElement.blur(); }, 1500);
             } catch(err) {
-                btn.innerText = "Error.";
-                setTimeout(() => { btn.innerText = "Post"; btn.disabled = false; }, 1500);
+                btn.innerText = "ERROR.";
+                setTimeout(() => { btn.innerText = "POST"; btn.disabled = false; }, 1500);
             }
         }
 
@@ -744,20 +735,20 @@
             const btn = document.getElementById(`feed-del-btn-${id}`);
             if (btn.dataset.confirm === "true") {
                 clearTimeout(btn.timeoutId);
-                btn.disabled = true; btn.innerText = "Deleting...";
+                btn.disabled = true; btn.innerText = "DELETING...";
                 try {
                     const res = await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
                     if (res.status === 401) return handleUnauthorized();
                     fetchStatuses(true); 
                 } catch(e) {
-                    alert("Error deleting post.");
-                    btn.innerText = "Delete"; btn.disabled = false; btn.dataset.confirm = "false";
+                    alert("ERROR DELETING POST.");
+                    btn.innerText = "DELETE"; btn.disabled = false; btn.dataset.confirm = "false";
                 }
             } else {
-                btn.dataset.confirm = "true"; btn.innerText = "Confirm";
+                btn.dataset.confirm = "true"; btn.innerText = "CONFIRM";
                 btn.timeoutId = setTimeout(() => {
                     if (document.getElementById(`feed-del-btn-${id}`)) { 
-                        btn.dataset.confirm = "false"; btn.innerText = "Delete"; 
+                        btn.dataset.confirm = "false"; btn.innerText = "DELETE"; 
                     }
                 }, 3000);
             }
@@ -766,7 +757,7 @@
         function resetDeleteButton() {
             const btn = document.getElementById('delete-all-btn');
             const advBtn = document.getElementById('add-adv-btn');
-            btn.dataset.state = "0"; btn.innerText = "Delete All Posts"; btn.disabled = false;
+            btn.dataset.state = "0"; btn.innerText = "DELETE ALL POSTS"; btn.disabled = false;
             if (advBtn) advBtn.style.display = 'flex'; 
         }
 
@@ -775,20 +766,20 @@
             const advBtn = document.getElementById('add-adv-btn');
             const state = btn.dataset.state || "0";
             if (state === "0") {
-                btn.dataset.state = "1"; btn.innerText = "Click to confirm";
+                btn.dataset.state = "1"; btn.innerText = "CLICK TO CONFIRM";
                 if (advBtn) advBtn.style.display = 'none'; 
                 clearTimeout(deleteConfirmTimeout);
                 deleteConfirmTimeout = setTimeout(() => resetDeleteButton(), 3000);
             } else if (state === "1") {
                 clearTimeout(deleteConfirmTimeout);
                 btn.dataset.state = "2"; countdownValue = 5;
-                btn.innerText = `Deleting in ${countdownValue}s (Cancel)`;
+                btn.innerText = `DELETING IN ${countdownValue}S (CANCEL)`;
                 deleteCountdownInterval = setInterval(() => {
                     countdownValue--;
-                    if (countdownValue > 0) btn.innerText = `Deleting in ${countdownValue}s (Cancel)`;
+                    if (countdownValue > 0) btn.innerText = `DELETING IN ${countdownValue}S (CANCEL)`;
                     else {
                         clearInterval(deleteCountdownInterval);
-                        btn.innerText = "Deleting everything..."; btn.disabled = true;
+                        btn.innerText = "DELETING EVERYTHING..."; btn.disabled = true;
                         executeDeleteAll();
                     }
                 }, 1000);
@@ -810,7 +801,7 @@
                 }
                 fetchStatuses(true);
             } catch(e) {
-                alert("An error occurred while deleting all posts.");
+                alert("AN ERROR OCCURRED WHILE DELETING ALL POSTS.");
             } finally {
                 resetDeleteButton(); closeMenu();
             }
