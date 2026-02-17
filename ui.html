@@ -278,7 +278,7 @@
                     
                     <input type="text" id="quick-text" placeholder="Quick thought..." required style="flex-grow: 1; border: none; background: transparent; padding: var(--input-padding); color: var(--black); font-family: inherit; font-size: var(--size-small); outline: none;">
                     
-                    <button type="submit" id="quick-btn" style="border: none; background: var(--black); color: var(--white); padding: 0 24px; font-family: inherit; font-size: var(--size-small); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease;">Post</button>
+                    <button type="submit" id="quick-btn" style="width: 120px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: none; background: var(--black); color: var(--white); font-family: inherit; font-size: var(--size-small); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease;">Post</button>
                     
                 </form>
             </div>
@@ -374,7 +374,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.8.10 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.8.11 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -738,7 +738,6 @@
             }
         }
 
-        // --- Logika zjednoteného Quick Postu ---
         async function handleQuickPost(e) {
             e.preventDefault();
             const inputField = document.getElementById('quick-text');
