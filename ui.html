@@ -274,7 +274,7 @@
                     <div style="display: flex; gap: 10px; margin-top: var(--gap-item);">
                         <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="flex-grow: 1; margin: 0; display: flex; align-items: center; justify-content: center;" onclick="handleDeleteAllClick()">Delete All Posts</button>
                         
-                        <button type="button" class="submit-btn" style="width: 120px; flex-shrink: 0; margin: 0; display: flex; align-items: center; justify-content: center;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
+                        <button type="button" id="add-adv-btn" class="submit-btn" style="width: 120px; flex-shrink: 0; margin: 0; display: flex; align-items: center; justify-content: center;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -305,7 +305,7 @@
 
                         <div class="form-group"><textarea id="edit-text" class="form-textarea" placeholder="Content (Optional if image attached)"></textarea></div>
                         
-                        <div class="form-group" style="margin-bottom: 12px;"><button type="submit" id="publish-btn" class="submit-btn">Publish</button></div>
+                        <div class="form-group"><button type="submit" id="publish-btn" class="submit-btn">Publish</button></div>
                         <div class="form-group" style="margin-bottom: 0;"><button type="button" id="cancel-btn" class="submit-btn secondary-btn" onclick="toggleAdvancedEditor(false)">Cancel</button></div>
                     </form>
                 </div>
@@ -318,7 +318,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.9.2 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.9.3 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -734,17 +734,28 @@
             }
         }
 
+        // --- Logika dynamického Delete All tlačidla ---
         function resetDeleteButton() {
             const btn = document.getElementById('delete-all-btn');
-            btn.dataset.state = "0"; btn.innerText = "Delete All Posts"; btn.disabled = false;
+            const advBtn = document.getElementById('add-adv-btn');
+            
+            btn.dataset.state = "0"; 
+            btn.innerText = "Delete All Posts"; 
+            btn.disabled = false;
+            
+            if (advBtn) advBtn.style.display = 'flex'; // Vráti plus tlačidlo
         }
 
         function handleDeleteAllClick() {
             const btn = document.getElementById('delete-all-btn');
+            const advBtn = document.getElementById('add-adv-btn');
             const state = btn.dataset.state || "0";
 
             if (state === "0") {
-                btn.dataset.state = "1"; btn.innerText = "Click to confirm";
+                btn.dataset.state = "1"; 
+                btn.innerText = "Click to confirm";
+                if (advBtn) advBtn.style.display = 'none'; // Schová plusko a roztiahne Delete
+                
                 clearTimeout(deleteConfirmTimeout);
                 deleteConfirmTimeout = setTimeout(() => resetDeleteButton(), 3000);
             } else if (state === "1") {
