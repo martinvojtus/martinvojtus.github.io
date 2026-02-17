@@ -14,6 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
+            /* STRICT 2 FONT SIZES ONLY */
             --size-large: 2.0rem;
             --size-small: 1.0rem;
             
@@ -25,6 +26,7 @@
             --content-width: 540px; 
             
             --border-radius: 12px; 
+            /* ABSOLUTE 12px SYSTEM SPACING */
             --gap-item: 12px; 
 
             --glass-opacity: 0.6; 
@@ -53,16 +55,22 @@
             margin: 0; padding: 0;
             background-color: var(--white);
             color: var(--black);
-            line-height: 1.5;
+            line-height: 1.5; /* Only applies to regular paragraphs now */
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
             transition: background-color 0.3s ease, color 0.3s ease; 
         }
 
+        /* LINE HEIGHT KILLER FOR EXACT SPACING */
+        .menu-link, .status-date, .admin-action-btn, .footer-info, .checkbox-label-text, .submit-btn, .form-input, .logo-text, .status-title {
+            line-height: 1;
+        }
+
         header {
             position: fixed; top: 0; left: 0;
-            width: 100%; height: 50px;
+            width: 100%; 
             display: flex; justify-content: center;
+            padding: var(--gap-item) 0; /* Header now strictly follows 12px rule */
             background: rgba(var(--glass-rgb), var(--glass-opacity));
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
@@ -71,13 +79,13 @@
 
         .header-content {
             width: 100%; max-width: var(--content-width);
-            height: 100%; display: flex; justify-content: space-between;
+            display: flex; justify-content: space-between;
             align-items: center; padding: 0 var(--gap-item); 
         }
 
         .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
         .header-left svg { height: 24px; width: auto; display: block; }
-        .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); letter-spacing: 0.05em; white-space: nowrap; }
+        .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); letter-spacing: 0.05em; white-space: nowrap; margin: 0; }
 
         .menu-toggle { width: 24px; height: 12px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; z-index: 2100; }
         .line { width: 24px; height: 1px; background-color: var(--black); transition: transform 0.3s ease, background-color 0.3s ease; }
@@ -92,7 +100,7 @@
             -webkit-backdrop-filter: blur(var(--glass-blur));
             transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1);
             z-index: 1500; 
-            padding: calc(50px + var(--gap-item)) 0 var(--gap-item) 0; 
+            padding: calc(48px + var(--gap-item)) 0 var(--gap-item) 0; 
             display: flex; flex-direction: column; align-items: center;
         }
         .nav-overlay.active { top: 0; }
@@ -106,7 +114,7 @@
         .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; letter-spacing: 0.02em; display: inline-block; padding: 0; border: none; background: transparent; text-align: left; margin: 0; }
 
         main {
-            padding: calc(50px + var(--gap-item)) var(--gap-item) var(--gap-item); 
+            padding: calc(48px + var(--gap-item)) var(--gap-item) var(--gap-item); 
             width: 100%; max-width: var(--content-width); 
             flex-grow: 1; display: flex; flex-direction: column; gap: var(--gap-item);
         }
@@ -121,23 +129,25 @@
         .status-feed {
             max-width: 600px; width: 100%;
             margin: 0 auto; 
-            display: flex; flex-direction: column; gap: var(--gap-item);
+            display: flex; flex-direction: column; gap: 0; /* Gap zero prevents double spacing! */
         }
 
         .status-card {
             background: transparent; border: none;
             border-bottom: 1px solid var(--divider); 
             border-radius: 0; 
-            padding: 0 0 var(--gap-item) 0; margin: 0;
+            padding: var(--gap-item) 0; /* Strict vertical padding instead of gap */
+            margin: 0;
             display: flex; flex-direction: column; gap: var(--gap-item);
         }
+        .status-card:first-child { padding-top: 0; }
         .status-card:last-child { border-bottom: none; }
 
         .status-date { font-size: var(--size-small); color: var(--grey-50); display: block; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
-        .status-title { font-size: var(--size-large); margin: 0; color: var(--black); line-height: 1.1; }
+        .status-title { font-size: var(--size-large); margin: 0; color: var(--black); }
         .status-image { width: 100%; height: auto; border-radius: var(--border-radius); display: block; margin: 0; border: none; }
-        .status-text { font-size: var(--size-small); line-height: 1.5; color: var(--black); opacity: 0.8; white-space: pre-line; text-align: justify; margin: 0; word-wrap: break-word; }
-        .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); margin: 0; padding: 0; }
+        .status-text { font-size: var(--size-small); color: var(--black); opacity: 0.8; white-space: pre-line; text-align: justify; margin: 0; word-wrap: break-word; }
+        .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); margin: 0; padding: var(--gap-item) 0; line-height: 1; }
 
         .form-input, .submit-btn { 
             width: 100%; height: 40px; border: 1px solid var(--black); border-radius: var(--border-radius); 
@@ -164,7 +174,7 @@
 
         .checkbox-wrapper { display: inline-flex; align-items: center; gap: var(--gap-item); cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; margin: 0; }
         .checkbox-wrapper input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
-        .checkmark { position: relative; height: 20px; width: 20px; background-color: transparent; border: 1px solid var(--black); border-radius: 6px; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .checkmark { position: relative; height: 20px; width: 20px; background-color: transparent; border: 1px solid var(--black); border-radius: 6px; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin: 0; }
         .checkbox-wrapper input:checked ~ .checkmark { background-color: var(--black); }
         .checkmark::after { content: ""; position: absolute; display: none; width: 4px; height: 9px; border: solid var(--white); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); margin-bottom: 2px; }
         .checkbox-wrapper input:checked ~ .checkmark::after { display: block; }
@@ -194,7 +204,7 @@
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
             
             <div id="menu-login-section">
-                <form onsubmit="handleLogin(event)" style="display: flex; height: 40px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent; margin: 0;">
+                <form onsubmit="handleLogin(event)" style="display: flex; height: 40px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent; margin: 0; gap: 0;">
                     <input type="password" id="admin-pass" placeholder="Password..." required style="flex-grow: 1; height: 100%; border: none; background: transparent; padding: 0 var(--gap-item); color: var(--black); outline: none; font-size: var(--size-small); margin: 0;">
                     <button type="submit" id="login-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: var(--size-small); margin: 0;">LOG IN</button>
                 </form>
@@ -212,18 +222,18 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.0.10 • 2026</div>
+            <div class="footer-info">build v3.0.11 • 2026</div>
         </div>
     </nav>
 
     <main>
         <div id="section-feed">
-            <h2 style="font-size: var(--size-large); margin: 0;">Feed.</h2>
+            <h2 style="font-size: var(--size-large); margin: 0; line-height: 1;">Feed.</h2>
             
             <div id="feed-admin-zone" style="display: none;">
                 
                 <div id="quick-post-wrapper">
-                    <form onsubmit="handleQuickPost(event)" style="display: flex; height: 40px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent; margin: 0;">
+                    <form onsubmit="handleQuickPost(event)" style="display: flex; height: 40px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent; margin: 0; gap: 0;">
                         <input type="text" id="quick-text" placeholder="Quick thought..." required style="flex-grow: 1; height: 100%; border: none; background: transparent; padding: 0 var(--gap-item); color: var(--black); outline: none; font-size: var(--size-small); margin: 0;">
                         <button type="submit" id="quick-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: var(--size-small); margin: 0;">POST</button>
                     </form>
@@ -244,16 +254,16 @@
                     <form id="editor-form" onsubmit="handlePublish(event)">
                         <input type="text" id="edit-title" class="form-input" placeholder="Title (Optional)">
                         
-                        <div id="current-image-container" style="display: none; font-size: var(--size-small); align-items: center; gap: var(--gap-item); margin: 0;">
-                            <span style="color: var(--grey-50);">Attached image </span>
+                        <div id="current-image-container" style="display: none; align-items: center; gap: var(--gap-item); margin: 0;">
+                            <span style="color: var(--grey-50); font-size: var(--size-small); line-height: 1;">Attached image </span>
                             <button type="button" class="admin-action-btn admin-action-link" style="color: var(--black);" onclick="flagImageForRemoval()">Remove</button>
                         </div>
 
                         <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateFileName()">
                         <div class="form-input" style="cursor: pointer;" onclick="document.getElementById('edit-image').click()">
                             <span class="admin-action-btn admin-action-link" style="pointer-events: none; white-space: nowrap;">Upload image</span>
-                            <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); margin-left: var(--gap-item);">(Optional)</span>
-                            <button type="button" id="clear-file-btn" class="admin-action-btn admin-action-link" style="color: var(--black); display: none; padding: 0; flex-shrink: 0; margin-left: var(--gap-item);" onclick="clearSelectedFile(event)">Remove</button>
+                            <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); line-height: 1; margin: 0;">(Optional)</span>
+                            <button type="button" id="clear-file-btn" class="admin-action-btn admin-action-link" style="color: var(--black); display: none; padding: 0; flex-shrink: 0;" onclick="clearSelectedFile(event)">Remove</button>
                         </div>
 
                         <textarea id="edit-text" class="form-textarea" placeholder="Content (Optional if image attached)"></textarea>
@@ -440,7 +450,7 @@
                 const updateObj = new Date(s.updated_at);
                 const updateDate = updateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
                 const updateTime = updateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-                editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin: 0;">EDITED: ${updateDate.toUpperCase()} • ${updateTime}</div>`;
+                editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin: 0; line-height: 1;">EDITED: ${updateDate.toUpperCase()} • ${updateTime}</div>`;
             }
             const titleHtml = (s.title && s.title.trim() !== "") ? `<h3 class="status-title">${s.title}</h3>` : '';
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image" loading="lazy">` : '';
@@ -448,14 +458,14 @@
             let adminActionsHtml = '';
             if (secretKey) {
                 adminActionsHtml = `
-                <div style="display: flex; gap: var(--gap-item); align-items: baseline; margin: 0;">
+                <div style="display: flex; gap: var(--gap-item); align-items: center; margin: 0;">
                     <button onclick="startEdit(${s.id});" class="admin-action-btn admin-action-link">Edit</button>
                     <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn admin-action-link">Delete</button>
                 </div>`;
             }
             return `
             <div class="status-card">
-                <div style="display: flex; justify-content: space-between; align-items: baseline; margin: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin: 0; gap: var(--gap-item);">
                     <span class="status-date">${date} • ${time}</span>
                     ${adminActionsHtml}
                 </div>
