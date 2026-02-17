@@ -337,7 +337,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider); margin: var(--gap-item) 0;"></div>
 
-            <div class="footer-info">build v3.0.6 • 2026</div>
+            <div class="footer-info">build v3.0.7 • 2026</div>
         </div>
     </nav>
 
@@ -393,7 +393,7 @@
             </div>
 
             <div id="status-container" class="status-feed"></div>
-            <div id="loading-indicator" class="loading-text">LOADING...</div>
+            <div id="loading-indicator" class="loading-text">Loading...</div>
         </div>
     </main>
 
@@ -474,7 +474,7 @@
             handleLogout();
             toggleMenu(true); 
             const passInput = document.getElementById('admin-pass');
-            passInput.placeholder = "INVALID PASSWORD.";
+            passInput.placeholder = "Invalid password.";
             setTimeout(() => { passInput.placeholder = "Password..."; }, 3000);
         }
 
@@ -525,6 +525,7 @@
                 globalPosts = [];
                 document.getElementById('status-container').innerHTML = '';
                 document.getElementById('loading-indicator').style.display = 'block';
+                document.getElementById('loading-indicator').innerText = 'Loading...';
             }
             if (isLoading || !hasMorePosts) return;
             isLoading = true;
@@ -538,7 +539,7 @@
                 currentOffset += newPosts.length;
                 globalPosts = globalPosts.concat(newPosts);
                 if (reset && globalPosts.length === 0) {
-                    container.innerHTML = '<p class="loading-text">NO POSTS YET.</p>';
+                    container.innerHTML = '<p class="loading-text">No posts yet.</p>';
                     loader.style.display = 'none';
                 } else {
                     const tempDiv = document.createElement('div');
@@ -546,7 +547,7 @@
                     while(tempDiv.firstChild) container.appendChild(tempDiv.firstChild);
                 }
             } catch (error) {
-                if (reset) container.innerHTML = `<p style="color:var(--black); text-align:center;">FAILED TO LOAD DATA.</p>`;
+                if (reset) container.innerHTML = `<p style="color:var(--black); text-align:center;">Failed to load data.</p>`;
                 loader.style.display = 'none';
             } finally {
                 isLoading = false;
@@ -630,27 +631,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function updateFileName() {
-            const input = document.getElementById('edit-image');
-            const display = document.getElementById('file-name-display');
-            const clearBtn = document.getElementById('clear-file-btn');
-            if (input.files && input.files.length > 0) {
-                display.innerText = input.files[0].name;
-                display.style.color = "var(--black)";
-                clearBtn.style.display = "block"; 
-            } else {
-                display.innerText = "(Optional)";
-                display.style.color = "var(--grey-50)";
-                clearBtn.style.display = "none";  
-            }
-        }
-
-        function clearSelectedFile(e) {
-            e.stopPropagation(); 
-            document.getElementById('edit-image').value = ""; 
-            updateFileName(); 
-        }
-
         async function handlePublish(e) {
             e.preventDefault();
             const title = document.getElementById('edit-title').value.trim();
@@ -660,7 +640,7 @@
             const originalBtnText = publishBtn.innerText;
             let hasImage = !!imageFile || (currentImageUrl && !removeImageFlag);
             if (!text && !hasImage) {
-                publishBtn.innerText = "ADD TEXT OR IMAGE.";
+                publishBtn.innerText = "Add text or image.";
                 publishBtn.disabled = true;
                 setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 2000);
                 return;
@@ -669,25 +649,25 @@
             let finalImageUrl = currentImageUrl;
             if (removeImageFlag && !imageFile) finalImageUrl = null; 
             if (imageFile) {
-                publishBtn.innerText = "COMPRESSING...";
+                publishBtn.innerText = "Compressing...";
                 const compressedFile = await compressImage(imageFile);
                 const formData = new FormData();
                 formData.append("file", compressedFile);
                 try {
-                    publishBtn.innerText = "UPLOADING...";
+                    publishBtn.innerText = "Uploading...";
                     const uploadRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
                     if (uploadRes.status === 401) throw new Error("Unauthorized");
                     if (!uploadRes.ok) throw new Error("Upload failed");
                     const uploadData = await uploadRes.json();
                     finalImageUrl = uploadData.image_url;
-                    publishBtn.innerText = "SAVING...";
+                    publishBtn.innerText = "Saving...";
                 } catch (err) {
                     if (err.message === "Unauthorized") return handleUnauthorized();
-                    publishBtn.innerText = "UPLOAD ERROR!";
+                    publishBtn.innerText = "Upload error!";
                     setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 2000);
                     return;
                 }
-            } else { publishBtn.innerText = "SAVING..."; }
+            } else { publishBtn.innerText = "Saving..."; }
             const method = editingId ? "PUT" : "POST";
             const endpoint = editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`;
             try {
@@ -698,11 +678,11 @@
                 });
                 if (res.status === 401) return handleUnauthorized();
                 if (!res.ok) throw new Error();
-                publishBtn.innerText = editingId ? "UPDATED." : "PUBLISHED.";
+                publishBtn.innerText = editingId ? "Updated." : "Published.";
                 await fetchStatuses(true); 
                 setTimeout(() => { document.activeElement.blur(); toggleAdvancedEditor(false); }, 1500);
             } catch (err) {
-                publishBtn.innerText = "CONNECTION ERROR!";
+                publishBtn.innerText = "Connection error!";
                 setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 2000);
             }
         }
@@ -722,11 +702,11 @@
                 });
                 if (res.status === 401) return handleUnauthorized();
                 if(!res.ok) throw new Error();
-                inputField.value = ""; btn.innerText = "POSTED.";
+                inputField.value = ""; btn.innerText = "Posted.";
                 await fetchStatuses(true);
                 setTimeout(() => { btn.innerText = "POST"; btn.disabled = false; document.activeElement.blur(); }, 1500);
             } catch(err) {
-                btn.innerText = "ERROR.";
+                btn.innerText = "Error.";
                 setTimeout(() => { btn.innerText = "POST"; btn.disabled = false; }, 1500);
             }
         }
@@ -741,7 +721,7 @@
                     if (res.status === 401) return handleUnauthorized();
                     fetchStatuses(true); 
                 } catch(e) {
-                    alert("ERROR DELETING POST.");
+                    alert("Error deleting post.");
                     btn.innerText = "Delete"; btn.disabled = false; btn.dataset.confirm = "false";
                 }
             } else {
@@ -801,7 +781,7 @@
                 }
                 fetchStatuses(true);
             } catch(e) {
-                alert("AN ERROR OCCURRED WHILE DELETING ALL POSTS.");
+                alert("An error occurred while deleting all posts.");
             } finally {
                 resetDeleteButton(); closeMenu();
             }
