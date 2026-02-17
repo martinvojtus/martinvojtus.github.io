@@ -346,9 +346,7 @@
 
                         <div class="form-group"><textarea id="edit-text" class="form-textarea" placeholder="Content (Optional if image attached)"></textarea></div>
                         
-                        <p id="admin-msg" style="font-size: var(--size-small); margin: 0 0 10px 0;"></p>
-                        
-                        <div class="form-group"><button type="submit" id="publish-btn" class="submit-btn" style="background: transparent; color: var(--black);">Publish</button></div>
+                        <div class="form-group"><button type="submit" id="publish-btn" class="submit-btn">Publish</button></div>
                         <div class="form-group" id="cancel-btn-container" style="display: none;"><button type="button" id="cancel-btn" class="submit-btn secondary-btn" onclick="cancelEdit()">Cancel Edit</button></div>
                     </form>
                 </div>
@@ -373,7 +371,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.8.12 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.8.13 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -413,7 +411,6 @@
             }
         }
 
-        // --- Nová funkcia na rýchly refresh Feedu po prihlásení/odhlásení ---
         function refreshFeedUI() {
             const container = document.getElementById('status-container');
             if (globalPosts.length > 0) {
@@ -572,7 +569,6 @@
                 textHtml = `<div class="status-text">${linkify(s.text)}</div>`;
             }
 
-            // Nové Inline Admin funkcie vo Feede
             let adminActionsHtml = '';
             if (secretKey) {
                 adminActionsHtml = `
@@ -609,7 +605,7 @@
             document.getElementById('quick-post-container').style.display = 'block'; 
             document.getElementById('login-error').style.display = 'none';
             switchAdminTab('editor'); 
-            refreshFeedUI(); // Aktualizuje Feed s Admin tlačidlami
+            refreshFeedUI(); 
         }
 
         function handleLogout() {
@@ -625,7 +621,7 @@
             document.getElementById('quick-post-container').style.display = 'none'; 
             cancelEdit();
             resetDeleteButton(); 
-            refreshFeedUI(); // Skryje Admin tlačidlá z Feedu
+            refreshFeedUI(); 
         }
 
         function flagImageForRemoval() {
@@ -657,23 +653,28 @@
             updateFileName(); 
         }
 
+        // --- Logika s notifikáciami priamo v tlačidle ---
         async function handlePublish(e) {
             e.preventDefault();
             const title = document.getElementById('edit-title').value.trim();
             const text = document.getElementById('edit-text').value.trim();
             const imageFile = document.getElementById('edit-image').files[0];
-            const msgBox = document.getElementById('admin-msg');
             const publishBtn = document.getElementById('publish-btn');
+            const originalBtnText = publishBtn.innerText;
             
             let hasImage = !!imageFile || (currentImageUrl && !removeImageFlag);
+            
+            // Kontrola prázdneho poľa - Notifikácia v tlačidle
             if (!text && !hasImage) {
-                msgBox.style.color = "var(--black)";
-                msgBox.style.fontWeight = "700";
-                msgBox.innerText = "Post must contain at least text or an image.";
+                publishBtn.innerText = "Add text or image.";
+                publishBtn.disabled = true;
+                setTimeout(() => {
+                    publishBtn.innerText = originalBtnText;
+                    publishBtn.disabled = false;
+                }, 2000);
                 return;
             }
 
-            msgBox.innerText = "";
             publishBtn.disabled = true;
 
             let finalImageUrl = currentImageUrl;
@@ -708,12 +709,13 @@
                         handleLogout();
                         document.getElementById('login-error').style.display = 'block';
                     } else {
-                        msgBox.style.color = "var(--black)";
-                        msgBox.style.fontWeight = "700";
-                        msgBox.innerText = "Error uploading image.";
+                        // Upload Error v tlačidle
+                        publishBtn.innerText = "Upload Error!";
+                        setTimeout(() => {
+                            publishBtn.innerText = originalBtnText;
+                            publishBtn.disabled = false;
+                        }, 2000);
                     }
-                    publishBtn.disabled = false;
-                    publishBtn.innerText = editingId ? "Save Changes" : "Publish";
                     return;
                 }
             } else {
@@ -734,13 +736,10 @@
                 });
 
                 if (res.status === 401) {
-                    msgBox.style.color = "var(--black)";
-                    msgBox.style.fontWeight = "700";
-                    msgBox.innerText = "Unauthorized. Wrong password.";
                     handleLogout();
                     document.getElementById('login-error').style.display = 'block';
+                    publishBtn.innerText = originalBtnText;
                     publishBtn.disabled = false;
-                    publishBtn.innerText = editingId ? "Save Changes" : "Publish";
                     return;
                 }
 
@@ -757,11 +756,12 @@
                 }, 1500);
 
             } catch (err) {
-                msgBox.style.color = "var(--black)";
-                msgBox.style.fontWeight = "700";
-                msgBox.innerText = "Connection error.";
-                publishBtn.disabled = false;
-                publishBtn.innerText = editingId ? "Save Changes" : "Publish";
+                // Connection Error v tlačidle
+                publishBtn.innerText = "Connection Error!";
+                setTimeout(() => {
+                    publishBtn.innerText = originalBtnText;
+                    publishBtn.disabled = false;
+                }, 2000);
             }
         }
 
@@ -893,9 +893,7 @@
             paginationControls.style.display = 'flex';
         }
 
-        // --- Upravený startEdit, aby vedel zobrať dáta aj priamo z Feedu (z globalPosts) ---
         function startEdit(id) {
-            // Skúsi nájsť v currentAdminPosts (Manage tab) alebo v globalPosts (Feed tab)
             const post = currentAdminPosts.find(p => p.id === id) || globalPosts.find(p => p.id === id);
             if(!post) return;
             editingId = id;
@@ -942,7 +940,6 @@
             document.getElementById('cancel-btn-container').style.display = "none";
         }
 
-        // Pôvodné mazanie v záložke Manage
         async function handleDeleteSingle(id) {
             const btn = document.getElementById(`del-btn-${id}`);
             
@@ -984,7 +981,6 @@
             }
         }
 
-        // --- Nové mazanie príspevkov priamo z Feedu ---
         async function handleDeleteFeed(id) {
             const btn = document.getElementById(`feed-del-btn-${id}`);
             
@@ -1005,7 +1001,6 @@
                         return;
                     }
                     fetchStatuses(true); 
-                    // Ak má náhodou otvorenú aj stránku manage, tak refreshneme aj tú
                     if(document.getElementById('admin-manage-view').style.display === 'block') {
                         fetchAdminPosts(adminCurrentPage);
                     }
