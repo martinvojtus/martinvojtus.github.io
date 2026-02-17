@@ -186,6 +186,7 @@
             box-sizing: border-box;
             display: block;
             transition: all 0.3s ease; 
+            min-height: 56px; 
         }
         
         ::placeholder { color: var(--grey-50); opacity: 1; }
@@ -318,7 +319,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.9.3 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.9.4 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -743,7 +744,7 @@
             btn.innerText = "Delete All Posts"; 
             btn.disabled = false;
             
-            if (advBtn) advBtn.style.display = 'flex'; // Vráti plus tlačidlo
+            if (advBtn) advBtn.style.display = 'flex'; 
         }
 
         function handleDeleteAllClick() {
@@ -754,7 +755,7 @@
             if (state === "0") {
                 btn.dataset.state = "1"; 
                 btn.innerText = "Click to confirm";
-                if (advBtn) advBtn.style.display = 'none'; // Schová plusko a roztiahne Delete
+                if (advBtn) advBtn.style.display = 'none'; 
                 
                 clearTimeout(deleteConfirmTimeout);
                 deleteConfirmTimeout = setTimeout(() => resetDeleteButton(), 3000);
