@@ -337,7 +337,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider); margin: var(--gap-item) 0;"></div>
 
-            <div class="footer-info">build v2.10.5 • 2026</div>
+            <div class="footer-info">build v3.0.6 • 2026</div>
         </div>
     </nav>
 
@@ -735,20 +735,20 @@
             const btn = document.getElementById(`feed-del-btn-${id}`);
             if (btn.dataset.confirm === "true") {
                 clearTimeout(btn.timeoutId);
-                btn.disabled = true; btn.innerText = "DELETING...";
+                btn.disabled = true; btn.innerText = "Deleting...";
                 try {
                     const res = await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
                     if (res.status === 401) return handleUnauthorized();
                     fetchStatuses(true); 
                 } catch(e) {
                     alert("ERROR DELETING POST.");
-                    btn.innerText = "DELETE"; btn.disabled = false; btn.dataset.confirm = "false";
+                    btn.innerText = "Delete"; btn.disabled = false; btn.dataset.confirm = "false";
                 }
             } else {
-                btn.dataset.confirm = "true"; btn.innerText = "CONFIRM";
+                btn.dataset.confirm = "true"; btn.innerText = "Confirm";
                 btn.timeoutId = setTimeout(() => {
                     if (document.getElementById(`feed-del-btn-${id}`)) { 
-                        btn.dataset.confirm = "false"; btn.innerText = "DELETE"; 
+                        btn.dataset.confirm = "false"; btn.innerText = "Delete"; 
                     }
                 }, 3000);
             }
