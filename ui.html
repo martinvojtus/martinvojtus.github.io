@@ -240,6 +240,15 @@
             margin-bottom: var(--gap-item);
         }
 
+        /* Nové štýly pre animáciu Quick Post šípky */
+        .send-icon {
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+        }
+        .send-icon.fly-away {
+            transform: translate(15px, -15px) scale(0.8);
+            opacity: 0;
+        }
+
         footer {
             width: 100%; max-width: var(--content-width); padding: 40px 20px 30px; 
             display: flex; flex-direction: column; align-items: center;
@@ -274,9 +283,14 @@
             <h2 style="font-size: var(--size-large); margin: 0 0 var(--gap-item) 0;">Feed.</h2>
             
             <div id="quick-post-container" style="display: none; margin-bottom: var(--gap-item);">
-                <form onsubmit="handleQuickPost(event)" style="display: flex; gap: 12px; width: 100%;">
-                    <input type="text" id="quick-text" class="form-input" placeholder="Quick thought..." required style="flex-grow: 1;">
-                    <button type="submit" id="quick-btn" class="submit-btn" style="width: auto; padding: 0 20px;">Post</button>
+                <form onsubmit="handleQuickPost(event)" style="position: relative; width: 100%; display: flex; align-items: center;">
+                    <input type="text" id="quick-text" class="form-input" placeholder="Quick thought..." required style="width: 100%; padding-right: 48px;">
+                    <button type="submit" id="quick-btn" aria-label="Post" style="position: absolute; right: 6px; background: transparent; border: none; padding: 8px; cursor: pointer; color: var(--black); display: flex; align-items: center; justify-content: center; outline: none;">
+                        <svg id="quick-icon" class="send-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="7" y1="17" x2="17" y2="7"></line>
+                            <polyline points="7 7 17 7 17 17"></polyline>
+                        </svg>
+                    </button>
                 </form>
             </div>
 
@@ -346,7 +360,7 @@
                         
                         <p id="admin-msg" style="font-size: var(--size-small); margin: 0 0 10px 0;"></p>
                         
-                        <div class="form-group"><button type="submit" id="publish-btn" class="submit-btn">Publish</button></div>
+                        <div class="form-group"><button type="submit" id="publish-btn" class="submit-btn" style="background: transparent; color: var(--black);">Publish</button></div>
                         <div class="form-group" id="cancel-btn-container" style="display: none;"><button type="button" id="cancel-btn" class="submit-btn secondary-btn" onclick="cancelEdit()">Cancel Edit</button></div>
                     </form>
                 </div>
@@ -371,7 +385,7 @@
     </main>
 
     <footer>
-        <div class="footer-info">build v2.8.7 • martin vojtus • 2026</div>
+        <div class="footer-info">build v2.8.8 • martin vojtus • 2026</div>
     </footer>
 
     <script>
@@ -736,14 +750,18 @@
             }
         }
 
+        // --- Logika a animácia Quick Postu ---
         async function handleQuickPost(e) {
             e.preventDefault();
-            const text = document.getElementById('quick-text').value.trim();
+            const inputField = document.getElementById('quick-text');
+            const text = inputField.value.trim();
             const btn = document.getElementById('quick-btn');
+            const icon = document.getElementById('quick-icon');
+
             if(!text) return;
             
             btn.disabled = true;
-            btn.innerText = "...";
+            icon.classList.add('fly-away'); // Spustí animáciu "odletu"
             
             try {
                 const res = await fetch(`${API_URL}/posts`, {
@@ -760,28 +778,29 @@
                     showSection('admin');
                     document.getElementById('login-error').style.display = 'block';
                     btn.disabled = false;
-                    btn.innerText = "Post";
+                    icon.classList.remove('fly-away');
                     return;
                 }
 
                 if(!res.ok) throw new Error();
 
-                document.getElementById('quick-text').value = "";
-                // Zmení sa len text pre čistý B&W vzhľad
-                btn.innerText = "Posted.";
+                inputField.value = "";
+                inputField.placeholder = "Posted."; // Namiesto fajky to napíše do inputu
                 
                 await fetchStatuses(true);
                 
                 setTimeout(() => {
-                    btn.innerText = "Post";
+                    inputField.placeholder = "Quick thought...";
+                    icon.classList.remove('fly-away'); // Vráti šípku späť
                     btn.disabled = false;
                     document.activeElement.blur();
                 }, 1500);
 
             } catch(err) {
-                btn.innerText = "Error.";
+                inputField.placeholder = "Error.";
                 setTimeout(() => {
-                    btn.innerText = "Post";
+                    inputField.placeholder = "Quick thought...";
+                    icon.classList.remove('fly-away');
                     btn.disabled = false;
                 }, 1500);
             }
@@ -907,6 +926,7 @@
             const publishBtn = document.getElementById('publish-btn');
             publishBtn.disabled = false;
             publishBtn.innerText = "Publish";
+            publishBtn.style.color = "var(--white)";
             document.getElementById('cancel-btn-container').style.display = "none";
         }
 
