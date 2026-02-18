@@ -14,12 +14,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
-            var(--size-large): 2.0rem;
+            /* STRICT 2 FONT SIZES ONLY */
+            --size-large: 2.0rem;
             --size-small: 1.0rem;
             
             --black: #000000;
             --white: #ffffff;
+            
+            /* 50% BLACK FOR SUBTLE TEXT & PLACEHOLDERS */
             --grey-50: rgba(0, 0, 0, 0.5);
+            
+            /* 10% BLACK FOR DIVIDER LINES */
             --divider: rgba(0, 0, 0, 0.1);
             
             --glass-rgb: 255, 255, 255; 
@@ -44,10 +49,11 @@
         }
 
         html { -webkit-text-size-adjust: 100%; scroll-behavior: auto; }
+        
         * { 
             -webkit-tap-highlight-color: transparent; 
             box-sizing: border-box; 
-            font-weight: 400; 
+            font-weight: 400; /* STRICTLY REGULAR FONT WEIGHT */
             font-family: 'Space Grotesk', sans-serif; 
             letter-spacing: var(--letter-spacing); 
         }
@@ -60,6 +66,7 @@
             min-height: 100vh;
         }
 
+        /* LINE HEIGHT KILLER FOR EXACT SPACING */
         .menu-link, .status-date, .admin-action-btn, .footer-info, .submit-btn, .form-input, .logo-text, .status-title {
             line-height: 1;
         }
@@ -141,7 +148,8 @@
 
         .form-input::placeholder, .form-textarea::placeholder { color: var(--grey-50); opacity: 1; }
 
-        .input-error { border-color: #ff4444 !important; color: #ff4444 !important; }
+        /* BRUTALIST ERROR STATES */
+        .input-error { border-color: #ff4444 !important; }
         .input-error::placeholder { color: #ff4444 !important; opacity: 1 !important; }
 
         .submit-btn { background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -204,7 +212,7 @@
             </div>
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
-            <div class="footer-info">build v5.0.0 • 2026</div>
+            <div class="footer-info">build v5.0.1 • 2026</div>
         </div>
     </nav>
 
@@ -282,7 +290,7 @@
         const titleInput = document.getElementById('edit-title');
         const textInput = document.getElementById('edit-text');
 
-        // Odstránenie chybových hlášok priamo pri písaní (Surový Brutalizmus)
+        /* ZERO-DELAY ERROR CLEARING */
         [passInput, titleInput, textInput].forEach(input => {
             if(input) input.addEventListener('input', function() {
                 this.classList.remove('input-error');
