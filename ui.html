@@ -184,7 +184,18 @@
         .danger-btn { background: #ff4444 !important; color: #000000 !important; border: none !important; }
 
         .admin-action-btn { background: transparent; border: none; font-size: var(--size-small); color: var(--black); cursor: pointer; padding: 0; margin: 0; display: inline-flex; align-items: center; transition: color 0.2s ease;}
-        .admin-action-link { text-decoration: underline; }
+        .admin-action-link { text-decoration: none; } /* Uvedené odstránenie podčiarknutí */
+
+        /* NEW ANIMATIONS */
+        .spin-btn svg { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .spin-btn:hover svg { transform: rotate(90deg); }
+        .spin-btn:active svg { transform: scale(0.8) rotate(90deg); }
+
+        .fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         .checkbox-wrapper { display: inline-flex; align-items: center; gap: var(--gap-item); cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; margin: 0; }
         .checkbox-wrapper input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
@@ -237,12 +248,12 @@
             </div>
 
             <div id="menu-admin-section" style="display: none;">
-                <button onclick="handleLogout()" class="menu-link" style="text-decoration: underline; color: #ff4444;">Logout</button>
+                <button onclick="handleLogout()" class="menu-link" style="text-decoration: none; color: #ff4444;">Logout</button>
             </div>
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.2.8 • 2026</div>
+            <div class="footer-info">build v3.2.9 • 2026</div>
         </div>
     </nav>
 
@@ -253,11 +264,11 @@
             
             <div id="feed-admin-zone" style="display: none;">
                 
-                <div id="quick-post-wrapper">
+                <div id="quick-post-wrapper" class="fade-in-up">
                     <form onsubmit="handleQuickPost(event)" style="display: flex; gap: var(--gap-item); flex-grow: 1; margin: 0;">
                         <input type="text" id="quick-text" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; margin: 0;">
                         
-                        <button type="button" id="add-adv-btn" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
+                        <button type="button" id="add-adv-btn" class="submit-btn spin-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -272,12 +283,12 @@
                     </form>
                 </div>
 
-                <div id="full-editor-wrapper" style="display: none; flex-direction: column; gap: var(--gap-item);">
+                <div id="full-editor-wrapper" class="fade-in-up" style="display: none; flex-direction: column; gap: var(--gap-item);">
                     <form id="editor-form" onsubmit="handlePublish(event)" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; margin: 0;">
                         <input type="text" id="edit-title" class="form-input" placeholder="Title (Optional)" style="width: 100%;">
                         
                         <div style="display: flex; gap: var(--gap-item); width: 100%;">
-                            <img id="upload-thumbnail" style="display: none; width: 48px; height: 48px; border-radius: var(--border-radius); object-fit: cover; flex-shrink: 0; margin: 0;" src="" alt="Thumbnail">
+                            <img id="upload-thumbnail" style="display: none; width: 48px; height: 48px; border-radius: var(--border-radius); object-fit: cover; flex-shrink: 0; margin: 0; border: 1px solid var(--black);" src="" alt="Thumbnail">
 
                             <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                             
@@ -300,7 +311,7 @@
                         
                         <div style="display: flex; gap: var(--gap-item);">
                             <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
-                            <button type="button" id="cancel-btn" class="submit-btn secondary-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
+                            <button type="button" id="cancel-btn" class="submit-btn secondary-btn spin-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
                                     <line x1="18" y1="6" x2="6" y2="18"></line>
                                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -436,8 +447,9 @@
 
         function linkify(text) {
             const urlRegex = /(https?:\/\/[^\s]+)/g;
+            // Odstránené podčiarknutie text-decoration: none
             return text.replace(urlRegex, function(url) {
-                return '<a href="' + url + '" target="_blank" style="color: inherit; text-decoration: underline;">' + url + '</a>';
+                return '<a href="' + url + '" target="_blank" style="color: inherit; text-decoration: none; opacity: 0.6; transition: opacity 0.3s ease;">' + url + '</a>';
             });
         }
 
@@ -483,7 +495,6 @@
                 currentOffset += newPosts.length;
                 globalPosts = globalPosts.concat(newPosts);
                 if (reset && globalPosts.length === 0) {
-                    // Update: Changed to "Nothing there."
                     container.innerHTML = '<p class="loading-text">Nothing there.</p>';
                     loader.style.display = 'none';
                 } else {
@@ -550,7 +561,13 @@
                     quickTextInput.value = "";
                 }
                 qWrapper.style.display = 'none';
+                
+                // Opätovné priradenie animácie pre čistý reset pri každom otvorení
+                fWrapper.classList.remove('fade-in-up');
+                void fWrapper.offsetWidth; // trigger reflow
+                fWrapper.classList.add('fade-in-up');
                 fWrapper.style.display = 'flex';
+                
                 updateImageUIState(); 
             } else {
                 editingId = null; currentImageUrl = null; removeImageFlag = false;
@@ -562,7 +579,13 @@
 
                 const publishBtn = document.getElementById('publish-btn');
                 publishBtn.disabled = false; publishBtn.innerText = "PUBLISH";
-                qWrapper.style.display = 'flex'; fWrapper.style.display = 'none';
+                
+                fWrapper.style.display = 'none';
+                qWrapper.classList.remove('fade-in-up');
+                void qWrapper.offsetWidth; // trigger reflow
+                qWrapper.classList.add('fade-in-up');
+                qWrapper.style.display = 'flex'; 
+                
                 resetDeleteButton();
             }
         }
@@ -582,6 +605,10 @@
             const qWrapper = document.getElementById('quick-post-wrapper');
             const fWrapper = document.getElementById('full-editor-wrapper');
             qWrapper.style.display = 'none';
+            
+            fWrapper.classList.remove('fade-in-up');
+            void fWrapper.offsetWidth; // trigger reflow
+            fWrapper.classList.add('fade-in-up');
             fWrapper.style.display = 'flex';
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -600,7 +627,6 @@
             const hasExistingImage = currentImageUrl && !removeImageFlag;
 
             if (hasNewFile || hasExistingImage) {
-                // State: Image Present
                 uploadContainer.onclick = null; 
                 uploadContainer.style.cursor = 'default';
                 
@@ -633,7 +659,6 @@
                 };
 
             } else {
-                // State: Empty
                 uploadContainer.onclick = () => document.getElementById('edit-image').click();
                 uploadContainer.style.cursor = 'pointer';
                 
@@ -642,6 +667,7 @@
                 
                 actionLabel.style.display = 'inline';
                 actionLabel.innerText = "Upload image";
+                actionLabel.style.textDecoration = 'none'; // Ensure no underline
                 
                 nameDisplay.innerText = "(Optional)";
                 nameDisplay.style.color = "var(--grey-30)";
@@ -742,7 +768,7 @@
                 clearTimeout(btn.timeoutId);
                 btn.disabled = true; 
                 btn.innerText = "Deleting...";
-                btn.style.color = ""; // reset color when actively deleting
+                btn.style.color = ""; 
                 try {
                     const res = await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
                     if (res.status === 401) return handleUnauthorized();
@@ -756,14 +782,14 @@
             } else {
                 btn.dataset.confirm = "true"; 
                 btn.innerText = "Confirm";
-                btn.style.color = "#ff4444"; // Set to danger red
+                btn.style.color = "#ff4444"; 
                 
                 btn.timeoutId = setTimeout(() => {
                     const currentBtn = document.getElementById(`feed-del-btn-${id}`);
                     if (currentBtn) { 
                         currentBtn.dataset.confirm = "false"; 
                         currentBtn.innerText = "Delete"; 
-                        currentBtn.style.color = ""; // Revert to normal
+                        currentBtn.style.color = ""; 
                     }
                 }, 3000);
             }
