@@ -159,14 +159,14 @@
             height: 48px; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; color: var(--black); box-sizing: border-box; display: flex; margin: 0; align-items: center;
-            gap: var(--gap-item); transition: border-color 0.3s ease;
+            gap: var(--gap-item); transition: border-color 0.3s ease, color 0.2s ease;
         }
         
         .form-textarea { 
             width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: var(--gap-item); 
             outline: none; color: var(--black); box-sizing: border-box; display: block; 
-            transition: border-color 0.3s ease; min-height: 80px; resize: vertical; margin: 0;
+            transition: border-color 0.3s ease, color 0.2s ease; min-height: 80px; resize: vertical; margin: 0;
         }
 
         .form-input::placeholder, .form-textarea::placeholder {
@@ -180,8 +180,7 @@
         .input-error::placeholder { color: #ff4444 !important; opacity: 1 !important; }
         .placeholder-fade-out::placeholder { 
             opacity: 0 !important; 
-            /* Dôležité: Keď mizne, mení sa len priehľadnosť. Zabráni to prelínaniu farieb. */
-            transition: opacity 0.15s ease !important; 
+            transition: opacity 0.2s ease !important; 
         }
 
         .submit-btn {
@@ -222,6 +221,12 @@
         #adv-content {
             opacity: 0;
             transition: opacity 0.2s ease;
+        }
+        
+        /* Obal pre modul Uploadu pre plynulú výmenu */
+        #upload-ui-wrapper {
+            transition: opacity 0.2s ease;
+            opacity: 1;
         }
 
         .checkbox-wrapper { display: inline-flex; align-items: center; gap: var(--gap-item); cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; margin: 0; }
@@ -279,7 +284,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.3.3 • 2026</div>
+            <div class="footer-info">build v3.3.4 • 2026</div>
         </div>
     </nav>
 
@@ -317,10 +322,10 @@
                                 
                                 <textarea id="edit-text" class="form-textarea" placeholder="Content"></textarea>
 
-                                <div style="display: flex; gap: var(--gap-item); width: 100%;">
-                                    <img id="upload-thumbnail" style="display: none; width: 48px; height: 48px; border-radius: var(--border-radius); object-fit: cover; flex-shrink: 0; margin: 0; border: 1px solid var(--black); color: transparent;" src="" alt="">
+                                <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
+                                    <img id="upload-thumbnail" style="display: none; width: 48px; height: 48px; border-radius: var(--border-radius); object-fit: cover; flex-shrink: 0; margin: 0; border: 1px solid var(--black); color: transparent;" src="" alt="" onload="this.style.border='none'">
 
-                                    <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
+                                    <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState(true)">
                                     
                                     <div id="upload-container" class="form-input" style="cursor: pointer; flex-grow: 1; min-width: 0; overflow: hidden;">
                                         <span id="upload-action-label" style="pointer-events: none; white-space: nowrap; color: var(--black); text-decoration: none; flex-shrink: 0;">Upload image</span>
@@ -398,7 +403,6 @@
                 el.setAttribute('placeholder', message);
                 el.classList.add('input-error');
                 
-                // Pustíme prechodový cyklus, aby si to browser zaradil
                 requestAnimationFrame(() => {
                     el.classList.remove('placeholder-fade-out');
                     
@@ -411,14 +415,14 @@
                             el.classList.remove('input-error');
                             el.setAttribute('placeholder', origPlaceholder);
                             
-                            // Force reflow - povie browseru "prekresli to hneď teraz, neanimuj zmenu farby"
+                            // Force reflow - prevents color bleeding
                             void el.offsetWidth; 
                             
                             // 5. Fade back in s pôvodnou farbou
                             el.classList.remove('placeholder-fade-out');
                             el.dataset.errorActive = "false";
-                        }, 200); // Čaká sa na dokončenie zmiznutia
-                    }, 2000); // Chybová hláška trvá 2 sekundy
+                        }, 200); 
+                    }, 2000); 
                 });
             }, 200); 
         }
@@ -606,7 +610,7 @@
             </div>`;
         }
 
-        // --- SEQUENTIAL EXPANSION ANIMATION LOGIC ---
+        // --- SEQUENTIAL EXPANSION & CROSS-FADE LOGIC ---
         function toggleAdvancedEditor(show) {
             const titleInput = document.getElementById('edit-title');
             const textInput = document.getElementById('edit-text');
@@ -620,40 +624,33 @@
                     titleInput.value = "";
                 }
                 
-                // 1. Zbaľ rýchle tlačidlá (roztiahne to input do plnej šírky)
                 quickButtons.classList.add('hidden');
                 
-                // 2. Cross-fade textu v placeholdery
                 titleInput.classList.add('placeholder-fade-out');
                 setTimeout(() => {
                     titleInput.setAttribute('placeholder', 'Title');
                     titleInput.classList.remove('placeholder-fade-out');
-                }, 150); 
+                }, 200); 
                 
-                // 3. Rozbaľ akordeón nadol
                 advWrapper.classList.add('open');
-                updateImageUIState();
+                updateImageUIState(false);
                 
-                // 4. Počas roztvárania vpi (fade-in) obsah
                 setTimeout(() => {
                     advContent.style.opacity = '1';
                 }, 150); 
                 
             } else {
-                // 1. Vypi obsah do stratena
                 advContent.style.opacity = '0';
                 
                 setTimeout(() => {
-                    // 2. Zbaľ akordeón nahor
                     advWrapper.classList.remove('open');
                     
-                    // Cross-fade textu späť
                     titleInput.classList.add('placeholder-fade-out');
                     
                     setTimeout(() => {
-                        // 3. Reset UI & vysunutie rýchlych tlačidiel
                         titleInput.setAttribute('placeholder', 'Quick thought...');
                         titleInput.classList.remove('placeholder-fade-out');
+                        titleInput.style.color = ''; // reset just in case
                         
                         quickButtons.classList.remove('hidden');
                         
@@ -663,104 +660,137 @@
                         document.getElementById('edit-image').value = "";
                         removeImageFlag = false;
                         currentImageUrl = null;
-                        updateImageUIState();
+                        updateImageUIState(false);
                         
                         resetDeleteButton();
                         const publishBtn = document.getElementById('publish-btn');
                         publishBtn.disabled = false; 
                         publishBtn.innerText = "PUBLISH";
                         
-                    }, 150); 
-                }, 150); 
+                    }, 200); 
+                }, 200); 
             }
         }
 
         function startEdit(id) {
             const post = globalPosts.find(p => p.id === id);
             if(!post) return;
-            editingId = id; currentImageUrl = post.image_url || null; removeImageFlag = false; 
             
             const titleInput = document.getElementById('edit-title');
             const textInput = document.getElementById('edit-text');
             const quickButtons = document.getElementById('quick-buttons');
             const advWrapper = document.getElementById('advanced-section-wrapper');
             const advContent = document.getElementById('adv-content');
-
-            titleInput.value = post.title || "";
-            textInput.value = post.text || "";
-            document.getElementById('edit-image').value = ""; 
             
-            updateImageUIState(); 
+            const isOpen = advWrapper.classList.contains('open');
 
-            document.getElementById('publish-btn').innerText = "SAVE CHANGES";
-            
-            quickButtons.classList.add('hidden');
-            titleInput.setAttribute('placeholder', 'Title');
-            advWrapper.classList.add('open');
-            advContent.style.opacity = '1';
+            const applyUpdates = () => {
+                editingId = id; 
+                currentImageUrl = post.image_url || null; 
+                removeImageFlag = false; 
+                titleInput.value = post.title || "";
+                textInput.value = post.text || "";
+                document.getElementById('edit-image').value = ""; 
+                updateImageUIState(false); 
+                document.getElementById('publish-btn').innerText = "SAVE CHANGES";
+                titleInput.setAttribute('placeholder', 'Title');
+            };
 
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (isOpen) {
+                // Cross-fade when already open
+                titleInput.style.color = 'transparent';
+                advContent.style.opacity = '0';
+                
+                setTimeout(() => {
+                    applyUpdates();
+                    titleInput.style.color = 'var(--black)';
+                    advContent.style.opacity = '1';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 200);
+            } else {
+                applyUpdates();
+                quickButtons.classList.add('hidden');
+                advWrapper.classList.add('open');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setTimeout(() => {
+                    advContent.style.opacity = '1';
+                }, 150);
+            }
         }
 
-        function updateImageUIState() {
-            const input = document.getElementById('edit-image');
-            const uploadContainer = document.getElementById('upload-container');
-            const actionLabel = document.getElementById('upload-action-label');
-            const nameDisplay = document.getElementById('file-name-display');
-            const clearBtn = document.getElementById('clear-file-btn');
-            const thumbnail = document.getElementById('upload-thumbnail');
+        function updateImageUIState(smooth = false) {
+            const exec = () => {
+                const input = document.getElementById('edit-image');
+                const uploadContainer = document.getElementById('upload-container');
+                const actionLabel = document.getElementById('upload-action-label');
+                const nameDisplay = document.getElementById('file-name-display');
+                const clearBtn = document.getElementById('clear-file-btn');
+                const thumbnail = document.getElementById('upload-thumbnail');
 
-            const hasNewFile = input.files && input.files.length > 0;
-            const hasExistingImage = currentImageUrl && !removeImageFlag;
+                const hasNewFile = input.files && input.files.length > 0;
+                const hasExistingImage = currentImageUrl && !removeImageFlag;
 
-            if (hasNewFile || hasExistingImage) {
-                uploadContainer.onclick = null; 
-                uploadContainer.style.cursor = 'default';
-                
-                actionLabel.style.display = 'none'; 
-                thumbnail.style.display = 'block'; 
-                
-                nameDisplay.style.color = "var(--black)"; 
-                nameDisplay.style.textAlign = "left";
+                if (hasNewFile || hasExistingImage) {
+                    uploadContainer.onclick = null; 
+                    uploadContainer.style.cursor = 'default';
+                    
+                    actionLabel.style.display = 'none'; 
+                    thumbnail.style.display = 'block'; 
+                    thumbnail.style.border = '1px solid var(--black)'; // Set border before load
+                    
+                    nameDisplay.style.color = "var(--black)"; 
+                    nameDisplay.style.textAlign = "left";
 
-                if (hasNewFile) {
-                     const file = input.files[0];
-                     nameDisplay.innerText = file.name;
-                     thumbnail.src = URL.createObjectURL(file);
-                } else {
-                     let fileName = currentImageUrl.split('/').pop().split('?')[0];
-                     nameDisplay.innerText = fileName;
-                     thumbnail.src = currentImageUrl;
-                }
-
-                clearBtn.style.display = "flex";
-                
-                clearBtn.onclick = (e) => {
-                    e.stopPropagation();
                     if (hasNewFile) {
-                        document.getElementById('edit-image').value = ""; 
+                         const file = input.files[0];
+                         nameDisplay.innerText = file.name;
+                         thumbnail.src = URL.createObjectURL(file);
                     } else {
-                        removeImageFlag = true; 
+                         let fileName = currentImageUrl.split('/').pop().split('?')[0];
+                         nameDisplay.innerText = fileName;
+                         thumbnail.src = currentImageUrl;
                     }
-                    updateImageUIState(); 
-                };
 
+                    clearBtn.style.display = "flex";
+                    
+                    clearBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        if (hasNewFile) {
+                            document.getElementById('edit-image').value = ""; 
+                        } else {
+                            removeImageFlag = true; 
+                        }
+                        updateImageUIState(true); 
+                    };
+
+                } else {
+                    uploadContainer.onclick = () => document.getElementById('edit-image').click();
+                    uploadContainer.style.cursor = 'pointer';
+                    
+                    thumbnail.style.display = 'none';
+                    thumbnail.src = ''; 
+                    
+                    actionLabel.style.display = 'inline';
+                    actionLabel.innerText = "Upload image";
+                    actionLabel.style.textDecoration = 'none';
+                    
+                    nameDisplay.innerText = "";
+                    nameDisplay.style.color = "var(--grey-30)";
+                    nameDisplay.style.textAlign = "right";
+
+                    clearBtn.style.display = "none";
+                }
+            };
+
+            if (smooth) {
+                const wrapper = document.getElementById('upload-ui-wrapper');
+                wrapper.style.opacity = '0';
+                setTimeout(() => {
+                    exec();
+                    wrapper.style.opacity = '1';
+                }, 200);
             } else {
-                uploadContainer.onclick = () => document.getElementById('edit-image').click();
-                uploadContainer.style.cursor = 'pointer';
-                
-                thumbnail.style.display = 'none';
-                thumbnail.src = ''; 
-                
-                actionLabel.style.display = 'inline';
-                actionLabel.innerText = "Upload image";
-                actionLabel.style.textDecoration = 'none';
-                
-                nameDisplay.innerText = "";
-                nameDisplay.style.color = "var(--grey-30)";
-                nameDisplay.style.textAlign = "right";
-
-                clearBtn.style.display = "none";
+                exec();
             }
         }
 
