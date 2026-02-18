@@ -128,8 +128,13 @@
 
         #section-feed { display: flex; flex-direction: column; gap: var(--gap-item); }
         #feed-admin-zone { display: flex; flex-direction: column; gap: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider); }
-        #menu-login-section { display: flex; flex-direction: column; gap: var(--gap-item); }
-        #menu-admin-section { display: flex; flex-direction: column; gap: var(--gap-item); }
+        
+        /* Menu Sections with Transition Support */
+        #menu-login-section, #menu-admin-section { 
+            display: flex; flex-direction: column; gap: var(--gap-item); 
+            transition: opacity 0.2s ease;
+            opacity: 1;
+        }
 
         .status-feed {
             max-width: 600px; width: 100%;
@@ -175,7 +180,7 @@
             transition: opacity 0.2s ease, color 0.2s ease;
         }
 
-        /* ERROR VALIDATION STYLES - WITH GHOSTING FIX */
+        /* ERROR VALIDATION STYLES */
         .input-error { border: 1px solid #ff4444 !important; }
         .input-error::placeholder { color: #ff4444 !important; opacity: 1 !important; }
         .placeholder-fade-out::placeholder { 
@@ -188,7 +193,13 @@
             cursor: pointer; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .secondary-btn { background: transparent; color: var(--black); }
-        .danger-btn { background: #ff4444 !important; color: #000000 !important; border: none !important; }
+        
+        /* UPDATED DANGER BUTTON STYLE (Black/White adaptívny bg, Red text) */
+        .danger-btn { 
+            background: var(--black) !important; 
+            color: #ff4444 !important; 
+            border: none !important; 
+        }
 
         .admin-action-btn { background: transparent; border: none; font-size: var(--size-small); color: var(--black); cursor: pointer; padding: 0; margin: 0; display: inline-flex; align-items: center; transition: color 0.2s ease;}
         .admin-action-link { text-decoration: none; } 
@@ -196,7 +207,7 @@
         /* ACCORDION & EXPANSION ANIMATION STYLES */
         #quick-buttons {
             display: flex; gap: var(--gap-item); flex-shrink: 0;
-            width: 112px; /* 48px + 48px + 16px gap */
+            width: 112px; 
             margin-left: var(--gap-item);
             opacity: 1;
             overflow: hidden;
@@ -223,7 +234,6 @@
             transition: opacity 0.2s ease;
         }
         
-        /* Obal pre modul Uploadu pre plynulú výmenu */
         #upload-ui-wrapper {
             transition: opacity 0.2s ease;
             opacity: 1;
@@ -265,8 +275,8 @@
                     <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="flex-grow: 1; margin: 0;">
                     <button type="submit" id="login-btn" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;" aria-label="Log In">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
-                            <path d="M5 11V7a7 7 0 0 1 14 0v4" stroke="currentColor" stroke-width="2" fill="none"></path>
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" fill="currentColor" stroke="none"></rect>
+                            <path d="M7 11V6a5 5 0 0 1 10 0v5" stroke="currentColor" stroke-width="1.5" fill="none"></path>
+                            <rect x="4" y="11" width="16" height="11" fill="currentColor" stroke="none"></rect>
                         </svg>
                     </button>
                 </form>
@@ -284,7 +294,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.3.4 • 2026</div>
+            <div class="footer-info">build v3.3.5 • 2026</div>
         </div>
     </nav>
 
@@ -387,7 +397,7 @@
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
         
-        // --- SMART ERROR ANIMATION LOGIC (GHOSTING FIX) ---
+        // --- SMART ERROR ANIMATION LOGIC ---
         function showErrorInInput(inputId, message) {
             const el = document.getElementById(inputId);
             if(!el || el.dataset.errorActive === "true") return;
@@ -395,11 +405,9 @@
             const origPlaceholder = el.getAttribute('placeholder') || '';
             el.dataset.errorActive = "true";
             
-            // 1. Fade out original text
             el.classList.add('placeholder-fade-out');
             
             setTimeout(() => {
-                // 2. Change text and color while invisible
                 el.setAttribute('placeholder', message);
                 el.classList.add('input-error');
                 
@@ -407,18 +415,14 @@
                     el.classList.remove('placeholder-fade-out');
                     
                     setTimeout(() => {
-                        // 3. Fade out error text
                         el.classList.add('placeholder-fade-out');
                         
                         setTimeout(() => {
-                            // 4. Restore original text and grey color while completely invisible
                             el.classList.remove('input-error');
                             el.setAttribute('placeholder', origPlaceholder);
                             
-                            // Force reflow - prevents color bleeding
                             void el.offsetWidth; 
                             
-                            // 5. Fade back in s pôvodnou farbou
                             el.classList.remove('placeholder-fade-out');
                             el.dataset.errorActive = "false";
                         }, 200); 
@@ -450,8 +454,15 @@
         }
 
         function activateAdminUI() {
-            document.getElementById('menu-login-section').style.display = 'none';
-            document.getElementById('menu-admin-section').style.display = 'flex';
+            const adminSec = document.getElementById('menu-admin-section');
+            const loginSec = document.getElementById('menu-login-section');
+            
+            loginSec.style.display = 'none';
+            loginSec.style.opacity = '0';
+            
+            adminSec.style.display = 'flex';
+            adminSec.style.opacity = '1';
+            
             document.getElementById('feed-admin-zone').style.display = 'block'; 
             refreshFeedUI();
         }
@@ -473,20 +484,43 @@
             closeMenu();
         }
 
+        // --- SEQUENTIAL LOGOUT FLOW ---
         function handleLogout() {
             secretKey = "";
             localStorage.removeItem('adminSecretKey');
-            document.getElementById('menu-admin-section').style.display = 'none';
-            document.getElementById('menu-login-section').style.display = 'flex';
-            document.getElementById('feed-admin-zone').style.display = 'none';
             document.getElementById('remember-me').checked = false;
             
             toggleAdvancedEditor(false);
+            
+            const adminSec = document.getElementById('menu-admin-section');
+            const loginSec = document.getElementById('menu-login-section');
+            
+            // 1. Plynulý Fade-out Admin Menu (0.2s)
+            adminSec.style.opacity = '0';
+            
             setTimeout(() => {
-                resetDeleteButton(); 
-                refreshFeedUI();
-                closeMenu();
-            }, 400); 
+                // 2. Prepnutie elementov (Vyroluje sa hĺbka pre Login)
+                adminSec.style.display = 'none';
+                loginSec.style.display = 'flex';
+                loginSec.style.opacity = '0';
+                
+                void loginSec.offsetWidth; // Force reflow
+                
+                // 3. Plynulý Fade-in Login Menu (0.2s)
+                loginSec.style.opacity = '1';
+                
+                // 4. Pauza na "uvedomenie si zmeny" a zatvorenie Menu (Slide Up)
+                setTimeout(() => {
+                    closeMenu();
+                    
+                    // Skryť feed editor v pozadí, kým sa menu zatvára
+                    setTimeout(() => {
+                        document.getElementById('feed-admin-zone').style.display = 'none';
+                        resetDeleteButton();
+                        refreshFeedUI();
+                    }, 500); 
+                }, 600); 
+            }, 200); 
         }
 
         function handleUnauthorized() {
@@ -610,7 +644,6 @@
             </div>`;
         }
 
-        // --- SEQUENTIAL EXPANSION & CROSS-FADE LOGIC ---
         function toggleAdvancedEditor(show) {
             const titleInput = document.getElementById('edit-title');
             const textInput = document.getElementById('edit-text');
@@ -650,7 +683,7 @@
                     setTimeout(() => {
                         titleInput.setAttribute('placeholder', 'Quick thought...');
                         titleInput.classList.remove('placeholder-fade-out');
-                        titleInput.style.color = ''; // reset just in case
+                        titleInput.style.color = ''; 
                         
                         quickButtons.classList.remove('hidden');
                         
@@ -697,7 +730,6 @@
             };
 
             if (isOpen) {
-                // Cross-fade when already open
                 titleInput.style.color = 'transparent';
                 advContent.style.opacity = '0';
                 
@@ -736,7 +768,7 @@
                     
                     actionLabel.style.display = 'none'; 
                     thumbnail.style.display = 'block'; 
-                    thumbnail.style.border = '1px solid var(--black)'; // Set border before load
+                    thumbnail.style.border = '1px solid var(--black)'; 
                     
                     nameDisplay.style.color = "var(--black)"; 
                     nameDisplay.style.textAlign = "left";
