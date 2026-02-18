@@ -242,7 +242,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.2.6 • 2026</div>
+            <div class="footer-info">build v3.2.7 • 2026</div>
         </div>
     </nav>
 
@@ -280,8 +280,9 @@
                             <img id="upload-thumbnail" style="display: none; width: 48px; height: 48px; border-radius: var(--border-radius); object-fit: cover; flex-shrink: 0; margin: 0;" src="" alt="Thumbnail">
 
                             <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
-                            <div id="upload-container" class="form-input" style="cursor: pointer; flex-grow: 1;">
-                                <span id="upload-action-label" style="pointer-events: none; white-space: nowrap; color: var(--black); text-decoration: none;">Upload image</span>
+                            
+                            <div id="upload-container" class="form-input" style="cursor: pointer; flex-grow: 1; min-width: 0; overflow: hidden;">
+                                <span id="upload-action-label" style="pointer-events: none; white-space: nowrap; color: var(--black); text-decoration: none; flex-shrink: 0;">Upload image</span>
                                 <span id="file-name-display" style="color: var(--grey-30); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); line-height: 1; margin: 0; text-align: right;">(Optional)</span>
                             </div>
 
@@ -613,7 +614,6 @@
                      nameDisplay.innerText = file.name;
                      thumbnail.src = URL.createObjectURL(file);
                 } else {
-                     // Display actual filename from the URL, let CSS handle the truncation if it's too long
                      let fileName = currentImageUrl.split('/').pop().split('?')[0];
                      nameDisplay.innerText = fileName;
                      thumbnail.src = currentImageUrl;
@@ -641,7 +641,6 @@
                 
                 actionLabel.style.display = 'inline';
                 actionLabel.innerText = "Upload image";
-                actionLabel.style.textDecoration = 'none'; // Ensure no underline
                 
                 nameDisplay.innerText = "(Optional)";
                 nameDisplay.style.color = "var(--grey-30)";
