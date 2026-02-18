@@ -20,8 +20,11 @@
             
             --black: #000000;
             --white: #ffffff;
-            --grey-50: rgba(0, 0, 0, 0.5);
-            --divider: rgba(0, 0, 0, 0.12);
+            /* 10% BLACK FOR SUBTLE TEXT & PLACEHOLDERS */
+            --grey-10: rgba(0, 0, 0, 0.1);
+            /* 10% BLACK FOR DIVIDER LINES */
+            --divider: rgba(0, 0, 0, 0.1);
+            
             --glass-rgb: 255, 255, 255; 
             --content-width: 540px; 
             
@@ -40,8 +43,8 @@
             :root {
                 --black: #ffffff;       
                 --white: #000000;       
-                --grey-50: rgba(255, 255, 255, 0.5); 
-                --divider: rgba(255, 255, 255, 0.12); 
+                --grey-10: rgba(255, 255, 255, 0.1); 
+                --divider: rgba(255, 255, 255, 0.1); 
                 --glass-rgb: 0, 0, 0;   
             }
         }
@@ -146,11 +149,11 @@
         .status-card:first-child { padding-top: 0; }
         .status-card:last-child { border-bottom: none; }
 
-        .status-date { font-size: var(--size-small); color: var(--grey-50); display: block; text-transform: uppercase; margin: 0; }
+        .status-date { font-size: var(--size-small); color: var(--grey-10); display: block; text-transform: uppercase; margin: 0; }
         .status-title { font-size: var(--size-large); margin: 0; color: var(--black); }
         .status-image { width: 100%; height: auto; border-radius: var(--border-radius); display: block; margin: 0; border: none; }
         .status-text { font-size: var(--size-small); color: var(--black); opacity: 0.8; white-space: pre-line; text-align: justify; margin: 0; word-wrap: break-word; }
-        .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); margin: 0; padding: var(--gap-item) 0; line-height: 1; }
+        .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-10); margin: 0; padding: var(--gap-item) 0; line-height: 1; }
 
         .form-input, .submit-btn { 
             height: 48px; border: 1px solid var(--black); border-radius: var(--border-radius); 
@@ -158,7 +161,7 @@
             outline: none; color: var(--black); box-sizing: border-box; display: flex; margin: 0; align-items: center;
             gap: var(--gap-item);
         }
-        ::placeholder { color: var(--grey-50); opacity: 1; }
+        ::placeholder { color: var(--grey-10); opacity: 1; }
         
         .form-textarea { 
             width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); 
@@ -184,7 +187,7 @@
         .checkbox-wrapper input:checked ~ .checkmark::after { display: block; }
         .checkbox-label-text { font-size: var(--size-small); color: var(--black); margin: 0; }
 
-        .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; text-align: left; margin: 0; }
+        .footer-info { font-size: var(--size-small); color: var(--grey-10); text-transform: uppercase; text-align: left; margin: 0; }
     </style>
 </head>
 <body>
@@ -226,7 +229,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.0.16 • 2026</div>
+            <div class="footer-info">build v3.0.18 • 2026</div>
         </div>
     </nav>
 
@@ -260,14 +263,14 @@
                         <input type="text" id="edit-title" class="form-input" placeholder="Title (Optional)" style="width: 100%;">
                         
                         <div id="current-image-container" style="display: none; align-items: center; gap: var(--gap-item); margin: 0;">
-                            <span style="color: var(--grey-50); font-size: var(--size-small); line-height: 1;">Attached image </span>
+                            <span style="color: var(--grey-10); font-size: var(--size-small); line-height: 1;">Attached image </span>
                             <button type="button" class="admin-action-btn admin-action-link" style="color: var(--black);" onclick="flagImageForRemoval()">Remove</button>
                         </div>
 
                         <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateFileName()">
                         <div class="form-input" style="cursor: pointer; width: 100%;" onclick="document.getElementById('edit-image').click()">
                             <span class="admin-action-btn admin-action-link" style="pointer-events: none; white-space: nowrap;">Upload image</span>
-                            <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); line-height: 1; margin: 0;">(Optional)</span>
+                            <span id="file-name-display" style="color: var(--grey-10); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); line-height: 1; margin: 0;">(Optional)</span>
                             <button type="button" id="clear-file-btn" class="admin-action-btn admin-action-link" style="color: var(--black); display: none; padding: 0; flex-shrink: 0;" onclick="clearSelectedFile(event)">Remove</button>
                         </div>
 
@@ -460,7 +463,7 @@
                 const updateObj = new Date(s.updated_at);
                 const updateDate = updateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
                 const updateTime = updateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-                editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin: 0; line-height: 1;">EDITED: ${updateDate.toUpperCase()} • ${updateTime}</div>`;
+                editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-10); margin: 0; line-height: 1;">EDITED: ${updateDate.toUpperCase()} • ${updateTime}</div>`;
             }
             const titleHtml = (s.title && s.title.trim() !== "") ? `<h3 class="status-title">${s.title}</h3>` : '';
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image" loading="lazy">` : '';
@@ -499,7 +502,7 @@
                 document.getElementById('edit-image').value = "";
                 document.getElementById('current-image-container').style.display = 'none';
                 document.getElementById('file-name-display').innerText = "(Optional)";
-                document.getElementById('file-name-display').style.color = "var(--grey-50)";
+                document.getElementById('file-name-display').style.color = "var(--grey-10)";
                 document.getElementById('clear-file-btn').style.display = "none";
                 const publishBtn = document.getElementById('publish-btn');
                 publishBtn.disabled = false; publishBtn.innerText = "PUBLISH";
@@ -516,7 +519,7 @@
             document.getElementById('edit-text').value = post.text || "";
             document.getElementById('edit-image').value = ""; 
             document.getElementById('file-name-display').innerText = "(Optional)";
-            document.getElementById('file-name-display').style.color = "var(--grey-50)";
+            document.getElementById('file-name-display').style.color = "var(--grey-10)";
             document.getElementById('clear-file-btn').style.display = "none";
             if (post.image_url) document.getElementById('current-image-container').style.display = 'flex';
             else document.getElementById('current-image-container').style.display = 'none';
@@ -535,7 +538,7 @@
                 clearBtn.style.display = "block"; 
             } else {
                 display.innerText = "(Optional)";
-                display.style.color = "var(--grey-50)";
+                display.style.color = "var(--grey-10)";
                 clearBtn.style.display = "none";  
             }
         }
