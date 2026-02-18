@@ -213,7 +213,13 @@
             <div id="menu-login-section">
                 <form onsubmit="handleLogin(event)" style="display: flex; width: 100%; gap: var(--gap-item); margin: 0;">
                     <input type="password" id="admin-pass" class="form-input" placeholder="Password..." required style="flex-grow: 1; margin: 0;">
-                    <button type="submit" id="login-btn" class="submit-btn" style="width: 120px; flex-shrink: 0; margin: 0;">LOG IN</button>
+                    <button type="submit" id="login-btn" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;" aria-label="Log In">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+                            <polyline points="15 3 21 3 21 21 15 21"></polyline>
+                            <polyline points="10 17 15 12 10 7"></polyline>
+                            <line x1="15" y1="12" x2="3" y2="12"></line>
+                        </svg>
+                    </button>
                 </form>
                 
                 <label class="checkbox-wrapper">
@@ -229,7 +235,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.2.1 • 2026</div>
+            <div class="footer-info">build v3.2.2 • 2026</div>
         </div>
     </nav>
 
@@ -279,7 +285,12 @@
                         
                         <div style="display: flex; gap: var(--gap-item);">
                             <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
-                            <button type="button" id="cancel-btn" class="submit-btn secondary-btn" style="flex-grow: 1;" onclick="toggleAdvancedEditor(false)">CANCEL</button>
+                            <button type="button" id="cancel-btn" class="submit-btn secondary-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
                         </div>
                     </form>
                     
