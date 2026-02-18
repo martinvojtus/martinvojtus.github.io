@@ -159,9 +159,9 @@
             height: 48px; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; color: var(--black); box-sizing: border-box; display: flex; margin: 0; align-items: center;
-            gap: var(--gap-item);
+            gap: var(--gap-item); transition: border-color 0.3s ease;
         }
-        ::placeholder { color: var(--grey-30); opacity: 1; }
+        ::placeholder { color: var(--grey-30); opacity: 1; transition: color 0.3s ease; }
         
         .form-textarea { 
             width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); 
@@ -170,11 +170,18 @@
             transition: all 0.3s ease; min-height: 80px; resize: vertical; margin: 0;
         }
 
+        /* CUSTOM ERROR VALIDATION STYLES */
+        .input-error { border: 1px solid #ff4444 !important; }
+        .input-error::placeholder { color: #ff4444 !important; opacity: 1 !important; }
+
         .submit-btn {
             background: var(--black); color: var(--white); text-transform: uppercase; 
             cursor: pointer; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .secondary-btn { background: transparent; color: var(--black); }
+        
+        /* DANGER BUTTON STYLE */
+        .danger-btn { background: #ff4444 !important; color: #000000 !important; border: none !important; }
 
         .admin-action-btn { background: transparent; border: none; font-size: var(--size-small); color: var(--black); cursor: pointer; padding: 0; margin: 0; display: inline-flex; align-items: center;}
         .admin-action-link { text-decoration: underline; }
@@ -212,7 +219,7 @@
             
             <div id="menu-login-section">
                 <form onsubmit="handleLogin(event)" style="display: flex; width: 100%; gap: var(--gap-item); margin: 0;">
-                    <input type="password" id="admin-pass" class="form-input" placeholder="Password..." required style="flex-grow: 1; margin: 0;">
+                    <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="flex-grow: 1; margin: 0;">
                     <button type="submit" id="login-btn" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;" aria-label="Log In">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
                             <polyline points="15 3 21 3 21 21 15 21"></polyline>
@@ -235,7 +242,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.2.2 • 2026</div>
+            <div class="footer-info">build v3.2.3 • 2026</div>
         </div>
     </nav>
 
@@ -248,7 +255,7 @@
                 
                 <div id="quick-post-wrapper">
                     <form onsubmit="handleQuickPost(event)" style="display: flex; gap: var(--gap-item); flex-grow: 1; margin: 0;">
-                        <input type="text" id="quick-text" class="form-input" placeholder="Quick thought..." required style="flex-grow: 1; margin: 0;">
+                        <input type="text" id="quick-text" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; margin: 0;">
                         
                         <button type="button" id="add-adv-btn" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
@@ -295,7 +302,7 @@
                     </form>
                     
                     <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
-                    <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="width: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
+                    <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
                 </div>
 
             </div>
@@ -325,6 +332,23 @@
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
         
+        // --- CUSTOM ERROR VALIDATION UI ---
+        function showErrorInInput(inputId, message) {
+            const el = document.getElementById(inputId);
+            if(!el || el.dataset.errorActive === "true") return;
+            
+            const origPlaceholder = el.getAttribute('placeholder') || '';
+            el.dataset.errorActive = "true";
+            el.classList.add('input-error');
+            el.setAttribute('placeholder', message);
+            
+            setTimeout(() => {
+                el.classList.remove('input-error');
+                el.setAttribute('placeholder', origPlaceholder);
+                el.dataset.errorActive = "false";
+            }, 2000);
+        }
+
         function toggleMenu(forceOpen = false) { 
             if(forceOpen) {
                 menuToggle.classList.add('active'); 
@@ -357,6 +381,13 @@
         function handleLogin(e) {
             e.preventDefault();
             const passInput = document.getElementById('admin-pass');
+            
+            // Validation
+            if (!passInput.value.trim()) {
+                showErrorInInput('admin-pass', 'Password is required...');
+                return;
+            }
+
             secretKey = passInput.value;
             const rememberMe = document.getElementById('remember-me').checked;
             if (rememberMe) localStorage.setItem('adminSecretKey', secretKey);
@@ -381,9 +412,7 @@
         function handleUnauthorized() {
             handleLogout();
             toggleMenu(true); 
-            const passInput = document.getElementById('admin-pass');
-            passInput.placeholder = "Invalid password.";
-            setTimeout(() => { passInput.placeholder = "Password..."; }, 3000);
+            showErrorInInput('admin-pass', 'Invalid password...');
         }
 
         function refreshFeedUI() {
@@ -508,7 +537,6 @@
             const editorTextInput = document.getElementById('edit-text');
 
             if (show) {
-                // If opening editor, copy text from quick post and clear it
                 if(quickTextInput.value.trim() !== "" && !editingId) {
                     editorTextInput.value = quickTextInput.value;
                     quickTextInput.value = "";
@@ -545,7 +573,6 @@
             else document.getElementById('current-image-container').style.display = 'none';
             document.getElementById('publish-btn').innerText = "SAVE CHANGES";
             
-            // Bypass the text transfer logic since we are explicitly editing an old post
             const qWrapper = document.getElementById('quick-post-wrapper');
             const fWrapper = document.getElementById('full-editor-wrapper');
             qWrapper.style.display = 'none';
@@ -588,12 +615,13 @@
             const publishBtn = document.getElementById('publish-btn');
             const originalBtnText = publishBtn.innerText;
             let hasImage = !!imageFile || (currentImageUrl && !removeImageFlag);
+            
+            // Validation
             if (!text && !hasImage) {
-                publishBtn.innerText = "Add text or image.";
-                publishBtn.disabled = true;
-                setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 2000);
+                showErrorInInput('edit-text', 'Add text or an image...');
                 return;
             }
+            
             publishBtn.disabled = true;
             let finalImageUrl = currentImageUrl;
             if (removeImageFlag && !imageFile) finalImageUrl = null; 
@@ -641,7 +669,13 @@
             const inputField = document.getElementById('quick-text');
             const text = inputField.value.trim();
             const btn = document.getElementById('quick-btn');
-            if(!text) return;
+            
+            // Validation
+            if(!text) {
+                showErrorInInput('quick-text', 'Type a thought to post...');
+                return;
+            }
+            
             btn.disabled = true; btn.innerHTML = "...";
             try {
                 const res = await fetch(`${API_URL}/posts`, {
