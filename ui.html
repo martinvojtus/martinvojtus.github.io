@@ -131,43 +131,41 @@
         #section-feed { display: flex; flex-direction: column; gap: var(--gap-item); }
         #feed-admin-zone { display: flex; flex-direction: column; gap: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider); }
         
-        /* AUTH MORPHING ANIMATION STYLES */
-        #auth-section { display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; }
+        /* CROSS-FADE AUTH SECTION STYLES */
+        #auth-section { 
+            display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; 
+            transition: opacity 0.2s ease; 
+            opacity: 1; 
+        }
         
         #auth-form {
             display: flex; width: 100%; gap: var(--gap-item); margin: 0;
-            transition: gap 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        #auth-form.logged-in { gap: 0; }
         
         #admin-pass {
             flex-grow: 1; margin: 0; min-width: 0; 
-            max-width: 600px; /* Šírka pre bezproblémové animovanie */
-            transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, border-color 0.3s ease;
+            transition: border-color 0.3s ease, color 0.2s ease;
         }
-        #auth-form.logged-in #admin-pass {
-            max-width: 0;
-            padding-left: 0;
-            padding-right: 0;
-            opacity: 0;
-            border-color: transparent;
-            pointer-events: none;
-        }
+        
+        /* Instant layout switch while invisible */
+        #auth-form.logged-in #admin-pass { display: none; }
 
         #auth-btn {
             width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), flex-grow 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
+            transition: border-color 0.3s ease;
         }
+        
+        /* Instant layout switch while invisible */
         #auth-form.logged-in #auth-btn {
             width: 100%;
             flex-grow: 1;
-            color: #ff4444; 
         }
 
         #remember-wrapper {
-            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             max-height: 50px; opacity: 1; overflow: hidden; margin-top: 0;
+            transition: max-height 0.3s ease, opacity 0.2s ease, margin 0.3s ease;
         }
+        
         #remember-wrapper.hidden {
             max-height: 0; opacity: 0; pointer-events: none;
             margin-top: calc(var(--gap-item) * -1);
@@ -308,7 +306,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.3.7 • 2026</div>
+            <div class="footer-info">build v3.3.8 • 2026</div>
         </div>
     </nav>
 
@@ -463,20 +461,20 @@
             const savedKey = localStorage.getItem('adminSecretKey');
             if (savedKey) {
                 secretKey = savedKey;
-                activateAdminUI(true); // instantný morph
+                activateAdminUI(true); 
             }
         }
 
-        // --- MORPHING AUTH LOGIC ---
+        // --- CROSS-FADE AUTH LOGIC ---
         function handleAuthSubmit(e) {
             e.preventDefault();
             const authForm = document.getElementById('auth-form');
             
             if (authForm.classList.contains('logged-in')) {
-                // LOGOUT AKCIA
+                // LOGOUT ACTION
                 handleLogout();
             } else {
-                // LOGIN AKCIA
+                // LOGIN ACTION
                 const passInput = document.getElementById('admin-pass');
                 if (!passInput.value.trim()) {
                     showErrorInInput('admin-pass', 'Password required...');
@@ -487,55 +485,49 @@
                 const rememberMe = document.getElementById('remember-me').checked;
                 if (rememberMe) localStorage.setItem('adminSecretKey', secretKey);
                 
-                // Spusti animáciu Zlúčenia (Merge)
                 activateAdminUI(false);
-                
-                // Zavri menu keď sa animácia dokončí
-                setTimeout(() => {
-                    closeMenu();
-                }, 800);
             }
         }
 
         function activateAdminUI(instant = false) {
+            const authSection = document.getElementById('auth-section');
             const authForm = document.getElementById('auth-form');
             const authBtn = document.getElementById('auth-btn');
-            const passInput = document.getElementById('admin-pass');
             const remWrapper = document.getElementById('remember-wrapper');
             
             if (instant) {
-                // Pre načítanie z LocalStorage - okamžitý stav
-                authForm.style.transition = 'none';
-                authBtn.style.transition = 'none';
-                passInput.style.transition = 'none';
-                remWrapper.style.transition = 'none';
-                
+                // Pre načítanie z LocalStorage - okamžitý stav bez animácie
                 authForm.classList.add('logged-in');
                 remWrapper.classList.add('hidden');
                 authBtn.innerHTML = 'LOGOUT';
                 
-                void authForm.offsetWidth; // Force reflow
-                
-                setTimeout(() => {
-                    authForm.style.transition = '';
-                    authBtn.style.transition = '';
-                    passInput.style.transition = '';
-                    remWrapper.style.transition = '';
-                }, 50);
+                document.getElementById('feed-admin-zone').style.display = 'block'; 
+                refreshFeedUI();
             } else {
-                // Plynulá animácia zlúčenia
-                authForm.classList.add('logged-in');
-                remWrapper.classList.add('hidden');
+                // Plynulá Cross-Fade animácia zlúčenia
+                authSection.style.opacity = '0';
                 
-                authBtn.style.color = 'transparent';
                 setTimeout(() => {
+                    // Prepnutie rozloženia, kým je prvok neviditeľný
+                    authForm.classList.add('logged-in');
+                    remWrapper.classList.add('hidden');
                     authBtn.innerHTML = 'LOGOUT';
-                    authBtn.style.color = '#ff4444'; // Prepne sa na CSS farbu pre logout
-                }, 150);
+                    
+                    document.getElementById('feed-admin-zone').style.display = 'block'; 
+                    refreshFeedUI();
+                    
+                    // Force reflow
+                    void authSection.offsetWidth;
+                    
+                    // Plynulý Fade-in do nového stavu
+                    authSection.style.opacity = '1';
+                    
+                    // Zavrie menu krátko na to, aby používateľ videl výsledok
+                    setTimeout(() => {
+                        closeMenu();
+                    }, 600);
+                }, 200); 
             }
-            
-            document.getElementById('feed-admin-zone').style.display = 'block'; 
-            refreshFeedUI();
         }
 
         function handleLogout() {
@@ -545,30 +537,37 @@
             
             toggleAdvancedEditor(false);
             
+            const authSection = document.getElementById('auth-section');
             const authForm = document.getElementById('auth-form');
             const authBtn = document.getElementById('auth-btn');
             const remWrapper = document.getElementById('remember-wrapper');
             const passInput = document.getElementById('admin-pass');
             
-            // Animácia rozdelenia (Split)
-            authForm.classList.remove('logged-in');
-            remWrapper.classList.remove('hidden');
+            // Plynulá Cross-Fade animácia rozdelenia
+            authSection.style.opacity = '0';
             
-            authBtn.style.color = 'transparent';
             setTimeout(() => {
+                // Prepnutie rozloženia späť, kým je prvok neviditeľný
+                authForm.classList.remove('logged-in');
+                remWrapper.classList.remove('hidden');
                 authBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>';
-                authBtn.style.color = ''; // Návrat k defaultnej farbe
-                passInput.value = ''; // Vymaž heslo po uvoľnení poľa
-            }, 150);
-            
-            setTimeout(() => {
-                closeMenu();
+                passInput.value = ''; 
+                
+                // Force reflow
+                void authSection.offsetWidth;
+                
+                // Plynulý Fade-in
+                authSection.style.opacity = '1';
+                
                 setTimeout(() => {
-                    document.getElementById('feed-admin-zone').style.display = 'none';
-                    resetDeleteButton();
-                    refreshFeedUI();
-                }, 500);
-            }, 800);
+                    closeMenu();
+                    setTimeout(() => {
+                        document.getElementById('feed-admin-zone').style.display = 'none';
+                        resetDeleteButton();
+                        refreshFeedUI();
+                    }, 500);
+                }, 600);
+            }, 200);
         }
 
         function handleUnauthorized() {
