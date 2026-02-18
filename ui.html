@@ -104,7 +104,6 @@
             -webkit-backdrop-filter: blur(var(--glass-blur));
             transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1);
             z-index: 1500; 
-            /* Header height: 16px top gap + 24px svg + 16px bot gap = 56px */
             padding: calc(56px + var(--gap-item)) 0 var(--gap-item) 0; 
             display: flex; flex-direction: column; align-items: center;
         }
@@ -126,8 +125,7 @@
 
         #section-feed { display: flex; flex-direction: column; gap: var(--gap-item); }
         #feed-admin-zone { display: flex; flex-direction: column; gap: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider); }
-        #quick-post-wrapper { display: flex; flex-direction: column; gap: var(--gap-item); }
-        #editor-form { display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; }
+        #quick-post-wrapper { display: flex; gap: var(--gap-item); width: 100%; }
         #menu-login-section { display: flex; flex-direction: column; gap: var(--gap-item); }
         #menu-admin-section { display: flex; flex-direction: column; gap: var(--gap-item); }
 
@@ -155,7 +153,7 @@
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); margin: 0; padding: var(--gap-item) 0; line-height: 1; }
 
         .form-input, .submit-btn { 
-            width: 100%; height: 48px; border: 1px solid var(--black); border-radius: var(--border-radius); 
+            height: 48px; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; color: var(--black); box-sizing: border-box; display: flex; margin: 0; align-items: center;
             gap: var(--gap-item);
@@ -210,9 +208,9 @@
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
             
             <div id="menu-login-section">
-                <form onsubmit="handleLogin(event)" style="display: flex; height: 48px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent; margin: 0; gap: 0;">
-                    <input type="password" id="admin-pass" placeholder="Password..." required style="flex-grow: 1; height: 100%; border: none; background: transparent; padding: 0 var(--gap-item); color: var(--black); outline: none; font-size: var(--size-small); margin: 0;">
-                    <button type="submit" id="login-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: var(--size-small); margin: 0;">LOG IN</button>
+                <form onsubmit="handleLogin(event)" style="display: flex; width: 100%; gap: var(--gap-item); margin: 0;">
+                    <input type="password" id="admin-pass" class="form-input" placeholder="Password..." required style="flex-grow: 1; margin: 0;">
+                    <button type="submit" id="login-btn" class="submit-btn" style="width: 120px; flex-shrink: 0; margin: 0;">LOG IN</button>
                 </form>
                 
                 <label class="checkbox-wrapper">
@@ -235,30 +233,31 @@
     <main>
         <div id="section-feed">
             <h2 style="font-size: var(--size-large); margin: 0; line-height: 1;">Feed.</h2>
+            <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
             
             <div id="feed-admin-zone" style="display: none;">
                 
                 <div id="quick-post-wrapper">
-                    <form onsubmit="handleQuickPost(event)" style="display: flex; height: 48px; width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); overflow: hidden; background: transparent; margin: 0; gap: 0;">
-                        <input type="text" id="quick-text" placeholder="Quick thought..." required style="flex-grow: 1; height: 100%; border: none; background: transparent; padding: 0 var(--gap-item); color: var(--black); outline: none; font-size: var(--size-small); margin: 0;">
-                        <button type="submit" id="quick-btn" style="width: 120px; flex-shrink: 0; height: 100%; border: none; background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; outline: none; transition: background-color 0.3s ease, color 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: var(--size-small); margin: 0;">POST</button>
-                    </form>
-                    
-                    <div style="display: flex; gap: var(--gap-item); height: 48px; margin: 0;">
-                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="flex-grow: 1; height: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
-                        
-                        <button type="button" id="add-adv-btn" class="submit-btn" style="width: 120px; flex-shrink: 0; height: 100%; margin: 0; padding: 0;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter">
-                                <line x1="12" y1="5" x2="12" y2="19"></line>
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <form onsubmit="handleQuickPost(event)" style="display: flex; gap: var(--gap-item); flex-grow: 1; margin: 0;">
+                        <input type="text" id="quick-text" class="form-input" placeholder="Quick thought..." required style="flex-grow: 1; margin: 0;">
+                        <button type="submit" id="quick-btn" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" aria-label="Post">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+                                <polyline points="9 18 15 12 9 6"></polyline>
                             </svg>
                         </button>
-                    </div>
+                    </form>
+                    
+                    <button type="button" id="add-adv-btn" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
                 </div>
 
-                <div id="full-editor-wrapper" style="display: none;">
-                    <form id="editor-form" onsubmit="handlePublish(event)">
-                        <input type="text" id="edit-title" class="form-input" placeholder="Title (Optional)">
+                <div id="full-editor-wrapper" style="display: none; flex-direction: column; gap: var(--gap-item);">
+                    <form id="editor-form" onsubmit="handlePublish(event)" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; margin: 0;">
+                        <input type="text" id="edit-title" class="form-input" placeholder="Title (Optional)" style="width: 100%;">
                         
                         <div id="current-image-container" style="display: none; align-items: center; gap: var(--gap-item); margin: 0;">
                             <span style="color: var(--grey-50); font-size: var(--size-small); line-height: 1;">Attached image </span>
@@ -266,7 +265,7 @@
                         </div>
 
                         <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateFileName()">
-                        <div class="form-input" style="cursor: pointer;" onclick="document.getElementById('edit-image').click()">
+                        <div class="form-input" style="cursor: pointer; width: 100%;" onclick="document.getElementById('edit-image').click()">
                             <span class="admin-action-btn admin-action-link" style="pointer-events: none; white-space: nowrap;">Upload image</span>
                             <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); line-height: 1; margin: 0;">(Optional)</span>
                             <button type="button" id="clear-file-btn" class="admin-action-btn admin-action-link" style="color: var(--black); display: none; padding: 0; flex-shrink: 0;" onclick="clearSelectedFile(event)">Remove</button>
@@ -274,9 +273,14 @@
 
                         <textarea id="edit-text" class="form-textarea" placeholder="Content (Optional if image attached)"></textarea>
                         
-                        <button type="submit" id="publish-btn" class="submit-btn">PUBLISH</button>
-                        <button type="button" id="cancel-btn" class="submit-btn secondary-btn" onclick="toggleAdvancedEditor(false)">CANCEL</button>
+                        <div style="display: flex; gap: var(--gap-item);">
+                            <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
+                            <button type="button" id="cancel-btn" class="submit-btn secondary-btn" style="flex-grow: 1;" onclick="toggleAdvancedEditor(false)">CANCEL</button>
+                        </div>
                     </form>
+                    
+                    <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
+                    <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="width: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
                 </div>
 
             </div>
@@ -500,6 +504,7 @@
                 const publishBtn = document.getElementById('publish-btn');
                 publishBtn.disabled = false; publishBtn.innerText = "PUBLISH";
                 qWrapper.style.display = 'flex'; fWrapper.style.display = 'none';
+                resetDeleteButton();
             }
         }
 
@@ -608,7 +613,7 @@
             const text = inputField.value.trim();
             const btn = document.getElementById('quick-btn');
             if(!text) return;
-            btn.disabled = true; btn.innerText = "...";
+            btn.disabled = true; btn.innerHTML = "...";
             try {
                 const res = await fetch(`${API_URL}/posts`, {
                     method: "POST",
@@ -617,12 +622,12 @@
                 });
                 if (res.status === 401) return handleUnauthorized();
                 if(!res.ok) throw new Error();
-                inputField.value = ""; btn.innerText = "Posted.";
+                inputField.value = ""; btn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>';
                 await fetchStatuses(true);
-                setTimeout(() => { btn.innerText = "POST"; btn.disabled = false; document.activeElement.blur(); }, 1500);
+                setTimeout(() => { btn.disabled = false; document.activeElement.blur(); }, 1500);
             } catch(err) {
-                btn.innerText = "Error.";
-                setTimeout(() => { btn.innerText = "POST"; btn.disabled = false; }, 1500);
+                btn.innerHTML = "!";
+                setTimeout(() => { btn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>'; btn.disabled = false; }, 1500);
             }
         }
 
@@ -651,18 +656,18 @@
 
         function resetDeleteButton() {
             const btn = document.getElementById('delete-all-btn');
-            const advBtn = document.getElementById('add-adv-btn');
-            btn.dataset.state = "0"; btn.innerText = "DELETE ALL POSTS"; btn.disabled = false;
-            if (advBtn) advBtn.style.display = 'flex'; 
+            if(btn) {
+                btn.dataset.state = "0"; 
+                btn.innerText = "DELETE ALL POSTS"; 
+                btn.disabled = false;
+            }
         }
 
         function handleDeleteAllClick() {
             const btn = document.getElementById('delete-all-btn');
-            const advBtn = document.getElementById('add-adv-btn');
             const state = btn.dataset.state || "0";
             if (state === "0") {
                 btn.dataset.state = "1"; btn.innerText = "CLICK TO CONFIRM";
-                if (advBtn) advBtn.style.display = 'none'; 
                 clearTimeout(deleteConfirmTimeout);
                 deleteConfirmTimeout = setTimeout(() => resetDeleteButton(), 3000);
             } else if (state === "1") {
