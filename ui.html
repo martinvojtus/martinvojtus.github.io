@@ -251,7 +251,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.3.0 • 2026</div>
+            <div class="footer-info">build v3.3.1 • 2026</div>
         </div>
     </nav>
 
@@ -268,7 +268,7 @@
                         <input type="text" id="edit-title" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; margin: 0;">
                         
                         <div id="quick-buttons" style="display: flex; gap: var(--gap-item); flex-shrink: 0;">
-                            <button type="button" id="add-adv-btn" class="submit-btn secondary-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
+                            <button type="button" id="add-adv-btn" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -287,6 +287,8 @@
                         <div style="overflow: hidden;">
                             <div style="padding-top: var(--gap-item); display: flex; flex-direction: column; gap: var(--gap-item);">
                                 
+                                <textarea id="edit-text" class="form-textarea" placeholder="Content *"></textarea>
+
                                 <div style="display: flex; gap: var(--gap-item); width: 100%;">
                                     <img id="upload-thumbnail" style="display: none; width: 48px; height: 48px; border-radius: var(--border-radius); object-fit: cover; flex-shrink: 0; margin: 0; border: 1px solid var(--black); color: transparent;" src="" alt="">
 
@@ -306,12 +308,10 @@
                                         </svg>
                                     </button>
                                 </div>
-
-                                <textarea id="edit-text" class="form-textarea" placeholder="Content (Optional if image attached)"></textarea>
                                 
                                 <div style="display: flex; gap: var(--gap-item);">
                                     <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
-                                    <button type="button" id="cancel-btn" class="submit-btn secondary-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
+                                    <button type="button" id="cancel-btn" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
                                             <line x1="18" y1="6" x2="6" y2="18"></line>
                                             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -396,7 +396,7 @@
         function activateAdminUI() {
             document.getElementById('menu-login-section').style.display = 'none';
             document.getElementById('menu-admin-section').style.display = 'flex';
-            document.getElementById('feed-admin-zone').style.display = 'block'; // Zmenené z flex kvôli div obalu
+            document.getElementById('feed-admin-zone').style.display = 'block'; 
             refreshFeedUI();
         }
 
@@ -559,21 +559,21 @@
             const advWrapper = document.getElementById('advanced-section-wrapper');
 
             if (show) {
-                // If user started typing a quick thought, move it to text area
                 if (titleInput.value.trim() !== "" && !editingId) {
                     textInput.value = titleInput.value;
                     titleInput.value = "";
                 }
                 quickButtons.style.display = 'none';
-                titleInput.setAttribute('placeholder', 'Title (Optional)');
+                // Dynamic placeholder change for title
+                titleInput.setAttribute('placeholder', 'Title *');
                 advWrapper.classList.add('open');
                 updateImageUIState();
             } else {
                 advWrapper.classList.remove('open');
                 
-                // Wait for the accordion to finish rolling up before resetting UI
                 setTimeout(() => {
                     quickButtons.style.display = 'flex';
+                    // Revert placeholder
                     titleInput.setAttribute('placeholder', 'Quick thought...');
                     
                     editingId = null; 
@@ -588,7 +588,7 @@
                     const publishBtn = document.getElementById('publish-btn');
                     publishBtn.disabled = false; 
                     publishBtn.innerText = "PUBLISH";
-                }, 400); // 400ms matches the CSS transition
+                }, 400); 
             }
         }
 
@@ -611,7 +611,7 @@
             document.getElementById('publish-btn').innerText = "SAVE CHANGES";
             
             quickButtons.style.display = 'none';
-            titleInput.setAttribute('placeholder', 'Title (Optional)');
+            titleInput.setAttribute('placeholder', 'Title *');
             advWrapper.classList.add('open');
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -679,7 +679,6 @@
             }
         }
 
-        // Central Form Handler routes to correct function
         async function handleMainSubmit(e) {
             e.preventDefault();
             const isAdvanced = document.getElementById('advanced-section-wrapper').classList.contains('open');
@@ -746,7 +745,7 @@
         }
 
         async function handleQuickPost() {
-            const inputField = document.getElementById('edit-title'); // Uses the same top input
+            const inputField = document.getElementById('edit-title'); 
             const text = inputField.value.trim();
             const btn = document.getElementById('quick-btn');
             
