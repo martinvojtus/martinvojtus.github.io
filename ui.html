@@ -14,27 +14,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* STRICT 2 FONT SIZES ONLY */
-            --size-large: 2.0rem;
+            var(--size-large): 2.0rem;
             --size-small: 1.0rem;
             
             --black: #000000;
             --white: #ffffff;
-            
-            /* 50% BLACK FOR SUBTLE TEXT & PLACEHOLDERS */
             --grey-50: rgba(0, 0, 0, 0.5);
-            
-            /* 10% BLACK FOR DIVIDER LINES */
             --divider: rgba(0, 0, 0, 0.1);
             
             --glass-rgb: 255, 255, 255; 
             --content-width: 540px; 
             
-            /* ABSOLUTE 16px SYSTEM RADIUS & SPACING */
             --border-radius: 16px; 
             --gap-item: 16px; 
-            
-            /* UNIFIED LETTER SPACING */
             --letter-spacing: 0.05em;
 
             --glass-opacity: 0.6; 
@@ -51,7 +43,7 @@
             }
         }
 
-        html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+        html { -webkit-text-size-adjust: 100%; scroll-behavior: auto; }
         * { 
             -webkit-tap-highlight-color: transparent; 
             box-sizing: border-box; 
@@ -62,34 +54,27 @@
 
         body {
             margin: 0; padding: 0;
-            background-color: var(--white);
-            color: var(--black);
+            background-color: var(--white); color: var(--black);
             line-height: 1.5; 
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
-            transition: background-color 0.3s ease, color 0.3s ease; 
         }
 
-        /* LINE HEIGHT KILLER FOR EXACT SPACING */
-        .menu-link, .status-date, .admin-action-btn, .footer-info, .checkbox-label-text, .submit-btn, .form-input, .logo-text, .status-title {
+        .menu-link, .status-date, .admin-action-btn, .footer-info, .submit-btn, .form-input, .logo-text, .status-title {
             line-height: 1;
         }
 
         header {
-            position: fixed; top: 0; left: 0;
-            width: 100%; 
-            display: flex; justify-content: center;
-            padding: var(--gap-item) 0; 
+            position: fixed; top: 0; left: 0; width: 100%; 
+            display: flex; justify-content: center; padding: var(--gap-item) 0; 
             background: rgba(var(--glass-rgb), var(--glass-opacity));
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
+            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 2000;
         }
 
         .header-content {
             width: 100%; max-width: var(--content-width);
-            display: flex; justify-content: space-between;
-            align-items: center; padding: 0 var(--gap-item); 
+            display: flex; justify-content: space-between; align-items: center; padding: 0 var(--gap-item); 
         }
 
         .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
@@ -97,29 +82,21 @@
         .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; }
 
         .menu-toggle { width: 24px; height: 12px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; z-index: 2100; }
-        .line { width: 24px; height: 1px; background-color: var(--black); transition: transform 0.3s ease, background-color 0.3s ease; }
+        .line { width: 24px; height: 1px; background-color: var(--black); }
         .menu-toggle.active .line:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
         .menu-toggle.active .line:nth-child(2) { transform: translateY(-5.5px) rotate(-45deg); }
 
         .nav-overlay {
-            position: fixed; top: -100%; left: 0; width: 100%; 
-            height: auto;
+            position: fixed; top: 0; left: 0; width: 100%; height: auto;
             background: rgba(var(--glass-rgb), var(--glass-opacity));
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            transition: top 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 1500; 
             padding: calc(56px + var(--gap-item)) 0 var(--gap-item) 0; 
-            display: flex; flex-direction: column; align-items: center;
+            display: none; flex-direction: column; align-items: center;
         }
-        .nav-overlay.active { top: 0; }
+        .nav-overlay.active { display: flex; }
         
-        .menu-items { 
-            width: 100%; 
-            max-width: var(--content-width); 
-            display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); 
-        }
-        
+        .menu-items { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); }
         .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; display: inline-block; padding: 0; border: none; background: transparent; text-align: left; margin: 0; }
 
         main {
@@ -130,48 +107,17 @@
 
         #section-feed { display: flex; flex-direction: column; gap: var(--gap-item); }
         
-        /* STATE MACHINE: FEED ADMIN ZONE */
-        #feed-admin-zone { 
-            display: none; 
-            flex-direction: column; gap: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider); 
-        }
+        #feed-admin-zone { display: none; flex-direction: column; gap: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider); }
         body.is-logged-in #feed-admin-zone { display: flex; }
 
-        /* STATE MACHINE: CSS GRID AUTH CROSS-FADE */
-        #auth-wrapper {
-            display: grid;
-            grid-template-areas: "overlap";
-            width: 100%;
-        }
-        
-        #login-ui, #logout-ui {
-            grid-area: overlap;
-            display: flex; flex-direction: column; gap: var(--gap-item);
-            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
+        #logout-ui { display: none; }
+        body.is-logged-in #login-ui { display: none; }
+        body.is-logged-in #logout-ui { display: flex; }
 
-        /* Default: Not logged in */
-        #login-ui { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
-        #logout-ui { opacity: 0; visibility: hidden; transform: translateY(-5px); pointer-events: none; }
+        .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 0; }
 
-        /* Logged In */
-        body.is-logged-in #login-ui { opacity: 0; visibility: hidden; transform: translateY(5px); pointer-events: none; }
-        body.is-logged-in #logout-ui { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
-
-        .status-feed {
-            max-width: 600px; width: 100%;
-            margin: 0 auto; 
-            display: flex; flex-direction: column; gap: 0; 
-        }
-
-        .status-card {
-            background: transparent; border: none;
-            border-bottom: 1px solid var(--divider); 
-            border-radius: 0; 
-            padding: var(--gap-item) 0; 
-            margin: 0;
-            display: flex; flex-direction: column; gap: var(--gap-item);
-        }
+        .status-card { background: transparent; border: none; border-bottom: 1px solid var(--divider); border-radius: 0; padding: var(--gap-item) 0; margin: 0; display: flex; flex-direction: column; gap: var(--gap-item); }
         .status-card:first-child { padding-top: 0; }
         .status-card:last-child { border-bottom: none; }
 
@@ -181,105 +127,47 @@
         .status-text { font-size: var(--size-small); color: var(--black); opacity: 0.8; white-space: pre-line; text-align: justify; margin: 0; word-wrap: break-word; }
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); margin: 0; padding: var(--gap-item) 0; line-height: 1; }
 
-        /* INPUTS & PLACEHOLDERS */
         .form-input, .submit-btn { 
             height: 48px; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: 0 var(--gap-item); 
-            outline: none; color: var(--black); box-sizing: border-box; display: flex; margin: 0; align-items: center;
-            gap: var(--gap-item); transition: border-color 0.3s ease;
+            outline: none; color: var(--black); box-sizing: border-box; display: flex; margin: 0; align-items: center; gap: var(--gap-item); 
         }
         
         .form-textarea { 
             width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: var(--gap-item); 
-            outline: none; color: var(--black); box-sizing: border-box; display: block; 
-            transition: border-color 0.3s ease; min-height: 80px; resize: vertical; margin: 0;
+            outline: none; color: var(--black); box-sizing: border-box; display: block; min-height: 80px; resize: vertical; margin: 0;
         }
 
         .form-input::placeholder, .form-textarea::placeholder { color: var(--grey-50); opacity: 1; }
 
-        /* BRUTALIST ERROR VALIDATION */
-        .input-error { border-color: #ff4444 !important; }
+        .input-error { border-color: #ff4444 !important; color: #ff4444 !important; }
         .input-error::placeholder { color: #ff4444 !important; opacity: 1 !important; }
 
-        /* CSS DESIGN SYSTEM: BUTTON STATES */
-        .submit-btn {
-            background: var(--black); color: var(--white); text-transform: uppercase; 
-            cursor: pointer; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
-        }
+        .submit-btn { background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .secondary-btn { background: transparent; color: var(--black); }
-        
-        .danger-btn { 
-            background: #ff4444 !important; 
-            color: #000000 !important; 
-            border: none !important; 
-        }
-        
-        /* 1. Pulzujúce nahrávanie */
-        @keyframes btn-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        .btn-loading {
-            pointer-events: none;
-            animation: btn-pulse 1.2s infinite ease-in-out;
-        }
+        .danger-btn { background: #ff4444 !important; color: #000000 !important; border: none !important; }
 
-        /* 2. Brutálna chyba (Shake + Farba) */
-        @keyframes btn-shake { 
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-4px); }
-            75% { transform: translateX(4px); }
-        }
-        .btn-error {
-            background-color: #ff4444 !important;
-            color: #000000 !important;
-            border-color: #ff4444 !important;
-            animation: btn-shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
-        }
-
-        /* 3. Varovný text bez zmeny pozadia */
-        .btn-warning {
-            color: #ff4444 !important;
-        }
-
-        .admin-action-btn { background: transparent; border: none; font-size: var(--size-small); color: var(--black); cursor: pointer; padding: 0; margin: 0; display: inline-flex; align-items: center; transition: color 0.2s ease;}
+        .admin-action-btn { background: transparent; border: none; font-size: var(--size-small); color: var(--black); cursor: pointer; padding: 0; margin: 0; display: inline-flex; align-items: center; }
         .admin-action-link { text-decoration: none; } 
 
-        /* STATE MACHINE: ADVANCED EDITOR EXPANSION */
-        #quick-buttons {
-            display: flex; gap: var(--gap-item); flex-shrink: 0; width: 112px; margin-left: var(--gap-item);
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
-        }
-        #editor-form.adv-open #quick-buttons { width: 0; margin-left: 0; opacity: 0; pointer-events: none; }
+        #quick-buttons { display: flex; gap: var(--gap-item); flex-shrink: 0; width: 112px; margin-left: var(--gap-item); }
+        #editor-form.adv-open #quick-buttons { display: none; }
         
-        #advanced-section-wrapper { 
-            display: grid; grid-template-rows: 0fr; 
-            transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
-        #editor-form.adv-open #advanced-section-wrapper { grid-template-rows: 1fr; }
+        #advanced-section-wrapper { display: none; flex-direction: column; gap: var(--gap-item); padding-top: var(--gap-item); }
+        #editor-form.adv-open #advanced-section-wrapper { display: flex; }
         
-        #adv-content { opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
-        #editor-form.adv-open #adv-content { opacity: 1; visibility: visible; }
-        
-        /* STATE MACHINE: UPLOAD UI */
-        #upload-container { display: flex; cursor: pointer; }
-        #upload-action-label { display: inline; color: var(--black); }
-        #file-name-display { color: var(--grey-50); text-align: right; }
-        #upload-thumbnail { display: none; border: 1px solid var(--black); }
-        #clear-file-btn { display: none; }
+        #upload-container { display: flex; cursor: pointer; flex-grow: 1; min-width: 0; overflow: hidden; }
+        #upload-action-label { display: inline; color: var(--black); flex-shrink: 0; white-space: nowrap; pointer-events: none; }
+        #file-name-display { color: var(--grey-50); text-align: right; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); pointer-events: none; }
+        #upload-thumbnail { display: none; width: 48px; height: 48px; border-radius: var(--border-radius); object-fit: cover; flex-shrink: 0; margin: 0; border: 1px solid var(--black); }
+        #clear-file-btn { display: none; width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0; }
 
         #upload-ui-wrapper.has-image #upload-container { cursor: default; }
         #upload-ui-wrapper.has-image #upload-action-label { display: none; }
         #upload-ui-wrapper.has-image #file-name-display { color: var(--black); text-align: left; }
         #upload-ui-wrapper.has-image #upload-thumbnail { display: block; }
         #upload-ui-wrapper.has-image #clear-file-btn { display: flex; }
-
-        .checkbox-wrapper { display: inline-flex; align-items: center; gap: var(--gap-item); cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; margin: 0; }
-        .checkbox-wrapper input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
-        .checkmark { position: relative; height: 16px; width: 16px; background-color: transparent; border: 1px solid var(--black); border-radius: 4px; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin: 0; }
-        .checkbox-wrapper input:checked ~ .checkmark { background-color: var(--black); }
-        .checkmark::after { content: ""; position: absolute; display: none; width: 3px; height: 7px; border: solid var(--white); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); margin-bottom: 2px; }
-        .checkbox-wrapper input:checked ~ .checkmark::after { display: block; }
-        .checkbox-label-text { font-size: var(--size-small); color: var(--black); margin: 0; }
 
         .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; text-align: left; margin: 0; }
     </style>
@@ -294,40 +182,29 @@
                 </div>
                 <div class="logo-text"><span>martinvojtus</span> • space</div>
             </div>
-            <div class="menu-toggle" id="menuToggle"><div class="line"></div><div class="line"></div></div>
+            <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()"><div class="line"></div><div class="line"></div></div>
         </div>
     </header>
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
             <a class="menu-link" onclick="window.scrollTo(0,0); closeMenu();"><span>Feed</span></a>
-            
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
             
-            <div id="auth-wrapper">
-                <div id="login-ui">
-                    <form onsubmit="handleLogin(event)" style="display: flex; width: 100%; gap: var(--gap-item); margin: 0;">
-                        <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="flex-grow: 1; margin: 0;">
-                        <button type="submit" id="auth-login-btn" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;" aria-label="Log In">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
-                                <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
-                        </button>
-                    </form>
-                    <label class="checkbox-wrapper">
-                        <input type="checkbox" id="remember-me">
-                        <span class="checkmark"></span>
-                        <span class="checkbox-label-text">Stay logged in</span>
-                    </label>
-                </div>
-                <div id="logout-ui">
-                    <button onclick="handleLogout()" id="auth-logout-btn" class="submit-btn" style="width: 100%; color: var(--white); margin: 0;">LOGOUT</button>
-                </div>
+            <div id="login-ui">
+                <form onsubmit="handleLogin(event)" style="display: flex; width: 100%; gap: var(--gap-item); margin: 0;">
+                    <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="flex-grow: 1; margin: 0;">
+                    <button type="submit" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;" aria-label="Log In">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                </form>
+            </div>
+            <div id="logout-ui">
+                <button onclick="handleLogout()" class="submit-btn" style="width: 100%; margin: 0;">LOGOUT</button>
             </div>
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
-
-            <div class="footer-info">build v4.1.0 • 2026</div>
+            <div class="footer-info">build v5.0.0 • 2026</div>
         </div>
     </nav>
 
@@ -352,35 +229,31 @@
                     </div>
 
                     <div id="advanced-section-wrapper">
-                        <div style="overflow: hidden;">
-                            <div id="adv-content" style="padding-top: var(--gap-item); display: flex; flex-direction: column; gap: var(--gap-item);">
-                                <textarea id="edit-text" class="form-textarea" placeholder="Content"></textarea>
+                        <textarea id="edit-text" class="form-textarea" placeholder="Content"></textarea>
 
-                                <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
-                                    <img id="upload-thumbnail" style="width: 48px; height: 48px; border-radius: var(--border-radius); object-fit: cover; flex-shrink: 0; margin: 0; color: transparent;" src="" alt="" onload="this.style.border='none'">
-                                    <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
-                                    
-                                    <div id="upload-container" class="form-input" style="flex-grow: 1; min-width: 0; overflow: hidden;" onclick="document.getElementById('edit-image').click()">
-                                        <span id="upload-action-label" style="pointer-events: none; white-space: nowrap; flex-shrink: 0;">Upload image</span>
-                                        <span id="file-name-display" style="pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); line-height: 1; margin: 0;"></span>
-                                    </div>
-
-                                    <button type="button" id="clear-file-btn" class="submit-btn secondary-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;" aria-label="Remove Image" onclick="clearImageSelection(event)">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                                    </button>
-                                </div>
-                                
-                                <div style="display: flex; gap: var(--gap-item);">
-                                    <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
-                                    <button type="button" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                    </button>
-                                </div>
-                                
-                                <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
-                                <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
+                        <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
+                            <img id="upload-thumbnail" src="" alt="">
+                            <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
+                            
+                            <div id="upload-container" class="form-input" onclick="document.getElementById('edit-image').click()">
+                                <span id="upload-action-label">Upload image</span>
+                                <span id="file-name-display"></span>
                             </div>
+
+                            <button type="button" id="clear-file-btn" class="submit-btn secondary-btn" aria-label="Remove Image" onclick="clearImageSelection(event)">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                            </button>
                         </div>
+                        
+                        <div style="display: flex; gap: var(--gap-item);">
+                            <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
+                            <button type="button" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
+                        
+                        <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
+                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
                     </div>
                 </form>
             </div>
@@ -402,99 +275,56 @@
         const postsLimit = 10;
         let isLoading = false;
         let hasMorePosts = true;
-        
-        let deleteConfirmTimeout;
-        let deleteCountdownInterval;
-        let countdownValue = 5;
 
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
-        
-        // --- BUTTON STATE MANAGER (THE CSS CONTROLLER) ---
-        // states: 'loading', 'error', 'warning', or null
-        function setBtnState(btnIdOrEl, state, htmlContent = null) {
-            const btn = typeof btnIdOrEl === 'string' ? document.getElementById(btnIdOrEl) : btnIdOrEl;
-            if(!btn) return;
+        const passInput = document.getElementById('admin-pass');
+        const titleInput = document.getElementById('edit-title');
+        const textInput = document.getElementById('edit-text');
 
-            btn.classList.remove('btn-loading', 'btn-error', 'btn-warning');
-            if (state) btn.classList.add(`btn-${state}`);
-            if (htmlContent !== null) btn.innerHTML = htmlContent;
-        }
+        // Odstránenie chybových hlášok priamo pri písaní (Surový Brutalizmus)
+        [passInput, titleInput, textInput].forEach(input => {
+            if(input) input.addEventListener('input', function() {
+                this.classList.remove('input-error');
+                if (this.id === 'admin-pass') this.placeholder = 'Password...';
+                if (this.id === 'edit-title' && document.getElementById('editor-form').classList.contains('adv-open')) this.placeholder = 'Title';
+                else if (this.id === 'edit-title') this.placeholder = 'Quick thought...';
+                if (this.id === 'edit-text') this.placeholder = 'Content';
+            });
+        });
 
-        function showErrorInInput(inputId, message) {
-            const el = document.getElementById(inputId);
-            if(!el) return;
-            const orig = el.getAttribute('placeholder') || '';
-            el.setAttribute('placeholder', message);
-            el.classList.add('input-error');
-            setTimeout(() => {
-                el.classList.remove('input-error');
-                el.setAttribute('placeholder', orig);
-            }, 2000); 
-        }
-
-        function toggleMenu(forceOpen = false) { 
-            if(forceOpen) {
-                menuToggle.classList.add('active'); navOverlay.classList.add('active');
-            } else {
-                menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); 
-            }
-        }
+        function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
         function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); }
-
-        function checkSavedLogin() {
-            const savedKey = localStorage.getItem('adminSecretKey');
-            if (savedKey) { secretKey = savedKey; activateAdminUI(true); }
-        }
 
         function handleLogin(e) {
             e.preventDefault();
-            const passInput = document.getElementById('admin-pass');
-            if (!passInput.value.trim()) { showErrorInInput('admin-pass', 'Password required...'); return; }
-            
-            const btn = document.getElementById('auth-login-btn');
-            setBtnState(btn, 'loading');
-
+            if (!passInput.value.trim()) {
+                passInput.classList.add('input-error');
+                passInput.placeholder = 'Required!';
+                return;
+            }
             secretKey = passInput.value;
-            if (document.getElementById('remember-me').checked) { localStorage.setItem('adminSecretKey', secretKey); }
-            
-            setTimeout(() => {
-                setBtnState(btn, null);
-                activateAdminUI();
-            }, 300); // Tiny artificial delay to show brutalist interaction
-        }
-
-        function activateAdminUI(instant = false) {
-            document.body.classList.add('is-logged-in'); 
+            document.body.classList.add('is-logged-in');
+            closeMenu();
             refreshFeedUI();
-            if (!instant) setTimeout(() => { closeMenu(); }, 600); 
         }
 
         function handleLogout() {
-            const btn = document.getElementById('auth-logout-btn');
-            setBtnState(btn, 'loading');
-            
-            setTimeout(() => {
-                secretKey = ""; localStorage.removeItem('adminSecretKey');
-                document.getElementById('remember-me').checked = false;
-                document.getElementById('admin-pass').value = ''; 
-                toggleAdvancedEditor(false);
-                document.body.classList.remove('is-logged-in'); 
-                
-                setBtnState(btn, null); // reset na pozadi
-
-                setTimeout(() => {
-                    closeMenu();
-                    setTimeout(() => { resetDeleteButton(); refreshFeedUI(); }, 500);
-                }, 600); 
-            }, 300);
+            secretKey = "";
+            passInput.value = ''; 
+            toggleAdvancedEditor(false);
+            document.body.classList.remove('is-logged-in'); 
+            closeMenu();
+            document.getElementById('delete-all-btn').dataset.state = "0"; 
+            document.getElementById('delete-all-btn').innerText = "DELETE ALL POSTS";
+            refreshFeedUI();
         }
 
         function handleUnauthorized() {
-            secretKey = ""; localStorage.removeItem('adminSecretKey');
-            document.body.classList.remove('is-logged-in');
-            toggleMenu(true); 
-            setTimeout(() => showErrorInInput('admin-pass', 'Invalid password...'), 600);
+            handleLogout();
+            toggleMenu(); 
+            passInput.classList.add('input-error');
+            passInput.placeholder = 'Invalid password!';
         }
 
         function refreshFeedUI() {
@@ -510,7 +340,7 @@
         function linkify(text) {
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             return text.replace(urlRegex, function(url) {
-                return '<a href="' + url + '" target="_blank" style="color: inherit; text-decoration: none; opacity: 0.6; transition: opacity 0.3s ease;">' + url + '</a>';
+                return '<a href="' + url + '" target="_blank" style="color: inherit; text-decoration: none; opacity: 0.6;">' + url + '</a>';
             });
         }
 
@@ -584,7 +414,7 @@
                 adminActionsHtml = `
                 <div style="display: flex; gap: var(--gap-item); align-items: center; margin: 0;">
                     <button onclick="startEdit(${s.id});" class="admin-action-btn admin-action-link">Edit</button>
-                    <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn admin-action-link">Delete</button>
+                    <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" data-confirm="false" class="admin-action-btn admin-action-link">Delete</button>
                 </div>`;
             }
             return `
@@ -602,25 +432,23 @@
 
         function toggleAdvancedEditor(show) {
             const form = document.getElementById('editor-form');
-            const titleInput = document.getElementById('edit-title');
-            const textInput = document.getElementById('edit-text');
-            const publishBtn = document.getElementById('publish-btn');
-
             if (show) {
-                if (titleInput.value.trim() !== "" && !editingId) {
-                    textInput.value = titleInput.value; titleInput.value = "";
-                }
+                if (titleInput.value.trim() !== "" && !editingId) { textInput.value = titleInput.value; titleInput.value = ""; }
                 titleInput.placeholder = "Title";
                 form.classList.add('adv-open'); 
                 updateImageUIState();
             } else {
                 form.classList.remove('adv-open'); 
                 titleInput.placeholder = "Quick thought...";
-                editingId = null; 
-                titleInput.value = ""; textInput.value = ""; document.getElementById('edit-image').value = "";
+                editingId = null; titleInput.value = ""; textInput.value = ""; document.getElementById('edit-image').value = "";
                 removeImageFlag = false; currentImageUrl = null;
-                updateImageUIState(); resetDeleteButton();
-                setBtnState(publishBtn, null, "PUBLISH");
+                updateImageUIState();
+                document.getElementById('delete-all-btn').dataset.state = "0"; 
+                document.getElementById('delete-all-btn').innerText = "DELETE ALL POSTS";
+                document.getElementById('publish-btn').innerText = "PUBLISH";
+                
+                titleInput.classList.remove('input-error');
+                textInput.classList.remove('input-error');
             }
         }
 
@@ -629,18 +457,15 @@
             if(!post) return;
             
             editingId = id; currentImageUrl = post.image_url || null; removeImageFlag = false; 
-            
-            const titleInput = document.getElementById('edit-title');
             titleInput.value = post.title || "";
-            document.getElementById('edit-text').value = post.text || "";
+            textInput.value = post.text || "";
             document.getElementById('edit-image').value = ""; 
-            
             titleInput.placeholder = "Title";
-            setBtnState('publish-btn', null, "SAVE CHANGES");
+            document.getElementById('publish-btn').innerText = "SAVE CHANGES";
             
             updateImageUIState(); 
             document.getElementById('editor-form').classList.add('adv-open');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'auto' });
         }
 
         function updateImageUIState() {
@@ -654,7 +479,6 @@
 
             if (hasNewFile || hasExistingImage) {
                 wrapper.classList.add('has-image'); 
-                thumbnail.style.border = '1px solid var(--black)'; 
                 if (hasNewFile) {
                      const file = input.files[0]; nameDisplay.innerText = file.name; thumbnail.src = URL.createObjectURL(file);
                 } else {
@@ -668,7 +492,7 @@
         function clearImageSelection(e) {
             e.stopPropagation();
             const input = document.getElementById('edit-image');
-            if (input.files && input.files.length > 0) { input.value = ""; } else { removeImageFlag = true; }
+            if (input.files && input.files.length > 0) input.value = ""; else removeImageFlag = true;
             updateImageUIState();
         }
 
@@ -679,37 +503,38 @@
         }
 
         async function handlePublish() {
-            const title = document.getElementById('edit-title').value.trim();
-            const text = document.getElementById('edit-text').value.trim();
+            const title = titleInput.value.trim();
+            const text = textInput.value.trim();
             const imageFile = document.getElementById('edit-image').files[0];
             const publishBtn = document.getElementById('publish-btn');
             const originalBtnText = editingId ? "SAVE CHANGES" : "PUBLISH";
             let hasImage = !!imageFile || (currentImageUrl && !removeImageFlag);
             
-            if (!text && !hasImage) { showErrorInInput('edit-text', 'Add text or an image...'); return; }
+            if (!text && !hasImage) { 
+                textInput.classList.add('input-error'); textInput.placeholder = 'Content required!'; return; 
+            }
             
+            publishBtn.disabled = true;
             let finalImageUrl = currentImageUrl;
             if (removeImageFlag && !imageFile) finalImageUrl = null; 
             
             if (imageFile) {
-                setBtnState(publishBtn, 'loading', 'COMPRESSING...');
+                publishBtn.innerText = "UPLOADING...";
                 const compressedFile = await compressImage(imageFile);
                 const formData = new FormData(); formData.append("file", compressedFile);
                 try {
-                    setBtnState(publishBtn, 'loading', 'UPLOADING...');
                     const uploadRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
-                    if (uploadRes.status === 401) throw new Error("Unauthorized");
-                    if (!uploadRes.ok) throw new Error("Upload failed");
+                    if (uploadRes.status === 401) return handleUnauthorized();
+                    if (!uploadRes.ok) throw new Error();
                     const uploadData = await uploadRes.json(); finalImageUrl = uploadData.image_url;
                 } catch (err) {
-                    if (err.message === "Unauthorized") return handleUnauthorized();
-                    setBtnState(publishBtn, 'error', 'ERROR!');
-                    setTimeout(() => setBtnState(publishBtn, null, originalBtnText), 2000);
+                    publishBtn.innerText = "ERROR!";
+                    setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 1500);
                     return;
                 }
             }
             
-            setBtnState(publishBtn, 'loading', 'SAVING...');
+            publishBtn.innerText = "SAVING...";
             const method = editingId ? "PUT" : "POST";
             const endpoint = editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`;
             try {
@@ -720,25 +545,25 @@
                 if (res.status === 401) return handleUnauthorized();
                 if (!res.ok) throw new Error();
                 
-                setBtnState(publishBtn, null, editingId ? "UPDATED." : "PUBLISHED.");
+                publishBtn.innerText = editingId ? "UPDATED." : "PUBLISHED.";
                 await fetchStatuses(true); 
-                setTimeout(() => { document.activeElement.blur(); toggleAdvancedEditor(false); }, 1500);
+                toggleAdvancedEditor(false);
+                publishBtn.disabled = false;
             } catch (err) {
-                setBtnState(publishBtn, 'error', 'ERROR!');
-                setTimeout(() => setBtnState(publishBtn, null, originalBtnText), 2000);
+                publishBtn.innerText = "ERROR!";
+                setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 1500);
             }
         }
 
         async function handleQuickPost() {
-            const inputField = document.getElementById('edit-title'); 
-            const text = inputField.value.trim();
+            const text = titleInput.value.trim();
             const btn = document.getElementById('quick-btn');
             const svgNormal = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>';
             const svgSuccess = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="20 6 9 17 4 12"></polyline></svg>';
             
-            if(!text) { showErrorInInput('edit-title', 'Type a thought...'); return; }
+            if(!text) { titleInput.classList.add('input-error'); titleInput.placeholder = 'Required!'; return; }
             
-            setBtnState(btn, 'loading', '...');
+            btn.disabled = true; btn.innerHTML = "...";
             try {
                 const res = await fetch(`${API_URL}/posts`, {
                     method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
@@ -747,45 +572,35 @@
                 if (res.status === 401) return handleUnauthorized();
                 if(!res.ok) throw new Error();
                 
-                inputField.value = ""; 
-                setBtnState(btn, null, svgSuccess);
+                titleInput.value = ""; 
+                btn.innerHTML = svgSuccess;
                 await fetchStatuses(true);
-                setTimeout(() => { setBtnState(btn, null, svgNormal); document.activeElement.blur(); }, 1500);
+                setTimeout(() => { btn.innerHTML = svgNormal; btn.disabled = false; }, 1000);
             } catch(err) {
-                setBtnState(btn, 'error', '!');
-                setTimeout(() => setBtnState(btn, null, svgNormal), 1500);
+                btn.innerHTML = "!";
+                setTimeout(() => { btn.innerHTML = svgNormal; btn.disabled = false; }, 1000);
             }
         }
 
         async function handleDeleteFeed(id) {
             const btn = document.getElementById(`feed-del-btn-${id}`);
             if (btn.dataset.confirm === "true") {
-                clearTimeout(btn.timeoutId);
-                setBtnState(btn, 'loading', 'Deleting...');
+                btn.innerText = "Deleting..."; btn.disabled = true;
                 try {
                     const res = await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
                     if (res.status === 401) return handleUnauthorized();
                     fetchStatuses(true); 
                 } catch(e) {
-                    setBtnState(btn, 'error', 'Error');
-                    setTimeout(() => { setBtnState(btn, null, 'Delete'); btn.dataset.confirm = "false"; }, 2000);
+                    btn.innerText = "Error";
+                    setTimeout(() => { btn.innerText = "Delete"; btn.disabled = false; btn.dataset.confirm = "false"; }, 1500);
                 }
             } else {
                 btn.dataset.confirm = "true"; 
-                setBtnState(btn, 'warning', 'Confirm');
-                btn.timeoutId = setTimeout(() => {
-                    if (btn.dataset.confirm === "true") { 
-                        btn.dataset.confirm = "false"; setBtnState(btn, null, 'Delete');
-                    }
+                btn.innerText = "Confirm";
+                btn.style.color = "#ff4444";
+                setTimeout(() => {
+                    if (btn.dataset.confirm === "true") { btn.dataset.confirm = "false"; btn.innerText = "Delete"; btn.style.color = ""; }
                 }, 3000);
-            }
-        }
-
-        function resetDeleteButton() {
-            const btn = document.getElementById('delete-all-btn');
-            if(btn) {
-                btn.dataset.state = "0"; 
-                setBtnState(btn, null, 'DELETE ALL POSTS');
             }
         }
 
@@ -793,28 +608,17 @@
             const btn = document.getElementById('delete-all-btn');
             const state = btn.dataset.state || "0";
             if (state === "0") {
-                btn.dataset.state = "1"; setBtnState(btn, null, 'CLICK TO CONFIRM');
-                clearTimeout(deleteConfirmTimeout);
-                deleteConfirmTimeout = setTimeout(() => resetDeleteButton(), 3000);
+                btn.dataset.state = "1"; btn.innerText = "CLICK TO CONFIRM";
+                setTimeout(() => {
+                    if(btn.dataset.state === "1") { btn.dataset.state = "0"; btn.innerText = "DELETE ALL POSTS"; }
+                }, 3000);
             } else if (state === "1") {
-                clearTimeout(deleteConfirmTimeout);
-                btn.dataset.state = "2"; countdownValue = 5;
-                setBtnState(btn, null, `DELETING IN ${countdownValue}S (CANCEL)`);
-                deleteCountdownInterval = setInterval(() => {
-                    countdownValue--;
-                    if (countdownValue > 0) setBtnState(btn, null, `DELETING IN ${countdownValue}S (CANCEL)`);
-                    else {
-                        clearInterval(deleteCountdownInterval);
-                        setBtnState(btn, 'loading', 'DELETING EVERYTHING...');
-                        executeDeleteAll();
-                    }
-                }, 1000);
-            } else if (state === "2") {
-                clearInterval(deleteCountdownInterval); resetDeleteButton();
+                btn.dataset.state = "2"; btn.innerText = "DELETING..."; btn.disabled = true;
+                executeDeleteAll(btn);
             }
         }
 
-        async function executeDeleteAll() {
+        async function executeDeleteAll(btn) {
             try {
                 let deleting = true;
                 while(deleting) {
@@ -827,15 +631,14 @@
                 }
                 fetchStatuses(true);
             } catch(e) {
-                setBtnState('delete-all-btn', 'error', 'ERROR!');
+                btn.innerText = "ERROR!";
             } finally {
-                setTimeout(() => { resetDeleteButton(); closeMenu(); }, 2000);
+                setTimeout(() => { btn.dataset.state = "0"; btn.innerText = "DELETE ALL POSTS"; btn.disabled = false; closeMenu(); }, 1000);
             }
         }
 
         fetchStatuses(true);
-        checkSavedLogin(); 
-        menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
+        
         document.addEventListener('click', (e) => { 
             if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); 
         });
