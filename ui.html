@@ -166,7 +166,7 @@
             width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: var(--gap-item); 
             outline: none; color: var(--black); box-sizing: border-box; display: block; 
-            transition: all 0.3s ease; min-height: 80px; resize: vertical; margin: 0;
+            transition: border-color 0.3s ease; min-height: 80px; resize: vertical; margin: 0;
         }
 
         .form-input::placeholder, .form-textarea::placeholder {
@@ -175,10 +175,14 @@
             transition: opacity 0.2s ease, color 0.2s ease;
         }
 
-        /* CUSTOM ERROR VALIDATION STYLES */
+        /* ERROR VALIDATION STYLES - WITH GHOSTING FIX */
         .input-error { border: 1px solid #ff4444 !important; }
         .input-error::placeholder { color: #ff4444 !important; opacity: 1 !important; }
-        .placeholder-fade-out::placeholder { opacity: 0 !important; }
+        .placeholder-fade-out::placeholder { 
+            opacity: 0 !important; 
+            /* Dôležité: Keď mizne, mení sa len priehľadnosť. Zabráni to prelínaniu farieb. */
+            transition: opacity 0.15s ease !important; 
+        }
 
         .submit-btn {
             background: var(--black); color: var(--white); text-transform: uppercase; 
@@ -190,10 +194,20 @@
         .admin-action-btn { background: transparent; border: none; font-size: var(--size-small); color: var(--black); cursor: pointer; padding: 0; margin: 0; display: inline-flex; align-items: center; transition: color 0.2s ease;}
         .admin-action-link { text-decoration: none; } 
 
-        /* ACCORDION ANIMATION STYLES */
+        /* ACCORDION & EXPANSION ANIMATION STYLES */
         #quick-buttons {
-            transition: opacity 0.15s ease;
+            display: flex; gap: var(--gap-item); flex-shrink: 0;
+            width: 112px; /* 48px + 48px + 16px gap */
+            margin-left: var(--gap-item);
             opacity: 1;
+            overflow: hidden;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+        }
+        #quick-buttons.hidden {
+            width: 0;
+            margin-left: 0;
+            opacity: 0;
+            pointer-events: none;
         }
         
         #advanced-section-wrapper {
@@ -246,8 +260,8 @@
                     <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="flex-grow: 1; margin: 0;">
                     <button type="submit" id="login-btn" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;" aria-label="Log In">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            <path d="M5 11V7a7 7 0 0 1 14 0v4" stroke="currentColor" stroke-width="2" fill="none"></path>
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" fill="currentColor" stroke="none"></rect>
                         </svg>
                     </button>
                 </form>
@@ -265,7 +279,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.3.2 • 2026</div>
+            <div class="footer-info">build v3.3.3 • 2026</div>
         </div>
     </nav>
 
@@ -278,10 +292,10 @@
                 
                 <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; margin: 0;">
                     
-                    <div style="display: flex; gap: var(--gap-item); width: 100%;">
-                        <input type="text" id="edit-title" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; margin: 0;">
+                    <div style="display: flex; width: 100%;">
+                        <input type="text" id="edit-title" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; margin: 0; min-width: 0;">
                         
-                        <div id="quick-buttons" style="display: flex; gap: var(--gap-item); flex-shrink: 0;">
+                        <div id="quick-buttons">
                             <button type="button" id="add-adv-btn" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -368,7 +382,7 @@
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
         
-        // --- SMART ERROR ANIMATION LOGIC ---
+        // --- SMART ERROR ANIMATION LOGIC (GHOSTING FIX) ---
         function showErrorInInput(inputId, message) {
             const el = document.getElementById(inputId);
             if(!el || el.dataset.errorActive === "true") return;
@@ -380,24 +394,33 @@
             el.classList.add('placeholder-fade-out');
             
             setTimeout(() => {
-                // 2. Change text and color, then fade back in
+                // 2. Change text and color while invisible
                 el.setAttribute('placeholder', message);
-                el.classList.remove('placeholder-fade-out');
                 el.classList.add('input-error');
                 
-                setTimeout(() => {
-                    // 3. Fade out error text
-                    el.classList.add('placeholder-fade-out');
+                // Pustíme prechodový cyklus, aby si to browser zaradil
+                requestAnimationFrame(() => {
+                    el.classList.remove('placeholder-fade-out');
                     
                     setTimeout(() => {
-                        // 4. Restore original text and color, then fade back in
-                        el.classList.remove('input-error');
-                        el.setAttribute('placeholder', origPlaceholder);
-                        el.classList.remove('placeholder-fade-out');
-                        el.dataset.errorActive = "false";
-                    }, 200); // Wait for fade out to complete
-                }, 2000); // Display error for 2 seconds
-            }, 200); // Wait for first fade out
+                        // 3. Fade out error text
+                        el.classList.add('placeholder-fade-out');
+                        
+                        setTimeout(() => {
+                            // 4. Restore original text and grey color while completely invisible
+                            el.classList.remove('input-error');
+                            el.setAttribute('placeholder', origPlaceholder);
+                            
+                            // Force reflow - povie browseru "prekresli to hneď teraz, neanimuj zmenu farby"
+                            void el.offsetWidth; 
+                            
+                            // 5. Fade back in s pôvodnou farbou
+                            el.classList.remove('placeholder-fade-out');
+                            el.dataset.errorActive = "false";
+                        }, 200); // Čaká sa na dokončenie zmiznutia
+                    }, 2000); // Chybová hláška trvá 2 sekundy
+                });
+            }, 200); 
         }
 
         function toggleMenu(forceOpen = false) { 
@@ -454,7 +477,6 @@
             document.getElementById('feed-admin-zone').style.display = 'none';
             document.getElementById('remember-me').checked = false;
             
-            // Force clean reset
             toggleAdvancedEditor(false);
             setTimeout(() => {
                 resetDeleteButton(); 
@@ -584,7 +606,7 @@
             </div>`;
         }
 
-        // --- SEQUENTIAL ANIMATION LOGIC ---
+        // --- SEQUENTIAL EXPANSION ANIMATION LOGIC ---
         function toggleAdvancedEditor(show) {
             const titleInput = document.getElementById('edit-title');
             const textInput = document.getElementById('edit-text');
@@ -598,35 +620,42 @@
                     titleInput.value = "";
                 }
                 
-                // 1. Fade out quick buttons fast
-                quickButtons.style.opacity = '0';
+                // 1. Zbaľ rýchle tlačidlá (roztiahne to input do plnej šírky)
+                quickButtons.classList.add('hidden');
                 
+                // 2. Cross-fade textu v placeholdery
+                titleInput.classList.add('placeholder-fade-out');
                 setTimeout(() => {
-                    quickButtons.style.display = 'none';
                     titleInput.setAttribute('placeholder', 'Title');
-                    
-                    // 2. Expand wrapper smoothly
-                    advWrapper.classList.add('open');
-                    updateImageUIState();
-                    
-                    // 3. Fade in content quickly after expansion starts
-                    setTimeout(() => {
-                        advContent.style.opacity = '1';
-                    }, 300); 
+                    titleInput.classList.remove('placeholder-fade-out');
+                }, 150); 
+                
+                // 3. Rozbaľ akordeón nadol
+                advWrapper.classList.add('open');
+                updateImageUIState();
+                
+                // 4. Počas roztvárania vpi (fade-in) obsah
+                setTimeout(() => {
+                    advContent.style.opacity = '1';
                 }, 150); 
                 
             } else {
-                // 1. Fade out content fast
+                // 1. Vypi obsah do stratena
                 advContent.style.opacity = '0';
                 
                 setTimeout(() => {
-                    // 2. Collapse wrapper smoothly
+                    // 2. Zbaľ akordeón nahor
                     advWrapper.classList.remove('open');
                     
+                    // Cross-fade textu späť
+                    titleInput.classList.add('placeholder-fade-out');
+                    
                     setTimeout(() => {
-                        // 3. Reset UI & Fade in quick buttons
-                        quickButtons.style.display = 'flex';
+                        // 3. Reset UI & vysunutie rýchlych tlačidiel
                         titleInput.setAttribute('placeholder', 'Quick thought...');
+                        titleInput.classList.remove('placeholder-fade-out');
+                        
+                        quickButtons.classList.remove('hidden');
                         
                         editingId = null; 
                         titleInput.value = "";
@@ -641,10 +670,7 @@
                         publishBtn.disabled = false; 
                         publishBtn.innerText = "PUBLISH";
                         
-                        // force reflow before opacity change to ensure transition happens
-                        void quickButtons.offsetWidth;
-                        quickButtons.style.opacity = '1';
-                    }, 300); 
+                    }, 150); 
                 }, 150); 
             }
         }
@@ -668,9 +694,7 @@
 
             document.getElementById('publish-btn').innerText = "SAVE CHANGES";
             
-            // Instant open for edit button directly
-            quickButtons.style.opacity = '0';
-            quickButtons.style.display = 'none';
+            quickButtons.classList.add('hidden');
             titleInput.setAttribute('placeholder', 'Title');
             advWrapper.classList.add('open');
             advContent.style.opacity = '1';
@@ -732,7 +756,6 @@
                 actionLabel.innerText = "Upload image";
                 actionLabel.style.textDecoration = 'none';
                 
-                // Odstránené Optional pre čistejší dizajn
                 nameDisplay.innerText = "";
                 nameDisplay.style.color = "var(--grey-30)";
                 nameDisplay.style.textAlign = "right";
