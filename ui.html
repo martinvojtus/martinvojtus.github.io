@@ -242,7 +242,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.2.5 • 2026</div>
+            <div class="footer-info">build v3.2.6 • 2026</div>
         </div>
     </nav>
 
@@ -281,7 +281,7 @@
 
                             <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                             <div id="upload-container" class="form-input" style="cursor: pointer; flex-grow: 1;">
-                                <span id="upload-action-label" class="admin-action-link" style="pointer-events: none; white-space: nowrap; color: var(--black);">Upload image</span>
+                                <span id="upload-action-label" style="pointer-events: none; white-space: nowrap; color: var(--black); text-decoration: none;">Upload image</span>
                                 <span id="file-name-display" style="color: var(--grey-30); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); line-height: 1; margin: 0; text-align: right;">(Optional)</span>
                             </div>
 
@@ -598,7 +598,7 @@
             const hasExistingImage = currentImageUrl && !removeImageFlag;
 
             if (hasNewFile || hasExistingImage) {
-                // State: Image Present (Show thumbnail, filename, and trash button)
+                // State: Image Present
                 uploadContainer.onclick = null; 
                 uploadContainer.style.cursor = 'default';
                 
@@ -613,13 +613,8 @@
                      nameDisplay.innerText = file.name;
                      thumbnail.src = URL.createObjectURL(file);
                 } else {
+                     // Display actual filename from the URL, let CSS handle the truncation if it's too long
                      let fileName = currentImageUrl.split('/').pop().split('?')[0];
-                     // Smart UUID Stripper: If the filename from server is a long hash, make it readable
-                     if (fileName.length > 20) {
-                         const parts = fileName.split('.');
-                         const ext = parts.length > 1 ? parts.pop() : 'jpg';
-                         fileName = 'image.' + ext;
-                     }
                      nameDisplay.innerText = fileName;
                      thumbnail.src = currentImageUrl;
                 }
@@ -637,7 +632,7 @@
                 };
 
             } else {
-                // State: Empty (Show standard upload button)
+                // State: Empty
                 uploadContainer.onclick = () => document.getElementById('edit-image').click();
                 uploadContainer.style.cursor = 'pointer';
                 
@@ -646,6 +641,7 @@
                 
                 actionLabel.style.display = 'inline';
                 actionLabel.innerText = "Upload image";
+                actionLabel.style.textDecoration = 'none'; // Ensure no underline
                 
                 nameDisplay.innerText = "(Optional)";
                 nameDisplay.style.color = "var(--grey-30)";
