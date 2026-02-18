@@ -20,9 +20,11 @@
             
             --black: #000000;
             --white: #ffffff;
-            /* 30% BLACK FOR SUBTLE TEXT & PLACEHOLDERS */
-            --grey-30: rgba(0, 0, 0, 0.3);
-            /* 10% BLACK FOR DIVIDER LINES */
+            
+            /* UPDATED: 50% BLACK FOR SUBTLE TEXT & PLACEHOLDERS */
+            --grey-50: rgba(0, 0, 0, 0.5);
+            
+            /* 10% BLACK FOR DIVIDER LINES - EXACTLY 10% OPACITY */
             --divider: rgba(0, 0, 0, 0.1);
             
             --glass-rgb: 255, 255, 255; 
@@ -43,7 +45,7 @@
             :root {
                 --black: #ffffff;       
                 --white: #000000;       
-                --grey-30: rgba(255, 255, 255, 0.3); 
+                --grey-50: rgba(255, 255, 255, 0.5); 
                 --divider: rgba(255, 255, 255, 0.1); 
                 --glass-rgb: 0, 0, 0;   
             }
@@ -129,7 +131,6 @@
         #section-feed { display: flex; flex-direction: column; gap: var(--gap-item); }
         #feed-admin-zone { display: flex; flex-direction: column; gap: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider); }
         
-        /* Menu Sections with Transition Support */
         #menu-login-section, #menu-admin-section { 
             display: flex; flex-direction: column; gap: var(--gap-item); 
             transition: opacity 0.2s ease;
@@ -153,11 +154,11 @@
         .status-card:first-child { padding-top: 0; }
         .status-card:last-child { border-bottom: none; }
 
-        .status-date { font-size: var(--size-small); color: var(--grey-30); display: block; text-transform: uppercase; margin: 0; }
+        .status-date { font-size: var(--size-small); color: var(--grey-50); display: block; text-transform: uppercase; margin: 0; }
         .status-title { font-size: var(--size-large); margin: 0; color: var(--black); }
         .status-image { width: 100%; height: auto; border-radius: var(--border-radius); display: block; margin: 0; border: none; }
         .status-text { font-size: var(--size-small); color: var(--black); opacity: 0.8; white-space: pre-line; text-align: justify; margin: 0; word-wrap: break-word; }
-        .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-30); margin: 0; padding: var(--gap-item) 0; line-height: 1; }
+        .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); margin: 0; padding: var(--gap-item) 0; line-height: 1; }
 
         /* INPUTS & PLACEHOLDER SMOOTH FADE */
         .form-input, .submit-btn { 
@@ -175,7 +176,7 @@
         }
 
         .form-input::placeholder, .form-textarea::placeholder {
-            color: var(--grey-30);
+            color: var(--grey-50);
             opacity: 1;
             transition: opacity 0.2s ease, color 0.2s ease;
         }
@@ -194,7 +195,6 @@
         }
         .secondary-btn { background: transparent; color: var(--black); }
         
-        /* UPDATED DANGER BUTTON STYLE (Black/White adaptívny bg, Red text) */
         .danger-btn { 
             background: var(--black) !important; 
             color: #ff4444 !important; 
@@ -247,7 +247,7 @@
         .checkbox-wrapper input:checked ~ .checkmark::after { display: block; }
         .checkbox-label-text { font-size: var(--size-small); color: var(--black); margin: 0; }
 
-        .footer-info { font-size: var(--size-small); color: var(--grey-30); text-transform: uppercase; text-align: left; margin: 0; }
+        .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; text-align: left; margin: 0; }
     </style>
 </head>
 <body>
@@ -275,8 +275,8 @@
                     <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="flex-grow: 1; margin: 0;">
                     <button type="submit" id="login-btn" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;" aria-label="Log In">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
-                            <path d="M7 11V6a5 5 0 0 1 10 0v5" stroke="currentColor" stroke-width="1.5" fill="none"></path>
-                            <rect x="4" y="11" width="16" height="11" fill="currentColor" stroke="none"></rect>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
                         </svg>
                     </button>
                 </form>
@@ -294,7 +294,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.3.5 • 2026</div>
+            <div class="footer-info">build v3.3.6 • 2026</div>
         </div>
     </nav>
 
@@ -339,7 +339,7 @@
                                     
                                     <div id="upload-container" class="form-input" style="cursor: pointer; flex-grow: 1; min-width: 0; overflow: hidden;">
                                         <span id="upload-action-label" style="pointer-events: none; white-space: nowrap; color: var(--black); text-decoration: none; flex-shrink: 0;">Upload image</span>
-                                        <span id="file-name-display" style="color: var(--grey-30); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); line-height: 1; margin: 0; text-align: right;"></span>
+                                        <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); line-height: 1; margin: 0; text-align: right;"></span>
                                     </div>
 
                                     <button type="button" id="clear-file-btn" class="submit-btn secondary-btn" style="display: none; width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;" aria-label="Remove Image">
@@ -449,19 +449,24 @@
             const savedKey = localStorage.getItem('adminSecretKey');
             if (savedKey) {
                 secretKey = savedKey;
-                activateAdminUI();
+                activateAdminUI(true);
             }
         }
 
-        function activateAdminUI() {
+        function activateAdminUI(instant = false) {
             const adminSec = document.getElementById('menu-admin-section');
             const loginSec = document.getElementById('menu-login-section');
             
-            loginSec.style.display = 'none';
-            loginSec.style.opacity = '0';
-            
-            adminSec.style.display = 'flex';
-            adminSec.style.opacity = '1';
+            if (instant) {
+                loginSec.style.display = 'none';
+                loginSec.style.opacity = '0';
+                adminSec.style.display = 'flex';
+                adminSec.style.opacity = '1';
+            } else {
+                loginSec.style.display = 'none';
+                adminSec.style.display = 'flex';
+                adminSec.style.opacity = '1';
+            }
             
             document.getElementById('feed-admin-zone').style.display = 'block'; 
             refreshFeedUI();
@@ -484,7 +489,7 @@
             closeMenu();
         }
 
-        // --- SEQUENTIAL LOGOUT FLOW ---
+        // --- BULLETPROOF SEQUENTIAL LOGOUT FLOW ---
         function handleLogout() {
             secretKey = "";
             localStorage.removeItem('adminSecretKey');
@@ -495,31 +500,34 @@
             const adminSec = document.getElementById('menu-admin-section');
             const loginSec = document.getElementById('menu-login-section');
             
-            // 1. Plynulý Fade-out Admin Menu (0.2s)
+            // 1. Plynulý Fade-out Logout odkazu (0.2s)
             adminSec.style.opacity = '0';
             
             setTimeout(() => {
-                // 2. Prepnutie elementov (Vyroluje sa hĺbka pre Login)
+                // 2. Skryť admin sekciu a pripraviť Login sekciu
                 adminSec.style.display = 'none';
+                loginSec.style.opacity = '0'; // Zaručí neviditeľnosť pred vykreslením
                 loginSec.style.display = 'flex';
-                loginSec.style.opacity = '0';
                 
-                void loginSec.offsetWidth; // Force reflow
+                // 3. Počkať na Browser, kým prepočíta výšku menu po display: flex
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        // 4. Až teraz spusti plynulý Fade-in
+                        loginSec.style.opacity = '1';
+                    });
+                });
                 
-                // 3. Plynulý Fade-in Login Menu (0.2s)
-                loginSec.style.opacity = '1';
-                
-                // 4. Pauza na "uvedomenie si zmeny" a zatvorenie Menu (Slide Up)
+                // 5. Pauza, aby používateľ videl, že je vonku, a potom zatvoriť
                 setTimeout(() => {
                     closeMenu();
                     
-                    // Skryť feed editor v pozadí, kým sa menu zatvára
+                    // Skryť feed editor v pozadí, kým sa menu roluje nahor
                     setTimeout(() => {
                         document.getElementById('feed-admin-zone').style.display = 'none';
                         resetDeleteButton();
                         refreshFeedUI();
                     }, 500); 
-                }, 600); 
+                }, 800); 
             }, 200); 
         }
 
@@ -618,7 +626,7 @@
                 const updateObj = new Date(s.updated_at);
                 const updateDate = updateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
                 const updateTime = updateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-                editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-30); margin: 0; line-height: 1;">EDITED: ${updateDate.toUpperCase()} • ${updateTime}</div>`;
+                editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin: 0; line-height: 1;">EDITED: ${updateDate.toUpperCase()} • ${updateTime}</div>`;
             }
             const titleHtml = (s.title && s.title.trim() !== "") ? `<h3 class="status-title">${s.title}</h3>` : '';
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image" loading="lazy">` : '';
@@ -807,7 +815,7 @@
                     actionLabel.style.textDecoration = 'none';
                     
                     nameDisplay.innerText = "";
-                    nameDisplay.style.color = "var(--grey-30)";
+                    nameDisplay.style.color = "var(--grey-50)";
                     nameDisplay.style.textAlign = "right";
 
                     clearBtn.style.display = "none";
