@@ -154,13 +154,13 @@
         .status-text { font-size: var(--size-small); color: var(--black); opacity: 0.8; white-space: pre-line; text-align: justify; margin: 0; word-wrap: break-word; }
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-30); margin: 0; padding: var(--gap-item) 0; line-height: 1; }
 
+        /* INPUTS & PLACEHOLDER SMOOTH FADE */
         .form-input, .submit-btn { 
             height: 48px; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; color: var(--black); box-sizing: border-box; display: flex; margin: 0; align-items: center;
             gap: var(--gap-item); transition: border-color 0.3s ease;
         }
-        ::placeholder { color: var(--grey-30); opacity: 1; transition: color 0.3s ease; }
         
         .form-textarea { 
             width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); 
@@ -169,30 +169,45 @@
             transition: all 0.3s ease; min-height: 80px; resize: vertical; margin: 0;
         }
 
+        .form-input::placeholder, .form-textarea::placeholder {
+            color: var(--grey-30);
+            opacity: 1;
+            transition: opacity 0.2s ease, color 0.2s ease;
+        }
+
         /* CUSTOM ERROR VALIDATION STYLES */
         .input-error { border: 1px solid #ff4444 !important; }
         .input-error::placeholder { color: #ff4444 !important; opacity: 1 !important; }
+        .placeholder-fade-out::placeholder { opacity: 0 !important; }
 
         .submit-btn {
             background: var(--black); color: var(--white); text-transform: uppercase; 
             cursor: pointer; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .secondary-btn { background: transparent; color: var(--black); }
-        
-        /* DANGER BUTTON STYLE */
         .danger-btn { background: #ff4444 !important; color: #000000 !important; border: none !important; }
 
         .admin-action-btn { background: transparent; border: none; font-size: var(--size-small); color: var(--black); cursor: pointer; padding: 0; margin: 0; display: inline-flex; align-items: center; transition: color 0.2s ease;}
         .admin-action-link { text-decoration: none; } 
 
         /* ACCORDION ANIMATION STYLES */
+        #quick-buttons {
+            transition: opacity 0.15s ease;
+            opacity: 1;
+        }
+        
         #advanced-section-wrapper {
             display: grid; 
             grid-template-rows: 0fr; 
-            transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         #advanced-section-wrapper.open {
             grid-template-rows: 1fr;
+        }
+
+        #adv-content {
+            opacity: 0;
+            transition: opacity 0.2s ease;
         }
 
         .checkbox-wrapper { display: inline-flex; align-items: center; gap: var(--gap-item); cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; margin: 0; }
@@ -231,9 +246,8 @@
                     <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="flex-grow: 1; margin: 0;">
                     <button type="submit" id="login-btn" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;" aria-label="Log In">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
-                            <polyline points="15 3 21 3 21 21 15 21"></polyline>
-                            <polyline points="10 17 15 12 10 7"></polyline>
-                            <line x1="15" y1="12" x2="3" y2="12"></line>
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                         </svg>
                     </button>
                 </form>
@@ -251,7 +265,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.3.1 • 2026</div>
+            <div class="footer-info">build v3.3.2 • 2026</div>
         </div>
     </nav>
 
@@ -285,9 +299,9 @@
 
                     <div id="advanced-section-wrapper">
                         <div style="overflow: hidden;">
-                            <div style="padding-top: var(--gap-item); display: flex; flex-direction: column; gap: var(--gap-item);">
+                            <div id="adv-content" style="padding-top: var(--gap-item); display: flex; flex-direction: column; gap: var(--gap-item);">
                                 
-                                <textarea id="edit-text" class="form-textarea" placeholder="Content *"></textarea>
+                                <textarea id="edit-text" class="form-textarea" placeholder="Content"></textarea>
 
                                 <div style="display: flex; gap: var(--gap-item); width: 100%;">
                                     <img id="upload-thumbnail" style="display: none; width: 48px; height: 48px; border-radius: var(--border-radius); object-fit: cover; flex-shrink: 0; margin: 0; border: 1px solid var(--black); color: transparent;" src="" alt="">
@@ -296,7 +310,7 @@
                                     
                                     <div id="upload-container" class="form-input" style="cursor: pointer; flex-grow: 1; min-width: 0; overflow: hidden;">
                                         <span id="upload-action-label" style="pointer-events: none; white-space: nowrap; color: var(--black); text-decoration: none; flex-shrink: 0;">Upload image</span>
-                                        <span id="file-name-display" style="color: var(--grey-30); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); line-height: 1; margin: 0; text-align: right;">(Optional)</span>
+                                        <span id="file-name-display" style="color: var(--grey-30); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); line-height: 1; margin: 0; text-align: right;"></span>
                                     </div>
 
                                     <button type="button" id="clear-file-btn" class="submit-btn secondary-btn" style="display: none; width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;" aria-label="Remove Image">
@@ -354,21 +368,36 @@
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
         
-        // --- CUSTOM ERROR VALIDATION UI ---
+        // --- SMART ERROR ANIMATION LOGIC ---
         function showErrorInInput(inputId, message) {
             const el = document.getElementById(inputId);
             if(!el || el.dataset.errorActive === "true") return;
             
             const origPlaceholder = el.getAttribute('placeholder') || '';
             el.dataset.errorActive = "true";
-            el.classList.add('input-error');
-            el.setAttribute('placeholder', message);
+            
+            // 1. Fade out original text
+            el.classList.add('placeholder-fade-out');
             
             setTimeout(() => {
-                el.classList.remove('input-error');
-                el.setAttribute('placeholder', origPlaceholder);
-                el.dataset.errorActive = "false";
-            }, 2000);
+                // 2. Change text and color, then fade back in
+                el.setAttribute('placeholder', message);
+                el.classList.remove('placeholder-fade-out');
+                el.classList.add('input-error');
+                
+                setTimeout(() => {
+                    // 3. Fade out error text
+                    el.classList.add('placeholder-fade-out');
+                    
+                    setTimeout(() => {
+                        // 4. Restore original text and color, then fade back in
+                        el.classList.remove('input-error');
+                        el.setAttribute('placeholder', origPlaceholder);
+                        el.classList.remove('placeholder-fade-out');
+                        el.dataset.errorActive = "false";
+                    }, 200); // Wait for fade out to complete
+                }, 2000); // Display error for 2 seconds
+            }, 200); // Wait for first fade out
         }
 
         function toggleMenu(forceOpen = false) { 
@@ -405,7 +434,7 @@
             const passInput = document.getElementById('admin-pass');
             
             if (!passInput.value.trim()) {
-                showErrorInInput('admin-pass', 'Password is required...');
+                showErrorInInput('admin-pass', 'Password required...');
                 return;
             }
 
@@ -424,10 +453,14 @@
             document.getElementById('menu-login-section').style.display = 'flex';
             document.getElementById('feed-admin-zone').style.display = 'none';
             document.getElementById('remember-me').checked = false;
+            
+            // Force clean reset
             toggleAdvancedEditor(false);
-            resetDeleteButton(); 
-            refreshFeedUI();
-            closeMenu(); 
+            setTimeout(() => {
+                resetDeleteButton(); 
+                refreshFeedUI();
+                closeMenu();
+            }, 400); 
         }
 
         function handleUnauthorized() {
@@ -551,44 +584,68 @@
             </div>`;
         }
 
-        // --- NEW MERGED ACCORDION LOGIC ---
+        // --- SEQUENTIAL ANIMATION LOGIC ---
         function toggleAdvancedEditor(show) {
             const titleInput = document.getElementById('edit-title');
             const textInput = document.getElementById('edit-text');
             const quickButtons = document.getElementById('quick-buttons');
             const advWrapper = document.getElementById('advanced-section-wrapper');
+            const advContent = document.getElementById('adv-content');
 
             if (show) {
                 if (titleInput.value.trim() !== "" && !editingId) {
                     textInput.value = titleInput.value;
                     titleInput.value = "";
                 }
-                quickButtons.style.display = 'none';
-                // Dynamic placeholder change for title
-                titleInput.setAttribute('placeholder', 'Title *');
-                advWrapper.classList.add('open');
-                updateImageUIState();
-            } else {
-                advWrapper.classList.remove('open');
+                
+                // 1. Fade out quick buttons fast
+                quickButtons.style.opacity = '0';
                 
                 setTimeout(() => {
-                    quickButtons.style.display = 'flex';
-                    // Revert placeholder
-                    titleInput.setAttribute('placeholder', 'Quick thought...');
+                    quickButtons.style.display = 'none';
+                    titleInput.setAttribute('placeholder', 'Title');
                     
-                    editingId = null; 
-                    titleInput.value = "";
-                    textInput.value = "";
-                    document.getElementById('edit-image').value = "";
-                    removeImageFlag = false;
-                    currentImageUrl = null;
+                    // 2. Expand wrapper smoothly
+                    advWrapper.classList.add('open');
                     updateImageUIState();
                     
-                    resetDeleteButton();
-                    const publishBtn = document.getElementById('publish-btn');
-                    publishBtn.disabled = false; 
-                    publishBtn.innerText = "PUBLISH";
-                }, 400); 
+                    // 3. Fade in content quickly after expansion starts
+                    setTimeout(() => {
+                        advContent.style.opacity = '1';
+                    }, 300); 
+                }, 150); 
+                
+            } else {
+                // 1. Fade out content fast
+                advContent.style.opacity = '0';
+                
+                setTimeout(() => {
+                    // 2. Collapse wrapper smoothly
+                    advWrapper.classList.remove('open');
+                    
+                    setTimeout(() => {
+                        // 3. Reset UI & Fade in quick buttons
+                        quickButtons.style.display = 'flex';
+                        titleInput.setAttribute('placeholder', 'Quick thought...');
+                        
+                        editingId = null; 
+                        titleInput.value = "";
+                        textInput.value = "";
+                        document.getElementById('edit-image').value = "";
+                        removeImageFlag = false;
+                        currentImageUrl = null;
+                        updateImageUIState();
+                        
+                        resetDeleteButton();
+                        const publishBtn = document.getElementById('publish-btn');
+                        publishBtn.disabled = false; 
+                        publishBtn.innerText = "PUBLISH";
+                        
+                        // force reflow before opacity change to ensure transition happens
+                        void quickButtons.offsetWidth;
+                        quickButtons.style.opacity = '1';
+                    }, 300); 
+                }, 150); 
             }
         }
 
@@ -601,6 +658,7 @@
             const textInput = document.getElementById('edit-text');
             const quickButtons = document.getElementById('quick-buttons');
             const advWrapper = document.getElementById('advanced-section-wrapper');
+            const advContent = document.getElementById('adv-content');
 
             titleInput.value = post.title || "";
             textInput.value = post.text || "";
@@ -610,9 +668,12 @@
 
             document.getElementById('publish-btn').innerText = "SAVE CHANGES";
             
+            // Instant open for edit button directly
+            quickButtons.style.opacity = '0';
             quickButtons.style.display = 'none';
-            titleInput.setAttribute('placeholder', 'Title *');
+            titleInput.setAttribute('placeholder', 'Title');
             advWrapper.classList.add('open');
+            advContent.style.opacity = '1';
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -671,7 +732,8 @@
                 actionLabel.innerText = "Upload image";
                 actionLabel.style.textDecoration = 'none';
                 
-                nameDisplay.innerText = "(Optional)";
+                // Odstránené Optional pre čistejší dizajn
+                nameDisplay.innerText = "";
                 nameDisplay.style.color = "var(--grey-30)";
                 nameDisplay.style.textAlign = "right";
 
@@ -750,7 +812,7 @@
             const btn = document.getElementById('quick-btn');
             
             if(!text) {
-                showErrorInInput('edit-title', 'Type a thought to post...');
+                showErrorInInput('edit-title', 'Type a thought...');
                 return;
             }
             
