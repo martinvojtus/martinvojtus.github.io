@@ -129,47 +129,34 @@
         }
 
         #section-feed { display: flex; flex-direction: column; gap: var(--gap-item); }
-        #feed-admin-zone { display: flex; flex-direction: column; gap: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider); }
         
-        /* CROSS-FADE AUTH SECTION STYLES */
-        #auth-section { 
-            display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; 
-            transition: opacity 0.2s ease; 
-            opacity: 1; 
+        /* STATE MACHINE: FEED ADMIN ZONE */
+        #feed-admin-zone { 
+            display: none; 
+            flex-direction: column; gap: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider); 
         }
-        
-        #auth-form {
-            display: flex; width: 100%; gap: var(--gap-item); margin: 0;
-        }
-        
-        #admin-pass {
-            flex-grow: 1; margin: 0; min-width: 0; 
-            transition: border-color 0.3s ease, color 0.2s ease;
-        }
-        
-        /* Instant layout switch while invisible */
-        #auth-form.logged-in #admin-pass { display: none; }
+        body.is-logged-in #feed-admin-zone { display: flex; }
 
-        #auth-btn {
-            width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;
-            transition: border-color 0.3s ease;
-        }
-        
-        /* Instant layout switch while invisible */
-        #auth-form.logged-in #auth-btn {
+        /* STATE MACHINE: CSS GRID AUTH CROSS-FADE */
+        #auth-wrapper {
+            display: grid;
+            grid-template-areas: "overlap";
             width: 100%;
-            flex-grow: 1;
-        }
-
-        #remember-wrapper {
-            max-height: 50px; opacity: 1; overflow: hidden; margin-top: 0;
-            transition: max-height 0.3s ease, opacity 0.2s ease, margin 0.3s ease;
         }
         
-        #remember-wrapper.hidden {
-            max-height: 0; opacity: 0; pointer-events: none;
-            margin-top: calc(var(--gap-item) * -1);
+        #login-ui, #logout-ui {
+            grid-area: overlap;
+            display: flex; flex-direction: column; gap: var(--gap-item);
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
+        /* Default: Not logged in */
+        #login-ui { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
+        #logout-ui { opacity: 0; visibility: hidden; transform: translateY(-5px); pointer-events: none; }
+
+        /* Logged In */
+        body.is-logged-in #login-ui { opacity: 0; visibility: hidden; transform: translateY(5px); pointer-events: none; }
+        body.is-logged-in #logout-ui { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
 
         .status-feed {
             max-width: 600px; width: 100%;
@@ -194,31 +181,29 @@
         .status-text { font-size: var(--size-small); color: var(--black); opacity: 0.8; white-space: pre-line; text-align: justify; margin: 0; word-wrap: break-word; }
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); margin: 0; padding: var(--gap-item) 0; line-height: 1; }
 
-        /* INPUTS & PLACEHOLDER SMOOTH FADE */
+        /* INPUTS & PLACEHOLDERS */
         .form-input, .submit-btn { 
             height: 48px; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; color: var(--black); box-sizing: border-box; display: flex; margin: 0; align-items: center;
-            gap: var(--gap-item); transition: border-color 0.3s ease, color 0.2s ease;
+            gap: var(--gap-item); transition: border-color 0.3s ease;
         }
         
         .form-textarea { 
             width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: var(--gap-item); 
             outline: none; color: var(--black); box-sizing: border-box; display: block; 
-            transition: border-color 0.3s ease, color 0.2s ease; min-height: 80px; resize: vertical; margin: 0;
+            transition: border-color 0.3s ease; min-height: 80px; resize: vertical; margin: 0;
         }
 
         .form-input::placeholder, .form-textarea::placeholder {
             color: var(--grey-50);
             opacity: 1;
-            transition: opacity 0.2s ease, color 0.2s ease;
         }
 
-        /* ERROR VALIDATION STYLES */
-        .input-error { border: 1px solid #ff4444 !important; }
+        /* BRUTALIST ERROR VALIDATION - ZERO GHOSTING */
+        .input-error { border-color: #ff4444 !important; }
         .input-error::placeholder { color: #ff4444 !important; opacity: 1 !important; }
-        .placeholder-fade-out::placeholder { opacity: 0 !important; transition: opacity 0.2s ease !important; }
 
         .submit-btn {
             background: var(--black); color: var(--white); text-transform: uppercase; 
@@ -236,23 +221,34 @@
         .admin-action-btn { background: transparent; border: none; font-size: var(--size-small); color: var(--black); cursor: pointer; padding: 0; margin: 0; display: inline-flex; align-items: center; transition: color 0.2s ease;}
         .admin-action-link { text-decoration: none; } 
 
-        /* ACCORDION & EXPANSION ANIMATION STYLES */
+        /* STATE MACHINE: ADVANCED EDITOR EXPANSION */
         #quick-buttons {
-            display: flex; gap: var(--gap-item); flex-shrink: 0;
-            width: 112px; 
-            margin-left: var(--gap-item);
-            opacity: 1;
-            overflow: hidden;
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+            display: flex; gap: var(--gap-item); flex-shrink: 0; width: 112px; margin-left: var(--gap-item);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
         }
-        #quick-buttons.hidden {
-            width: 0; margin-left: 0; opacity: 0; pointer-events: none;
-        }
+        #editor-form.adv-open #quick-buttons { width: 0; margin-left: 0; opacity: 0; pointer-events: none; }
         
-        #advanced-section-wrapper { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        #advanced-section-wrapper.open { grid-template-rows: 1fr; }
-        #adv-content { opacity: 0; transition: opacity 0.2s ease; }
-        #upload-ui-wrapper { transition: opacity 0.2s ease; opacity: 1; }
+        #advanced-section-wrapper { 
+            display: grid; grid-template-rows: 0fr; 
+            transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        #editor-form.adv-open #advanced-section-wrapper { grid-template-rows: 1fr; }
+        
+        #adv-content { opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        #editor-form.adv-open #adv-content { opacity: 1; visibility: visible; }
+        
+        /* STATE MACHINE: UPLOAD UI */
+        #upload-container { display: flex; cursor: pointer; }
+        #upload-action-label { display: inline; color: var(--black); }
+        #file-name-display { color: var(--grey-50); text-align: right; }
+        #upload-thumbnail { display: none; border: 1px solid var(--black); }
+        #clear-file-btn { display: none; }
+
+        #upload-ui-wrapper.has-image #upload-container { cursor: default; }
+        #upload-ui-wrapper.has-image #upload-action-label { display: none; }
+        #upload-ui-wrapper.has-image #file-name-display { color: var(--black); text-align: left; }
+        #upload-ui-wrapper.has-image #upload-thumbnail { display: block; }
+        #upload-ui-wrapper.has-image #clear-file-btn { display: flex; }
 
         .checkbox-wrapper { display: inline-flex; align-items: center; gap: var(--gap-item); cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; margin: 0; }
         .checkbox-wrapper input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
@@ -285,28 +281,34 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
             
-            <div id="auth-section">
-                <form id="auth-form" onsubmit="handleAuthSubmit(event)">
-                    <input type="password" id="admin-pass" class="form-input" placeholder="Password...">
-                    <button type="submit" id="auth-btn" class="submit-btn" aria-label="Authenticate">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </button>
-                </form>
+            <div id="auth-wrapper">
                 
-                <div id="remember-wrapper">
+                <div id="login-ui">
+                    <form onsubmit="handleLogin(event)" style="display: flex; width: 100%; gap: var(--gap-item); margin: 0;">
+                        <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="flex-grow: 1; margin: 0;">
+                        <button type="submit" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;" aria-label="Log In">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+                    </form>
+                    
                     <label class="checkbox-wrapper">
                         <input type="checkbox" id="remember-me">
                         <span class="checkmark"></span>
                         <span class="checkbox-label-text">Stay logged in</span>
                     </label>
                 </div>
+
+                <div id="logout-ui">
+                    <button onclick="handleLogout()" class="submit-btn" style="width: 100%; color: var(--white); margin: 0;">LOGOUT</button>
+                </div>
+
             </div>
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.3.8 • 2026</div>
+            <div class="footer-info">build v4.0.0 • 2026</div>
         </div>
     </nav>
 
@@ -315,7 +317,7 @@
             <h2 style="font-size: var(--size-large); margin: 0; line-height: 1;">Feed.</h2>
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
             
-            <div id="feed-admin-zone" style="display: none;">
+            <div id="feed-admin-zone">
                 
                 <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; margin: 0;">
                     
@@ -323,7 +325,7 @@
                         <input type="text" id="edit-title" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; margin: 0; min-width: 0;">
                         
                         <div id="quick-buttons">
-                            <button type="button" id="add-adv-btn" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
+                            <button type="button" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -345,16 +347,16 @@
                                 <textarea id="edit-text" class="form-textarea" placeholder="Content"></textarea>
 
                                 <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
-                                    <img id="upload-thumbnail" style="display: none; width: 48px; height: 48px; border-radius: var(--border-radius); object-fit: cover; flex-shrink: 0; margin: 0; border: 1px solid var(--black); color: transparent;" src="" alt="" onload="this.style.border='none'">
+                                    <img id="upload-thumbnail" style="width: 48px; height: 48px; border-radius: var(--border-radius); object-fit: cover; flex-shrink: 0; margin: 0; color: transparent;" src="" alt="" onload="this.style.border='none'">
 
-                                    <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState(true)">
+                                    <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                                     
-                                    <div id="upload-container" class="form-input" style="cursor: pointer; flex-grow: 1; min-width: 0; overflow: hidden;">
-                                        <span id="upload-action-label" style="pointer-events: none; white-space: nowrap; color: var(--black); text-decoration: none; flex-shrink: 0;">Upload image</span>
-                                        <span id="file-name-display" style="color: var(--grey-50); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); line-height: 1; margin: 0; text-align: right;"></span>
+                                    <div id="upload-container" class="form-input" style="flex-grow: 1; min-width: 0; overflow: hidden;" onclick="document.getElementById('edit-image').click()">
+                                        <span id="upload-action-label" style="pointer-events: none; white-space: nowrap; flex-shrink: 0;">Upload image</span>
+                                        <span id="file-name-display" style="pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); line-height: 1; margin: 0;"></span>
                                     </div>
 
-                                    <button type="button" id="clear-file-btn" class="submit-btn secondary-btn" style="display: none; width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;" aria-label="Remove Image">
+                                    <button type="button" id="clear-file-btn" class="submit-btn secondary-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;" aria-label="Remove Image" onclick="clearImageSelection(event)">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
                                             <polyline points="3 6 5 6 21 6"></polyline>
                                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -366,7 +368,7 @@
                                 
                                 <div style="display: flex; gap: var(--gap-item);">
                                     <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
-                                    <button type="button" id="cancel-btn" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
+                                    <button type="button" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0;" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
                                             <line x1="18" y1="6" x2="6" y2="18"></line>
                                             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -409,38 +411,17 @@
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
         
-        // --- SMART ERROR ANIMATION LOGIC ---
+        // --- CLEAN BRUTALIST ERROR JS ---
         function showErrorInInput(inputId, message) {
             const el = document.getElementById(inputId);
-            if(!el || el.dataset.errorActive === "true") return;
-            
-            const origPlaceholder = el.getAttribute('placeholder') || '';
-            el.dataset.errorActive = "true";
-            
-            el.classList.add('placeholder-fade-out');
-            
+            if(!el) return;
+            const orig = el.getAttribute('placeholder') || '';
+            el.setAttribute('placeholder', message);
+            el.classList.add('input-error');
             setTimeout(() => {
-                el.setAttribute('placeholder', message);
-                el.classList.add('input-error');
-                
-                requestAnimationFrame(() => {
-                    el.classList.remove('placeholder-fade-out');
-                    
-                    setTimeout(() => {
-                        el.classList.add('placeholder-fade-out');
-                        
-                        setTimeout(() => {
-                            el.classList.remove('input-error');
-                            el.setAttribute('placeholder', origPlaceholder);
-                            
-                            void el.offsetWidth; 
-                            
-                            el.classList.remove('placeholder-fade-out');
-                            el.dataset.errorActive = "false";
-                        }, 200); 
-                    }, 2000); 
-                });
-            }, 200); 
+                el.classList.remove('input-error');
+                el.setAttribute('placeholder', orig);
+            }, 2000); 
         }
 
         function toggleMenu(forceOpen = false) { 
@@ -465,68 +446,27 @@
             }
         }
 
-        // --- CROSS-FADE AUTH LOGIC ---
-        function handleAuthSubmit(e) {
+        // --- CSS STATE MACHINE AUTH LOGIC ---
+        function handleLogin(e) {
             e.preventDefault();
-            const authForm = document.getElementById('auth-form');
-            
-            if (authForm.classList.contains('logged-in')) {
-                // LOGOUT ACTION
-                handleLogout();
-            } else {
-                // LOGIN ACTION
-                const passInput = document.getElementById('admin-pass');
-                if (!passInput.value.trim()) {
-                    showErrorInInput('admin-pass', 'Password required...');
-                    return;
-                }
-
-                secretKey = passInput.value;
-                const rememberMe = document.getElementById('remember-me').checked;
-                if (rememberMe) localStorage.setItem('adminSecretKey', secretKey);
-                
-                activateAdminUI(false);
+            const passInput = document.getElementById('admin-pass');
+            if (!passInput.value.trim()) {
+                showErrorInInput('admin-pass', 'Password required...');
+                return;
             }
+            secretKey = passInput.value;
+            if (document.getElementById('remember-me').checked) {
+                localStorage.setItem('adminSecretKey', secretKey);
+            }
+            activateAdminUI();
         }
 
         function activateAdminUI(instant = false) {
-            const authSection = document.getElementById('auth-section');
-            const authForm = document.getElementById('auth-form');
-            const authBtn = document.getElementById('auth-btn');
-            const remWrapper = document.getElementById('remember-wrapper');
+            document.body.classList.add('is-logged-in'); // CSS DO THE MAGIC
+            refreshFeedUI();
             
-            if (instant) {
-                // Pre načítanie z LocalStorage - okamžitý stav bez animácie
-                authForm.classList.add('logged-in');
-                remWrapper.classList.add('hidden');
-                authBtn.innerHTML = 'LOGOUT';
-                
-                document.getElementById('feed-admin-zone').style.display = 'block'; 
-                refreshFeedUI();
-            } else {
-                // Plynulá Cross-Fade animácia zlúčenia
-                authSection.style.opacity = '0';
-                
-                setTimeout(() => {
-                    // Prepnutie rozloženia, kým je prvok neviditeľný
-                    authForm.classList.add('logged-in');
-                    remWrapper.classList.add('hidden');
-                    authBtn.innerHTML = 'LOGOUT';
-                    
-                    document.getElementById('feed-admin-zone').style.display = 'block'; 
-                    refreshFeedUI();
-                    
-                    // Force reflow
-                    void authSection.offsetWidth;
-                    
-                    // Plynulý Fade-in do nového stavu
-                    authSection.style.opacity = '1';
-                    
-                    // Zavrie menu krátko na to, aby používateľ videl výsledok
-                    setTimeout(() => {
-                        closeMenu();
-                    }, 600);
-                }, 200); 
+            if (!instant) {
+                setTimeout(() => { closeMenu(); }, 600); // Nechaj čas vidieť prechod
             }
         }
 
@@ -534,46 +474,25 @@
             secretKey = "";
             localStorage.removeItem('adminSecretKey');
             document.getElementById('remember-me').checked = false;
+            document.getElementById('admin-pass').value = ''; 
             
             toggleAdvancedEditor(false);
             
-            const authSection = document.getElementById('auth-section');
-            const authForm = document.getElementById('auth-form');
-            const authBtn = document.getElementById('auth-btn');
-            const remWrapper = document.getElementById('remember-wrapper');
-            const passInput = document.getElementById('admin-pass');
-            
-            // Plynulá Cross-Fade animácia rozdelenia
-            authSection.style.opacity = '0';
+            document.body.classList.remove('is-logged-in'); // CSS DO THE MAGIC
             
             setTimeout(() => {
-                // Prepnutie rozloženia späť, kým je prvok neviditeľný
-                authForm.classList.remove('logged-in');
-                remWrapper.classList.remove('hidden');
-                authBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>';
-                passInput.value = ''; 
-                
-                // Force reflow
-                void authSection.offsetWidth;
-                
-                // Plynulý Fade-in
-                authSection.style.opacity = '1';
-                
+                closeMenu();
                 setTimeout(() => {
-                    closeMenu();
-                    setTimeout(() => {
-                        document.getElementById('feed-admin-zone').style.display = 'none';
-                        resetDeleteButton();
-                        refreshFeedUI();
-                    }, 500);
-                }, 600);
-            }, 200);
+                    resetDeleteButton();
+                    refreshFeedUI();
+                }, 500);
+            }, 600); // Nechaj čas vidieť prechod
         }
 
         function handleUnauthorized() {
             handleLogout();
             toggleMenu(true); 
-            showErrorInInput('admin-pass', 'Invalid password...');
+            setTimeout(() => showErrorInInput('admin-pass', 'Invalid password...'), 600);
         }
 
         function refreshFeedUI() {
@@ -582,9 +501,7 @@
                 container.innerHTML = '';
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = globalPosts.map(s => renderSinglePost(s)).join('');
-                while(tempDiv.firstChild) {
-                    container.appendChild(tempDiv.firstChild);
-                }
+                while(tempDiv.firstChild) container.appendChild(tempDiv.firstChild);
             }
         }
 
@@ -691,64 +608,32 @@
             </div>`;
         }
 
+        // --- CLEAN STATE MACHINE EDITOR ---
         function toggleAdvancedEditor(show) {
+            const form = document.getElementById('editor-form');
             const titleInput = document.getElementById('edit-title');
             const textInput = document.getElementById('edit-text');
-            const quickButtons = document.getElementById('quick-buttons');
-            const advWrapper = document.getElementById('advanced-section-wrapper');
-            const advContent = document.getElementById('adv-content');
 
             if (show) {
                 if (titleInput.value.trim() !== "" && !editingId) {
                     textInput.value = titleInput.value;
                     titleInput.value = "";
                 }
-                
-                quickButtons.classList.add('hidden');
-                
-                titleInput.classList.add('placeholder-fade-out');
-                setTimeout(() => {
-                    titleInput.setAttribute('placeholder', 'Title');
-                    titleInput.classList.remove('placeholder-fade-out');
-                }, 200); 
-                
-                advWrapper.classList.add('open');
-                updateImageUIState(false);
-                
-                setTimeout(() => {
-                    advContent.style.opacity = '1';
-                }, 150); 
-                
+                titleInput.placeholder = "Title";
+                form.classList.add('adv-open'); // CSS roztvorí všetko plynule
+                updateImageUIState();
             } else {
-                advContent.style.opacity = '0';
-                
-                setTimeout(() => {
-                    advWrapper.classList.remove('open');
-                    
-                    titleInput.classList.add('placeholder-fade-out');
-                    
-                    setTimeout(() => {
-                        titleInput.setAttribute('placeholder', 'Quick thought...');
-                        titleInput.classList.remove('placeholder-fade-out');
-                        titleInput.style.color = ''; 
-                        
-                        quickButtons.classList.remove('hidden');
-                        
-                        editingId = null; 
-                        titleInput.value = "";
-                        textInput.value = "";
-                        document.getElementById('edit-image').value = "";
-                        removeImageFlag = false;
-                        currentImageUrl = null;
-                        updateImageUIState(false);
-                        
-                        resetDeleteButton();
-                        const publishBtn = document.getElementById('publish-btn');
-                        publishBtn.disabled = false; 
-                        publishBtn.innerText = "PUBLISH";
-                        
-                    }, 200); 
-                }, 200); 
+                form.classList.remove('adv-open'); // CSS zroluje všetko plynule
+                titleInput.placeholder = "Quick thought...";
+                editingId = null; 
+                titleInput.value = "";
+                textInput.value = "";
+                document.getElementById('edit-image').value = "";
+                removeImageFlag = false;
+                currentImageUrl = null;
+                updateImageUIState();
+                resetDeleteButton();
+                document.getElementById('publish-btn').innerText = "PUBLISH";
             }
         }
 
@@ -756,126 +641,66 @@
             const post = globalPosts.find(p => p.id === id);
             if(!post) return;
             
-            const titleInput = document.getElementById('edit-title');
-            const textInput = document.getElementById('edit-text');
-            const quickButtons = document.getElementById('quick-buttons');
-            const advWrapper = document.getElementById('advanced-section-wrapper');
-            const advContent = document.getElementById('adv-content');
+            editingId = id; 
+            currentImageUrl = post.image_url || null; 
+            removeImageFlag = false; 
             
-            const isOpen = advWrapper.classList.contains('open');
-
-            const applyUpdates = () => {
-                editingId = id; 
-                currentImageUrl = post.image_url || null; 
-                removeImageFlag = false; 
-                titleInput.value = post.title || "";
-                textInput.value = post.text || "";
-                document.getElementById('edit-image').value = ""; 
-                updateImageUIState(false); 
-                document.getElementById('publish-btn').innerText = "SAVE CHANGES";
-                titleInput.setAttribute('placeholder', 'Title');
-            };
-
-            if (isOpen) {
-                titleInput.style.color = 'transparent';
-                advContent.style.opacity = '0';
-                
-                setTimeout(() => {
-                    applyUpdates();
-                    titleInput.style.color = 'var(--black)';
-                    advContent.style.opacity = '1';
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 200);
-            } else {
-                applyUpdates();
-                quickButtons.classList.add('hidden');
-                advWrapper.classList.add('open');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                setTimeout(() => {
-                    advContent.style.opacity = '1';
-                }, 150);
-            }
+            const titleInput = document.getElementById('edit-title');
+            titleInput.value = post.title || "";
+            document.getElementById('edit-text').value = post.text || "";
+            document.getElementById('edit-image').value = ""; 
+            
+            titleInput.placeholder = "Title";
+            document.getElementById('publish-btn').innerText = "SAVE CHANGES";
+            
+            updateImageUIState(); 
+            document.getElementById('editor-form').classList.add('adv-open');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function updateImageUIState(smooth = false) {
-            const exec = () => {
-                const input = document.getElementById('edit-image');
-                const uploadContainer = document.getElementById('upload-container');
-                const actionLabel = document.getElementById('upload-action-label');
-                const nameDisplay = document.getElementById('file-name-display');
-                const clearBtn = document.getElementById('clear-file-btn');
-                const thumbnail = document.getElementById('upload-thumbnail');
+        function updateImageUIState() {
+            const wrapper = document.getElementById('upload-ui-wrapper');
+            const input = document.getElementById('edit-image');
+            const nameDisplay = document.getElementById('file-name-display');
+            const thumbnail = document.getElementById('upload-thumbnail');
 
-                const hasNewFile = input.files && input.files.length > 0;
-                const hasExistingImage = currentImageUrl && !removeImageFlag;
+            const hasNewFile = input.files && input.files.length > 0;
+            const hasExistingImage = currentImageUrl && !removeImageFlag;
 
-                if (hasNewFile || hasExistingImage) {
-                    uploadContainer.onclick = null; 
-                    uploadContainer.style.cursor = 'default';
-                    
-                    actionLabel.style.display = 'none'; 
-                    thumbnail.style.display = 'block'; 
-                    thumbnail.style.border = '1px solid var(--black)'; 
-                    
-                    nameDisplay.style.color = "var(--black)"; 
-                    nameDisplay.style.textAlign = "left";
+            if (hasNewFile || hasExistingImage) {
+                wrapper.classList.add('has-image'); // CSS vymení UI
+                thumbnail.style.border = '1px solid var(--black)'; 
 
-                    if (hasNewFile) {
-                         const file = input.files[0];
-                         nameDisplay.innerText = file.name;
-                         thumbnail.src = URL.createObjectURL(file);
-                    } else {
-                         let fileName = currentImageUrl.split('/').pop().split('?')[0];
-                         nameDisplay.innerText = fileName;
-                         thumbnail.src = currentImageUrl;
-                    }
-
-                    clearBtn.style.display = "flex";
-                    
-                    clearBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        if (hasNewFile) {
-                            document.getElementById('edit-image').value = ""; 
-                        } else {
-                            removeImageFlag = true; 
-                        }
-                        updateImageUIState(true); 
-                    };
-
+                if (hasNewFile) {
+                     const file = input.files[0];
+                     nameDisplay.innerText = file.name;
+                     thumbnail.src = URL.createObjectURL(file);
                 } else {
-                    uploadContainer.onclick = () => document.getElementById('edit-image').click();
-                    uploadContainer.style.cursor = 'pointer';
-                    
-                    thumbnail.style.display = 'none';
-                    thumbnail.src = ''; 
-                    
-                    actionLabel.style.display = 'inline';
-                    actionLabel.innerText = "Upload image";
-                    actionLabel.style.textDecoration = 'none';
-                    
-                    nameDisplay.innerText = "";
-                    nameDisplay.style.color = "var(--grey-50)";
-                    nameDisplay.style.textAlign = "right";
-
-                    clearBtn.style.display = "none";
+                     let fileName = currentImageUrl.split('/').pop().split('?')[0];
+                     nameDisplay.innerText = fileName;
+                     thumbnail.src = currentImageUrl;
                 }
-            };
-
-            if (smooth) {
-                const wrapper = document.getElementById('upload-ui-wrapper');
-                wrapper.style.opacity = '0';
-                setTimeout(() => {
-                    exec();
-                    wrapper.style.opacity = '1';
-                }, 200);
             } else {
-                exec();
+                wrapper.classList.remove('has-image');
+                thumbnail.src = ''; 
+                nameDisplay.innerText = "";
             }
+        }
+        
+        function clearImageSelection(e) {
+            e.stopPropagation();
+            const input = document.getElementById('edit-image');
+            if (input.files && input.files.length > 0) {
+                input.value = ""; 
+            } else {
+                removeImageFlag = true; 
+            }
+            updateImageUIState();
         }
 
         async function handleMainSubmit(e) {
             e.preventDefault();
-            const isAdvanced = document.getElementById('advanced-section-wrapper').classList.contains('open');
+            const isAdvanced = document.getElementById('editor-form').classList.contains('adv-open');
             if (isAdvanced) {
                 await handlePublish();
             } else {
