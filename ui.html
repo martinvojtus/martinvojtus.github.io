@@ -21,10 +21,10 @@
             --black: #000000;
             --white: #ffffff;
             
-            /* UPDATED: 50% BLACK FOR SUBTLE TEXT & PLACEHOLDERS */
+            /* 50% BLACK FOR SUBTLE TEXT & PLACEHOLDERS */
             --grey-50: rgba(0, 0, 0, 0.5);
             
-            /* 10% BLACK FOR DIVIDER LINES - EXACTLY 10% OPACITY */
+            /* 10% BLACK FOR DIVIDER LINES */
             --divider: rgba(0, 0, 0, 0.1);
             
             --glass-rgb: 255, 255, 255; 
@@ -131,10 +131,46 @@
         #section-feed { display: flex; flex-direction: column; gap: var(--gap-item); }
         #feed-admin-zone { display: flex; flex-direction: column; gap: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider); }
         
-        #menu-login-section, #menu-admin-section { 
-            display: flex; flex-direction: column; gap: var(--gap-item); 
-            transition: opacity 0.2s ease;
-            opacity: 1;
+        /* AUTH MORPHING ANIMATION STYLES */
+        #auth-section { display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; }
+        
+        #auth-form {
+            display: flex; width: 100%; gap: var(--gap-item); margin: 0;
+            transition: gap 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #auth-form.logged-in { gap: 0; }
+        
+        #admin-pass {
+            flex-grow: 1; margin: 0; min-width: 0; 
+            max-width: 600px; /* Šírka pre bezproblémové animovanie */
+            transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, border-color 0.3s ease;
+        }
+        #auth-form.logged-in #admin-pass {
+            max-width: 0;
+            padding-left: 0;
+            padding-right: 0;
+            opacity: 0;
+            border-color: transparent;
+            pointer-events: none;
+        }
+
+        #auth-btn {
+            width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), flex-grow 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
+        }
+        #auth-form.logged-in #auth-btn {
+            width: 100%;
+            flex-grow: 1;
+            color: #ff4444; 
+        }
+
+        #remember-wrapper {
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 50px; opacity: 1; overflow: hidden; margin-top: 0;
+        }
+        #remember-wrapper.hidden {
+            max-height: 0; opacity: 0; pointer-events: none;
+            margin-top: calc(var(--gap-item) * -1);
         }
 
         .status-feed {
@@ -184,10 +220,7 @@
         /* ERROR VALIDATION STYLES */
         .input-error { border: 1px solid #ff4444 !important; }
         .input-error::placeholder { color: #ff4444 !important; opacity: 1 !important; }
-        .placeholder-fade-out::placeholder { 
-            opacity: 0 !important; 
-            transition: opacity 0.2s ease !important; 
-        }
+        .placeholder-fade-out::placeholder { opacity: 0 !important; transition: opacity 0.2s ease !important; }
 
         .submit-btn {
             background: var(--black); color: var(--white); text-transform: uppercase; 
@@ -195,9 +228,10 @@
         }
         .secondary-btn { background: transparent; color: var(--black); }
         
+        /* SOLID RED DANGER BUTTON */
         .danger-btn { 
-            background: var(--black) !important; 
-            color: #ff4444 !important; 
+            background: #ff4444 !important; 
+            color: #000000 !important; 
             border: none !important; 
         }
 
@@ -214,30 +248,13 @@
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
         }
         #quick-buttons.hidden {
-            width: 0;
-            margin-left: 0;
-            opacity: 0;
-            pointer-events: none;
+            width: 0; margin-left: 0; opacity: 0; pointer-events: none;
         }
         
-        #advanced-section-wrapper {
-            display: grid; 
-            grid-template-rows: 0fr; 
-            transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        #advanced-section-wrapper.open {
-            grid-template-rows: 1fr;
-        }
-
-        #adv-content {
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-        
-        #upload-ui-wrapper {
-            transition: opacity 0.2s ease;
-            opacity: 1;
-        }
+        #advanced-section-wrapper { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        #advanced-section-wrapper.open { grid-template-rows: 1fr; }
+        #adv-content { opacity: 0; transition: opacity 0.2s ease; }
+        #upload-ui-wrapper { transition: opacity 0.2s ease; opacity: 1; }
 
         .checkbox-wrapper { display: inline-flex; align-items: center; gap: var(--gap-item); cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; margin: 0; }
         .checkbox-wrapper input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
@@ -270,31 +287,28 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
             
-            <div id="menu-login-section">
-                <form onsubmit="handleLogin(event)" style="display: flex; width: 100%; gap: var(--gap-item); margin: 0;">
-                    <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="flex-grow: 1; margin: 0;">
-                    <button type="submit" id="login-btn" class="submit-btn" style="width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0;" aria-label="Log In">
+            <div id="auth-section">
+                <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+                    <input type="password" id="admin-pass" class="form-input" placeholder="Password...">
+                    <button type="submit" id="auth-btn" class="submit-btn" aria-label="Authenticate">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                            <polyline points="12 5 19 12 12 19"></polyline>
+                            <polyline points="9 18 15 12 9 6"></polyline>
                         </svg>
                     </button>
                 </form>
                 
-                <label class="checkbox-wrapper">
-                    <input type="checkbox" id="remember-me">
-                    <span class="checkmark"></span>
-                    <span class="checkbox-label-text">Stay logged in</span>
-                </label>
-            </div>
-
-            <div id="menu-admin-section" style="display: none;">
-                <button onclick="handleLogout()" class="menu-link" style="text-decoration: none; color: #ff4444;">Logout</button>
+                <div id="remember-wrapper">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="remember-me">
+                        <span class="checkmark"></span>
+                        <span class="checkbox-label-text">Stay logged in</span>
+                    </label>
+                </div>
             </div>
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.3.6 • 2026</div>
+            <div class="footer-info">build v3.3.7 • 2026</div>
         </div>
     </nav>
 
@@ -449,47 +463,81 @@
             const savedKey = localStorage.getItem('adminSecretKey');
             if (savedKey) {
                 secretKey = savedKey;
-                activateAdminUI(true);
+                activateAdminUI(true); // instantný morph
+            }
+        }
+
+        // --- MORPHING AUTH LOGIC ---
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            const authForm = document.getElementById('auth-form');
+            
+            if (authForm.classList.contains('logged-in')) {
+                // LOGOUT AKCIA
+                handleLogout();
+            } else {
+                // LOGIN AKCIA
+                const passInput = document.getElementById('admin-pass');
+                if (!passInput.value.trim()) {
+                    showErrorInInput('admin-pass', 'Password required...');
+                    return;
+                }
+
+                secretKey = passInput.value;
+                const rememberMe = document.getElementById('remember-me').checked;
+                if (rememberMe) localStorage.setItem('adminSecretKey', secretKey);
+                
+                // Spusti animáciu Zlúčenia (Merge)
+                activateAdminUI(false);
+                
+                // Zavri menu keď sa animácia dokončí
+                setTimeout(() => {
+                    closeMenu();
+                }, 800);
             }
         }
 
         function activateAdminUI(instant = false) {
-            const adminSec = document.getElementById('menu-admin-section');
-            const loginSec = document.getElementById('menu-login-section');
+            const authForm = document.getElementById('auth-form');
+            const authBtn = document.getElementById('auth-btn');
+            const passInput = document.getElementById('admin-pass');
+            const remWrapper = document.getElementById('remember-wrapper');
             
             if (instant) {
-                loginSec.style.display = 'none';
-                loginSec.style.opacity = '0';
-                adminSec.style.display = 'flex';
-                adminSec.style.opacity = '1';
+                // Pre načítanie z LocalStorage - okamžitý stav
+                authForm.style.transition = 'none';
+                authBtn.style.transition = 'none';
+                passInput.style.transition = 'none';
+                remWrapper.style.transition = 'none';
+                
+                authForm.classList.add('logged-in');
+                remWrapper.classList.add('hidden');
+                authBtn.innerHTML = 'LOGOUT';
+                
+                void authForm.offsetWidth; // Force reflow
+                
+                setTimeout(() => {
+                    authForm.style.transition = '';
+                    authBtn.style.transition = '';
+                    passInput.style.transition = '';
+                    remWrapper.style.transition = '';
+                }, 50);
             } else {
-                loginSec.style.display = 'none';
-                adminSec.style.display = 'flex';
-                adminSec.style.opacity = '1';
+                // Plynulá animácia zlúčenia
+                authForm.classList.add('logged-in');
+                remWrapper.classList.add('hidden');
+                
+                authBtn.style.color = 'transparent';
+                setTimeout(() => {
+                    authBtn.innerHTML = 'LOGOUT';
+                    authBtn.style.color = '#ff4444'; // Prepne sa na CSS farbu pre logout
+                }, 150);
             }
             
             document.getElementById('feed-admin-zone').style.display = 'block'; 
             refreshFeedUI();
         }
 
-        function handleLogin(e) {
-            e.preventDefault();
-            const passInput = document.getElementById('admin-pass');
-            
-            if (!passInput.value.trim()) {
-                showErrorInInput('admin-pass', 'Password required...');
-                return;
-            }
-
-            secretKey = passInput.value;
-            const rememberMe = document.getElementById('remember-me').checked;
-            if (rememberMe) localStorage.setItem('adminSecretKey', secretKey);
-            passInput.value = ''; 
-            activateAdminUI();
-            closeMenu();
-        }
-
-        // --- BULLETPROOF SEQUENTIAL LOGOUT FLOW ---
         function handleLogout() {
             secretKey = "";
             localStorage.removeItem('adminSecretKey');
@@ -497,38 +545,30 @@
             
             toggleAdvancedEditor(false);
             
-            const adminSec = document.getElementById('menu-admin-section');
-            const loginSec = document.getElementById('menu-login-section');
+            const authForm = document.getElementById('auth-form');
+            const authBtn = document.getElementById('auth-btn');
+            const remWrapper = document.getElementById('remember-wrapper');
+            const passInput = document.getElementById('admin-pass');
             
-            // 1. Plynulý Fade-out Logout odkazu (0.2s)
-            adminSec.style.opacity = '0';
+            // Animácia rozdelenia (Split)
+            authForm.classList.remove('logged-in');
+            remWrapper.classList.remove('hidden');
+            
+            authBtn.style.color = 'transparent';
+            setTimeout(() => {
+                authBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>';
+                authBtn.style.color = ''; // Návrat k defaultnej farbe
+                passInput.value = ''; // Vymaž heslo po uvoľnení poľa
+            }, 150);
             
             setTimeout(() => {
-                // 2. Skryť admin sekciu a pripraviť Login sekciu
-                adminSec.style.display = 'none';
-                loginSec.style.opacity = '0'; // Zaručí neviditeľnosť pred vykreslením
-                loginSec.style.display = 'flex';
-                
-                // 3. Počkať na Browser, kým prepočíta výšku menu po display: flex
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        // 4. Až teraz spusti plynulý Fade-in
-                        loginSec.style.opacity = '1';
-                    });
-                });
-                
-                // 5. Pauza, aby používateľ videl, že je vonku, a potom zatvoriť
+                closeMenu();
                 setTimeout(() => {
-                    closeMenu();
-                    
-                    // Skryť feed editor v pozadí, kým sa menu roluje nahor
-                    setTimeout(() => {
-                        document.getElementById('feed-admin-zone').style.display = 'none';
-                        resetDeleteButton();
-                        refreshFeedUI();
-                    }, 500); 
-                }, 800); 
-            }, 200); 
+                    document.getElementById('feed-admin-zone').style.display = 'none';
+                    resetDeleteButton();
+                    refreshFeedUI();
+                }, 500);
+            }, 800);
         }
 
         function handleUnauthorized() {
