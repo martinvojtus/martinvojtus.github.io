@@ -242,7 +242,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.2.4 • 2026</div>
+            <div class="footer-info">build v3.2.5 • 2026</div>
         </div>
     </nav>
 
@@ -278,6 +278,7 @@
                         
                         <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                         <div id="upload-container" class="form-input" style="cursor: pointer; width: 100%;">
+                            <img id="upload-thumbnail" style="display: none; width: 32px; height: 32px; border-radius: 8px; object-fit: cover; flex-shrink: 0; margin: 0;" src="" alt="Thumbnail">
                             <span id="upload-action-label" class="admin-action-btn admin-action-link" style="pointer-events: none; white-space: nowrap; color: var(--black);">Upload image</span>
                             <span id="file-name-display" style="color: var(--grey-30); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); line-height: 1; margin: 0;">(Optional)</span>
                             <button type="button" id="clear-file-btn" class="admin-action-btn admin-action-link" style="color: var(--black); display: none; padding: 0; flex-shrink: 0;">Remove</button>
@@ -580,28 +581,34 @@
             const actionLabel = document.getElementById('upload-action-label');
             const nameDisplay = document.getElementById('file-name-display');
             const clearBtn = document.getElementById('clear-file-btn');
+            const thumbnail = document.getElementById('upload-thumbnail');
 
             const hasNewFile = input.files && input.files.length > 0;
             const hasExistingImage = currentImageUrl && !removeImageFlag;
 
             if (hasNewFile || hasExistingImage) {
                 // State: Image Present (Show info & remove button)
-                uploadContainer.onclick = null; // Disable upload click on container
+                uploadContainer.onclick = null; 
                 uploadContainer.style.cursor = 'default';
                 
-                actionLabel.style.color = 'var(--grey-30)'; // Make label subtle
-                actionLabel.style.textDecoration = 'none'; // Remove underline
+                actionLabel.style.display = 'none'; // Hide "Upload image"
+                thumbnail.style.display = 'block'; // Show Thumbnail
+                
+                nameDisplay.style.color = "var(--black)"; // Full opacity black text
 
                 if (hasNewFile) {
-                     actionLabel.innerText = "Selected file:";
-                     nameDisplay.innerText = input.files[0].name;
-                     nameDisplay.style.color = "var(--black)";
+                     const file = input.files[0];
+                     nameDisplay.innerText = file.name;
+                     thumbnail.src = URL.createObjectURL(file);
                 } else {
-                     actionLabel.innerText = "Attached image";
-                     nameDisplay.innerText = ""; 
+                     // Extract filename and extension from existing URL
+                     let fileName = currentImageUrl.split('/').pop().split('?')[0];
+                     nameDisplay.innerText = fileName;
+                     thumbnail.src = currentImageUrl;
                 }
 
                 clearBtn.style.display = "block";
+                
                 // Define what 'Remove' does based on context
                 clearBtn.onclick = (e) => {
                     e.stopPropagation();
@@ -618,6 +625,10 @@
                 uploadContainer.onclick = () => document.getElementById('edit-image').click();
                 uploadContainer.style.cursor = 'pointer';
                 
+                thumbnail.style.display = 'none';
+                thumbnail.src = ''; // Clear memory
+                
+                actionLabel.style.display = 'inline';
                 actionLabel.innerText = "Upload image";
                 actionLabel.style.color = 'var(--black)';
                 actionLabel.style.textDecoration = 'underline';
@@ -637,6 +648,7 @@
             const originalBtnText = publishBtn.innerText;
             let hasImage = !!imageFile || (currentImageUrl && !removeImageFlag);
             
+            // Validation
             if (!text && !hasImage) {
                 showErrorInInput('edit-text', 'Add text or an image...');
                 return;
