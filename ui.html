@@ -14,17 +14,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* STRICT 2 FONT SIZES ONLY */
             --size-large: 2.0rem;
             --size-small: 1.0rem;
             
             --black: #000000;
             --white: #ffffff;
             
-            /* 50% BLACK FOR SUBTLE TEXT & PLACEHOLDERS */
             --grey-50: rgba(0, 0, 0, 0.5);
-            
-            /* 10% BLACK FOR DIVIDER LINES */
             --divider: rgba(0, 0, 0, 0.1);
             
             --glass-rgb: 255, 255, 255; 
@@ -53,7 +49,7 @@
         * { 
             -webkit-tap-highlight-color: transparent; 
             box-sizing: border-box; 
-            font-weight: 400; /* STRICTLY REGULAR FONT WEIGHT */
+            font-weight: 400; 
             font-family: 'Space Grotesk', sans-serif; 
             letter-spacing: var(--letter-spacing); 
         }
@@ -66,7 +62,6 @@
             min-height: 100vh;
         }
 
-        /* LINE HEIGHT KILLER FOR EXACT SPACING */
         .menu-link, .status-date, .admin-action-btn, .footer-info, .submit-btn, .form-input, .logo-text, .status-title {
             line-height: 1;
         }
@@ -148,7 +143,6 @@
 
         .form-input::placeholder, .form-textarea::placeholder { color: var(--grey-50); opacity: 1; }
 
-        /* BRUTALIST ERROR STATES */
         .input-error { border-color: #ff4444 !important; }
         .input-error::placeholder { color: #ff4444 !important; opacity: 1 !important; }
 
@@ -212,7 +206,7 @@
             </div>
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
-            <div class="footer-info">build v5.0.2 • 2026</div>
+            <div class="footer-info">build v5.0.3 • 2026</div>
         </div>
     </nav>
 
@@ -442,9 +436,14 @@
 
         function toggleAdvancedEditor(show) {
             const form = document.getElementById('editor-form');
+            
+            /* RESET VŠETKÝCH CHÝB PRI PREPÍNANÍ */
+            titleInput.classList.remove('input-error');
+            textInput.classList.remove('input-error');
+
             if (show) {
-                if (titleInput.value.trim() !== "" && !editingId) { textInput.value = titleInput.value; titleInput.value = ""; }
                 titleInput.placeholder = "Title";
+                textInput.placeholder = "Content";
                 form.classList.add('adv-open'); 
                 updateImageUIState();
             } else {
@@ -456,9 +455,6 @@
                 document.getElementById('delete-all-btn').dataset.state = "0"; 
                 document.getElementById('delete-all-btn').innerText = "DELETE ALL POSTS";
                 document.getElementById('publish-btn').innerText = "PUBLISH";
-                
-                titleInput.classList.remove('input-error');
-                textInput.classList.remove('input-error');
             }
         }
 
@@ -466,6 +462,10 @@
             const post = globalPosts.find(p => p.id === id);
             if(!post) return;
             
+            /* RESET CHÝB PRI OTVÁRANÍ STARÉHO POSTU */
+            titleInput.classList.remove('input-error');
+            textInput.classList.remove('input-error');
+
             editingId = id; currentImageUrl = post.image_url || null; removeImageFlag = false; 
             titleInput.value = post.title || "";
             textInput.value = post.text || "";
@@ -521,6 +521,7 @@
             let hasImage = !!imageFile || (currentImageUrl && !removeImageFlag);
             
             if (!text && !hasImage) { 
+                /* OZNACENIE IBA OBSAHU ZA CHYBU */
                 textInput.classList.add('input-error'); textInput.placeholder = 'Content required!'; return; 
             }
             
