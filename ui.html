@@ -242,7 +242,7 @@
             
             <div style="width: 100%; height: 1px; background-color: var(--divider);"></div>
 
-            <div class="footer-info">build v3.2.3 • 2026</div>
+            <div class="footer-info">build v3.2.4 • 2026</div>
         </div>
     </nav>
 
@@ -276,16 +276,11 @@
                     <form id="editor-form" onsubmit="handlePublish(event)" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; margin: 0;">
                         <input type="text" id="edit-title" class="form-input" placeholder="Title (Optional)" style="width: 100%;">
                         
-                        <div id="current-image-container" style="display: none; align-items: center; gap: var(--gap-item); margin: 0;">
-                            <span style="color: var(--grey-30); font-size: var(--size-small); line-height: 1;">Attached image </span>
-                            <button type="button" class="admin-action-btn admin-action-link" style="color: var(--black);" onclick="flagImageForRemoval()">Remove</button>
-                        </div>
-
-                        <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateFileName()">
-                        <div class="form-input" style="cursor: pointer; width: 100%;" onclick="document.getElementById('edit-image').click()">
-                            <span class="admin-action-btn admin-action-link" style="pointer-events: none; white-space: nowrap;">Upload image</span>
+                        <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
+                        <div id="upload-container" class="form-input" style="cursor: pointer; width: 100%;">
+                            <span id="upload-action-label" class="admin-action-btn admin-action-link" style="pointer-events: none; white-space: nowrap; color: var(--black);">Upload image</span>
                             <span id="file-name-display" style="color: var(--grey-30); pointer-events: none; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); line-height: 1; margin: 0;">(Optional)</span>
-                            <button type="button" id="clear-file-btn" class="admin-action-btn admin-action-link" style="color: var(--black); display: none; padding: 0; flex-shrink: 0;" onclick="clearSelectedFile(event)">Remove</button>
+                            <button type="button" id="clear-file-btn" class="admin-action-btn admin-action-link" style="color: var(--black); display: none; padding: 0; flex-shrink: 0;">Remove</button>
                         </div>
 
                         <textarea id="edit-text" class="form-textarea" placeholder="Content (Optional if image attached)"></textarea>
@@ -382,7 +377,6 @@
             e.preventDefault();
             const passInput = document.getElementById('admin-pass');
             
-            // Validation
             if (!passInput.value.trim()) {
                 showErrorInInput('admin-pass', 'Password is required...');
                 return;
@@ -543,15 +537,15 @@
                 }
                 qWrapper.style.display = 'none';
                 fWrapper.style.display = 'flex';
+                updateImageUIState(); // Ensure UI is correct when opening
             } else {
                 editingId = null; currentImageUrl = null; removeImageFlag = false;
                 document.getElementById('edit-title').value = "";
                 editorTextInput.value = "";
                 document.getElementById('edit-image').value = "";
-                document.getElementById('current-image-container').style.display = 'none';
-                document.getElementById('file-name-display').innerText = "(Optional)";
-                document.getElementById('file-name-display').style.color = "var(--grey-30)";
-                document.getElementById('clear-file-btn').style.display = "none";
+                
+                updateImageUIState(); // Reset UI state
+
                 const publishBtn = document.getElementById('publish-btn');
                 publishBtn.disabled = false; publishBtn.innerText = "PUBLISH";
                 qWrapper.style.display = 'flex'; fWrapper.style.display = 'none';
@@ -566,11 +560,9 @@
             document.getElementById('edit-title').value = post.title || "";
             document.getElementById('edit-text').value = post.text || "";
             document.getElementById('edit-image').value = ""; 
-            document.getElementById('file-name-display').innerText = "(Optional)";
-            document.getElementById('file-name-display').style.color = "var(--grey-30)";
-            document.getElementById('clear-file-btn').style.display = "none";
-            if (post.image_url) document.getElementById('current-image-container').style.display = 'flex';
-            else document.getElementById('current-image-container').style.display = 'none';
+            
+            updateImageUIState(); // Update UI based on existing image
+
             document.getElementById('publish-btn').innerText = "SAVE CHANGES";
             
             const qWrapper = document.getElementById('quick-post-wrapper');
@@ -581,30 +573,59 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function updateFileName() {
+        // --- NEW UNIFIED IMAGE UI LOGIC ---
+        function updateImageUIState() {
             const input = document.getElementById('edit-image');
-            const display = document.getElementById('file-name-display');
+            const uploadContainer = document.getElementById('upload-container');
+            const actionLabel = document.getElementById('upload-action-label');
+            const nameDisplay = document.getElementById('file-name-display');
             const clearBtn = document.getElementById('clear-file-btn');
-            if (input.files && input.files.length > 0) {
-                display.innerText = input.files[0].name;
-                display.style.color = "var(--black)";
-                clearBtn.style.display = "block"; 
+
+            const hasNewFile = input.files && input.files.length > 0;
+            const hasExistingImage = currentImageUrl && !removeImageFlag;
+
+            if (hasNewFile || hasExistingImage) {
+                // State: Image Present (Show info & remove button)
+                uploadContainer.onclick = null; // Disable upload click on container
+                uploadContainer.style.cursor = 'default';
+                
+                actionLabel.style.color = 'var(--grey-30)'; // Make label subtle
+                actionLabel.style.textDecoration = 'none'; // Remove underline
+
+                if (hasNewFile) {
+                     actionLabel.innerText = "Selected file:";
+                     nameDisplay.innerText = input.files[0].name;
+                     nameDisplay.style.color = "var(--black)";
+                } else {
+                     actionLabel.innerText = "Attached image";
+                     nameDisplay.innerText = ""; 
+                }
+
+                clearBtn.style.display = "block";
+                // Define what 'Remove' does based on context
+                clearBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if (hasNewFile) {
+                        document.getElementById('edit-image').value = ""; // Clear new file
+                    } else {
+                        removeImageFlag = true; // Flag existing for removal
+                    }
+                    updateImageUIState(); // Update UI back to empty state
+                };
+
             } else {
-                display.innerText = "(Optional)";
-                display.style.color = "var(--grey-30)";
-                clearBtn.style.display = "none";  
+                // State: Empty (Show upload button)
+                uploadContainer.onclick = () => document.getElementById('edit-image').click();
+                uploadContainer.style.cursor = 'pointer';
+                
+                actionLabel.innerText = "Upload image";
+                actionLabel.style.color = 'var(--black)';
+                actionLabel.style.textDecoration = 'underline';
+
+                nameDisplay.innerText = "(Optional)";
+                nameDisplay.style.color = "var(--grey-30)";
+                clearBtn.style.display = "none";
             }
-        }
-
-        function clearSelectedFile(e) {
-            e.stopPropagation(); 
-            document.getElementById('edit-image').value = ""; 
-            updateFileName(); 
-        }
-
-        function flagImageForRemoval() {
-            removeImageFlag = true;
-            document.getElementById('current-image-container').style.display = 'none';
         }
 
         async function handlePublish(e) {
@@ -616,7 +637,6 @@
             const originalBtnText = publishBtn.innerText;
             let hasImage = !!imageFile || (currentImageUrl && !removeImageFlag);
             
-            // Validation
             if (!text && !hasImage) {
                 showErrorInInput('edit-text', 'Add text or an image...');
                 return;
@@ -670,7 +690,6 @@
             const text = inputField.value.trim();
             const btn = document.getElementById('quick-btn');
             
-            // Validation
             if(!text) {
                 showErrorInInput('quick-text', 'Type a thought to post...');
                 return;
