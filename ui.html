@@ -69,22 +69,26 @@
         /* HEADER & EDITOR FORM */
         header {
             position: fixed; top: 0; left: 0; width: 100%; 
-            display: flex; justify-content: center; padding: var(--gap-item) 0; 
+            display: flex; flex-direction: column; align-items: center;
+            padding: var(--gap-item) 0; 
             background: rgba(var(--glass-rgb), var(--glass-opacity));
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 2000;
+            
+            /* Týmto zaistíme scrollovanie celej hlavičky ak obsah pretečie */
+            max-height: 100vh; 
+            max-height: 100dvh;
+            overflow-y: auto;
         }
 
         .header-content {
             width: 100%; max-width: var(--content-width);
-            display: flex; justify-content: space-between; 
-            align-items: flex-start; /* Fix pre nežiadúci posun elementov hore pri zväčšovaní editora */
+            display: flex; flex-direction: column;
             padding: 0 var(--gap-item); 
         }
 
         #editor-form {
             display: flex; flex-direction: column; width: 100%; margin: 0;
-            max-height: calc(100vh - 32px); /* Limit pre scrollovanie vnútorného obsahu */
         }
         
         #editor-top-row {
@@ -98,11 +102,16 @@
         #guest-title { 
             display: flex; flex-grow: 1; margin: 0; justify-content: center; align-items: center;
             cursor: pointer; user-select: none;
-            background-color: var(--black); color: var(--white); /* Invertované farby (automaticky sa mení v Dark Mode) */
-            border-radius: var(--border-radius); font-size: var(--size-small); height: 48px;
+            background-color: var(--black); color: var(--white); 
+            border-radius: var(--border-radius); font-size: 16px; height: 48px;
         }
         
         #menuToggle { display: flex; z-index: 2100; }
+        
+        /* Okamžitá výmena SVG z + na X */
+        #menuToggle.active #icon-menu-plus { display: none; }
+        #menuToggle.active #icon-menu-x { display: block; }
+        
         #edit-title, #quick-btn, #admin-plus-btn { display: none; }
 
         body.is-logged-in #guest-title, body.is-logged-in #menuToggle { display: none; }
@@ -110,8 +119,6 @@
 
         #advanced-section-wrapper { 
             display: none; flex-direction: column; gap: var(--gap-item); padding-top: var(--gap-item); 
-            overflow-y: auto; overscroll-behavior: contain;
-            padding-bottom: var(--gap-item);
         }
         #editor-form.adv-open #advanced-section-wrapper { display: flex; }
         
@@ -153,15 +160,15 @@
 
         .form-input, .submit-btn { 
             height: 48px; border: 1px solid var(--black); border-radius: var(--border-radius); 
-            background: transparent; font-size: 16px !important; /* Striktne 16px kvôli iOS Zoom bugu */
+            background: transparent; font-size: 16px !important; 
             padding: 0 var(--gap-item); 
             outline: none; color: var(--black); display: flex; margin: 0; align-items: center; gap: var(--gap-item); 
-            flex-shrink: 0; /* Zamedzenie deformácie vstupov vo flexe */
+            flex-shrink: 0; 
         }
         
         .form-textarea { 
             width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); 
-            background: transparent; font-size: 16px !important; /* Striktne 16px kvôli iOS Zoom bugu */
+            background: transparent; font-size: 16px !important; 
             padding: var(--gap-item); 
             outline: none; color: var(--black); display: block; min-height: 80px; resize: vertical; margin: 0;
             flex-shrink: 0;
@@ -173,7 +180,19 @@
         .input-error::placeholder { color: #ff4444 !important; opacity: 1 !important; }
 
         .submit-btn { background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1; }
-        .icon-btn { width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0; }
+        
+        /* Striktná fixácia pre ikony */
+        .icon-btn { 
+            width: 48px; height: 48px; 
+            flex-shrink: 0; 
+            padding: 0 !important; 
+            margin: 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .icon-btn svg { display: block; }
+
         .secondary-btn { background: transparent; color: var(--black); }
         .danger-btn { background: #ff4444 !important; color: #000000 !important; border: none !important; }
 
@@ -202,7 +221,7 @@
             <form id="editor-form" onsubmit="handleMainSubmit(event)">
                 
                 <div id="editor-top-row">
-                    <button type="button" class="submit-btn icon-btn" onclick="window.scrollTo(0,0)" aria-label="Home" style="display: flex; align-items: center; justify-content: center; padding: 0;">
+                    <button type="button" class="submit-btn icon-btn" onclick="window.scrollTo(0,0)" aria-label="Home">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="currentColor" /></g></svg>
                     </button>
                     
@@ -222,7 +241,8 @@
                         </button>
                         
                         <button type="button" id="menuToggle" class="submit-btn icon-btn" onclick="toggleMenu()" aria-label="Menu">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            <svg id="icon-menu-plus" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            <svg id="icon-menu-x" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                     </div>
                 </div>
@@ -306,6 +326,7 @@
         const passInput = document.getElementById('admin-pass');
         const titleInput = document.getElementById('edit-title');
         const textInput = document.getElementById('edit-text');
+        const menuToggle = document.getElementById('menuToggle');
 
         const svgNormal = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>';
         const svgSuccess = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="20 6 9 17 4 12"></polyline></svg>';
@@ -322,10 +343,12 @@
 
         function toggleMenu() { 
             navOverlay.classList.toggle('active'); 
+            menuToggle.classList.toggle('active');
         }
         
         function closeMenu() { 
             navOverlay.classList.remove('active'); 
+            menuToggle.classList.remove('active');
         }
 
         function handleLogin(e) {
@@ -350,6 +373,7 @@
         function handleUnauthorized() {
             handleLogout(); 
             navOverlay.classList.add('active'); 
+            menuToggle.classList.add('active');
             passInput.classList.add('input-error'); passInput.placeholder = 'Invalid password!';
         }
 
