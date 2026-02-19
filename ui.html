@@ -58,7 +58,6 @@
             line-height: 1.5; 
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
-            overflow-x: hidden; 
         }
 
         .menu-link, .status-date, .admin-action-btn, .footer-info, .submit-btn, .form-input, .logo-text, .status-title {
@@ -72,7 +71,6 @@
             display: flex; justify-content: center; padding: var(--gap-item) 0; 
             background: rgba(var(--glass-rgb), var(--glass-opacity));
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
-            transform: translateZ(0);
             z-index: 2000;
         }
 
@@ -111,81 +109,15 @@
 
         #section-feed { display: flex; flex-direction: column; gap: var(--gap-item); }
         
-        /* 1. ZÁKLADNÝ STICKY PANEL */
-        #feed-admin-zone { 
-            display: none; 
-            position: sticky; 
-            top: 56px; 
-            z-index: 1000;
-            
-            margin-left: calc(50% - 50vw);
-            margin-right: calc(50% - 50vw);
-            width: 100vw;
-        }
-        body.is-logged-in #feed-admin-zone { display: block; }
-        
-        /* SAFARI FIX: Sklo pre horný riadok sa aplikuje nezávisle cez ::before */
-        #feed-admin-zone::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(var(--glass-rgb), var(--glass-opacity));
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            transform: translateZ(0);
-            border-bottom: 1px solid var(--divider);
-            z-index: -1;
-        }
-        
-        #feed-admin-zone.zone-open::before { border-bottom-color: transparent; }
-
-        .admin-inner-wrapper {
-            width: 100%; 
-            max-width: var(--content-width); 
-            padding: var(--gap-item); 
-            margin: 0 auto;
-            position: relative; 
-        }
-
-        #advanced-section-wrapper { display: none; }
-        
-        /* 2. PADAJÚCA ROLETA (NEZÁVISLÝ BLUR PRE SAFARI) */
-        #editor-form.adv-open #advanced-section-wrapper { 
-            display: flex; 
-            flex-direction: column; 
-            
-            position: absolute; 
-            top: 100%; 
-            left: calc(50% - 50vw); 
-            width: 100vw; 
-            z-index: 2000; 
-            
-            padding: 0 0 var(--gap-item) 0; 
-            
-            /* Glass Efekt a HW Akcelerácia */
-            background: rgba(var(--glass-rgb), var(--glass-opacity));
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            transform: translateZ(0); 
-            border-bottom: 1px solid var(--divider);
-        }
-
-        .advanced-inner {
-            width: 100%;
-            max-width: var(--content-width);
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: var(--gap-item);
-            padding: 0 var(--gap-item);
-        }
+        #feed-admin-zone { display: none; flex-direction: column; gap: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider); }
+        body.is-logged-in #feed-admin-zone { display: flex; }
 
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
         #logout-ui { display: none; }
         body.is-logged-in #login-ui { display: none; }
         body.is-logged-in #logout-ui { display: flex; }
 
-        .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 0; position: relative; z-index: 1; }
+        .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 0; }
 
         .status-card { background: transparent; border: none; border-bottom: 1px solid var(--divider); border-radius: 0; padding: var(--gap-item) 0; margin: 0; display: flex; flex-direction: column; gap: var(--gap-item); }
         .status-card:first-child { padding-top: 0; }
@@ -224,6 +156,9 @@
 
         #quick-buttons { display: flex; gap: var(--gap-item); flex-shrink: 0; width: 112px; margin-left: var(--gap-item); }
         #editor-form.adv-open #quick-buttons { display: none; }
+        
+        #advanced-section-wrapper { display: none; flex-direction: column; gap: var(--gap-item); padding-top: var(--gap-item); }
+        #editor-form.adv-open #advanced-section-wrapper { display: flex; }
         
         #upload-container { display: flex; cursor: pointer; flex-grow: 1; min-width: 0; overflow: hidden; }
         #upload-action-label { display: inline; color: var(--black); flex-shrink: 0; white-space: nowrap; pointer-events: none; }
@@ -272,61 +207,60 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.0.11 • 2026</div>
+            <div class="footer-info">build v5.0.5 • 2026</div>
         </div>
     </nav>
 
     <main>
         <div id="section-feed">
+            <h2 style="font-size: var(--size-large); margin: 0; line-height: 1;">Feed.</h2>
+            <div class="divider"></div>
+            
             <div id="feed-admin-zone">
-                <div class="admin-inner-wrapper">
-                    <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; margin: 0;">
-                        <div style="display: flex; width: 100%;">
-                            <input type="text" id="edit-title" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; margin: 0; min-width: 0;">
+                <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; margin: 0;">
+                    <div style="display: flex; width: 100%;">
+                        <input type="text" id="edit-title" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; margin: 0; min-width: 0;">
+                        
+                        <div id="quick-buttons">
+                            <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            </button>
+                            <button type="submit" id="quick-btn" class="submit-btn icon-btn" aria-label="Post">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="advanced-section-wrapper">
+                        <textarea id="edit-text" class="form-textarea" placeholder="Content"></textarea>
+
+                        <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
+                            <img id="upload-thumbnail" src="" alt="">
+                            <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                             
-                            <div id="quick-buttons">
-                                <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                </button>
-                                <button type="submit" id="quick-btn" class="submit-btn icon-btn" aria-label="Post">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                                </button>
+                            <div id="upload-container" class="form-input" onclick="document.getElementById('edit-image').click()">
+                                <span id="upload-action-label">Upload image</span>
+                                <span id="file-name-display"></span>
                             </div>
+
+                            <button type="button" id="clear-file-btn" class="submit-btn secondary-btn icon-btn" aria-label="Remove Image" onclick="clearImageSelection(event)">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                            </button>
                         </div>
-
-                        <div id="advanced-section-wrapper">
-                            <div class="advanced-inner">
-                                <textarea id="edit-text" class="form-textarea" placeholder="Content"></textarea>
-
-                                <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
-                                    <img id="upload-thumbnail" src="" alt="">
-                                    <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
-                                    
-                                    <div id="upload-container" class="form-input" onclick="document.getElementById('edit-image').click()">
-                                        <span id="upload-action-label">Upload image</span>
-                                        <span id="file-name-display"></span>
-                                    </div>
-
-                                    <button type="button" id="clear-file-btn" class="submit-btn secondary-btn icon-btn" aria-label="Remove Image" onclick="clearImageSelection(event)">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                                    </button>
-                                </div>
-                                
-                                <div class="divider"></div>
-                                
-                                <div style="display: flex; gap: var(--gap-item);">
-                                    <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
-                                    <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                    </button>
-                                </div>
-                                
-                                <div class="divider"></div>
-                                <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
-                            </div>
+                        
+                        <div class="divider"></div>
+                        
+                        <div style="display: flex; gap: var(--gap-item);">
+                            <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
+                            <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
                         </div>
-                    </form>
-                </div>
+                        
+                        <div class="divider"></div>
+                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
+                    </div>
+                </form>
             </div>
 
             <div id="status-container" class="status-feed"></div>
@@ -494,19 +428,13 @@
 
         function toggleAdvancedEditor(show) {
             const form = document.getElementById('editor-form');
-            const zone = document.getElementById('feed-admin-zone');
-            
             titleInput.classList.remove('input-error'); textInput.classList.remove('input-error');
 
             if (show) {
                 titleInput.placeholder = "Title"; textInput.placeholder = "Content";
-                form.classList.add('adv-open'); 
-                zone.classList.add('zone-open'); 
-                updateImageUIState();
+                form.classList.add('adv-open'); updateImageUIState();
             } else {
-                form.classList.remove('adv-open'); 
-                zone.classList.remove('zone-open'); 
-                titleInput.placeholder = "Quick thought...";
+                form.classList.remove('adv-open'); titleInput.placeholder = "Quick thought...";
                 editingId = null; titleInput.value = ""; textInput.value = ""; document.getElementById('edit-image').value = "";
                 removeImageFlag = false; currentImageUrl = null;
                 updateImageUIState();
@@ -528,8 +456,7 @@
             
             updateImageUIState(); 
             document.getElementById('editor-form').classList.add('adv-open');
-            document.getElementById('feed-admin-zone').classList.add('zone-open');
-            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+            window.scrollTo({ top: 0, behavior: 'auto' });
         }
 
         function updateImageUIState() {
