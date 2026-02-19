@@ -29,7 +29,7 @@
             --border-radius: 16px; 
             --gap-item: 16px; 
 
-            --glass-opacity: 0.6; /* PRESNE AKO HORNÉ MENU */
+            --glass-opacity: 0.6; 
             --glass-blur: 25px;   
         }
 
@@ -115,7 +115,7 @@
         #feed-admin-zone { 
             display: none; 
             position: sticky; 
-            top: 56px; /* Zasekne sa tesne pod hlavným menu */
+            top: 56px; 
             z-index: 1000;
             
             margin-left: calc(50% - 50vw);
@@ -129,39 +129,39 @@
         }
         body.is-logged-in #feed-admin-zone { display: block; }
         
-        /* Zmazanie spodnej čiary keď je roleta stiahnutá */
         #feed-admin-zone.zone-open { border-bottom-color: transparent; }
 
-        /* VNÚTORNÝ CENTROVANÝ KOTVOVACÍ BOD */
         .admin-inner-wrapper {
             width: 100%; 
             max-width: var(--content-width); 
             padding: var(--gap-item); 
             margin: 0 auto;
-            position: relative; /* Kritické pre padajúcu roletu */
+            position: relative; 
         }
 
         #advanced-section-wrapper { display: none; }
         
-        /* 2. PADAJÚCA ROLETA (ABSOLUTE POSITION = NEODTLÁČA OBSAH) */
+        /* 2. PADAJÚCA ROLETA (OPRAVENÝ BLUR) */
         #editor-form.adv-open #advanced-section-wrapper { 
             display: flex; 
             flex-direction: column; 
             
             position: absolute; 
-            top: 100%; /* Spustí sa presne zo spodnej hrany .admin-inner-wrapper */
-            left: calc(50% - 50vw); /* Roztiahne na 100% okna */
+            top: 100%; 
+            left: calc(50% - 50vw); 
             width: 100vw; 
+            /* Zvýšený z-index pre vynútenie novej vrstvy v Safari */
+            z-index: 2000; 
             
             padding: 0 0 var(--gap-item) 0; 
             
+            /* Glass Efekt */
             background: rgba(var(--glass-rgb), var(--glass-opacity));
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
             border-bottom: 1px solid var(--divider);
         }
 
-        /* Udržanie vnútorného obsahu rolety na 540px */
         .advanced-inner {
             width: 100%;
             max-width: var(--content-width);
@@ -264,7 +264,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.0.9 • 2026</div>
+            <div class="footer-info">build v5.0.10 • 2026</div>
         </div>
     </nav>
 
@@ -493,7 +493,7 @@
             if (show) {
                 titleInput.placeholder = "Title"; textInput.placeholder = "Content";
                 form.classList.add('adv-open'); 
-                zone.classList.add('zone-open'); /* SKRYJE CIARU POD QUICK POSTOM */
+                zone.classList.add('zone-open'); 
                 updateImageUIState();
             } else {
                 form.classList.remove('adv-open'); 
