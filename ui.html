@@ -60,12 +60,13 @@
             min-height: 100vh;
         }
 
-        .menu-link, .status-date, .admin-action-btn, .footer-info, .submit-btn, .form-input, .logo-text, .status-title {
+        .menu-link, .status-date, .admin-action-btn, .footer-info, .submit-btn, .form-input, .status-title {
             line-height: 1;
         }
 
         .divider { width: 100%; height: 1px; background-color: var(--divider); }
 
+        /* HEADER & EDITOR FORM */
         header {
             position: fixed; top: 0; left: 0; width: 100%; 
             display: flex; justify-content: center; padding: var(--gap-item) 0; 
@@ -79,10 +80,22 @@
             display: flex; justify-content: space-between; align-items: center; padding: 0 var(--gap-item); 
         }
 
-        /* Nové vlastnosti pre animáciu hlavného menu (+) */
-        #menuToggle { transition: transform 0.3s ease; z-index: 2100; }
-        #menuToggle.active { transform: rotate(45deg); }
+        #quick-buttons { display: flex; gap: var(--gap-item); flex-shrink: 0; }
+        #editor-form.adv-open #quick-buttons { display: none; }
+        
+        /* Logic for button swapping based on login state */
+        #admin-plus-btn { display: none; }
+        #menuToggle { display: flex; }
+        body.is-logged-in #admin-plus-btn { display: flex; }
+        body.is-logged-in #menuToggle { display: none; }
 
+        #advanced-section-wrapper { 
+            display: none; flex-direction: column; gap: var(--gap-item); padding-top: var(--gap-item); 
+            max-height: calc(100vh - 80px); overflow-y: auto; 
+        }
+        #editor-form.adv-open #advanced-section-wrapper { display: flex; }
+        
+        /* OVERLAY MENU */
         .nav-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: auto;
             background: rgba(var(--glass-rgb), var(--glass-opacity));
@@ -94,8 +107,8 @@
         .nav-overlay.active { display: flex; }
         
         .menu-items { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); }
-        .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; display: inline-block; padding: 0; border: none; background: transparent; text-align: left; margin: 0; }
 
+        /* MAIN & FEED */
         main {
             padding: calc(80px + var(--gap-item)) var(--gap-item) var(--gap-item); 
             width: 100%; max-width: var(--content-width); 
@@ -104,13 +117,7 @@
 
         #section-feed { display: flex; flex-direction: column; gap: var(--gap-item); }
         
-        #feed-admin-zone { display: none; flex-direction: column; gap: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider); }
-        body.is-logged-in #feed-admin-zone { display: flex; }
-
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
-        #logout-ui { display: none; }
-        body.is-logged-in #login-ui { display: none; }
-        body.is-logged-in #logout-ui { display: flex; }
 
         .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 0; }
 
@@ -148,12 +155,6 @@
 
         .admin-action-btn { background: transparent; border: none; font-size: var(--size-small); color: var(--black); cursor: pointer; padding: 0; margin: 0; display: inline-flex; align-items: center; }
         .admin-action-link { text-decoration: none; } 
-
-        #quick-buttons { display: flex; gap: var(--gap-item); flex-shrink: 0; }
-        #editor-form.adv-open #quick-buttons { display: none; }
-        
-        #advanced-section-wrapper { display: none; flex-direction: column; gap: var(--gap-item); padding-top: var(--gap-item); }
-        #editor-form.adv-open #advanced-section-wrapper { display: flex; }
         
         #upload-container { display: flex; cursor: pointer; flex-grow: 1; min-width: 0; overflow: hidden; }
         #upload-action-label { display: inline; color: var(--black); flex-shrink: 0; white-space: nowrap; pointer-events: none; }
@@ -174,13 +175,65 @@
 
     <header>
         <div class="header-content">
-            <button class="submit-btn icon-btn" onclick="window.scrollTo(0,0)" aria-label="Home">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="none" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke" stroke-linejoin="miter" /></g></svg>
-            </button>
-            
-            <button class="submit-btn icon-btn" id="menuToggle" onclick="toggleMenu()" aria-label="Menu">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </button>
+            <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; margin: 0;">
+                
+                <div style="display: flex; width: 100%; gap: var(--gap-item);">
+                    <button type="button" class="submit-btn icon-btn" onclick="window.scrollTo(0,0)" aria-label="Home" style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="currentColor" /></g></svg>
+                    </button>
+                    
+                    <input type="text" id="edit-title" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; margin: 0; min-width: 0;">
+                    
+                    <div id="quick-buttons">
+                        <button type="submit" id="quick-btn" class="submit-btn icon-btn" aria-label="Post">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+                        
+                        <button type="button" id="admin-plus-btn" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        </button>
+                        
+                        <button type="button" id="menuToggle" class="submit-btn icon-btn" onclick="toggleMenu()" aria-label="Menu">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="advanced-section-wrapper">
+                    <textarea id="edit-text" class="form-textarea" placeholder="Content"></textarea>
+
+                    <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
+                        <img id="upload-thumbnail" src="" alt="">
+                        <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
+                        
+                        <div id="upload-container" class="form-input" onclick="document.getElementById('edit-image').click()">
+                            <span id="upload-action-label">Upload image</span>
+                            <span id="file-name-display"></span>
+                        </div>
+
+                        <button type="button" id="clear-file-btn" class="submit-btn secondary-btn icon-btn" aria-label="Remove Image" onclick="clearImageSelection(event)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div style="display: flex; gap: var(--gap-item);">
+                        <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
+                        <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
+                    
+                    <div class="divider"></div>
+                    <button type="button" onclick="handleLogout()" class="submit-btn secondary-btn" style="width: 100%; margin: 0;">LOGOUT</button>
+                    <div class="divider"></div>
+                    <div class="footer-info">build v5.0.5 • 2026</div>
+                </div>
+            </form>
         </div>
     </header>
 
@@ -194,10 +247,6 @@
                     </button>
                 </form>
             </div>
-            <div id="logout-ui">
-                <button onclick="handleLogout()" class="submit-btn" style="width: 100%; margin: 0;">LOGOUT</button>
-            </div>
-            
             <div class="divider"></div>
             <div class="footer-info">build v5.0.5 • 2026</div>
         </div>
@@ -205,64 +254,6 @@
 
     <main>
         <div id="section-feed">
-            <div id="feed-admin-zone">
-                <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; margin: 0;">
-                    
-                    <div style="display: flex; width: 100%; gap: var(--gap-item);">
-                        <div class="submit-btn icon-btn" style="pointer-events: none; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="none" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke" stroke-linejoin="miter" /></g></svg>
-                        </div>
-                        
-                        <input type="text" id="edit-title" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; margin: 0; min-width: 0;">
-                        
-                        <div id="quick-buttons">
-                            <button type="submit" id="quick-btn" class="submit-btn icon-btn" aria-label="Post">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                            </button>
-                            <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="advanced-section-wrapper">
-                        <textarea id="edit-text" class="form-textarea" placeholder="Content"></textarea>
-
-                        <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
-                            <img id="upload-thumbnail" src="" alt="">
-                            <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
-                            
-                            <div id="upload-container" class="form-input" onclick="document.getElementById('edit-image').click()">
-                                <span id="upload-action-label">Upload image</span>
-                                <span id="file-name-display"></span>
-                            </div>
-
-                            <button type="button" id="clear-file-btn" class="submit-btn secondary-btn icon-btn" aria-label="Remove Image" onclick="clearImageSelection(event)">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                            </button>
-                        </div>
-                        
-                        <div class="divider"></div>
-                        
-                        <div style="display: flex; gap: var(--gap-item);">
-                            <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
-                            <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                            </button>
-                        </div>
-                        
-                        <div class="divider"></div>
-                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
-                        
-                        <div class="divider"></div>
-                        <button type="button" onclick="handleLogout()" class="submit-btn secondary-btn" style="width: 100%; margin: 0;">LOGOUT</button>
-                        <div class="divider"></div>
-                        <div class="footer-info">build v5.0.5 • 2026</div>
-
-                    </div>
-                </form>
-            </div>
-
             <div id="status-container" class="status-feed"></div>
             <div id="loading-indicator" class="loading-text">Loading...</div>
         </div>
@@ -301,12 +292,10 @@
         });
 
         function toggleMenu() { 
-            menuToggle.classList.toggle('active'); 
             navOverlay.classList.toggle('active'); 
         }
         
         function closeMenu() { 
-            menuToggle.classList.remove('active'); 
             navOverlay.classList.remove('active'); 
         }
 
@@ -330,7 +319,8 @@
         }
 
         function handleUnauthorized() {
-            handleLogout(); toggleMenu(); 
+            handleLogout(); 
+            navOverlay.classList.add('active'); 
             passInput.classList.add('input-error'); passInput.placeholder = 'Invalid password!';
         }
 
