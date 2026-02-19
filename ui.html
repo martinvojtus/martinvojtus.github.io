@@ -83,11 +83,13 @@
         #quick-buttons { display: flex; gap: var(--gap-item); flex-shrink: 0; }
         #editor-form.adv-open #quick-buttons { display: none; }
         
-        /* Logic for button swapping based on login state */
-        #admin-plus-btn { display: none; }
-        #menuToggle { display: flex; }
-        body.is-logged-in #admin-plus-btn { display: flex; }
-        body.is-logged-in #menuToggle { display: none; }
+        /* LOGIC: Guest vs Admin prepínanie UI v hlavičke */
+        #guest-title { display: flex; flex-grow: 1; margin: 0; justify-content: center; cursor: pointer; user-select: none; }
+        #menuToggle { display: flex; z-index: 2100; }
+        #edit-title, #quick-btn, #admin-plus-btn { display: none; }
+
+        body.is-logged-in #guest-title, body.is-logged-in #menuToggle { display: none; }
+        body.is-logged-in #edit-title, body.is-logged-in #quick-btn, body.is-logged-in #admin-plus-btn { display: flex; }
 
         #advanced-section-wrapper { 
             display: none; flex-direction: column; gap: var(--gap-item); padding-top: var(--gap-item); 
@@ -178,9 +180,14 @@
             <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; margin: 0;">
                 
                 <div style="display: flex; width: 100%; gap: var(--gap-item);">
+                    
                     <button type="button" class="submit-btn icon-btn" onclick="window.scrollTo(0,0)" aria-label="Home" style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="currentColor" /></g></svg>
                     </button>
+                    
+                    <div id="guest-title" class="form-input" onclick="window.scrollTo(0,0)">
+                        martinvojtus &bull; space
+                    </div>
                     
                     <input type="text" id="edit-title" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; margin: 0; min-width: 0;">
                     
@@ -607,7 +614,7 @@
 
         fetchStatuses(true);
         document.addEventListener('click', (e) => { 
-            if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); 
+            if (!navOverlay.contains(e.target) && !document.getElementById('menuToggle').contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); 
         });
     </script>
 </body>
