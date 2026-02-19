@@ -75,10 +75,10 @@
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 2000;
             
-            /* Týmto zaistíme scrollovanie celej hlavičky ak obsah pretečie */
-            max-height: 100vh; 
+            /* Scrollovanie pre cely header ak je obsah vyssi ako obrazovka */
             max-height: 100dvh;
             overflow-y: auto;
+            overscroll-behavior: none;
         }
 
         .header-content {
@@ -93,9 +93,10 @@
         
         #editor-top-row {
             display: flex; width: 100%; gap: var(--gap-item); flex-shrink: 0; 
+            align-items: center; /* Presne vertikalne zarovnanie vsetkych prvkov */
         }
 
-        #quick-buttons { display: flex; gap: var(--gap-item); flex-shrink: 0; }
+        #quick-buttons { display: flex; gap: var(--gap-item); flex-shrink: 0; align-items: center; }
         #editor-form.adv-open #quick-buttons { display: none; }
         
         /* LOGIC: Guest vs Admin prepínanie UI v hlavičke */
@@ -103,15 +104,10 @@
             display: flex; flex-grow: 1; margin: 0; justify-content: center; align-items: center;
             cursor: pointer; user-select: none;
             background-color: var(--black); color: var(--white); 
-            border-radius: var(--border-radius); font-size: 16px; height: 48px;
+            border-radius: var(--border-radius); font-size: var(--size-small); height: 48px;
         }
         
         #menuToggle { display: flex; z-index: 2100; }
-        
-        /* Okamžitá výmena SVG z + na X */
-        #menuToggle.active #icon-menu-plus { display: none; }
-        #menuToggle.active #icon-menu-x { display: block; }
-        
         #edit-title, #quick-btn, #admin-plus-btn { display: none; }
 
         body.is-logged-in #guest-title, body.is-logged-in #menuToggle { display: none; }
@@ -160,7 +156,7 @@
 
         .form-input, .submit-btn { 
             height: 48px; border: 1px solid var(--black); border-radius: var(--border-radius); 
-            background: transparent; font-size: 16px !important; 
+            background: transparent; font-size: var(--size-small); 
             padding: 0 var(--gap-item); 
             outline: none; color: var(--black); display: flex; margin: 0; align-items: center; gap: var(--gap-item); 
             flex-shrink: 0; 
@@ -168,7 +164,7 @@
         
         .form-textarea { 
             width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); 
-            background: transparent; font-size: 16px !important; 
+            background: transparent; font-size: var(--size-small); 
             padding: var(--gap-item); 
             outline: none; color: var(--black); display: block; min-height: 80px; resize: vertical; margin: 0;
             flex-shrink: 0;
@@ -179,9 +175,13 @@
         .input-error { border-color: #ff4444 !important; }
         .input-error::placeholder { color: #ff4444 !important; opacity: 1 !important; }
 
-        .submit-btn { background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1; }
+        /* Plne vyplnene tlacidla */
+        .submit-btn { 
+            background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; 
+            justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1; 
+        }
         
-        /* Striktná fixácia pre ikony */
+        /* Striktná fixácia pre štvorcové ikony */
         .icon-btn { 
             width: 48px; height: 48px; 
             flex-shrink: 0; 
@@ -241,8 +241,7 @@
                         </button>
                         
                         <button type="button" id="menuToggle" class="submit-btn icon-btn" onclick="toggleMenu()" aria-label="Menu">
-                            <svg id="icon-menu-plus" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            <svg id="icon-menu-x" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         </button>
                     </div>
                 </div>
@@ -259,8 +258,8 @@
                             <span id="file-name-display"></span>
                         </div>
 
-                        <button type="button" id="clear-file-btn" class="submit-btn secondary-btn icon-btn" aria-label="Remove Image" onclick="clearImageSelection(event)">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        <button type="button" id="clear-file-btn" class="submit-btn icon-btn" aria-label="Remove Image" onclick="clearImageSelection(event)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                         
                         <button type="submit" id="publish-btn" class="submit-btn icon-btn" aria-label="Publish">
@@ -275,7 +274,8 @@
                     
                     <div style="display: flex; gap: var(--gap-item); width: 100%;">
                         <button type="button" onclick="handleLogout()" class="submit-btn" style="flex-grow: 1; margin: 0;">LOGOUT</button>
-                        <button type="button" class="submit-btn secondary-btn icon-btn" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
+                        
+                        <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                     </div>
@@ -328,6 +328,8 @@
         const textInput = document.getElementById('edit-text');
         const menuToggle = document.getElementById('menuToggle');
 
+        const svgPlus = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+        const svgX = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
         const svgNormal = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>';
         const svgSuccess = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="20 6 9 17 4 12"></polyline></svg>';
 
@@ -341,14 +343,16 @@
             });
         });
 
+        // Natvrdo vymení SVG ikonu v tlačidle cez JS pre bezchybné zobrazenie
         function toggleMenu() { 
             navOverlay.classList.toggle('active'); 
-            menuToggle.classList.toggle('active');
+            const isActive = navOverlay.classList.contains('active');
+            menuToggle.innerHTML = isActive ? svgX : svgPlus;
         }
         
         function closeMenu() { 
             navOverlay.classList.remove('active'); 
-            menuToggle.classList.remove('active');
+            menuToggle.innerHTML = svgPlus;
         }
 
         function handleLogin(e) {
@@ -373,7 +377,7 @@
         function handleUnauthorized() {
             handleLogout(); 
             navOverlay.classList.add('active'); 
-            menuToggle.classList.add('active');
+            menuToggle.innerHTML = svgX;
             passInput.classList.add('input-error'); passInput.placeholder = 'Invalid password!';
         }
 
