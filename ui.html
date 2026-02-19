@@ -92,6 +92,9 @@
         }
         
         #menuToggle { display: flex; z-index: 2100; }
+        #menuToggle svg { transition: transform 0.2s ease; }
+        #menuToggle.active svg { transform: rotate(45deg); } /* Animácia premeny + na X */
+
         #edit-title, #quick-btn, #admin-plus-btn { display: none; }
 
         body.is-logged-in #guest-title, body.is-logged-in #menuToggle { display: none; }
@@ -308,10 +311,12 @@
 
         function toggleMenu() { 
             navOverlay.classList.toggle('active'); 
+            menuToggle.classList.toggle('active');
         }
         
         function closeMenu() { 
             navOverlay.classList.remove('active'); 
+            menuToggle.classList.remove('active');
         }
 
         function handleLogin(e) {
@@ -336,6 +341,7 @@
         function handleUnauthorized() {
             handleLogout(); 
             navOverlay.classList.add('active'); 
+            menuToggle.classList.add('active');
             passInput.classList.add('input-error'); passInput.placeholder = 'Invalid password!';
         }
 
