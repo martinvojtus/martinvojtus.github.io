@@ -29,7 +29,7 @@
             --border-radius: 16px; 
             --gap-item: 16px; 
 
-            --glass-opacity: 0.6; 
+            --glass-opacity: 0.85; /* Mierne zvýšená nepriehľadnosť pre lepšiu čitateľnosť editora nad textom */
             --glass-blur: 25px;   
         }
 
@@ -109,15 +109,46 @@
 
         #section-feed { display: flex; flex-direction: column; gap: var(--gap-item); }
         
-        #feed-admin-zone { display: none; flex-direction: column; gap: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider); }
+        /* --- NEW GLASS EDITOR CSS --- */
+        #feed-admin-zone { 
+            display: none; 
+            flex-direction: column; 
+            /* gap a padding odstranene, riesi to overlay */
+            border-bottom: 1px solid var(--divider); 
+            position: relative; /* Dolezite pre absolutne pozicovanie editora */
+            z-index: 1000;
+        }
         body.is-logged-in #feed-admin-zone { display: flex; }
+
+        /* Skrytie spodnej ciary inputu ked je editor otvoreny */
+        #editor-form.adv-open { border-bottom-color: transparent; }
+
+        #advanced-section-wrapper { display: none; }
+        
+        /* Skleneny Overlay Editor */
+        #editor-form.adv-open #advanced-section-wrapper { 
+            display: flex; flex-direction: column; gap: var(--gap-item); 
+            padding: var(--gap-item) 0; /* Padding vo vnutri skla */
+            
+            position: absolute; /* Vznasa sa nad obsahom */
+            top: 100%; /* Zacina presne pod inputom */
+            left: 0; width: 100%;
+            z-index: 900; /* Nad feedom */
+            
+            /* Glass Efekt */
+            background: rgba(var(--glass-rgb), var(--glass-opacity));
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border-bottom: 1px solid var(--divider);
+        }
+        /* --------------------------- */
 
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
         #logout-ui { display: none; }
         body.is-logged-in #login-ui { display: none; }
         body.is-logged-in #logout-ui { display: flex; }
 
-        .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 0; }
+        .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 0; position: relative; z-index: 1; }
 
         .status-card { background: transparent; border: none; border-bottom: 1px solid var(--divider); border-radius: 0; padding: var(--gap-item) 0; margin: 0; display: flex; flex-direction: column; gap: var(--gap-item); }
         .status-card:first-child { padding-top: 0; }
@@ -156,9 +187,6 @@
 
         #quick-buttons { display: flex; gap: var(--gap-item); flex-shrink: 0; width: 112px; margin-left: var(--gap-item); }
         #editor-form.adv-open #quick-buttons { display: none; }
-        
-        #advanced-section-wrapper { display: none; flex-direction: column; gap: var(--gap-item); padding-top: var(--gap-item); }
-        #editor-form.adv-open #advanced-section-wrapper { display: flex; }
         
         #upload-container { display: flex; cursor: pointer; flex-grow: 1; min-width: 0; overflow: hidden; }
         #upload-action-label { display: inline; color: var(--black); flex-shrink: 0; white-space: nowrap; pointer-events: none; }
@@ -207,7 +235,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.0.5 • 2026</div>
+            <div class="footer-info">build v5.0.6 • 2026</div>
         </div>
     </nav>
 
