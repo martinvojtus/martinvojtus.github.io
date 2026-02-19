@@ -29,7 +29,7 @@
             --border-radius: 16px; 
             --gap-item: 16px; 
 
-            --glass-opacity: 0.6; /* VRATENE NA SILNU PRIEHLADNOST */
+            --glass-opacity: 0.6; /* Vrátené na skutočnú priehľadnosť ako v menu */
             --glass-blur: 25px;   
         }
 
@@ -58,7 +58,7 @@
             line-height: 1.5; 
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
-            overflow-x: hidden; /* ZABRANUJE HORIZONTALNEMU SCROLLOVANIU */
+            overflow-x: hidden; /* Dôležité: Zabraňuje bočnému scrollovaniu pri 100vw šírkach */
         }
 
         .menu-link, .status-date, .admin-action-btn, .footer-info, .submit-btn, .form-input, .logo-text, .status-title {
@@ -110,39 +110,39 @@
 
         #section-feed { display: flex; flex-direction: column; gap: var(--gap-item); }
         
+        /* EDGE-TO-EDGE STICKY EDITOR */
         #feed-admin-zone { 
             display: none; 
-            flex-direction: column; 
-            padding-bottom: var(--gap-item); /* MEDZERA POD INPUTOM JE SPAT */
-            border-bottom: 1px solid var(--divider); 
-            position: relative; 
+            position: sticky; 
+            top: 56px; /* Zasekne sa tesne pod hlavným menu (56px výška) */
             z-index: 1000;
-        }
-        body.is-logged-in #feed-admin-zone { display: flex; }
-
-        #editor-form.adv-open { border-bottom-color: transparent; }
-
-        #advanced-section-wrapper { display: none; }
-        
-        /* EDGE TO EDGE SKLENENY OVERLAY */
-        #editor-form.adv-open #advanced-section-wrapper { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; /* Drží vnútorný obsah v strede */
-            padding: var(--gap-item) 0; 
             
-            position: absolute; 
-            top: 100%; /* Upevní to presne pod vstupný riadok */
-            left: 50%; 
-            transform: translateX(-50%);
-            width: 100vw; /* Roztiahne na celú šírku obrazovky */
-            z-index: 900; 
+            /* Matematika pre edge-to-edge efekt vnútri obmedzeného divu */
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+            width: 100vw;
+            justify-content: center;
             
+            /* Presne rovnaké sklo ako horné menu */
             background: rgba(var(--glass-rgb), var(--glass-opacity));
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
             border-bottom: 1px solid var(--divider);
         }
+        body.is-logged-in #feed-admin-zone { display: flex; }
+
+        /* Vnútorný kontajner udržuje šírku 540px a dokonalé zarovnanie */
+        .admin-inner-wrapper {
+            width: 100%; 
+            max-width: var(--content-width); 
+            padding: var(--gap-item); 
+            display: flex; 
+            flex-direction: column; 
+            margin: 0 auto;
+        }
+
+        #advanced-section-wrapper { display: none; flex-direction: column; gap: var(--gap-item); padding-top: var(--gap-item); }
+        #editor-form.adv-open #advanced-section-wrapper { display: flex; }
 
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
         #logout-ui { display: none; }
@@ -236,33 +236,29 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.0.7 • 2026</div>
+            <div class="footer-info">build v5.0.8 • 2026</div>
         </div>
     </nav>
 
     <main>
         <div id="section-feed">
-            <h2 style="font-size: var(--size-large); margin: 0; line-height: 1;">Feed.</h2>
-            <div class="divider"></div>
-            
             <div id="feed-admin-zone">
-                <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; margin: 0; position: relative;">
-                    
-                    <div style="display: flex; width: 100%;">
-                        <input type="text" id="edit-title" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; margin: 0; min-width: 0;">
-                        
-                        <div id="quick-buttons">
-                            <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            </button>
-                            <button type="submit" id="quick-btn" class="submit-btn icon-btn" aria-label="Post">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                            </button>
+                <div class="admin-inner-wrapper">
+                    <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; margin: 0;">
+                        <div style="display: flex; width: 100%;">
+                            <input type="text" id="edit-title" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; margin: 0; min-width: 0;">
+                            
+                            <div id="quick-buttons">
+                                <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                </button>
+                                <button type="submit" id="quick-btn" class="submit-btn icon-btn" aria-label="Post">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
-                    <div id="advanced-section-wrapper">
-                        <div style="width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item);">
+                        <div id="advanced-section-wrapper">
                             <textarea id="edit-text" class="form-textarea" placeholder="Content"></textarea>
 
                             <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
@@ -291,8 +287,8 @@
                             <div class="divider"></div>
                             <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
 
             <div id="status-container" class="status-feed"></div>
@@ -488,7 +484,7 @@
             
             updateImageUIState(); 
             document.getElementById('editor-form').classList.add('adv-open');
-            window.scrollTo({ top: 0, behavior: 'auto' });
+            window.scrollTo({ top: 0, behavior: 'smooth' }); /* Hladké scrollovanie hore pri edite */
         }
 
         function updateImageUIState() {
