@@ -79,16 +79,15 @@
             display: flex; justify-content: space-between; align-items: center; padding: 0 var(--gap-item); 
         }
 
-        /* Animácia pre novú štvorcovú ikonu menu */
-        #menuToggle.active .line-1 { transform: translateY(3px) rotate(45deg); }
-        #menuToggle.active .line-2 { transform: translateY(-3px) rotate(-45deg); }
+        /* Nové vlastnosti pre animáciu hlavného menu (+) */
+        #menuToggle { transition: transform 0.3s ease; z-index: 2100; }
+        #menuToggle.active { transform: rotate(45deg); }
 
         .nav-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: auto;
             background: rgba(var(--glass-rgb), var(--glass-opacity));
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 1500; 
-            /* Výpočet medzery pre nové väčšie štvorcové tlačidlá v hlavičke (80px) */
             padding: calc(80px + var(--gap-item)) 0 var(--gap-item) 0; 
             display: none; flex-direction: column; align-items: center;
         }
@@ -150,7 +149,7 @@
         .admin-action-btn { background: transparent; border: none; font-size: var(--size-small); color: var(--black); cursor: pointer; padding: 0; margin: 0; display: inline-flex; align-items: center; }
         .admin-action-link { text-decoration: none; } 
 
-        #quick-buttons { display: flex; gap: var(--gap-item); flex-shrink: 0; width: 112px; margin-left: var(--gap-item); }
+        #quick-buttons { display: flex; gap: var(--gap-item); flex-shrink: 0; }
         #editor-form.adv-open #quick-buttons { display: none; }
         
         #advanced-section-wrapper { display: none; flex-direction: column; gap: var(--gap-item); padding-top: var(--gap-item); }
@@ -176,23 +175,17 @@
     <header>
         <div class="header-content">
             <button class="submit-btn icon-btn" onclick="window.scrollTo(0,0)" aria-label="Home">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="currentColor" /></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="none" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke" stroke-linejoin="miter" /></g></svg>
             </button>
             
             <button class="submit-btn icon-btn" id="menuToggle" onclick="toggleMenu()" aria-label="Menu">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter">
-                    <line class="line-1" x1="5" y1="9" x2="19" y2="9" style="transition: transform 0.2s; transform-origin: center;"></line>
-                    <line class="line-2" x1="5" y1="15" x2="19" y2="15" style="transition: transform 0.2s; transform-origin: center;"></line>
-                </svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             </button>
         </div>
     </header>
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
-            <a class="menu-link" onclick="window.scrollTo(0,0); closeMenu();"><span>Feed</span></a>
-            <div class="divider"></div>
-            
             <div id="login-ui">
                 <form onsubmit="handleLogin(event)" style="display: flex; width: 100%; gap: var(--gap-item); margin: 0;">
                     <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="flex-grow: 1; margin: 0;">
@@ -214,15 +207,20 @@
         <div id="section-feed">
             <div id="feed-admin-zone">
                 <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; margin: 0;">
-                    <div style="display: flex; width: 100%;">
+                    
+                    <div style="display: flex; width: 100%; gap: var(--gap-item);">
+                        <div class="submit-btn icon-btn" style="pointer-events: none; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="none" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke" stroke-linejoin="miter" /></g></svg>
+                        </div>
+                        
                         <input type="text" id="edit-title" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; margin: 0; min-width: 0;">
                         
                         <div id="quick-buttons">
-                            <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            </button>
                             <button type="submit" id="quick-btn" class="submit-btn icon-btn" aria-label="Post">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </button>
+                            <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                             </button>
                         </div>
                     </div>
@@ -302,8 +300,15 @@
             });
         });
 
-        function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
-        function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); }
+        function toggleMenu() { 
+            menuToggle.classList.toggle('active'); 
+            navOverlay.classList.toggle('active'); 
+        }
+        
+        function closeMenu() { 
+            menuToggle.classList.remove('active'); 
+            navOverlay.classList.remove('active'); 
+        }
 
         function handleLogin(e) {
             e.preventDefault();
