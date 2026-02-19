@@ -84,7 +84,13 @@
         #editor-form.adv-open #quick-buttons { display: none; }
         
         /* LOGIC: Guest vs Admin prepínanie UI v hlavičke */
-        #guest-title { display: flex; flex-grow: 1; margin: 0; justify-content: center; cursor: pointer; user-select: none; }
+        #guest-title { 
+            display: flex; flex-grow: 1; margin: 0; justify-content: center; align-items: center;
+            cursor: pointer; user-select: none;
+            background-color: var(--black); color: var(--white);
+            border-radius: var(--border-radius); font-size: var(--size-small); height: 48px;
+        }
+        
         #menuToggle { display: flex; z-index: 2100; }
         #edit-title, #quick-btn, #admin-plus-btn { display: none; }
 
@@ -185,7 +191,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="currentColor" /></g></svg>
                     </button>
                     
-                    <div id="guest-title" class="form-input" onclick="window.scrollTo(0,0)">
+                    <div id="guest-title" onclick="window.scrollTo(0,0)">
                         martinvojtus &bull; space
                     </div>
                     
@@ -221,14 +227,9 @@
                         <button type="button" id="clear-file-btn" class="submit-btn secondary-btn icon-btn" aria-label="Remove Image" onclick="clearImageSelection(event)">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                         </button>
-                    </div>
-                    
-                    <div class="divider"></div>
-                    
-                    <div style="display: flex; gap: var(--gap-item);">
-                        <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
-                        <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        
+                        <button type="submit" id="publish-btn" class="submit-btn icon-btn" aria-label="Publish">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </button>
                     </div>
                     
@@ -236,7 +237,14 @@
                     <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
                     
                     <div class="divider"></div>
-                    <button type="button" onclick="handleLogout()" class="submit-btn secondary-btn" style="width: 100%; margin: 0;">LOGOUT</button>
+                    
+                    <div style="display: flex; gap: var(--gap-item); width: 100%;">
+                        <button type="button" onclick="handleLogout()" class="submit-btn" style="flex-grow: 1; margin: 0;">LOGOUT</button>
+                        <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                    
                     <div class="divider"></div>
                     <div class="footer-info">build v5.0.5 • 2026</div>
                 </div>
@@ -444,7 +452,7 @@
                 updateImageUIState();
                 document.getElementById('delete-all-btn').dataset.state = "0"; 
                 document.getElementById('delete-all-btn').innerText = "DELETE ALL POSTS";
-                document.getElementById('publish-btn').innerText = "PUBLISH";
+                document.getElementById('publish-btn').innerHTML = svgNormal;
             }
         }
 
@@ -456,7 +464,7 @@
             editingId = id; currentImageUrl = post.image_url || null; removeImageFlag = false; 
             titleInput.value = post.title || ""; textInput.value = post.text || "";
             document.getElementById('edit-image').value = ""; titleInput.placeholder = "Title";
-            document.getElementById('publish-btn').innerText = "SAVE CHANGES";
+            document.getElementById('publish-btn').innerHTML = svgNormal;
             
             updateImageUIState(); 
             document.getElementById('editor-form').classList.add('adv-open');
@@ -502,7 +510,6 @@
             const text = textInput.value.trim();
             const imageFile = document.getElementById('edit-image').files[0];
             const publishBtn = document.getElementById('publish-btn');
-            const originalBtnText = editingId ? "SAVE CHANGES" : "PUBLISH";
             let hasImage = !!imageFile || (currentImageUrl && !removeImageFlag);
             
             if (!text && !hasImage) { textInput.classList.add('input-error'); textInput.placeholder = 'Content required!'; return; }
@@ -511,7 +518,7 @@
             if (removeImageFlag && !imageFile) finalImageUrl = null; 
             
             if (imageFile) {
-                publishBtn.innerText = "UPLOADING...";
+                publishBtn.innerHTML = "...";
                 const compressedFile = await compressImage(imageFile);
                 const formData = new FormData(); formData.append("file", compressedFile);
                 try {
@@ -520,11 +527,11 @@
                     if (!uploadRes.ok) throw new Error();
                     const uploadData = await uploadRes.json(); finalImageUrl = uploadData.image_url;
                 } catch (err) {
-                    publishBtn.innerText = "ERROR!"; setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 1500); return;
+                    publishBtn.innerHTML = "!"; setTimeout(() => { publishBtn.innerHTML = svgNormal; publishBtn.disabled = false; }, 1500); return;
                 }
             }
             
-            publishBtn.innerText = "SAVING...";
+            publishBtn.innerHTML = "...";
             const method = editingId ? "PUT" : "POST";
             const endpoint = editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`;
             try {
@@ -535,10 +542,11 @@
                 if (res.status === 401) return handleUnauthorized();
                 if (!res.ok) throw new Error();
                 
-                publishBtn.innerText = editingId ? "UPDATED." : "PUBLISHED.";
-                await fetchStatuses(true); toggleAdvancedEditor(false); publishBtn.disabled = false;
+                publishBtn.innerHTML = svgSuccess;
+                await fetchStatuses(true); 
+                setTimeout(() => { toggleAdvancedEditor(false); publishBtn.disabled = false; }, 1000);
             } catch (err) {
-                publishBtn.innerText = "ERROR!"; setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 1500);
+                publishBtn.innerHTML = "!"; setTimeout(() => { publishBtn.innerHTML = svgNormal; publishBtn.disabled = false; }, 1500);
             }
         }
 
