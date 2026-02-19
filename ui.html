@@ -79,21 +79,17 @@
             display: flex; justify-content: space-between; align-items: center; padding: 0 var(--gap-item); 
         }
 
-        .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
-        .header-left svg { height: 24px; width: auto; display: block; }
-        .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; }
-
-        .menu-toggle { width: 24px; height: 12px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; z-index: 2100; }
-        .line { width: 24px; height: 1px; background-color: var(--black); }
-        .menu-toggle.active .line:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
-        .menu-toggle.active .line:nth-child(2) { transform: translateY(-5.5px) rotate(-45deg); }
+        /* Animácia pre novú štvorcovú ikonu menu */
+        #menuToggle.active .line-1 { transform: translateY(3px) rotate(45deg); }
+        #menuToggle.active .line-2 { transform: translateY(-3px) rotate(-45deg); }
 
         .nav-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: auto;
             background: rgba(var(--glass-rgb), var(--glass-opacity));
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 1500; 
-            padding: calc(56px + var(--gap-item)) 0 var(--gap-item) 0; 
+            /* Výpočet medzery pre nové väčšie štvorcové tlačidlá v hlavičke (80px) */
+            padding: calc(80px + var(--gap-item)) 0 var(--gap-item) 0; 
             display: none; flex-direction: column; align-items: center;
         }
         .nav-overlay.active { display: flex; }
@@ -102,7 +98,7 @@
         .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; display: inline-block; padding: 0; border: none; background: transparent; text-align: left; margin: 0; }
 
         main {
-            padding: calc(56px + var(--gap-item)) var(--gap-item) var(--gap-item); 
+            padding: calc(80px + var(--gap-item)) var(--gap-item) var(--gap-item); 
             width: 100%; max-width: var(--content-width); 
             flex-grow: 1; display: flex; flex-direction: column; gap: var(--gap-item);
         }
@@ -179,13 +175,16 @@
 
     <header>
         <div class="header-content">
-            <div class="logo-link" onclick="window.scrollTo(0,0)">
-                <div class="header-left">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="935.31" height="810" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
-                </div>
-                <div class="logo-text"><span>martinvojtus</span> • space</div>
-            </div>
-            <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()"><div class="line"></div><div class="line"></div></div>
+            <button class="submit-btn icon-btn" onclick="window.scrollTo(0,0)" aria-label="Home">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="currentColor" /></g></svg>
+            </button>
+            
+            <button class="submit-btn icon-btn" id="menuToggle" onclick="toggleMenu()" aria-label="Menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter">
+                    <line class="line-1" x1="5" y1="9" x2="19" y2="9" style="transition: transform 0.2s; transform-origin: center;"></line>
+                    <line class="line-2" x1="5" y1="15" x2="19" y2="15" style="transition: transform 0.2s; transform-origin: center;"></line>
+                </svg>
+            </button>
         </div>
     </header>
 
@@ -213,9 +212,6 @@
 
     <main>
         <div id="section-feed">
-            <h2 style="font-size: var(--size-large); margin: 0; line-height: 1;">Feed.</h2>
-            <div class="divider"></div>
-            
             <div id="feed-admin-zone">
                 <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; margin: 0;">
                     <div style="display: flex; width: 100%;">
@@ -259,6 +255,12 @@
                         
                         <div class="divider"></div>
                         <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
+                        
+                        <div class="divider"></div>
+                        <button type="button" onclick="handleLogout()" class="submit-btn secondary-btn" style="width: 100%; margin: 0;">LOGOUT</button>
+                        <div class="divider"></div>
+                        <div class="footer-info">build v5.0.5 • 2026</div>
+
                     </div>
                 </form>
             </div>
