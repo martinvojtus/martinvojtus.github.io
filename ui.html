@@ -69,22 +69,21 @@
         /* HEADER & EDITOR FORM */
         header {
             position: fixed; top: 0; left: 0; width: 100%; 
-            display: flex; flex-direction: column; align-items: center;
-            padding: var(--gap-item) 0; 
+            display: flex; justify-content: center;
             background: rgba(var(--glass-rgb), var(--glass-opacity));
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 2000;
             
-            /* Scrollovanie pre cely header ak je obsah vyssi ako obrazovka */
+            /* Ak je editor vysoky, povolime scrollovanie celej hlavicky */
             max-height: 100dvh;
             overflow-y: auto;
-            overscroll-behavior: none;
+            overscroll-behavior: contain;
         }
 
         .header-content {
             width: 100%; max-width: var(--content-width);
             display: flex; flex-direction: column;
-            padding: 0 var(--gap-item); 
+            padding: var(--gap-item); /* Odsadenie je vnútri, aby sa posuvalo s obsahom */
         }
 
         #editor-form {
@@ -93,10 +92,10 @@
         
         #editor-top-row {
             display: flex; width: 100%; gap: var(--gap-item); flex-shrink: 0; 
-            align-items: center; /* Presne vertikalne zarovnanie vsetkych prvkov */
+            align-items: center; /* Presne vertikalne zarovnanie vsetkych prvkov na stred */
         }
 
-        #quick-buttons { display: flex; gap: var(--gap-item); flex-shrink: 0; align-items: center; }
+        #quick-buttons { display: flex; gap: var(--gap-item); align-items: center; flex-shrink: 0; height: 48px; }
         #editor-form.adv-open #quick-buttons { display: none; }
         
         /* LOGIC: Guest vs Admin prepínanie UI v hlavičke */
@@ -154,6 +153,7 @@
         .status-text { font-size: var(--size-small); color: var(--black); opacity: 0.8; white-space: pre-line; text-align: justify; margin: 0; word-wrap: break-word; }
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); margin: 0; padding: var(--gap-item) 0; line-height: 1; }
 
+        /* Vstupy a textové polia */
         .form-input, .submit-btn { 
             height: 48px; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); 
@@ -175,13 +175,19 @@
         .input-error { border-color: #ff4444 !important; }
         .input-error::placeholder { color: #ff4444 !important; opacity: 1 !important; }
 
-        /* Plne vyplnene tlacidla */
+        /* Plné tlačidlá */
         .submit-btn { 
             background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; 
             justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1; 
         }
         
-        /* Striktná fixácia pre štvorcové ikony */
+        /* Inverzné tlačidlá pre X (biele pozadie, čierny text v Light mode / naopak v Dark mode) */
+        .inverted-btn {
+            background-color: var(--white) !important;
+            color: var(--black) !important;
+        }
+        
+        /* Pevné ikonové tlačidlá */
         .icon-btn { 
             width: 48px; height: 48px; 
             flex-shrink: 0; 
@@ -275,7 +281,7 @@
                     <div style="display: flex; gap: var(--gap-item); width: 100%;">
                         <button type="button" onclick="handleLogout()" class="submit-btn" style="flex-grow: 1; margin: 0;">LOGOUT</button>
                         
-                        <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
+                        <button type="button" class="submit-btn icon-btn inverted-btn" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                     </div>
@@ -343,16 +349,22 @@
             });
         });
 
-        // Natvrdo vymení SVG ikonu v tlačidle cez JS pre bezchybné zobrazenie
+        // Absolútne presná výmena ikony na X a pridanie inverznej triedy
         function toggleMenu() { 
             navOverlay.classList.toggle('active'); 
             const isActive = navOverlay.classList.contains('active');
             menuToggle.innerHTML = isActive ? svgX : svgPlus;
+            if (isActive) {
+                menuToggle.classList.add('inverted-btn');
+            } else {
+                menuToggle.classList.remove('inverted-btn');
+            }
         }
         
         function closeMenu() { 
             navOverlay.classList.remove('active'); 
             menuToggle.innerHTML = svgPlus;
+            menuToggle.classList.remove('inverted-btn');
         }
 
         function handleLogin(e) {
@@ -378,6 +390,7 @@
             handleLogout(); 
             navOverlay.classList.add('active'); 
             menuToggle.innerHTML = svgX;
+            menuToggle.classList.add('inverted-btn');
             passInput.classList.add('input-error'); passInput.placeholder = 'Invalid password!';
         }
 
