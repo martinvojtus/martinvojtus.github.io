@@ -249,6 +249,11 @@
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                             </button>
                         </div>
+
+                        <label class="form-input" style="cursor: pointer; justify-content: flex-start; user-select: none;">
+                            <input type="checkbox" id="edit-show-date" checked style="accent-color: var(--black); width: 18px; height: 18px; margin: 0; cursor: pointer;">
+                            <span style="color: var(--black);">Show date & time</span>
+                        </label>
                         
                         <div class="divider"></div>
                         
@@ -394,16 +399,24 @@
         window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
 
         function renderSinglePost(s) {
-            const dateObj = new Date(s.at);
-            const date = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
-            const time = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+            const showDate = s.show_date !== false; // Predvolené je true (pre staré príspevky)
+            let dateHtml = '<span></span>'; // Prázdny span, aby sa nenarušilo zarovnanie Delete/Edit tlačidiel
             let editedHtml = '';
-            if (s.updated_at) {
-                const updateObj = new Date(s.updated_at);
-                const updateDate = updateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-                const updateTime = updateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-                editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin: 0; line-height: 1;">EDITED: ${updateDate.toUpperCase()} • ${updateTime}</div>`;
+
+            if (showDate) {
+                const dateObj = new Date(s.at);
+                const date = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
+                const time = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                dateHtml = `<span class="status-date">${date} • ${time}</span>`;
+                
+                if (s.updated_at) {
+                    const updateObj = new Date(s.updated_at);
+                    const updateDate = updateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+                    const updateTime = updateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                    editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin: 0; line-height: 1;">EDITED: ${updateDate.toUpperCase()} • ${updateTime}</div>`;
+                }
             }
+
             const titleHtml = (s.title && s.title.trim() !== "") ? `<h3 class="status-title">${s.title}</h3>` : '';
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image" loading="lazy">` : '';
             let textHtml = (s.text && s.text.trim() !== "") ? `<div class="status-text">${linkify(s.text)}</div>` : '';
@@ -418,7 +431,7 @@
             return `
             <div class="status-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin: 0; gap: var(--gap-item);">
-                    <span class="status-date">${date} • ${time}</span>
+                    ${dateHtml}
                     ${adminActionsHtml}
                 </div>
                 ${titleHtml}
@@ -438,6 +451,7 @@
             } else {
                 form.classList.remove('adv-open'); titleInput.placeholder = "Quick thought...";
                 editingId = null; titleInput.value = ""; textInput.value = ""; document.getElementById('edit-image').value = "";
+                document.getElementById('edit-show-date').checked = true; // Reset checkboxu na predvolené zobrazenie
                 removeImageFlag = false; currentImageUrl = null;
                 updateImageUIState();
                 document.getElementById('delete-all-btn').dataset.state = "0"; 
@@ -454,6 +468,7 @@
             editingId = id; currentImageUrl = post.image_url || null; removeImageFlag = false; 
             titleInput.value = post.title || ""; textInput.value = post.text || "";
             document.getElementById('edit-image').value = ""; titleInput.placeholder = "Title";
+            document.getElementById('edit-show-date').checked = post.show_date !== false; // Nastavenie checkboxu podľa postu
             document.getElementById('publish-btn').innerText = "SAVE CHANGES";
             
             updateImageUIState(); 
@@ -498,6 +513,7 @@
         async function handlePublish() {
             const title = titleInput.value.trim();
             const text = textInput.value.trim();
+            const showDate = document.getElementById('edit-show-date').checked; // Načítanie hodnoty z checkboxu
             const imageFile = document.getElementById('edit-image').files[0];
             const publishBtn = document.getElementById('publish-btn');
             const originalBtnText = editingId ? "SAVE CHANGES" : "PUBLISH";
@@ -528,7 +544,7 @@
             try {
                 const res = await fetch(endpoint, {
                     method: method, headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                    body: JSON.stringify({ title: title, text: text, image_url: finalImageUrl })
+                    body: JSON.stringify({ title: title, text: text, image_url: finalImageUrl, show_date: showDate }) // Poslanie show_date
                 });
                 if (res.status === 401) return handleUnauthorized();
                 if (!res.ok) throw new Error();
@@ -550,7 +566,7 @@
             try {
                 const res = await fetch(`${API_URL}/posts`, {
                     method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                    body: JSON.stringify({ title: "", text: text, image_url: null })
+                    body: JSON.stringify({ title: "", text: text, image_url: null, show_date: true }) // Rýchly post má defaultne true
                 });
                 if (res.status === 401) return handleUnauthorized();
                 if(!res.ok) throw new Error();
