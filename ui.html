@@ -406,7 +406,7 @@
             const date = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             const time = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
             let editedHtml = '';
-            if (s.updated_at) {
+            if (s.include_timestamps !== false && s.updated_at) { // default true for posts without the field
                 const updateObj = new Date(s.updated_at);
                 const updateDate = updateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
                 const updateTime = updateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
@@ -423,10 +423,11 @@
                     <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" data-confirm="false" class="admin-action-btn admin-action-link">Delete</button>
                 </div>`;
             }
+            const dateHtml = s.include_timestamps !== false ? `<span class="status-date">${date} • ${time}</span>` : ''; // default true for posts without the field
             return `
             <div class="status-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin: 0; gap: var(--gap-item);">
-                    <span class="status-date">${date} • ${time}</span>
+                    ${dateHtml}
                     ${adminActionsHtml}
                 </div>
                 ${titleHtml}
@@ -534,12 +535,7 @@
             const method = editingId ? "PUT" : "POST";
             const endpoint = editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`;
             const includeTimestamps = document.getElementById('include-timestamps-checkbox').checked;
-            const payload = { title: title, text: text, image_url: finalImageUrl };
-            if (includeTimestamps) {
-                const now = new Date().toISOString();
-                if (!editingId) payload.at = now;
-                if (editingId) payload.updated_at = now;
-            }
+            const payload = { title: title, text: text, image_url: finalImageUrl, include_timestamps: includeTimestamps };
             try {
                 const res = await fetch(endpoint, {
                     method: method, headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
@@ -565,7 +561,7 @@
             try {
                 const res = await fetch(`${API_URL}/posts`, {
                     method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                    body: JSON.stringify({ title: "", text: text, image_url: null })
+                    body: JSON.stringify({ title: "", text: text, image_url: null, include_timestamps: document.getElementById('include-timestamps-checkbox').checked })
                 });
                 if (res.status === 401) return handleUnauthorized();
                 if(!res.ok) throw new Error();
