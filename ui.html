@@ -568,6 +568,7 @@
         async function handleQuickPost() {
             const text = titleInput.value.trim();
             const btn = document.getElementById('quick-btn');
+            const includeTimestamps = document.getElementById('include-timestamps-checkbox').checked;
             
             if(!text) { titleInput.classList.add('input-error'); titleInput.placeholder = 'Required!'; return; }
             
@@ -575,7 +576,7 @@
             try {
                 const res = await fetch(`${API_URL}/posts`, {
                     method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                    body: JSON.stringify({ title: "", text: text, image_url: null })
+                    body: JSON.stringify({ title: "", text: text, image_url: null, include_timestamps: includeTimestamps })
                 });
                 if (res.status === 401) return handleUnauthorized();
                 if(!res.ok) throw new Error();
