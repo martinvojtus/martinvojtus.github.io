@@ -174,6 +174,9 @@
         #upload-ui-wrapper.has-image #clear-file-btn { display: flex; }
         #clear-file-btn { display: none; }
 
+        #include-timestamps-label { cursor: pointer; width: 100%; gap: var(--gap-item); }
+        #include-timestamps-checkbox { cursor: pointer; width: 16px; height: 16px; flex-shrink: 0; accent-color: var(--black); }
+
         .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; text-align: left; margin: 0; }
     </style>
 </head>
@@ -250,6 +253,11 @@
                             </button>
                         </div>
                         
+                        <label id="include-timestamps-label" class="form-input" for="include-timestamps-checkbox">
+                            <input type="checkbox" id="include-timestamps-checkbox">
+                            Include upload/edit time
+                        </label>
+
                         <div class="divider"></div>
                         
                         <div style="display: flex; gap: var(--gap-item);">
@@ -525,10 +533,17 @@
             publishBtn.innerText = "SAVING...";
             const method = editingId ? "PUT" : "POST";
             const endpoint = editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`;
+            const includeTimestamps = document.getElementById('include-timestamps-checkbox').checked;
+            const payload = { title: title, text: text, image_url: finalImageUrl };
+            if (includeTimestamps) {
+                const now = new Date().toISOString();
+                if (!editingId) payload.at = now;
+                if (editingId) payload.updated_at = now;
+            }
             try {
                 const res = await fetch(endpoint, {
                     method: method, headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                    body: JSON.stringify({ title: title, text: text, image_url: finalImageUrl })
+                    body: JSON.stringify(payload)
                 });
                 if (res.status === 401) return handleUnauthorized();
                 if (!res.ok) throw new Error();
