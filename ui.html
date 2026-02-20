@@ -399,8 +399,8 @@
         window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
 
         function renderSinglePost(s) {
-            const showDate = s.show_date !== false; // Predvolené je true (pre staré príspevky)
-            let dateHtml = '<span></span>'; // Prázdny span, aby sa nenarušilo zarovnanie Delete/Edit tlačidiel
+            const showDate = s.show_date !== false;
+            let dateHtml = '';
             let editedHtml = '';
 
             if (showDate) {
@@ -420,6 +420,7 @@
             const titleHtml = (s.title && s.title.trim() !== "") ? `<h3 class="status-title">${s.title}</h3>` : '';
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image" loading="lazy">` : '';
             let textHtml = (s.text && s.text.trim() !== "") ? `<div class="status-text">${linkify(s.text)}</div>` : '';
+            
             let adminActionsHtml = '';
             if (secretKey) {
                 adminActionsHtml = `
@@ -428,12 +429,20 @@
                     <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" data-confirm="false" class="admin-action-btn admin-action-link">Delete</button>
                 </div>`;
             }
+
+            let topRowHtml = '';
+            if (dateHtml || adminActionsHtml) {
+                const leftElement = dateHtml ? dateHtml : '<span></span>';
+                topRowHtml = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin: 0; gap: var(--gap-item);">
+                    ${leftElement}
+                    ${adminActionsHtml}
+                </div>`;
+            }
+
             return `
             <div class="status-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin: 0; gap: var(--gap-item);">
-                    ${dateHtml}
-                    ${adminActionsHtml}
-                </div>
+                ${topRowHtml}
                 ${titleHtml}
                 ${imageHtml}
                 ${textHtml}
@@ -451,7 +460,7 @@
             } else {
                 form.classList.remove('adv-open'); titleInput.placeholder = "Quick thought...";
                 editingId = null; titleInput.value = ""; textInput.value = ""; document.getElementById('edit-image').value = "";
-                document.getElementById('edit-show-date').checked = true; // Reset checkboxu na predvolené zobrazenie
+                document.getElementById('edit-show-date').checked = true; // Reset checkboxu
                 removeImageFlag = false; currentImageUrl = null;
                 updateImageUIState();
                 document.getElementById('delete-all-btn').dataset.state = "0"; 
@@ -468,7 +477,7 @@
             editingId = id; currentImageUrl = post.image_url || null; removeImageFlag = false; 
             titleInput.value = post.title || ""; textInput.value = post.text || "";
             document.getElementById('edit-image').value = ""; titleInput.placeholder = "Title";
-            document.getElementById('edit-show-date').checked = post.show_date !== false; // Nastavenie checkboxu podľa postu
+            document.getElementById('edit-show-date').checked = post.show_date !== false;
             document.getElementById('publish-btn').innerText = "SAVE CHANGES";
             
             updateImageUIState(); 
@@ -513,7 +522,7 @@
         async function handlePublish() {
             const title = titleInput.value.trim();
             const text = textInput.value.trim();
-            const showDate = document.getElementById('edit-show-date').checked; // Načítanie hodnoty z checkboxu
+            const showDate = document.getElementById('edit-show-date').checked; 
             const imageFile = document.getElementById('edit-image').files[0];
             const publishBtn = document.getElementById('publish-btn');
             const originalBtnText = editingId ? "SAVE CHANGES" : "PUBLISH";
@@ -544,7 +553,7 @@
             try {
                 const res = await fetch(endpoint, {
                     method: method, headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                    body: JSON.stringify({ title: title, text: text, image_url: finalImageUrl, show_date: showDate }) // Poslanie show_date
+                    body: JSON.stringify({ title: title, text: text, image_url: finalImageUrl, show_date: showDate }) 
                 });
                 if (res.status === 401) return handleUnauthorized();
                 if (!res.ok) throw new Error();
@@ -566,7 +575,7 @@
             try {
                 const res = await fetch(`${API_URL}/posts`, {
                     method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                    body: JSON.stringify({ title: "", text: text, image_url: null, show_date: true }) // Rýchly post má defaultne true
+                    body: JSON.stringify({ title: "", text: text, image_url: null, show_date: true }) 
                 });
                 if (res.status === 401) return handleUnauthorized();
                 if(!res.ok) throw new Error();
