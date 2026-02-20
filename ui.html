@@ -252,6 +252,11 @@
                         
                         <div class="divider"></div>
                         
+                        <label style="display: flex; align-items: center; gap: 8px; margin: 16px 0; cursor: pointer;">
+                            <input type="checkbox" id="include-timestamps-checkbox" checked style="cursor: pointer;">
+                            <span>Zobraziť dátumy</span>
+                        </label>
+
                         <div style="display: flex; gap: var(--gap-item);">
                             <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
                             <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
@@ -418,7 +423,7 @@
             return `
             <div class="status-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin: 0; gap: var(--gap-item);">
-                    <span class="status-date">${date} • ${time}</span>
+                    <span class="status-date" style="${s.include_timestamps === false ? 'display:none;' : ''}">${date} • ${time}</span>
                     ${adminActionsHtml}
                 </div>
                 ${titleHtml}
@@ -439,6 +444,7 @@
                 form.classList.remove('adv-open'); titleInput.placeholder = "Quick thought...";
                 editingId = null; titleInput.value = ""; textInput.value = ""; document.getElementById('edit-image').value = "";
                 removeImageFlag = false; currentImageUrl = null;
+                document.getElementById('include-timestamps-checkbox').checked = true;
                 updateImageUIState();
                 document.getElementById('delete-all-btn').dataset.state = "0"; 
                 document.getElementById('delete-all-btn').innerText = "DELETE ALL POSTS";
@@ -455,6 +461,7 @@
             titleInput.value = post.title || ""; textInput.value = post.text || "";
             document.getElementById('edit-image').value = ""; titleInput.placeholder = "Title";
             document.getElementById('publish-btn').innerText = "SAVE CHANGES";
+            document.getElementById('include-timestamps-checkbox').checked = post.include_timestamps !== false;
             
             updateImageUIState(); 
             document.getElementById('editor-form').classList.add('adv-open');
@@ -523,12 +530,13 @@
             }
             
             publishBtn.innerText = "SAVING...";
+            const includeTimestamps = document.getElementById('include-timestamps-checkbox').checked;
             const method = editingId ? "PUT" : "POST";
             const endpoint = editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`;
             try {
                 const res = await fetch(endpoint, {
                     method: method, headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                    body: JSON.stringify({ title: title, text: text, image_url: finalImageUrl })
+                    body: JSON.stringify({ title: title, text: text, image_url: finalImageUrl, include_timestamps: includeTimestamps })
                 });
                 if (res.status === 401) return handleUnauthorized();
                 if (!res.ok) throw new Error();
