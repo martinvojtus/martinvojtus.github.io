@@ -174,7 +174,7 @@
         #upload-ui-wrapper.has-image #clear-file-btn { display: flex; }
         #clear-file-btn { display: none; }
 
-        /* Vlastný dizajn zaškrtávacieho políčka */
+        /* Vlastný dizajn zaškrtávacieho políčka BEZ animácií */
         .custom-checkbox {
             appearance: none;
             -webkit-appearance: none;
@@ -188,7 +188,6 @@
             place-content: center;
             background-color: transparent;
             flex-shrink: 0;
-            transition: all 0.2s ease-in-out;
         }
         .custom-checkbox::before {
             content: "";
@@ -199,7 +198,6 @@
             transform: rotate(45deg);
             margin-top: -2px;
             opacity: 0;
-            transition: opacity 0.2s;
         }
         .custom-checkbox:checked {
             background-color: var(--black);
@@ -244,7 +242,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.0.4 • 2026</div>
+            <div class="footer-info">build v5.0.5 • 2026</div>
         </div>
     </nav>
 
@@ -492,7 +490,7 @@
             } else {
                 form.classList.remove('adv-open'); titleInput.placeholder = "Quick thought...";
                 editingId = null; titleInput.value = ""; textInput.value = ""; document.getElementById('edit-image').value = "";
-                document.getElementById('edit-show-date').checked = true; // Reset checkboxu
+                document.getElementById('edit-show-date').checked = true;
                 removeImageFlag = false; currentImageUrl = null;
                 updateImageUIState();
                 document.getElementById('delete-all-btn').dataset.state = "0"; 
