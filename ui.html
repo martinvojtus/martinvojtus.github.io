@@ -174,7 +174,6 @@
         #upload-ui-wrapper.has-image #clear-file-btn { display: flex; }
         #clear-file-btn { display: none; }
 
-        /* Vlastný dizajn zaškrtávacieho políčka BEZ animácií */
         .custom-checkbox {
             appearance: none;
             -webkit-appearance: none;
@@ -230,9 +229,9 @@
             <div class="divider"></div>
             
             <div id="login-ui">
-                <form onsubmit="handleLogin(event)" style="display: flex; width: 100%; gap: var(--gap-item); margin: 0;">
+                <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; width: 100%; gap: var(--gap-item); margin: 0;">
                     <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="flex-grow: 1; margin: 0;">
-                    <button type="submit" class="submit-btn icon-btn" aria-label="Log In">
+                    <button type="submit" id="login-btn" class="submit-btn icon-btn" aria-label="Log In">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
                 </form>
@@ -242,7 +241,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.0.5 • 2026</div>
+            <div class="footer-info">build v5.0.6 • 2026</div>
         </div>
     </nav>
 
@@ -340,13 +339,43 @@
         function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
         function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); }
 
-        function handleLogin(e) {
+        // NOVÉ BEZPEČNÉ PRIHLASOVANIE
+        async function handleLogin(e) {
             e.preventDefault();
             if (!passInput.value.trim()) { passInput.classList.add('input-error'); passInput.placeholder = 'Required!'; return; }
-            secretKey = passInput.value;
-            document.body.classList.add('is-logged-in');
-            closeMenu();
-            refreshFeedUI();
+            
+            const tempKey = passInput.value;
+            const btn = document.getElementById('login-btn');
+            const originalIcon = btn.innerHTML;
+            
+            btn.innerHTML = '...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_URL}/verify`, {
+                    method: 'POST',
+                    headers: { 'x-admin-password': tempKey }
+                });
+                
+                if (res.ok) {
+                    secretKey = tempKey;
+                    document.body.classList.add('is-logged-in');
+                    closeMenu();
+                    refreshFeedUI();
+                    passInput.value = ''; // Vymažeme heslo z políčka po prihlásení
+                } else {
+                    passInput.classList.add('input-error');
+                    passInput.value = '';
+                    passInput.placeholder = 'Invalid password!';
+                }
+            } catch (err) {
+                passInput.classList.add('input-error');
+                passInput.value = '';
+                passInput.placeholder = 'Error connecting!';
+            } finally {
+                btn.innerHTML = originalIcon;
+                btn.disabled = false;
+            }
         }
 
         function handleLogout() {
