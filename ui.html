@@ -241,7 +241,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.0.6 • 2026</div>
+            <div class="footer-info">build v5.0.7 • 2026</div>
         </div>
     </nav>
 
@@ -339,7 +339,7 @@
         function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
         function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); }
 
-        // NOVÉ BEZPEČNÉ PRIHLASOVANIE
+        // ZMENENÉ NA GET REQUEST!
         async function handleLogin(e) {
             e.preventDefault();
             if (!passInput.value.trim()) { passInput.classList.add('input-error'); passInput.placeholder = 'Required!'; return; }
@@ -353,7 +353,7 @@
 
             try {
                 const res = await fetch(`${API_URL}/verify`, {
-                    method: 'POST',
+                    method: 'GET',
                     headers: { 'x-admin-password': tempKey }
                 });
                 
@@ -362,7 +362,7 @@
                     document.body.classList.add('is-logged-in');
                     closeMenu();
                     refreshFeedUI();
-                    passInput.value = ''; // Vymažeme heslo z políčka po prihlásení
+                    passInput.value = ''; 
                 } else {
                     passInput.classList.add('input-error');
                     passInput.value = '';
