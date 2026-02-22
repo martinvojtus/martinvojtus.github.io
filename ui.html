@@ -82,13 +82,19 @@
         }
 
         .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
-        .header-left svg { height: 24px; width: auto; display: block; }
+        
+        /* 🛠️ UPRAVENÉ: Logo 16x16px */
+        .header-left svg { width: 16px; height: 16px; display: block; }
+        
         .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; }
 
-        .menu-toggle { width: 24px; height: 12px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; z-index: 2100; }
-        .line { width: 24px; height: 1px; background-color: var(--black); }
-        .menu-toggle.active .line:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
-        .menu-toggle.active .line:nth-child(2) { transform: translateY(-5.5px) rotate(-45deg); }
+        /* 🛠️ UPRAVENÉ: Menu toggle presne 16x16px s plynulou animáciou X */
+        .menu-toggle { width: 16px; height: 16px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 2100; position: relative; }
+        .line { width: 16px; height: 1px; background-color: var(--black); position: absolute; transition: transform 0.2s ease-in-out; }
+        .line:nth-child(1) { transform: translateY(-4px); }
+        .line:nth-child(2) { transform: translateY(4px); }
+        .menu-toggle.active .line:nth-child(1) { transform: translateY(0) rotate(45deg); }
+        .menu-toggle.active .line:nth-child(2) { transform: translateY(0) rotate(-45deg); }
 
         .nav-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: auto;
@@ -241,7 +247,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.0.7 • 2026</div>
+            <div class="footer-info">build v5.0.8 • 2026</div>
         </div>
     </nav>
 
@@ -339,7 +345,6 @@
         function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
         function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); }
 
-        // ZMENENÉ NA GET REQUEST!
         async function handleLogin(e) {
             e.preventDefault();
             if (!passInput.value.trim()) { passInput.classList.add('input-error'); passInput.placeholder = 'Required!'; return; }
@@ -466,13 +471,12 @@
                 const dateObj = new Date(s.at);
                 const date = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
                 const time = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-                dateHtml = `<span class="status-date">${date} • ${time}</span>`;
+                dateHtml = `<span class="status-date">${date}</span>`;
                 
                 if (s.updated_at) {
                     const updateObj = new Date(s.updated_at);
                     const updateDate = updateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-                    const updateTime = updateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-                    editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin: 0; line-height: 1;">EDITED: ${updateDate.toUpperCase()} • ${updateTime}</div>`;
+                    editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin: 0; line-height: 1;">EDITED: ${updateDate.toUpperCase()}</div>`;
                 }
             }
 
