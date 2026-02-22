@@ -136,7 +136,6 @@
         .admin-action-btn { 
             background-color: var(--divider); border: none; border-radius: var(--border-radius); 
             color: var(--black); cursor: pointer; 
-            /* 🛠️ OPRAVA: Vrátená pevná šírka pre štvorcový tvar */
             width: 3rem; height: 3rem; 
             display: inline-flex; justify-content: center; align-items: center; flex-shrink: 0;
         }
@@ -160,6 +159,10 @@
 
         .solid-input { background-color: var(--divider) !important; border: none !important; }
         
+        /* 🛠️ Pravidlo pre zobrazenie Author poľa len v rozšírenom režime */
+        #edit-author { display: none; margin-bottom: var(--gap-item); }
+        #editor-form.adv-open #edit-author { display: flex; }
+
         #edit-text {
             width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: var(--gap-item); 
@@ -245,7 +248,7 @@
                 <button onclick="handleLogout()" class="submit-btn danger-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.3.2 • 2026</div>
+            <div class="footer-info">build v5.3.3 • 2026</div>
         </div>
     </nav>
 
@@ -253,6 +256,9 @@
         <div id="section-feed">
             <div id="feed-admin-zone">
                 <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%;">
+                    
+                    <input type="text" id="edit-author" class="form-input" placeholder="Author (optional)">
+
                     <div style="display: flex; width: 100%;">
                         <input type="text" id="edit-title" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; min-width: 0;">
                         <div id="quick-buttons">
@@ -260,6 +266,7 @@
                             <button type="submit" id="quick-btn" class="submit-btn icon-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
                         </div>
                     </div>
+                    
                     <div id="advanced-section-wrapper">
                         
                         <div id="edit-text" contenteditable="true" data-placeholder="Content"></div>
@@ -285,8 +292,6 @@
                             </button>
                         </div>
 
-                        <input type="text" id="edit-author" class="form-input" placeholder="Author (optional)">
-
                         <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
                             <div id="thumb-container" class="solid-input">
                                 <svg id="placeholder-icon" width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
@@ -298,12 +303,12 @@
                             </div>
                             
                             <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
-                            <div id="upload-container" class="form-input" onclick="document.getElementById('edit-image').click()">
+                            <div id="upload-container" class="form-input solid-input" onclick="document.getElementById('edit-image').click()">
                                 <span id="upload-action-label" style="color: var(--black);">Upload image</span>
                                 <span id="file-name-display"></span>
                             </div>
                             <button type="button" id="clear-file-btn" data-confirm="false" class="submit-btn secondary-btn icon-btn solid-input" onclick="clearImageSelection(event)">
-                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2-2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                             </button>
                         </div>
                         
@@ -457,10 +462,9 @@
             const titleHtml = s.title ? `<h3 class="status-title">${s.title}</h3>` : '';
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
             
-            // Text je teraz priamo renderovaný aj so skrytým HTML formátovaním
             let textHtml = s.text ? `<div class="status-text">${linkify(s.text)}</div>` : '';
             
-            let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button onclick="startEdit(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></div>` : '';
+            let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button onclick="startEdit(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2-2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></div>` : '';
 
             let topRowHtml = `<div style="display: flex; justify-content: space-between; align-items: center;"><div>${idBadgeHtml}${dateHtml}</div>${adminActionsHtml}</div>`;
             
