@@ -150,7 +150,7 @@
             outline: none; color: var(--black); display: flex; align-items: center; gap: var(--gap-item); 
         }
 
-        /* 🛠️ NOVÉ: Trieda pre plné polia bez okraja (Author, Upload, Checkboxy) */
+        /* Trieda pre plné polia bez okraja (teraz len pre checkboxy) */
         .solid-input {
             background-color: var(--divider) !important;
             border: none !important;
@@ -232,7 +232,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.2.6 • 2026</div>
+            <div class="footer-info">build v5.2.7 • 2026</div>
         </div>
     </nav>
 
@@ -250,12 +250,12 @@
                     <div id="advanced-section-wrapper">
                         <textarea id="edit-text" class="form-textarea" placeholder="Content"></textarea>
                         
-                        <input type="text" id="edit-author" class="form-input solid-input" placeholder="Author (optional)">
+                        <input type="text" id="edit-author" class="form-input" placeholder="Author (optional)">
 
                         <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
                             <img id="upload-thumbnail" src="" alt="">
                             <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
-                            <div id="upload-container" class="form-input solid-input" onclick="document.getElementById('edit-image').click()">
+                            <div id="upload-container" class="form-input" onclick="document.getElementById('edit-image').click()">
                                 <span id="upload-action-label">Upload image</span>
                                 <span id="file-name-display"></span>
                             </div>
@@ -305,7 +305,6 @@
                 if(inp.id === 'edit-title') inp.placeholder = document.getElementById('editor-form').classList.contains('adv-open') ? 'Title' : 'Quick thought...';
                 if(inp.id === 'edit-text') inp.placeholder = 'Content';
                 if(inp.id === 'admin-pass') inp.placeholder = 'Password...';
-                // 🛠️ OPRAVA: Aktualizácia textu pri zmiznutí error state
                 if(inp.id === 'edit-author') inp.placeholder = 'Author (optional)';
             });
         });
@@ -404,7 +403,10 @@
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
             let textHtml = s.text ? `<div class="status-text">${linkify(s.text)}</div>` : '';
             
-            let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button onclick="startEdit(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></div>` : '';
+            let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);">
+                <button onclick="startEdit(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button>
+                <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
+            </div>` : '';
 
             let topRowHtml = `<div style="display: flex; justify-content: space-between; align-items: center;"><div>${idBadgeHtml}${dateHtml}</div>${adminActionsHtml}</div>`;
             
