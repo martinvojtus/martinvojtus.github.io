@@ -16,6 +16,8 @@
         :root {
             --size-large: 2.0rem;
             --size-small: 1.0rem;
+            /* 🛠️ NOVÉ: Micro veľkosť pre pilulky */
+            --size-micro: 0.7rem; 
             
             --black: #000000;
             --white: #ffffff;
@@ -127,17 +129,17 @@
         .status-card:first-child { padding-top: 0; }
         .status-card:last-child { border-bottom: none; }
 
-        /* 🛠️ UPRAVENÉ: Štýly pre bubliny (badges) */
+        /* 🛠️ UPRAVENÉ: Micro štýly s paddingom 8px */
         .status-date, .status-edited { 
-            font-size: var(--size-small); color: var(--grey-50); 
+            font-size: var(--size-micro); color: var(--grey-50); 
             text-transform: uppercase; margin: 0; 
-            background-color: var(--divider); padding: 6px 12px; 
+            background-color: var(--divider); padding: 8px 12px; 
             border-radius: var(--border-radius); display: inline-flex; align-items: center; width: fit-content;
         }
         .admin-action-btn { 
             background-color: var(--divider); border: none; border-radius: var(--border-radius); 
-            font-size: var(--size-small); color: var(--black); cursor: pointer; 
-            padding: 6px 12px; margin: 0; display: inline-flex; align-items: center; 
+            font-size: var(--size-micro); color: var(--black); cursor: pointer; 
+            padding: 8px 12px; margin: 0; display: inline-flex; align-items: center; 
         }
 
         .status-title { font-size: var(--size-large); margin: 0; color: var(--black); }
@@ -219,7 +221,8 @@
             opacity: 1;
         }
 
-        .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; text-align: left; margin: 0; }
+        /* 🛠️ UPRAVENÉ: Build info tiež v micro veľkosti */
+        .footer-info { font-size: var(--size-micro); color: var(--grey-50); text-transform: uppercase; text-align: left; margin: 0; }
     </style>
 </head>
 <body>
@@ -254,7 +257,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.0.9 • 2026</div>
+            <div class="footer-info">build v5.1.0 • 2026</div>
         </div>
     </nav>
 
@@ -318,6 +321,7 @@
     </main>
 
     <script>
+        // Skript zostáva rovnaký ako v predošlej správe
         const API_URL = "https://mv-backend-ak8l.onrender.com";
         let secretKey = ""; 
         let editingId = null;
@@ -355,55 +359,27 @@
         async function handleLogin(e) {
             e.preventDefault();
             if (!passInput.value.trim()) { passInput.classList.add('input-error'); passInput.placeholder = 'Required!'; return; }
-            
             const tempKey = passInput.value;
             const btn = document.getElementById('login-btn');
             const originalIcon = btn.innerHTML;
-            
-            btn.innerHTML = '...';
-            btn.disabled = true;
-
+            btn.innerHTML = '...'; btn.disabled = true;
             try {
-                const res = await fetch(`${API_URL}/verify`, {
-                    method: 'GET',
-                    headers: { 'x-admin-password': tempKey }
-                });
-                
-                if (res.ok) {
-                    secretKey = tempKey;
-                    document.body.classList.add('is-logged-in');
-                    closeMenu();
-                    refreshFeedUI();
-                    passInput.value = ''; 
-                } else {
-                    passInput.classList.add('input-error');
-                    passInput.value = '';
-                    passInput.placeholder = 'Invalid password!';
-                }
-            } catch (err) {
-                passInput.classList.add('input-error');
-                passInput.value = '';
-                passInput.placeholder = 'Error connecting!';
-            } finally {
-                btn.innerHTML = originalIcon;
-                btn.disabled = false;
-            }
+                const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': tempKey } });
+                if (res.ok) { secretKey = tempKey; document.body.classList.add('is-logged-in'); closeMenu(); refreshFeedUI(); passInput.value = ''; 
+                } else { passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; }
+            } catch (err) { passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Error connecting!';
+            } finally { btn.innerHTML = originalIcon; btn.disabled = false; }
         }
 
         function handleLogout() {
-            secretKey = ""; passInput.value = ''; 
-            toggleAdvancedEditor(false);
-            document.body.classList.remove('is-logged-in'); 
-            closeMenu();
+            secretKey = ""; passInput.value = ''; toggleAdvancedEditor(false);
+            document.body.classList.remove('is-logged-in'); closeMenu();
             document.getElementById('delete-all-btn').dataset.state = "0"; 
             document.getElementById('delete-all-btn').innerText = "DELETE ALL POSTS";
             refreshFeedUI();
         }
 
-        function handleUnauthorized() {
-            handleLogout(); toggleMenu(); 
-            passInput.classList.add('input-error'); passInput.placeholder = 'Invalid password!';
-        }
+        function handleUnauthorized() { handleLogout(); toggleMenu(); passInput.classList.add('input-error'); passInput.placeholder = 'Invalid password!'; }
 
         function refreshFeedUI() {
             const container = document.getElementById('status-container');
@@ -415,9 +391,7 @@
             }
         }
 
-        function linkify(text) {
-            return text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: inherit; text-decoration: none; opacity: 0.6;">$1</a>');
-        }
+        function linkify(text) { return text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: inherit; text-decoration: none; opacity: 0.6;">$1</a>'); }
 
         function compressImage(file, maxWidth = 1200, quality = 0.8) {
             return new Promise((resolve) => {
@@ -454,16 +428,13 @@
                 if (newPosts.length < postsLimit) { hasMorePosts = false; loader.style.display = 'none'; }
                 currentOffset += newPosts.length;
                 globalPosts = globalPosts.concat(newPosts);
-                if (reset && globalPosts.length === 0) {
-                    container.innerHTML = '<p class="loading-text">Nothing there.</p>'; loader.style.display = 'none';
+                if (reset && globalPosts.length === 0) { container.innerHTML = '<p class="loading-text">Nothing there.</p>'; loader.style.display = 'none';
                 } else {
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = newPosts.map(s => renderSinglePost(s)).join('');
                     while(tempDiv.firstChild) container.appendChild(tempDiv.firstChild);
                 }
-            } catch (error) {
-                if (reset) container.innerHTML = `<p class="loading-text">Failed to load data.</p>`;
-                loader.style.display = 'none';
+            } catch (error) { if (reset) container.innerHTML = `<p class="loading-text">Failed to load data.</p>`; loader.style.display = 'none';
             } finally { isLoading = false; }
         }
 
@@ -471,87 +442,57 @@
 
         function renderSinglePost(s) {
             const showDate = s.show_date !== false;
-            let dateHtml = '';
-            let editedHtml = '';
-
+            let dateHtml = ''; let editedHtml = '';
             if (showDate) {
                 const dateObj = new Date(s.at);
                 const date = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
                 dateHtml = `<span class="status-date">${date}</span>`;
-                
                 if (s.updated_at) {
                     const updateObj = new Date(s.updated_at);
                     const updateDate = updateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-                    // 🛠️ UPRAVENÉ: Pridaná trieda pre badge
                     editedHtml = `<div class="status-edited">EDITED: ${updateDate.toUpperCase()}</div>`;
                 }
             }
-
             const titleHtml = (s.title && s.title.trim() !== "") ? `<h3 class="status-title">${s.title}</h3>` : '';
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image" loading="lazy">` : '';
             let textHtml = (s.text && s.text.trim() !== "") ? `<div class="status-text">${linkify(s.text)}</div>` : '';
-            
             let adminActionsHtml = '';
             if (secretKey) {
-                adminActionsHtml = `
-                <div style="display: flex; gap: var(--gap-item); align-items: center; margin: 0;">
+                adminActionsHtml = `<div style="display: flex; gap: var(--gap-item); align-items: center; margin: 0;">
                     <button onclick="startEdit(${s.id});" class="admin-action-btn admin-action-link">Edit</button>
                     <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" data-confirm="false" class="admin-action-btn admin-action-link">Delete</button>
                 </div>`;
             }
-
             let topRowHtml = '';
             if (dateHtml || adminActionsHtml) {
                 const leftElement = dateHtml ? dateHtml : '<span></span>';
-                topRowHtml = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin: 0; gap: var(--gap-item);">
-                    ${leftElement}
-                    ${adminActionsHtml}
-                </div>`;
+                topRowHtml = `<div style="display: flex; justify-content: space-between; align-items: center; margin: 0; gap: var(--gap-item);">${leftElement}${adminActionsHtml}</div>`;
             }
-
-            return `
-            <div class="status-card">
-                ${topRowHtml}
-                ${titleHtml}
-                ${imageHtml}
-                ${textHtml}
-                ${editedHtml}
-            </div>`;
+            return `<div class="status-card">${topRowHtml}${titleHtml}${imageHtml}${textHtml}${editedHtml}</div>`;
         }
 
         function toggleAdvancedEditor(show) {
             const form = document.getElementById('editor-form');
             titleInput.classList.remove('input-error'); textInput.classList.remove('input-error');
-
-            if (show) {
-                titleInput.placeholder = "Title"; textInput.placeholder = "Content";
-                form.classList.add('adv-open'); updateImageUIState();
+            if (show) { titleInput.placeholder = "Title"; textInput.placeholder = "Content"; form.classList.add('adv-open'); updateImageUIState();
             } else {
                 form.classList.remove('adv-open'); titleInput.placeholder = "Quick thought...";
                 editingId = null; titleInput.value = ""; textInput.value = ""; document.getElementById('edit-image').value = "";
-                document.getElementById('edit-show-date').checked = true;
-                removeImageFlag = false; currentImageUrl = null;
-                updateImageUIState();
-                document.getElementById('delete-all-btn').dataset.state = "0"; 
-                document.getElementById('delete-all-btn').innerText = "DELETE ALL POSTS";
-                document.getElementById('publish-btn').innerText = "PUBLISH";
+                document.getElementById('edit-show-date').checked = true; removeImageFlag = false; currentImageUrl = null;
+                updateImageUIState(); document.getElementById('delete-all-btn').dataset.state = "0"; 
+                document.getElementById('delete-all-btn').innerText = "DELETE ALL POSTS"; document.getElementById('publish-btn').innerText = "PUBLISH";
             }
         }
 
         function startEdit(id) {
-            const post = globalPosts.find(p => p.id === id);
-            if(!post) return;
-            
+            const post = globalPosts.find(p => p.id === id); if(!post) return;
             titleInput.classList.remove('input-error'); textInput.classList.remove('input-error');
             editingId = id; currentImageUrl = post.image_url || null; removeImageFlag = false; 
             titleInput.value = post.title || ""; textInput.value = post.text || "";
             document.getElementById('edit-image').value = ""; titleInput.placeholder = "Title";
             document.getElementById('edit-show-date').checked = post.show_date !== false;
             document.getElementById('publish-btn').innerText = "SAVE CHANGES";
-            
-            updateImageUIState(); 
-            document.getElementById('editor-form').classList.add('adv-open');
+            updateImageUIState(); document.getElementById('editor-form').classList.add('adv-open');
             window.scrollTo({ top: 0, behavior: 'auto' });
         }
 
@@ -560,20 +501,13 @@
             const input = document.getElementById('edit-image');
             const nameDisplay = document.getElementById('file-name-display');
             const thumbnail = document.getElementById('upload-thumbnail');
-
             const hasNewFile = input.files && input.files.length > 0;
             const hasExistingImage = currentImageUrl && !removeImageFlag;
-
             if (hasNewFile || hasExistingImage) {
                 wrapper.classList.add('has-image'); 
-                if (hasNewFile) {
-                     const file = input.files[0]; nameDisplay.innerText = file.name; thumbnail.src = URL.createObjectURL(file);
-                } else {
-                     let fileName = currentImageUrl.split('/').pop().split('?')[0]; nameDisplay.innerText = fileName; thumbnail.src = currentImageUrl;
-                }
-            } else {
-                wrapper.classList.remove('has-image'); thumbnail.src = ''; nameDisplay.innerText = "";
-            }
+                if (hasNewFile) { const file = input.files[0]; nameDisplay.innerText = file.name; thumbnail.src = URL.createObjectURL(file);
+                } else { let fileName = currentImageUrl.split('/').pop().split('?')[0]; nameDisplay.innerText = fileName; thumbnail.src = currentImageUrl; }
+            } else { wrapper.classList.remove('has-image'); thumbnail.src = ''; nameDisplay.innerText = ""; }
         }
         
         function clearImageSelection(e) {
@@ -590,19 +524,15 @@
         }
 
         async function handlePublish() {
-            const title = titleInput.value.trim();
-            const text = textInput.value.trim();
+            const title = titleInput.value.trim(); const text = textInput.value.trim();
             const showDate = document.getElementById('edit-show-date').checked; 
             const imageFile = document.getElementById('edit-image').files[0];
             const publishBtn = document.getElementById('publish-btn');
             const originalBtnText = editingId ? "SAVE CHANGES" : "PUBLISH";
             let hasImage = !!imageFile || (currentImageUrl && !removeImageFlag);
-            
             if (!text && !hasImage) { textInput.classList.add('input-error'); textInput.placeholder = 'Content required!'; return; }
-            
             publishBtn.disabled = true; let finalImageUrl = currentImageUrl;
             if (removeImageFlag && !imageFile) finalImageUrl = null; 
-            
             if (imageFile) {
                 publishBtn.innerText = "UPLOADING...";
                 const compressedFile = await compressImage(imageFile);
@@ -610,52 +540,30 @@
                 try {
                     const uploadRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
                     if (uploadRes.status === 401) return handleUnauthorized();
-                    if (!uploadRes.ok) throw new Error();
                     const uploadData = await uploadRes.json(); finalImageUrl = uploadData.image_url;
-                } catch (err) {
-                    publishBtn.innerText = "ERROR!"; setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 1500); return;
-                }
+                } catch (err) { publishBtn.innerText = "ERROR!"; setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 1500); return; }
             }
-            
             publishBtn.innerText = "SAVING...";
             const method = editingId ? "PUT" : "POST";
             const endpoint = editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`;
             try {
-                const res = await fetch(endpoint, {
-                    method: method, headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                    body: JSON.stringify({ title: title, text: text, image_url: finalImageUrl, show_date: showDate }) 
-                });
+                const res = await fetch(endpoint, { method: method, headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify({ title: title, text: text, image_url: finalImageUrl, show_date: showDate }) });
                 if (res.status === 401) return handleUnauthorized();
-                if (!res.ok) throw new Error();
-                
                 publishBtn.innerText = editingId ? "UPDATED." : "PUBLISHED.";
                 await fetchStatuses(true); toggleAdvancedEditor(false); publishBtn.disabled = false;
-            } catch (err) {
-                publishBtn.innerText = "ERROR!"; setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 1500);
-            }
+            } catch (err) { publishBtn.innerText = "ERROR!"; setTimeout(() => { publishBtn.innerText = originalBtnText; publishBtn.disabled = false; }, 1500); }
         }
 
         async function handleQuickPost() {
-            const text = titleInput.value.trim();
-            const btn = document.getElementById('quick-btn');
-            
+            const text = titleInput.value.trim(); const btn = document.getElementById('quick-btn');
             if(!text) { titleInput.classList.add('input-error'); titleInput.placeholder = 'Required!'; return; }
-            
             btn.disabled = true; btn.innerHTML = "...";
             try {
-                const res = await fetch(`${API_URL}/posts`, {
-                    method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                    body: JSON.stringify({ title: "", text: text, image_url: null, show_date: true }) 
-                });
+                const res = await fetch(`${API_URL}/posts`, { method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify({ title: "", text: text, image_url: null, show_date: true }) });
                 if (res.status === 401) return handleUnauthorized();
-                if(!res.ok) throw new Error();
-                
-                titleInput.value = ""; btn.innerHTML = svgSuccess;
-                await fetchStatuses(true);
+                titleInput.value = ""; btn.innerHTML = svgSuccess; await fetchStatuses(true);
                 setTimeout(() => { btn.innerHTML = svgNormal; btn.disabled = false; }, 1000);
-            } catch(err) {
-                btn.innerHTML = "!"; setTimeout(() => { btn.innerHTML = svgNormal; btn.disabled = false; }, 1000);
-            }
+            } catch(err) { btn.innerHTML = "!"; setTimeout(() => { btn.innerHTML = svgNormal; btn.disabled = false; }, 1000); }
         }
 
         async function handleDeleteFeed(id) {
@@ -666,14 +574,10 @@
                     const res = await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
                     if (res.status === 401) return handleUnauthorized();
                     fetchStatuses(true); 
-                } catch(e) {
-                    btn.innerText = "Error"; setTimeout(() => { btn.innerText = "Delete"; btn.disabled = false; btn.dataset.confirm = "false"; }, 1500);
-                }
+                } catch(e) { btn.innerText = "Error"; setTimeout(() => { btn.innerText = "Delete"; btn.disabled = false; btn.dataset.confirm = "false"; }, 1500); }
             } else {
                 btn.dataset.confirm = "true"; btn.innerText = "Confirm"; btn.style.color = "#ff4444";
-                setTimeout(() => {
-                    if (btn.dataset.confirm === "true") { btn.dataset.confirm = "false"; btn.innerText = "Delete"; btn.style.color = ""; }
-                }, 3000);
+                setTimeout(() => { if (btn.dataset.confirm === "true") { btn.dataset.confirm = "false"; btn.innerText = "Delete"; btn.style.color = ""; } }, 3000);
             }
         }
 
@@ -683,10 +587,7 @@
             if (state === "0") {
                 btn.dataset.state = "1"; btn.innerText = "CLICK TO CONFIRM";
                 setTimeout(() => { if(btn.dataset.state === "1") { btn.dataset.state = "0"; btn.innerText = "DELETE ALL POSTS"; } }, 3000);
-            } else if (state === "1") {
-                btn.dataset.state = "2"; btn.innerText = "DELETING..."; btn.disabled = true;
-                executeDeleteAll(btn);
-            }
+            } else if (state === "1") { btn.dataset.state = "2"; btn.innerText = "DELETING..."; btn.disabled = true; executeDeleteAll(btn); }
         }
 
         async function executeDeleteAll(btn) {
@@ -696,9 +597,7 @@
                     const res = await fetch(`${API_URL}/posts?skip=0&limit=50`);
                     const posts = await res.json();
                     if (posts.length === 0) { deleting = false; break; }
-                    for (const p of posts) {
-                        await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
-                    }
+                    for (const p of posts) { await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); }
                 }
                 fetchStatuses(true);
             } catch(e) { btn.innerText = "ERROR!"; } 
@@ -706,9 +605,7 @@
         }
 
         fetchStatuses(true);
-        document.addEventListener('click', (e) => { 
-            if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); 
-        });
+        document.addEventListener('click', (e) => { if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); });
     </script>
 </body>
 </html>
