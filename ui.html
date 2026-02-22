@@ -123,14 +123,12 @@
         .status-card:first-child { padding-top: 0; }
         .status-card:last-child { border-bottom: none; }
 
-        /* 🛠️ UPRAVENÉ: Pridaný .status-author k rovnakým blokovým štýlom */
         .status-date, .status-edited, .status-author { 
             font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; 
             background-color: var(--divider); padding: 0 var(--gap-item); height: 3rem; 
             border-radius: var(--border-radius); display: inline-flex; align-items: center; width: fit-content;
         }
 
-        /* Farba autora môže byť výraznejšia (čierna/biela), ak chceš, zmenil som na --black */
         .status-author { color: var(--black); font-weight: bold; }
 
         .admin-action-btn { 
@@ -228,7 +226,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.2.1 • 2026</div>
+            <div class="footer-info">build v5.2.2 • 2026</div>
         </div>
     </nav>
 
@@ -255,7 +253,7 @@
                                 <span id="upload-action-label">Upload image</span>
                                 <span id="file-name-display"></span>
                             </div>
-                            <button type="button" id="clear-file-btn" data-confirm="false" class="submit-btn secondary-btn icon-btn" onclick="clearImageSelection(event)"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
+                            <button type="button" id="clear-file-btn" data-confirm="false" class="submit-btn secondary-btn icon-btn" onclick="clearImageSelection(event)"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2-2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
                         </div>
                         <label class="form-input" style="cursor: pointer; justify-content: flex-start; user-select: none;">
                             <input type="checkbox" id="edit-show-date" class="custom-checkbox" checked>
@@ -356,13 +354,16 @@
             let dateHtml = showDate ? `<span class="status-date">${new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}</span>` : '';
             let idBadgeHtml = secretKey ? `<span class="status-date" style="margin-right: var(--gap-item);">#${s.id}</span>` : '';
             
-            // 🛠️ EDIT DATUM a AUTOR sa zložia do jedného riadku úplne dole doprava
+            // 🛠️ EDITED zarovnaný vľavo, AUTHOR zarovnaný vpravo cez space-between
             let editedHtml = (showDate && s.updated_at) ? `<div class="status-edited">EDITED: ${new Date(s.updated_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}</div>` : '';
             let authorHtml = (s.author && s.author.trim() !== "") ? `<div class="status-author">${s.author.trim().toUpperCase()}</div>` : '';
             
             let bottomInfoHtml = '';
             if (editedHtml || authorHtml) {
-                bottomInfoHtml = `<div style="display: flex; justify-content: flex-end; gap: var(--gap-item); width: 100%; flex-wrap: wrap;">${editedHtml}${authorHtml}</div>`;
+                bottomInfoHtml = `<div style="display: flex; justify-content: space-between; width: 100%; gap: var(--gap-item);">
+                    <div>${editedHtml}</div>
+                    <div>${authorHtml}</div>
+                </div>`;
             }
 
             const titleHtml = s.title ? `<h3 class="status-title">${s.title}</h3>` : '';
@@ -373,7 +374,6 @@
 
             let topRowHtml = `<div style="display: flex; justify-content: space-between; align-items: center;"><div>${idBadgeHtml}${dateHtml}</div>${adminActionsHtml}</div>`;
             
-            // 🛠️ Tu sa dole pripojí bottomInfoHtml
             return `<div class="status-card">${topRowHtml}${titleHtml}${imageHtml}${textHtml}${bottomInfoHtml}</div>`;
         }
 
@@ -433,7 +433,6 @@
                 const upData = await upRes.json(); finalImageUrl = upData.image_url;
             }
             
-            // 🛠️ Odosielame aj author
             const authorVal = authorInput.value.trim();
             const res = await fetch(editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`, {
                 method: editingId ? "PUT" : "POST",
