@@ -62,7 +62,7 @@
             min-height: 100vh;
         }
 
-        .menu-link, .status-date, .admin-action-btn, .footer-info, .submit-btn, .form-input, .logo-text, .status-title {
+        .menu-link, .status-date, .status-edited, .admin-action-btn, .footer-info, .submit-btn, .form-input, .logo-text, .status-title {
             line-height: 1;
         }
 
@@ -82,13 +82,9 @@
         }
 
         .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
-        
-        /* 🛠️ UPRAVENÉ: Logo 16x16px */
         .header-left svg { width: 16px; height: 16px; display: block; }
-        
         .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; }
 
-        /* 🛠️ UPRAVENÉ: Menu toggle presne 16x16px s plynulou animáciou X */
         .menu-toggle { width: 16px; height: 16px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 2100; position: relative; }
         .line { width: 16px; height: 1px; background-color: var(--black); position: absolute; transition: transform 0.2s ease-in-out; }
         .line:nth-child(1) { transform: translateY(-4px); }
@@ -131,7 +127,19 @@
         .status-card:first-child { padding-top: 0; }
         .status-card:last-child { border-bottom: none; }
 
-        .status-date { font-size: var(--size-small); color: var(--grey-50); display: block; text-transform: uppercase; margin: 0; }
+        /* 🛠️ UPRAVENÉ: Štýly pre bubliny (badges) */
+        .status-date, .status-edited { 
+            font-size: var(--size-small); color: var(--grey-50); 
+            text-transform: uppercase; margin: 0; 
+            background-color: var(--divider); padding: 6px 12px; 
+            border-radius: var(--border-radius); display: inline-flex; align-items: center; width: fit-content;
+        }
+        .admin-action-btn { 
+            background-color: var(--divider); border: none; border-radius: var(--border-radius); 
+            font-size: var(--size-small); color: var(--black); cursor: pointer; 
+            padding: 6px 12px; margin: 0; display: inline-flex; align-items: center; 
+        }
+
         .status-title { font-size: var(--size-large); margin: 0; color: var(--black); }
         .status-image { width: 100%; height: auto; border-radius: var(--border-radius); display: block; margin: 0; border: none; }
         .status-text { font-size: var(--size-small); color: var(--black); opacity: 0.8; white-space: pre-line; text-align: justify; margin: 0; word-wrap: break-word; }
@@ -159,7 +167,6 @@
         .secondary-btn { background: transparent; color: var(--black); }
         .danger-btn { background: #ff4444 !important; color: #000000 !important; border: none !important; }
 
-        .admin-action-btn { background: transparent; border: none; font-size: var(--size-small); color: var(--black); cursor: pointer; padding: 0; margin: 0; display: inline-flex; align-items: center; }
         .admin-action-link { text-decoration: none; } 
 
         #quick-buttons { display: flex; gap: var(--gap-item); flex-shrink: 0; width: 112px; margin-left: var(--gap-item); }
@@ -247,7 +254,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.0.8 • 2026</div>
+            <div class="footer-info">build v5.0.9 • 2026</div>
         </div>
     </nav>
 
@@ -470,13 +477,13 @@
             if (showDate) {
                 const dateObj = new Date(s.at);
                 const date = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
-                const time = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
                 dateHtml = `<span class="status-date">${date}</span>`;
                 
                 if (s.updated_at) {
                     const updateObj = new Date(s.updated_at);
                     const updateDate = updateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-                    editedHtml = `<div style="font-size: var(--size-small); color: var(--grey-50); margin: 0; line-height: 1;">EDITED: ${updateDate.toUpperCase()}</div>`;
+                    // 🛠️ UPRAVENÉ: Pridaná trieda pre badge
+                    editedHtml = `<div class="status-edited">EDITED: ${updateDate.toUpperCase()}</div>`;
                 }
             }
 
