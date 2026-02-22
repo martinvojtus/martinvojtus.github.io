@@ -62,7 +62,7 @@
             min-height: 100vh;
         }
 
-        .menu-link, .status-date, .status-edited, .admin-action-btn, .footer-info, .submit-btn, .form-input, .logo-text, .status-title {
+        .menu-link, .status-date, .status-edited, .footer-info, .submit-btn, .form-input, .logo-text, .status-title {
             line-height: 1;
         }
 
@@ -119,7 +119,7 @@
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
         #logout-ui { display: none; }
         body.is-logged-in #login-ui { display: none; }
-        body.is-logged-in #logout-ui { flex-direction: column; gap: var(--gap-item); }
+        body.is-logged-in #logout-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
 
         .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 0; }
 
@@ -127,7 +127,6 @@
         .status-card:first-child { padding-top: 0; }
         .status-card:last-child { border-bottom: none; }
 
-        /* 🛠️ UPRAVENÉ: Plná veľkosť 1rem, výška 48px a padding 16px */
         .status-date, .status-edited { 
             font-size: var(--size-small); color: var(--grey-50); 
             text-transform: uppercase; margin: 0; 
@@ -135,12 +134,17 @@
             height: 48px; border-radius: var(--border-radius); 
             display: inline-flex; align-items: center; width: fit-content;
         }
+
+        /* 🛠️ UPRAVENÉ: Štvorcové tlačidlá pre admin akcie s ikonami */
         .admin-action-btn { 
             background-color: var(--divider); border: none; border-radius: var(--border-radius); 
-            font-size: var(--size-small); color: var(--black); cursor: pointer; 
-            padding: 0 var(--gap-item); height: 48px; margin: 0; 
-            display: inline-flex; align-items: center; 
+            color: var(--black); cursor: pointer; 
+            padding: 0; width: 48px; height: 48px; margin: 0; /* Štvorcový rozmer 48x48 */
+            display: inline-flex; justify-content: center; align-items: center; flex-shrink: 0;
+            transition: color 0.2s ease;
         }
+        /* Zaistenie, že ikona vnútri má správnu veľkosť 16x16 */
+        .admin-action-btn svg { width: 16px; height: 16px; display: block; }
 
         .status-title { font-size: var(--size-large); margin: 0; color: var(--black); }
         .status-image { width: 100%; height: auto; border-radius: var(--border-radius); display: block; margin: 0; border: none; }
@@ -168,8 +172,6 @@
         .icon-btn { width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0; }
         .secondary-btn { background: transparent; color: var(--black); }
         .danger-btn { background: #ff4444 !important; color: #000000 !important; border: none !important; }
-
-        .admin-action-link { text-decoration: none; } 
 
         #quick-buttons { display: flex; gap: var(--gap-item); flex-shrink: 0; width: 112px; margin-left: var(--gap-item); }
         #editor-form.adv-open #quick-buttons { display: none; }
@@ -256,7 +258,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.1.1 • 2026</div>
+            <div class="footer-info">build v5.1.2 • 2026</div>
         </div>
     </nav>
 
@@ -444,13 +446,19 @@
             const titleHtml = (s.title && s.title.trim() !== "") ? `<h3 class="status-title">${s.title}</h3>` : '';
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="Post image" loading="lazy">` : '';
             let textHtml = (s.text && s.text.trim() !== "") ? `<div class="status-text">${linkify(s.text)}</div>` : '';
+            
             let adminActionsHtml = '';
             if (secretKey) {
+                // 🛠️ NOVÉ IKONY PRE EDIT A DELETE
+                const editIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>';
+                const deleteIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
+                
                 adminActionsHtml = `<div style="display: flex; gap: var(--gap-item); align-items: center; margin: 0;">
-                    <button onclick="startEdit(${s.id});" class="admin-action-btn admin-action-link">Edit</button>
-                    <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" data-confirm="false" class="admin-action-btn admin-action-link">Delete</button>
+                    <button onclick="startEdit(${s.id});" class="admin-action-btn" aria-label="Edit post">${editIcon}</button>
+                    <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" data-confirm="false" class="admin-action-btn" aria-label="Delete post">${deleteIcon}</button>
                 </div>`;
             }
+
             let topRowHtml = '';
             if (dateHtml || adminActionsHtml) {
                 const leftElement = dateHtml ? dateHtml : '<span></span>';
@@ -560,8 +568,9 @@
                     fetchStatuses(true); 
                 } catch(e) { btn.innerText = "Error"; setTimeout(() => { btn.innerText = "Delete"; btn.disabled = false; btn.dataset.confirm = "false"; }, 1500); }
             } else {
-                btn.dataset.confirm = "true"; btn.innerText = "Confirm"; btn.style.color = "#ff4444";
-                setTimeout(() => { if (btn.dataset.confirm === "true") { btn.dataset.confirm = "false"; btn.innerText = "Delete"; btn.style.color = ""; } }, 3000);
+                // 🛠️ Prvé kliknutie - zmeníme farbu na červenú ako varovanie
+                btn.dataset.confirm = "true"; btn.style.color = "#ff4444";
+                setTimeout(() => { if (btn.dataset.confirm === "true") { btn.dataset.confirm = "false"; btn.style.color = ""; } }, 3000);
             }
         }
 
