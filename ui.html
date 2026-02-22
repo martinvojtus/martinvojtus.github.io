@@ -42,7 +42,6 @@
 
         html { -webkit-text-size-adjust: 100%; }
         
-        /* 🚫 Odstránené všetky animácie a prechody */
         * { 
             -webkit-tap-highlight-color: transparent; 
             box-sizing: border-box; 
@@ -156,13 +155,11 @@
         }
 
         .input-error { border-color: var(--danger) !important; }
-        .input-error::placeholder { color: var(--danger) !important; }
+        .input-error::placeholder { color: var(--danger) !important; opacity: 1; }
 
         .submit-btn { background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
         .icon-btn { width: 48px; height: 48px; flex-shrink: 0; padding: 0; }
         .secondary-btn { background: transparent; color: var(--black); }
-        
-        /* 🔴 Danger Button (Delete) */
         .danger-btn { background: var(--danger) !important; color: #000000 !important; border: none !important; }
 
         #quick-buttons { display: flex; gap: var(--gap-item); width: 112px; margin-left: var(--gap-item); }
@@ -221,7 +218,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.1.6 • 2026</div>
+            <div class="footer-info">build v5.1.7 • 2026</div>
         </div>
     </nav>
 
@@ -272,14 +269,20 @@
         let currentOffset = 0; const postsLimit = 10; let isLoading = false; let hasMorePosts = true;
         let deleteTimer = null;
 
-        const menuToggle = document.getElementById('menuToggle');
-        const navOverlay = document.getElementById('navOverlay');
-        const passInput = document.getElementById('admin-pass');
         const titleInput = document.getElementById('edit-title');
         const textInput = document.getElementById('edit-text');
+        const passInput = document.getElementById('admin-pass');
+        const menuToggle = document.getElementById('menuToggle');
+        const navOverlay = document.getElementById('navOverlay');
 
-        const svgNormal = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="9 18 15 12 9 6"></polyline></svg>';
-        const svgSuccess = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        [titleInput, textInput, passInput].forEach(inp => {
+            if(inp) inp.addEventListener('input', () => {
+                inp.classList.remove('input-error');
+                if(inp.id === 'edit-title') inp.placeholder = document.getElementById('editor-form').classList.contains('adv-open') ? 'Title' : 'Quick thought...';
+                if(inp.id === 'edit-text') inp.placeholder = 'Content';
+                if(inp.id === 'admin-pass') inp.placeholder = 'Password...';
+            });
+        });
 
         function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
         function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); }
@@ -290,24 +293,18 @@
             try {
                 const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': tempKey } });
                 if (res.ok) { secretKey = tempKey; document.body.classList.add('is-logged-in'); closeMenu(); refreshFeedUI(); passInput.value = ''; 
-                } else { passInput.classList.add('input-error'); passInput.value = ''; }
+                } else { passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; }
             } catch (err) { passInput.classList.add('input-error'); }
         }
 
         function handleLogout() {
             secretKey = ""; passInput.value = ''; toggleAdvancedEditor(false);
             document.body.classList.remove('is-logged-in'); closeMenu();
-            resetDeleteAllBtn();
-            refreshFeedUI();
+            resetDeleteAllBtn(); refreshFeedUI();
         }
 
-        function handleUnauthorized() { handleLogout(); }
-
         function refreshFeedUI() {
-            const container = document.getElementById('status-container');
-            if (globalPosts.length > 0) {
-                container.innerHTML = globalPosts.map(s => renderSinglePost(s)).join('');
-            }
+            document.getElementById('status-container').innerHTML = globalPosts.map(s => renderSinglePost(s)).join('');
         }
 
         function linkify(text) { return text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: inherit; text-decoration: none; opacity: 0.6;">$1</a>'); }
@@ -333,19 +330,13 @@
             let dateHtml = showDate ? `<span class="status-date">${new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}</span>` : '';
             let idBadgeHtml = secretKey ? `<span class="status-date" style="margin-right: var(--gap-item);">#${s.id}</span>` : '';
             let editedHtml = (showDate && s.updated_at) ? `<div class="status-edited">EDITED: ${new Date(s.updated_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}</div>` : '';
-            const titleHtml = s.title ? `<h3 class="status-title">${s.title}</h3>` : '';
-            const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
-            let textHtml = s.text ? `<div class="status-text">${linkify(s.text)}</div>` : '';
-            
-            let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button onclick="startEdit(${s.id});" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" data-confirm="false" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></div>` : '';
-
-            return `<div class="status-card"><div style="display: flex; justify-content: space-between; align-items: center;"><div>${idBadgeHtml}${dateHtml}</div>${adminActionsHtml}</div>${titleHtml}${imageHtml}${textHtml}${editedHtml}</div>`;
+            return `<div class="status-card"><div style="display: flex; justify-content: space-between; align-items: center;"><div>${idBadgeHtml}${dateHtml}</div>${secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button onclick="startEdit(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></div>` : ''}</div>${s.title ? `<h3 class="status-title">${s.title}</h3>` : ''}${s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : ''}${s.text ? `<div class="status-text">${linkify(s.text)}</div>` : ''}${editedHtml}</div>`;
         }
 
         function toggleAdvancedEditor(show) {
             const form = document.getElementById('editor-form');
-            if (show) { form.classList.add('adv-open'); }
-            else { form.classList.remove('adv-open'); editingId = null; resetDeleteAllBtn(); document.getElementById('publish-btn').innerText = "PUBLISH"; }
+            if (show) { form.classList.add('adv-open'); titleInput.placeholder = "Title"; }
+            else { form.classList.remove('adv-open'); editingId = null; titleInput.value = ""; textInput.value = ""; document.getElementById('edit-image').value = ""; removeImageFlag = false; currentImageUrl = null; updateImageUIState(); titleInput.placeholder = "Quick thought..."; document.getElementById('publish-btn').innerText = "PUBLISH"; }
         }
 
         function startEdit(id) {
@@ -365,25 +356,28 @@
             if (hasNew || hasOld) {
                 wrapper.classList.add('has-image');
                 thumbnail.src = hasNew ? URL.createObjectURL(input.files[0]) : currentImageUrl;
-                document.getElementById('file-name-display').innerText = hasNew ? input.files[0].name : "current_image.jpg";
+                document.getElementById('file-name-display').innerText = hasNew ? input.files[0].name : "image.jpg";
             } else { wrapper.classList.remove('has-image'); }
         }
 
         function clearImageSelection(e) {
             const btn = e.currentTarget;
-            if (btn.dataset.confirm === "true") {
-                document.getElementById('edit-image').value = ""; removeImageFlag = true;
-                btn.classList.remove('danger-btn'); btn.dataset.confirm = "false"; updateImageUIState();
-            } else { btn.classList.add('danger-btn'); btn.dataset.confirm = "true"; setTimeout(() => { btn.classList.remove('danger-btn'); btn.dataset.confirm = "false"; }, 3000); }
+            if (btn.dataset.confirm === "true") { document.getElementById('edit-image').value = ""; removeImageFlag = true; btn.classList.remove('danger-btn'); btn.dataset.confirm = "false"; updateImageUIState(); }
+            else { btn.classList.add('danger-btn'); btn.dataset.confirm = "true"; setTimeout(() => { btn.classList.remove('danger-btn'); btn.dataset.confirm = "false"; }, 3000); }
         }
 
-        async function handleMainSubmit(e) { e.preventDefault(); (document.getElementById('editor-form').classList.contains('adv-open')) ? await handlePublish() : await handleQuickPost(); }
+        async function handleMainSubmit(e) { 
+            e.preventDefault(); 
+            const isAdv = document.getElementById('editor-form').classList.contains('adv-open');
+            if (isAdv) await handlePublish(); else await handleQuickPost(); 
+        }
 
         async function handlePublish() {
-            const publishBtn = document.getElementById('publish-btn');
-            publishBtn.disabled = true;
-            let finalImageUrl = currentImageUrl;
-            if (removeImageFlag) finalImageUrl = null;
+            const hasImg = document.getElementById('edit-image').files.length > 0 || (currentImageUrl && !removeImageFlag);
+            if (!textInput.value.trim() && !hasImg) { textInput.classList.add('input-error'); textInput.placeholder = "Content required!"; return; }
+            
+            const publishBtn = document.getElementById('publish-btn'); publishBtn.disabled = true;
+            let finalImageUrl = currentImageUrl; if (removeImageFlag) finalImageUrl = null;
             const imageFile = document.getElementById('edit-image').files[0];
             if (imageFile) {
                 const formData = new FormData(); formData.append("file", imageFile);
@@ -400,6 +394,7 @@
         }
 
         async function handleQuickPost() {
+            if (!titleInput.value.trim()) { titleInput.classList.add('input-error'); titleInput.placeholder = "Required!"; return; }
             const btn = document.getElementById('quick-btn'); btn.disabled = true;
             const res = await fetch(`${API_URL}/posts`, {
                 method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
@@ -411,57 +406,24 @@
 
         async function handleDeleteFeed(id) {
             const btn = document.getElementById(`feed-del-btn-${id}`);
-            if (btn.dataset.confirm === "true") {
-                await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
-                fetchStatuses(true); 
-            } else {
-                btn.classList.add('danger-btn'); btn.dataset.confirm = "true";
-                setTimeout(() => { btn.classList.remove('danger-btn'); btn.dataset.confirm = "false"; }, 3000);
-            }
+            if (btn.dataset.confirm === "true") { await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); fetchStatuses(true); }
+            else { btn.classList.add('danger-btn'); btn.dataset.confirm = "true"; setTimeout(() => { btn.classList.remove('danger-btn'); btn.dataset.confirm = "false"; }, 3000); }
         }
 
-        /* 🏁 DELETE ALL LOGIC with Countdown */
         function handleDeleteAllClick() {
             const btn = document.getElementById('delete-all-btn');
-            const state = btn.dataset.state;
-
-            if (state === "0") {
-                btn.dataset.state = "1"; btn.innerText = "CLICK TO CONFIRM";
-                setTimeout(() => { if(btn.dataset.state === "1") resetDeleteAllBtn(); }, 3000);
-            } else if (state === "1") {
-                btn.dataset.state = "2"; 
-                startDeleteCountdown(5);
-            } else if (state === "2") {
-                stopDeleteCountdown();
-            }
+            if (btn.dataset.state === "0") { btn.dataset.state = "1"; btn.innerText = "CLICK TO CONFIRM"; setTimeout(() => { if(btn.dataset.state === "1") resetDeleteAllBtn(); }, 3000); }
+            else if (btn.dataset.state === "1") { btn.dataset.state = "2"; startDeleteCountdown(5); }
+            else if (btn.dataset.state === "2") { stopDeleteCountdown(); }
         }
 
         function startDeleteCountdown(seconds) {
-            const btn = document.getElementById('delete-all-btn');
-            let timeLeft = seconds;
-            btn.innerText = `CANCEL IN ${timeLeft}S`;
-            
-            deleteTimer = setInterval(() => {
-                timeLeft--;
-                if (timeLeft <= 0) {
-                    clearInterval(deleteTimer);
-                    btn.innerText = "DELETING..."; btn.disabled = true;
-                    executeDeleteAll();
-                } else {
-                    btn.innerText = `CANCEL IN ${timeLeft}S`;
-                }
-            }, 1000);
+            const btn = document.getElementById('delete-all-btn'); let left = seconds; btn.innerText = `CANCEL IN ${left}S`;
+            deleteTimer = setInterval(() => { left--; if (left <= 0) { clearInterval(deleteTimer); btn.innerText = "DELETING..."; btn.disabled = true; executeDeleteAll(); } else { btn.innerText = `CANCEL IN ${left}S`; } }, 1000);
         }
 
-        function stopDeleteCountdown() {
-            clearInterval(deleteTimer);
-            resetDeleteAllBtn();
-        }
-
-        function resetDeleteAllBtn() {
-            const btn = document.getElementById('delete-all-btn');
-            btn.dataset.state = "0"; btn.innerText = "DELETE ALL POSTS"; btn.disabled = false;
-        }
+        function stopDeleteCountdown() { clearInterval(deleteTimer); resetDeleteAllBtn(); }
+        function resetDeleteAllBtn() { const btn = document.getElementById('delete-all-btn'); btn.dataset.state = "0"; btn.innerText = "DELETE ALL POSTS"; btn.disabled = false; }
 
         async function executeDeleteAll() {
             const res = await fetch(`${API_URL}/posts?skip=0&limit=100`);
