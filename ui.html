@@ -136,11 +136,19 @@
             color: var(--black); cursor: pointer; width: 3rem; height: 3rem; 
             display: inline-flex; justify-content: center; align-items: center; flex-shrink: 0;
         }
+
         .admin-action-btn svg, .icon-btn svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
 
         .status-title { font-size: var(--size-large); margin: 0; color: var(--black); }
         .status-image { width: 100%; height: auto; border-radius: var(--border-radius); display: block; }
-        .status-text { font-size: var(--size-small); color: var(--black); opacity: 0.8; white-space: pre-line; text-align: justify; word-wrap: break-word; margin: 0; }
+        
+        /* 🛠️ Odstránené white-space: pre-line, HTML generované editorom sa o zalamovanie riadkov postará samo */
+        .status-text { font-size: var(--size-small); color: var(--black); opacity: 0.8; word-wrap: break-word; margin: 0; }
+        /* Reset pre štýly vo vnútri status-text generované editorom */
+        .status-text b { font-weight: bold; }
+        .status-text i { font-style: italic; }
+        .status-text u { text-decoration: underline; }
+
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; }
 
         .form-input, .submit-btn { 
@@ -151,10 +159,20 @@
 
         .solid-input { background-color: var(--divider) !important; border: none !important; }
         
-        .form-textarea { 
+        /* 🛠️ Nový vizuálny editor (nahradil textarea) */
+        #edit-text {
             width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: var(--gap-item); 
-            outline: none; color: var(--black); display: block; min-height: 5rem; resize: vertical;
+            outline: none; color: var(--black); min-height: 5rem; overflow-y: auto; word-wrap: break-word;
+        }
+        #edit-text:empty:before {
+            content: attr(data-placeholder);
+            color: var(--grey-50);
+            pointer-events: none;
+            display: block;
+        }
+        #edit-text.input-error:empty:before {
+            color: var(--danger) !important;
         }
 
         .input-error { border-color: var(--danger) !important; }
@@ -234,7 +252,7 @@
                 <button onclick="handleLogout()" class="submit-btn danger-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.2.9 • 2026</div>
+            <div class="footer-info">build v5.3.0 • 2026</div>
         </div>
     </nav>
 
@@ -250,28 +268,29 @@
                         </div>
                     </div>
                     <div id="advanced-section-wrapper">
-                        <textarea id="edit-text" class="form-textarea" placeholder="Content"></textarea>
                         
                         <div style="display: flex; gap: var(--gap-item); width: 100%; flex-wrap: wrap;">
-                            <button type="button" class="admin-action-btn" onclick="insertFormat('<b>', '</b>')" title="Bold">
+                            <button type="button" class="admin-action-btn" onmousedown="event.preventDefault(); formatText('bold')" title="Bold">
                                 <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg>
                             </button>
-                            <button type="button" class="admin-action-btn" onclick="insertFormat('<i>', '</i>')" title="Italic">
+                            <button type="button" class="admin-action-btn" onmousedown="event.preventDefault(); formatText('italic')" title="Italic">
                                 <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"></line><line x1="14" y1="20" x2="5" y2="20"></line><line x1="15" y1="4" x2="9" y2="20"></line></svg>
                             </button>
-                            <button type="button" class="admin-action-btn" onclick="insertFormat('<u>', '</u>')" title="Underline">
+                            <button type="button" class="admin-action-btn" onmousedown="event.preventDefault(); formatText('underline')" title="Underline">
                                 <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path><line x1="4" y1="21" x2="20" y2="21"></line></svg>
                             </button>
-                            <button type="button" class="admin-action-btn" onclick="insertFormat('<div style=\'text-align: left;\'>', '</div>')" title="Align Left">
+                            <button type="button" class="admin-action-btn" onmousedown="event.preventDefault(); formatText('justifyLeft')" title="Align Left">
                                 <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
                             </button>
-                            <button type="button" class="admin-action-btn" onclick="insertFormat('<div style=\'text-align: right;\'>', '</div>')" title="Align Right">
+                            <button type="button" class="admin-action-btn" onmousedown="event.preventDefault(); formatText('justifyRight')" title="Align Right">
                                 <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="10" x2="7" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="7" y2="18"></line></svg>
                             </button>
-                            <button type="button" class="admin-action-btn" onclick="insertFormat('<div style=\'text-align: justify;\'>', '</div>')" title="Align Justify">
+                            <button type="button" class="admin-action-btn" onmousedown="event.preventDefault(); formatText('justifyFull')" title="Align Justify">
                                 <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg>
                             </button>
                         </div>
+
+                        <div id="edit-text" contenteditable="true" data-placeholder="Content"></div>
 
                         <input type="text" id="edit-author" class="form-input" placeholder="Author (optional)">
 
@@ -324,20 +343,31 @@
         let deleteTimer = null;
 
         const titleInput = document.getElementById('edit-title');
-        const textInput = document.getElementById('edit-text');
+        const textInput = document.getElementById('edit-text'); // Teraz to ukazuje na div
         const passInput = document.getElementById('admin-pass');
         const authorInput = document.getElementById('edit-author');
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
 
-        [titleInput, textInput, passInput, authorInput].forEach(inp => {
+        // Funkcia pre natívne vizuálne formátovanie
+        function formatText(command) {
+            document.execCommand(command, false, null);
+            textInput.focus();
+        }
+
+        [titleInput, passInput, authorInput].forEach(inp => {
             if(inp) inp.addEventListener('input', () => {
                 inp.classList.remove('input-error');
                 if(inp.id === 'edit-title') inp.placeholder = document.getElementById('editor-form').classList.contains('adv-open') ? 'Title' : 'Quick thought...';
-                if(inp.id === 'edit-text') inp.placeholder = 'Content';
                 if(inp.id === 'admin-pass') inp.placeholder = 'Password...';
                 if(inp.id === 'edit-author') inp.placeholder = 'Author (optional)';
             });
+        });
+
+        // Špeciálny listener pre contenteditable div
+        textInput.addEventListener('input', () => {
+            textInput.classList.remove('input-error');
+            textInput.setAttribute('data-placeholder', 'Content');
         });
 
         function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
@@ -374,25 +404,11 @@
             resetDeleteAllBtn(); refreshFeedUI();
         }
 
-        // 🛠️ Nová funkcia pre pridanie HTML formátovacích značiek
-        function insertFormat(startTag, endTag) {
-            const textarea = document.getElementById('edit-text');
-            if (!textarea) return;
-            
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const text = textarea.value;
-            const selectedText = text.substring(start, end);
-            
-            textarea.value = text.substring(0, start) + startTag + selectedText + endTag + text.substring(end);
-            
-            // Fokus späť do textarea na správne miesto (do vnútra tagov)
-            textarea.focus();
-            textarea.selectionEnd = start + startTag.length + selectedText.length;
-        }
-
         function refreshFeedUI() { document.getElementById('status-container').innerHTML = globalPosts.map(s => renderSinglePost(s)).join(''); }
-        function linkify(text) { return text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: inherit; text-decoration: none; opacity: 0.6;">$1</a>'); }
+        function linkify(text) { 
+            if (text.includes('<a href=')) return text; // Zabraňuje prelinkovaniu už existujúcich HTML odkazov
+            return text.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" style="color: inherit; text-decoration: none; opacity: 0.6;">$1</a>'); 
+        }
 
         function compressImage(file, maxWidth = 1200, quality = 0.8) {
             return new Promise((resolve) => {
@@ -449,6 +465,8 @@
 
             const titleHtml = s.title ? `<h3 class="status-title">${s.title}</h3>` : '';
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
+            
+            // Text je teraz priamo renderovaný aj so skrytým HTML formátovaním
             let textHtml = s.text ? `<div class="status-text">${linkify(s.text)}</div>` : '';
             
             let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button onclick="startEdit(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></div>` : '';
@@ -463,7 +481,7 @@
             titleInput.classList.remove('input-error'); textInput.classList.remove('input-error'); authorInput.classList.remove('input-error');
             if (show) { form.classList.add('adv-open'); titleInput.placeholder = "Title"; } 
             else { 
-                form.classList.remove('adv-open'); editingId = null; titleInput.value = ""; textInput.value = ""; authorInput.value = ""; document.getElementById('edit-image').value = ""; 
+                form.classList.remove('adv-open'); editingId = null; titleInput.value = ""; textInput.innerHTML = ""; authorInput.value = ""; document.getElementById('edit-image').value = ""; 
                 removeImageFlag = false; currentImageUrl = null; updateImageUIState(); titleInput.placeholder = "Quick thought..."; document.getElementById('publish-btn').innerText = "PUBLISH"; 
             }
         }
@@ -471,7 +489,7 @@
         function startEdit(id) {
             const post = globalPosts.find(p => p.id === id); if(!post) return;
             editingId = id; currentImageUrl = post.image_url; removeImageFlag = false;
-            titleInput.value = post.title || ""; textInput.value = post.text || ""; authorInput.value = post.author || "";
+            titleInput.value = post.title || ""; textInput.innerHTML = post.text || ""; authorInput.value = post.author || "";
             document.getElementById('edit-show-date').checked = post.show_date !== false;
             document.getElementById('publish-btn').innerText = "SAVE CHANGES";
             updateImageUIState(); toggleAdvancedEditor(true); window.scrollTo(0,0);
@@ -502,8 +520,15 @@
         }
 
         async function handlePublish() {
+            let textVal = textInput.innerHTML.trim();
+            if (textVal === '<br>') textVal = ''; // Ošetrenie prázdnych riadkov
+
             const hasImg = document.getElementById('edit-image').files.length > 0 || (currentImageUrl && !removeImageFlag);
-            if (!textInput.value.trim() && !hasImg) { textInput.classList.add('input-error'); textInput.placeholder = "Content required!"; return; }
+            if (!textVal && !hasImg) { 
+                textInput.classList.add('input-error'); 
+                textInput.setAttribute('data-placeholder', 'Content required!'); 
+                return; 
+            }
             
             const publishBtn = document.getElementById('publish-btn'); publishBtn.disabled = true;
             let finalImageUrl = currentImageUrl; if (removeImageFlag) finalImageUrl = null;
@@ -522,7 +547,7 @@
             const res = await fetch(editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`, {
                 method: editingId ? "PUT" : "POST",
                 headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                body: JSON.stringify({ title: titleInput.value, text: textInput.value, image_url: finalImageUrl, show_date: document.getElementById('edit-show-date').checked, author: authorVal })
+                body: JSON.stringify({ title: titleInput.value, text: textVal, image_url: finalImageUrl, show_date: document.getElementById('edit-show-date').checked, author: authorVal })
             });
             if (res.ok) { fetchStatuses(true); toggleAdvancedEditor(false); }
             publishBtn.disabled = false;
