@@ -60,7 +60,7 @@
             min-height: 100vh;
         }
 
-        .menu-link, .status-date, .status-edited, .footer-info, .submit-btn, .form-input, .logo-text, .status-title {
+        .menu-link, .status-date, .status-edited, .status-author, .footer-info, .submit-btn, .form-input, .logo-text, .status-title {
             line-height: 1;
         }
 
@@ -123,11 +123,15 @@
         .status-card:first-child { padding-top: 0; }
         .status-card:last-child { border-bottom: none; }
 
-        .status-date, .status-edited { 
+        /* 🛠️ UPRAVENÉ: Pridaný .status-author k rovnakým blokovým štýlom */
+        .status-date, .status-edited, .status-author { 
             font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; 
             background-color: var(--divider); padding: 0 var(--gap-item); height: 3rem; 
             border-radius: var(--border-radius); display: inline-flex; align-items: center; width: fit-content;
         }
+
+        /* Farba autora môže byť výraznejšia (čierna/biela), ak chceš, zmenil som na --black */
+        .status-author { color: var(--black); font-weight: bold; }
 
         .admin-action-btn { 
             background-color: var(--divider); border: none; border-radius: var(--border-radius); 
@@ -224,7 +228,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.2.0 • 2026</div>
+            <div class="footer-info">build v5.2.1 • 2026</div>
         </div>
     </nav>
 
@@ -241,6 +245,9 @@
                     </div>
                     <div id="advanced-section-wrapper">
                         <textarea id="edit-text" class="form-textarea" placeholder="Content"></textarea>
+                        
+                        <input type="text" id="edit-author" class="form-input" placeholder="Author (optional)...">
+
                         <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
                             <img id="upload-thumbnail" src="" alt="">
                             <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
@@ -278,37 +285,31 @@
         const titleInput = document.getElementById('edit-title');
         const textInput = document.getElementById('edit-text');
         const passInput = document.getElementById('admin-pass');
+        const authorInput = document.getElementById('edit-author');
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
 
-        [titleInput, textInput, passInput].forEach(inp => {
+        [titleInput, textInput, passInput, authorInput].forEach(inp => {
             if(inp) inp.addEventListener('input', () => {
                 inp.classList.remove('input-error');
                 if(inp.id === 'edit-title') inp.placeholder = document.getElementById('editor-form').classList.contains('adv-open') ? 'Title' : 'Quick thought...';
                 if(inp.id === 'edit-text') inp.placeholder = 'Content';
                 if(inp.id === 'admin-pass') inp.placeholder = 'Password...';
+                if(inp.id === 'edit-author') inp.placeholder = 'Author (optional)...';
             });
         });
 
         function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
         function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); }
 
-        // 🛠️ Overenie prihlásenia pri načítaní stránky (Remember me)
         async function checkRememberedLogin() {
             const savedKey = localStorage.getItem('mv_admin_key');
             if (savedKey) {
                 try {
                     const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': savedKey } });
-                    if (res.ok) {
-                        secretKey = savedKey;
-                        document.body.classList.add('is-logged-in');
-                        refreshFeedUI();
-                    } else {
-                        localStorage.removeItem('mv_admin_key');
-                    }
-                } catch (e) {
-                    // Ak sieť zlyhá, potichu ignorujeme
-                }
+                    if (res.ok) { secretKey = savedKey; document.body.classList.add('is-logged-in'); refreshFeedUI(); } 
+                    else { localStorage.removeItem('mv_admin_key'); }
+                } catch (e) {}
             }
         }
 
@@ -319,34 +320,20 @@
             try {
                 const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': tempKey } });
                 if (res.ok) { 
-                    secretKey = tempKey; 
-                    document.body.classList.add('is-logged-in'); 
-                    closeMenu(); 
-                    refreshFeedUI(); 
-                    passInput.value = ''; 
-                    
-                    if (rememberMe) {
-                        localStorage.setItem('mv_admin_key', secretKey);
-                    } else {
-                        localStorage.removeItem('mv_admin_key');
-                    }
-                } else { 
-                    passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; 
-                }
+                    secretKey = tempKey; document.body.classList.add('is-logged-in'); closeMenu(); refreshFeedUI(); passInput.value = ''; 
+                    if (rememberMe) { localStorage.setItem('mv_admin_key', secretKey); } else { localStorage.removeItem('mv_admin_key'); }
+                } else { passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; }
             } catch (err) { passInput.classList.add('input-error'); }
         }
 
         function handleLogout() {
             secretKey = ""; passInput.value = ''; toggleAdvancedEditor(false);
-            localStorage.removeItem('mv_admin_key'); // Vymazanie hesla z pamäte
+            localStorage.removeItem('mv_admin_key');
             document.body.classList.remove('is-logged-in'); closeMenu();
             resetDeleteAllBtn(); refreshFeedUI();
         }
 
-        function refreshFeedUI() {
-            document.getElementById('status-container').innerHTML = globalPosts.map(s => renderSinglePost(s)).join('');
-        }
-
+        function refreshFeedUI() { document.getElementById('status-container').innerHTML = globalPosts.map(s => renderSinglePost(s)).join(''); }
         function linkify(text) { return text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: inherit; text-decoration: none; opacity: 0.6;">$1</a>'); }
 
         async function fetchStatuses(reset = false) {
@@ -357,8 +344,7 @@
                 const response = await fetch(`${API_URL}/posts?skip=${currentOffset}&limit=${postsLimit}`);
                 const newPosts = await response.json();
                 if (newPosts.length < postsLimit) hasMorePosts = false;
-                currentOffset += newPosts.length;
-                globalPosts = globalPosts.concat(newPosts);
+                currentOffset += newPosts.length; globalPosts = globalPosts.concat(newPosts);
                 document.getElementById('status-container').innerHTML += newPosts.map(s => renderSinglePost(s)).join('');
             } catch (error) {} finally { isLoading = false; document.getElementById('loading-indicator').style.display = hasMorePosts ? 'block' : 'none'; }
         }
@@ -369,26 +355,42 @@
             const showDate = s.show_date !== false;
             let dateHtml = showDate ? `<span class="status-date">${new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}</span>` : '';
             let idBadgeHtml = secretKey ? `<span class="status-date" style="margin-right: var(--gap-item);">#${s.id}</span>` : '';
+            
+            // 🛠️ EDIT DATUM a AUTOR sa zložia do jedného riadku úplne dole doprava
             let editedHtml = (showDate && s.updated_at) ? `<div class="status-edited">EDITED: ${new Date(s.updated_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}</div>` : '';
-            return `<div class="status-card"><div style="display: flex; justify-content: space-between; align-items: center;"><div>${idBadgeHtml}${dateHtml}</div>${secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button onclick="startEdit(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></div>` : ''}</div>${s.title ? `<h3 class="status-title">${s.title}</h3>` : ''}${s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : ''}${s.text ? `<div class="status-text">${linkify(s.text)}</div>` : ''}${editedHtml}</div>`;
+            let authorHtml = (s.author && s.author.trim() !== "") ? `<div class="status-author">${s.author.trim().toUpperCase()}</div>` : '';
+            
+            let bottomInfoHtml = '';
+            if (editedHtml || authorHtml) {
+                bottomInfoHtml = `<div style="display: flex; justify-content: flex-end; gap: var(--gap-item); width: 100%; flex-wrap: wrap;">${editedHtml}${authorHtml}</div>`;
+            }
+
+            const titleHtml = s.title ? `<h3 class="status-title">${s.title}</h3>` : '';
+            const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
+            let textHtml = s.text ? `<div class="status-text">${linkify(s.text)}</div>` : '';
+            
+            let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button onclick="startEdit(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></div>` : '';
+
+            let topRowHtml = `<div style="display: flex; justify-content: space-between; align-items: center;"><div>${idBadgeHtml}${dateHtml}</div>${adminActionsHtml}</div>`;
+            
+            // 🛠️ Tu sa dole pripojí bottomInfoHtml
+            return `<div class="status-card">${topRowHtml}${titleHtml}${imageHtml}${textHtml}${bottomInfoHtml}</div>`;
         }
 
         function toggleAdvancedEditor(show) {
             const form = document.getElementById('editor-form');
-            titleInput.classList.remove('input-error'); textInput.classList.remove('input-error');
-            
-            if (show) { 
-                form.classList.add('adv-open'); 
-                titleInput.placeholder = "Title"; 
-            } else { 
-                form.classList.remove('adv-open'); editingId = null; titleInput.value = ""; textInput.value = ""; document.getElementById('edit-image').value = ""; removeImageFlag = false; currentImageUrl = null; updateImageUIState(); titleInput.placeholder = "Quick thought..."; document.getElementById('publish-btn').innerText = "PUBLISH"; 
+            titleInput.classList.remove('input-error'); textInput.classList.remove('input-error'); authorInput.classList.remove('input-error');
+            if (show) { form.classList.add('adv-open'); titleInput.placeholder = "Title"; } 
+            else { 
+                form.classList.remove('adv-open'); editingId = null; titleInput.value = ""; textInput.value = ""; authorInput.value = ""; document.getElementById('edit-image').value = ""; 
+                removeImageFlag = false; currentImageUrl = null; updateImageUIState(); titleInput.placeholder = "Quick thought..."; document.getElementById('publish-btn').innerText = "PUBLISH"; 
             }
         }
 
         function startEdit(id) {
             const post = globalPosts.find(p => p.id === id); if(!post) return;
             editingId = id; currentImageUrl = post.image_url; removeImageFlag = false;
-            titleInput.value = post.title || ""; textInput.value = post.text || "";
+            titleInput.value = post.title || ""; textInput.value = post.text || ""; authorInput.value = post.author || "";
             document.getElementById('edit-show-date').checked = post.show_date !== false;
             document.getElementById('publish-btn').innerText = "SAVE CHANGES";
             updateImageUIState(); toggleAdvancedEditor(true); window.scrollTo(0,0);
@@ -430,10 +432,13 @@
                 const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
                 const upData = await upRes.json(); finalImageUrl = upData.image_url;
             }
+            
+            // 🛠️ Odosielame aj author
+            const authorVal = authorInput.value.trim();
             const res = await fetch(editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`, {
                 method: editingId ? "PUT" : "POST",
                 headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                body: JSON.stringify({ title: titleInput.value, text: textInput.value, image_url: finalImageUrl, show_date: document.getElementById('edit-show-date').checked })
+                body: JSON.stringify({ title: titleInput.value, text: textInput.value, image_url: finalImageUrl, show_date: document.getElementById('edit-show-date').checked, author: authorVal })
             });
             if (res.ok) { fetchStatuses(true); toggleAdvancedEditor(false); }
             publishBtn.disabled = false;
@@ -444,7 +449,7 @@
             const btn = document.getElementById('quick-btn'); btn.disabled = true;
             const res = await fetch(`${API_URL}/posts`, {
                 method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                body: JSON.stringify({ title: "", text: titleInput.value, image_url: null, show_date: true })
+                body: JSON.stringify({ title: "", text: titleInput.value, image_url: null, show_date: true, author: null })
             });
             if (res.ok) { titleInput.value = ""; await fetchStatuses(true); }
             btn.disabled = false;
@@ -478,10 +483,8 @@
             fetchStatuses(true); resetDeleteAllBtn(); closeMenu();
         }
 
-        // Spustenie pri načítaní: Overenie lokálneho hesla a načítanie feedu
         checkRememberedLogin();
         fetchStatuses(true);
-        
         document.addEventListener('click', (e) => { if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); });
     </script>
 </body>
