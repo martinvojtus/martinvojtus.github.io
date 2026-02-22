@@ -218,7 +218,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.1.7 • 2026</div>
+            <div class="footer-info">build v5.1.8 • 2026</div>
         </div>
     </nav>
 
@@ -335,8 +335,26 @@
 
         function toggleAdvancedEditor(show) {
             const form = document.getElementById('editor-form');
-            if (show) { form.classList.add('adv-open'); titleInput.placeholder = "Title"; }
-            else { form.classList.remove('adv-open'); editingId = null; titleInput.value = ""; textInput.value = ""; document.getElementById('edit-image').value = ""; removeImageFlag = false; currentImageUrl = null; updateImageUIState(); titleInput.placeholder = "Quick thought..."; document.getElementById('publish-btn').innerText = "PUBLISH"; }
+            
+            // 🛠️ VYČISTENIE CHÝB PRI PREPÍNANÍ MÓDOV
+            titleInput.classList.remove('input-error');
+            textInput.classList.remove('input-error');
+            
+            if (show) { 
+                form.classList.add('adv-open'); 
+                titleInput.placeholder = "Title"; 
+            } else { 
+                form.classList.remove('adv-open'); 
+                editingId = null; 
+                titleInput.value = ""; 
+                textInput.value = ""; 
+                document.getElementById('edit-image').value = ""; 
+                removeImageFlag = false; 
+                currentImageUrl = null; 
+                updateImageUIState(); 
+                titleInput.placeholder = "Quick thought..."; 
+                document.getElementById('publish-btn').innerText = "PUBLISH"; 
+            }
         }
 
         function startEdit(id) {
