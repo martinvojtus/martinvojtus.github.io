@@ -86,11 +86,13 @@
         .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; }
 
         .menu-toggle { width: 1rem; height: 1rem; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 2100; position: relative; }
-        .line { width: 1rem; height: 1.2px; background-color: var(--black); position: absolute; }
+        /* 🛠️ OPRAVA: Zaoblenie a jemne prispôsobená hrúbka pre konzistentnosť so SVG */
+        .line { width: 1rem; height: 1.5px; background-color: var(--black); position: absolute; border-radius: 2px; }
         .line:nth-child(1) { transform: translateY(-0.25rem); }
         .line:nth-child(2) { transform: translateY(0.25rem); }
-        .menu-toggle.active .line:nth-child(1) { transform: translateY(0) rotate(45deg); }
-        .menu-toggle.active .line:nth-child(2) { transform: translateY(0) rotate(-45deg); }
+        /* 🛠️ OPRAVA: ScaleX(1.4) zabezpečí, že X bude rovnako široké ako pôvodné rovnobežné čiary */
+        .menu-toggle.active .line:nth-child(1) { transform: translateY(0) rotate(45deg) scaleX(1.4); }
+        .menu-toggle.active .line:nth-child(2) { transform: translateY(0) rotate(-45deg) scaleX(1.4); }
 
         .nav-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: auto;
@@ -248,7 +250,7 @@
                 <button onclick="handleLogout()" class="submit-btn danger-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.3.5 • 2026</div>
+            <div class="footer-info">build v5.3.6 • 2026</div>
         </div>
     </nav>
 
@@ -308,8 +310,9 @@
                                 <span id="upload-action-label" style="color: var(--black);">Upload image</span>
                                 <span id="file-name-display"></span>
                             </div>
+                            
                             <button type="button" id="clear-file-btn" data-confirm="false" class="submit-btn secondary-btn icon-btn solid-input" onclick="clearImageSelection(event)">
-                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2-2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                             </button>
                         </div>
                         
@@ -465,7 +468,8 @@
             
             let textHtml = s.text ? `<div class="status-text">${linkify(s.text)}</div>` : '';
             
-            let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button onclick="startEdit(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2-2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></div>` : '';
+            // 🛠️ OPRAVA: Aj sem (delete tlačidlo feedu) išla zjednodušená ikona koša
+            let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button onclick="startEdit(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>` : '';
 
             let topRowHtml = `<div style="display: flex; justify-content: space-between; align-items: center;"><div>${idBadgeHtml}${dateHtml}</div>${adminActionsHtml}</div>`;
             
