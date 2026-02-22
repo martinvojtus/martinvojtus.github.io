@@ -86,7 +86,8 @@
         .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; }
 
         .menu-toggle { width: 16px; height: 16px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 2100; position: relative; }
-        .line { width: 16px; height: 1px; background-color: var(--black); position: absolute; transition: transform 0.2s ease-in-out; }
+        /* Hrubka ciar menu na 1.2px */
+        .line { width: 16px; height: 1.2px; background-color: var(--black); position: absolute; transition: transform 0.2s ease-in-out; }
         .line:nth-child(1) { transform: translateY(-4px); }
         .line:nth-child(2) { transform: translateY(4px); }
         .menu-toggle.active .line:nth-child(1) { transform: translateY(0) rotate(45deg); }
@@ -140,10 +141,9 @@
             color: var(--black); cursor: pointer; 
             padding: 0; width: 48px; height: 48px; margin: 0; 
             display: inline-flex; justify-content: center; align-items: center; flex-shrink: 0;
-            transition: color 0.2s ease;
+            transition: all 0.2s ease;
         }
 
-        /* 📏 Veľkosť ikon zmenená na 1rem */
         .admin-action-btn svg, .icon-btn svg { width: 1rem; height: 1rem; display: block; }
 
         .status-title { font-size: var(--size-large); margin: 0; color: var(--black); }
@@ -168,7 +168,7 @@
         .input-error { border-color: #ff4444 !important; }
         .input-error::placeholder { color: #ff4444 !important; opacity: 1 !important; }
 
-        .submit-btn { background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .submit-btn { background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: all 0.2s ease; }
         .icon-btn { width: 48px; height: 48px; flex-shrink: 0; padding: 0; margin: 0; }
         .secondary-btn { background: transparent; color: var(--black); }
         .danger-btn { background: #ff4444 !important; color: #000000 !important; border: none !important; }
@@ -210,7 +210,7 @@
             width: 4px;
             height: 8px;
             border: solid var(--white);
-            border-width: 0 1px 1px 0;
+            border-width: 0 1.2px 1.2px 0;
             transform: rotate(45deg);
             margin-top: -2px;
             opacity: 0;
@@ -249,7 +249,7 @@
                 <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; width: 100%; gap: var(--gap-item); margin: 0;">
                     <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="flex-grow: 1; margin: 0;">
                     <button type="submit" id="login-btn" class="submit-btn icon-btn" aria-label="Log In">
-                        <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
                 </form>
             </div>
@@ -258,7 +258,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.1.4 • 2026</div>
+            <div class="footer-info">build v5.1.5 • 2026</div>
         </div>
     </nav>
 
@@ -271,10 +271,10 @@
                         
                         <div id="quick-buttons">
                             <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(true)" title="Advanced Editor" aria-label="Advanced Editor">
-                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                             </button>
                             <button type="submit" id="quick-btn" class="submit-btn icon-btn" aria-label="Post">
-                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>
                             </button>
                         </div>
                     </div>
@@ -291,8 +291,8 @@
                                 <span id="file-name-display"></span>
                             </div>
 
-                            <button type="button" id="clear-file-btn" class="submit-btn secondary-btn icon-btn" aria-label="Remove Image" onclick="clearImageSelection(event)">
-                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                            <button type="button" id="clear-file-btn" data-confirm="false" class="submit-btn secondary-btn icon-btn" aria-label="Remove Image" onclick="clearImageSelection(event)">
+                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                             </button>
                         </div>
 
@@ -306,12 +306,12 @@
                         <div style="display: flex; gap: var(--gap-item);">
                             <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
                             <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(false)" aria-label="Cancel">
-                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                             </button>
                         </div>
                         
                         <div class="divider"></div>
-                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
+                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn" style="width: 100%; margin: 0;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
                     </div>
                 </form>
             </div>
@@ -332,8 +332,8 @@
         const titleInput = document.getElementById('edit-title');
         const textInput = document.getElementById('edit-text');
 
-        const svgNormal = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>';
-        const svgSuccess = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        const svgNormal = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter"><polyline points="9 18 15 12 9 6"></polyline></svg>';
+        const svgSuccess = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter"><polyline points="20 6 9 17 4 12"></polyline></svg>';
 
         [passInput, titleInput, textInput].forEach(input => {
             if(input) input.addEventListener('input', function() {
@@ -364,8 +364,8 @@
         function handleLogout() {
             secretKey = ""; passInput.value = ''; toggleAdvancedEditor(false);
             document.body.classList.remove('is-logged-in'); closeMenu();
-            document.getElementById('delete-all-btn').dataset.state = "0"; 
-            document.getElementById('delete-all-btn').innerText = "DELETE ALL POSTS";
+            const delAll = document.getElementById('delete-all-btn');
+            delAll.dataset.state = "0"; delAll.innerText = "DELETE ALL POSTS"; delAll.classList.remove('danger-btn');
             refreshFeedUI();
         }
 
@@ -454,8 +454,8 @@
             
             let adminActionsHtml = '';
             if (secretKey) {
-                const editIcon = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>';
-                const deleteIcon = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
+                const editIcon = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>';
+                const deleteIcon = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
                 
                 adminActionsHtml = `<div style="display: flex; gap: var(--gap-item); align-items: center; margin: 0;">
                     <button onclick="startEdit(${s.id});" class="admin-action-btn" aria-label="Edit post">${editIcon}</button>
@@ -481,8 +481,10 @@
                 form.classList.remove('adv-open'); titleInput.placeholder = "Quick thought...";
                 editingId = null; titleInput.value = ""; textInput.value = ""; document.getElementById('edit-image').value = "";
                 document.getElementById('edit-show-date').checked = true; removeImageFlag = false; currentImageUrl = null;
-                updateImageUIState(); document.getElementById('delete-all-btn').dataset.state = "0"; 
-                document.getElementById('delete-all-btn').innerText = "DELETE ALL POSTS"; document.getElementById('publish-btn').innerText = "PUBLISH";
+                updateImageUIState(); 
+                const delAll = document.getElementById('delete-all-btn');
+                delAll.dataset.state = "0"; delAll.innerText = "DELETE ALL POSTS"; delAll.classList.remove('danger-btn');
+                document.getElementById('publish-btn').innerText = "PUBLISH";
             }
         }
 
@@ -503,8 +505,12 @@
             const input = document.getElementById('edit-image');
             const nameDisplay = document.getElementById('file-name-display');
             const thumbnail = document.getElementById('upload-thumbnail');
+            const clearBtn = document.getElementById('clear-file-btn');
             const hasNewFile = input.files && input.files.length > 0;
             const hasExistingImage = currentImageUrl && !removeImageFlag;
+            
+            clearBtn.classList.remove('danger-btn'); clearBtn.dataset.confirm = "false";
+            
             if (hasNewFile || hasExistingImage) {
                 wrapper.classList.add('has-image'); 
                 if (hasNewFile) { const file = input.files[0]; nameDisplay.innerText = file.name; thumbnail.src = URL.createObjectURL(file);
@@ -514,9 +520,16 @@
         
         function clearImageSelection(e) {
             e.stopPropagation();
-            const input = document.getElementById('edit-image');
-            if (input.files && input.files.length > 0) input.value = ""; else removeImageFlag = true;
-            updateImageUIState();
+            const btn = e.currentTarget;
+            if (btn.dataset.confirm === "true") {
+                const input = document.getElementById('edit-image');
+                if (input.files && input.files.length > 0) input.value = ""; else removeImageFlag = true;
+                btn.classList.remove('danger-btn'); btn.dataset.confirm = "false";
+                updateImageUIState();
+            } else {
+                btn.classList.add('danger-btn'); btn.dataset.confirm = "true";
+                setTimeout(() => { if(btn.dataset.confirm === "true") { btn.classList.remove('danger-btn'); btn.dataset.confirm = "false"; } }, 3000);
+            }
         }
 
         async function handleMainSubmit(e) { e.preventDefault(); (document.getElementById('editor-form').classList.contains('adv-open')) ? await handlePublish() : await handleQuickPost(); }
@@ -567,17 +580,15 @@
         async function handleDeleteFeed(id) {
             const btn = document.getElementById(`feed-del-btn-${id}`);
             if (btn.dataset.confirm === "true") {
-                btn.innerText = ""; btn.disabled = true; 
-                const loaderIcon = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"></path></svg>';
-                btn.innerHTML = loaderIcon;
+                btn.innerHTML = '...'; btn.disabled = true;
                 try {
                     const res = await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
                     if (res.status === 401) return handleUnauthorized();
                     fetchStatuses(true); 
-                } catch(e) { btn.innerHTML = "!"; setTimeout(() => { btn.innerHTML = svgNormal; btn.disabled = false; btn.dataset.confirm = "false"; }, 1500); }
+                } catch(e) { btn.innerHTML = "!"; setTimeout(() => { btn.innerHTML = svgNormal; btn.disabled = false; btn.dataset.confirm = "false"; btn.classList.remove('danger-btn'); }, 1500); }
             } else {
-                btn.dataset.confirm = "true"; btn.style.color = "#ff4444";
-                setTimeout(() => { if (btn.dataset.confirm === "true") { btn.dataset.confirm = "false"; btn.style.color = ""; } }, 3000);
+                btn.classList.add('danger-btn'); btn.dataset.confirm = "true";
+                setTimeout(() => { if (btn.dataset.confirm === "true") { btn.dataset.confirm = "false"; btn.classList.remove('danger-btn'); } }, 3000);
             }
         }
 
@@ -585,8 +596,8 @@
             const btn = document.getElementById('delete-all-btn');
             const state = btn.dataset.state || "0";
             if (state === "0") {
-                btn.dataset.state = "1"; btn.innerText = "CLICK TO CONFIRM";
-                setTimeout(() => { if(btn.dataset.state === "1") { btn.dataset.state = "0"; btn.innerText = "DELETE ALL POSTS"; } }, 3000);
+                btn.dataset.state = "1"; btn.innerText = "CLICK TO CONFIRM"; btn.classList.add('danger-btn');
+                setTimeout(() => { if(btn.dataset.state === "1") { btn.dataset.state = "0"; btn.innerText = "DELETE ALL POSTS"; btn.classList.remove('danger-btn'); } }, 3000);
             } else if (state === "1") { btn.dataset.state = "2"; btn.innerText = "DELETING..."; btn.disabled = true; executeDeleteAll(btn); }
         }
 
@@ -601,7 +612,7 @@
                 }
                 fetchStatuses(true);
             } catch(e) { btn.innerText = "ERROR!"; } 
-            finally { setTimeout(() => { btn.dataset.state = "0"; btn.innerText = "DELETE ALL POSTS"; btn.disabled = false; closeMenu(); }, 1000); }
+            finally { setTimeout(() => { btn.dataset.state = "0"; btn.innerText = "DELETE ALL POSTS"; btn.classList.remove('danger-btn'); btn.disabled = false; closeMenu(); }, 1000); }
         }
 
         fetchStatuses(true);
