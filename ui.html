@@ -137,7 +137,6 @@
             display: inline-flex; justify-content: center; align-items: center; flex-shrink: 0;
         }
 
-        /* 🛠️ OPRAVA: Ikonky nebudú stláčané flexboxom */
         .admin-action-btn svg, .icon-btn svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
 
         .status-title { font-size: var(--size-large); margin: 0; color: var(--black); }
@@ -149,6 +148,12 @@
             height: 3rem; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; color: var(--black); display: flex; align-items: center; gap: var(--gap-item); 
+        }
+
+        /* 🛠️ NOVÉ: Trieda pre plné polia bez okraja (Author, Upload, Checkboxy) */
+        .solid-input {
+            background-color: var(--divider) !important;
+            border: none !important;
         }
         
         .form-textarea { 
@@ -217,7 +222,7 @@
                             <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </button>
                     </div>
-                    <label class="form-input" style="cursor: pointer; justify-content: flex-start; user-select: none;">
+                    <label class="form-input solid-input" style="cursor: pointer; justify-content: flex-start; user-select: none;">
                         <input type="checkbox" id="remember-login" class="custom-checkbox">
                         <span>Remember me</span>
                     </label>
@@ -227,7 +232,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.2.5 • 2026</div>
+            <div class="footer-info">build v5.2.6 • 2026</div>
         </div>
     </nav>
 
@@ -245,12 +250,12 @@
                     <div id="advanced-section-wrapper">
                         <textarea id="edit-text" class="form-textarea" placeholder="Content"></textarea>
                         
-                        <input type="text" id="edit-author" class="form-input" placeholder="Author (optional)...">
+                        <input type="text" id="edit-author" class="form-input solid-input" placeholder="Author (optional)">
 
                         <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
                             <img id="upload-thumbnail" src="" alt="">
                             <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
-                            <div id="upload-container" class="form-input" onclick="document.getElementById('edit-image').click()">
+                            <div id="upload-container" class="form-input solid-input" onclick="document.getElementById('edit-image').click()">
                                 <span id="upload-action-label">Upload image</span>
                                 <span id="file-name-display"></span>
                             </div>
@@ -258,10 +263,12 @@
                                 <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                             </button>
                         </div>
-                        <label class="form-input" style="cursor: pointer; justify-content: flex-start; user-select: none;">
+                        
+                        <label class="form-input solid-input" style="cursor: pointer; justify-content: flex-start; user-select: none;">
                             <input type="checkbox" id="edit-show-date" class="custom-checkbox" checked>
-                            <span>Show date & time</span>
+                            <span>Show date & time post</span>
                         </label>
+                        
                         <div class="divider"></div>
                         <div style="display: flex; gap: var(--gap-item);">
                             <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
@@ -298,7 +305,8 @@
                 if(inp.id === 'edit-title') inp.placeholder = document.getElementById('editor-form').classList.contains('adv-open') ? 'Title' : 'Quick thought...';
                 if(inp.id === 'edit-text') inp.placeholder = 'Content';
                 if(inp.id === 'admin-pass') inp.placeholder = 'Password...';
-                if(inp.id === 'edit-author') inp.placeholder = 'Author (optional)...';
+                // 🛠️ OPRAVA: Aktualizácia textu pri zmiznutí error state
+                if(inp.id === 'edit-author') inp.placeholder = 'Author (optional)';
             });
         });
 
@@ -396,11 +404,7 @@
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
             let textHtml = s.text ? `<div class="status-text">${linkify(s.text)}</div>` : '';
             
-            // 🛠️ Opravený kôš a ceruzka pre post
-            let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);">
-                <button onclick="startEdit(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button>
-                <button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
-            </div>` : '';
+            let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button onclick="startEdit(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></div>` : '';
 
             let topRowHtml = `<div style="display: flex; justify-content: space-between; align-items: center;"><div>${idBadgeHtml}${dateHtml}</div>${adminActionsHtml}</div>`;
             
@@ -480,7 +484,6 @@
         async function handleQuickPost() {
             if (!titleInput.value.trim()) { titleInput.classList.add('input-error'); titleInput.placeholder = "Required!"; return; }
             const btn = document.getElementById('quick-btn'); btn.disabled = true;
-            // 🛠️ Opravená success/normal ikona
             const res = await fetch(`${API_URL}/posts`, {
                 method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
                 body: JSON.stringify({ title: "", text: titleInput.value, image_url: null, show_date: true, author: null })
