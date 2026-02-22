@@ -22,8 +22,8 @@
             --divider: rgba(0, 0, 0, 0.1);
             --glass-rgb: 255, 255, 255; 
             --content-width: 540px; 
-            --border-radius: 16px; 
-            --gap-item: 16px; 
+            --border-radius: 1rem; 
+            --gap-item: 1rem; 
             --letter-spacing: 0.05em;
             --glass-opacity: 0.6; 
             --glass-blur: 25px;   
@@ -83,10 +83,10 @@
         .header-left svg { width: 1rem; height: 1rem; display: block; }
         .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; }
 
-        .menu-toggle { width: 16px; height: 16px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 2100; position: relative; }
-        .line { width: 16px; height: 1.2px; background-color: var(--black); position: absolute; }
-        .line:nth-child(1) { transform: translateY(-4px); }
-        .line:nth-child(2) { transform: translateY(4px); }
+        .menu-toggle { width: 1rem; height: 1rem; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 2100; position: relative; }
+        .line { width: 1rem; height: 1.2px; background-color: var(--black); position: absolute; }
+        .line:nth-child(1) { transform: translateY(-0.25rem); }
+        .line:nth-child(2) { transform: translateY(0.25rem); }
         .menu-toggle.active .line:nth-child(1) { transform: translateY(0) rotate(45deg); }
         .menu-toggle.active .line:nth-child(2) { transform: translateY(0) rotate(-45deg); }
 
@@ -95,7 +95,7 @@
             background: rgba(var(--glass-rgb), var(--glass-opacity));
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 1500; 
-            padding: calc(56px + var(--gap-item)) 0 var(--gap-item) 0; 
+            padding: calc(3rem + var(--gap-item)) 0 var(--gap-item) 0; 
             display: none; flex-direction: column; align-items: center;
         }
         .nav-overlay.active { display: flex; }
@@ -104,7 +104,7 @@
         .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; display: inline-block; padding: 0; border: none; background: transparent; text-align: left; margin: 0; }
 
         main {
-            padding: calc(56px + var(--gap-item)) var(--gap-item) var(--gap-item); 
+            padding: calc(3rem + var(--gap-item)) var(--gap-item) var(--gap-item); 
             width: 100%; max-width: var(--content-width); 
             flex-grow: 1; display: flex; flex-direction: column; gap: var(--gap-item);
         }
@@ -125,13 +125,13 @@
 
         .status-date, .status-edited { 
             font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; 
-            background-color: var(--divider); padding: 0 var(--gap-item); height: 48px; 
+            background-color: var(--divider); padding: 0 var(--gap-item); height: 3rem; 
             border-radius: var(--border-radius); display: inline-flex; align-items: center; width: fit-content;
         }
 
         .admin-action-btn { 
             background-color: var(--divider); border: none; border-radius: var(--border-radius); 
-            color: var(--black); cursor: pointer; width: 48px; height: 48px; 
+            color: var(--black); cursor: pointer; width: 3rem; height: 3rem; 
             display: inline-flex; justify-content: center; align-items: center; flex-shrink: 0;
         }
 
@@ -143,7 +143,7 @@
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; }
 
         .form-input, .submit-btn { 
-            height: 48px; border: 1px solid var(--black); border-radius: var(--border-radius); 
+            height: 3rem; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; color: var(--black); display: flex; align-items: center; gap: var(--gap-item); 
         }
@@ -151,25 +151,25 @@
         .form-textarea { 
             width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: var(--gap-item); 
-            outline: none; color: var(--black); display: block; min-height: 80px; resize: vertical;
+            outline: none; color: var(--black); display: block; min-height: 5rem; resize: vertical;
         }
 
         .input-error { border-color: var(--danger) !important; }
         .input-error::placeholder { color: var(--danger) !important; opacity: 1; }
 
         .submit-btn { background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
-        .icon-btn { width: 48px; height: 48px; flex-shrink: 0; padding: 0; }
+        .icon-btn { width: 3rem; height: 3rem; flex-shrink: 0; padding: 0; }
         .secondary-btn { background: transparent; color: var(--black); }
         .danger-btn { background: var(--danger) !important; color: #000000 !important; border: none !important; }
 
-        #quick-buttons { display: flex; gap: var(--gap-item); width: 112px; margin-left: var(--gap-item); }
+        #quick-buttons { display: flex; gap: var(--gap-item); width: calc(6rem + var(--gap-item)); margin-left: var(--gap-item); }
         #editor-form.adv-open #quick-buttons { display: none; }
         #advanced-section-wrapper { display: none; flex-direction: column; gap: var(--gap-item); padding-top: var(--gap-item); }
         #editor-form.adv-open #advanced-section-wrapper { display: flex; }
         
         #upload-container { display: flex; cursor: pointer; flex-grow: 1; overflow: hidden; }
         #file-name-display { color: var(--grey-50); text-align: right; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); }
-        #upload-thumbnail { display: none; width: 48px; height: 48px; border-radius: var(--border-radius); object-fit: cover; border: 1px solid var(--black); }
+        #upload-thumbnail { display: none; width: 3rem; height: 3rem; border-radius: var(--border-radius); object-fit: cover; border: 1px solid var(--black); }
 
         #upload-ui-wrapper.has-image #upload-action-label { display: none; }
         #upload-ui-wrapper.has-image #file-name-display { color: var(--black); text-align: left; }
@@ -178,10 +178,10 @@
         #clear-file-btn { display: none; }
 
         .custom-checkbox {
-            appearance: none; width: 16px; height: 16px; border: 1px solid var(--black);
-            border-radius: 5px; cursor: pointer; display: grid; place-content: center;
+            appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black);
+            border-radius: calc(var(--border-radius) / 3); cursor: pointer; display: grid; place-content: center;
         }
-        .custom-checkbox::before { content: ""; width: 4px; height: 8px; border: solid var(--white); border-width: 0 1.2px 1.2px 0; transform: rotate(45deg); opacity: 0; }
+        .custom-checkbox::before { content: ""; width: 0.25rem; height: 0.5rem; border: solid var(--white); border-width: 0 1.2px 1.2px 0; transform: rotate(45deg); opacity: 0; margin-top: -0.125rem; }
         .custom-checkbox:checked { background-color: var(--black); }
         .custom-checkbox:checked::before { opacity: 1; }
 
@@ -218,7 +218,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.1.8 • 2026</div>
+            <div class="footer-info">build v5.1.9 • 2026</div>
         </div>
     </nav>
 
@@ -335,8 +335,6 @@
 
         function toggleAdvancedEditor(show) {
             const form = document.getElementById('editor-form');
-            
-            // 🛠️ VYČISTENIE CHÝB PRI PREPÍNANÍ MÓDOV
             titleInput.classList.remove('input-error');
             textInput.classList.remove('input-error');
             
