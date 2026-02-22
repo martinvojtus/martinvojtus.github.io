@@ -16,8 +16,6 @@
         :root {
             --size-large: 2.0rem;
             --size-small: 1.0rem;
-            /* 🛠️ NOVÉ: Micro veľkosť pre pilulky */
-            --size-micro: 0.7rem; 
             
             --black: #000000;
             --white: #ffffff;
@@ -121,7 +119,7 @@
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
         #logout-ui { display: none; }
         body.is-logged-in #login-ui { display: none; }
-        body.is-logged-in #logout-ui { display: flex; }
+        body.is-logged-in #logout-ui { flex-direction: column; gap: var(--gap-item); }
 
         .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 0; }
 
@@ -129,17 +127,19 @@
         .status-card:first-child { padding-top: 0; }
         .status-card:last-child { border-bottom: none; }
 
-        /* 🛠️ UPRAVENÉ: Micro štýly s paddingom 8px */
+        /* 🛠️ UPRAVENÉ: Plná veľkosť 1rem, výška 48px a padding 16px */
         .status-date, .status-edited { 
-            font-size: var(--size-micro); color: var(--grey-50); 
+            font-size: var(--size-small); color: var(--grey-50); 
             text-transform: uppercase; margin: 0; 
-            background-color: var(--divider); padding: 8px 12px; 
-            border-radius: var(--border-radius); display: inline-flex; align-items: center; width: fit-content;
+            background-color: var(--divider); padding: 0 var(--gap-item); 
+            height: 48px; border-radius: var(--border-radius); 
+            display: inline-flex; align-items: center; width: fit-content;
         }
         .admin-action-btn { 
             background-color: var(--divider); border: none; border-radius: var(--border-radius); 
-            font-size: var(--size-micro); color: var(--black); cursor: pointer; 
-            padding: 8px 12px; margin: 0; display: inline-flex; align-items: center; 
+            font-size: var(--size-small); color: var(--black); cursor: pointer; 
+            padding: 0 var(--gap-item); height: 48px; margin: 0; 
+            display: inline-flex; align-items: center; 
         }
 
         .status-title { font-size: var(--size-large); margin: 0; color: var(--black); }
@@ -221,8 +221,7 @@
             opacity: 1;
         }
 
-        /* 🛠️ UPRAVENÉ: Build info tiež v micro veľkosti */
-        .footer-info { font-size: var(--size-micro); color: var(--grey-50); text-transform: uppercase; text-align: left; margin: 0; }
+        .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; text-align: left; margin: 0; }
     </style>
 </head>
 <body>
@@ -257,7 +256,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.1.0 • 2026</div>
+            <div class="footer-info">build v5.1.1 • 2026</div>
         </div>
     </nav>
 
@@ -321,18 +320,9 @@
     </main>
 
     <script>
-        // Skript zostáva rovnaký ako v predošlej správe
         const API_URL = "https://mv-backend-ak8l.onrender.com";
-        let secretKey = ""; 
-        let editingId = null;
-        let globalPosts = [];
-        let currentImageUrl = null; 
-        let removeImageFlag = false; 
-
-        let currentOffset = 0;
-        const postsLimit = 10;
-        let isLoading = false;
-        let hasMorePosts = true;
+        let secretKey = ""; let editingId = null; let globalPosts = []; let currentImageUrl = null; let removeImageFlag = false; 
+        let currentOffset = 0; const postsLimit = 10; let isLoading = false; let hasMorePosts = true;
 
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
@@ -359,9 +349,7 @@
         async function handleLogin(e) {
             e.preventDefault();
             if (!passInput.value.trim()) { passInput.classList.add('input-error'); passInput.placeholder = 'Required!'; return; }
-            const tempKey = passInput.value;
-            const btn = document.getElementById('login-btn');
-            const originalIcon = btn.innerHTML;
+            const tempKey = passInput.value; const btn = document.getElementById('login-btn'); const originalIcon = btn.innerHTML;
             btn.innerHTML = '...'; btn.disabled = true;
             try {
                 const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': tempKey } });
@@ -517,11 +505,7 @@
             updateImageUIState();
         }
 
-        async function handleMainSubmit(e) {
-            e.preventDefault();
-            const isAdvanced = document.getElementById('editor-form').classList.contains('adv-open');
-            if (isAdvanced) await handlePublish(); else await handleQuickPost();
-        }
+        async function handleMainSubmit(e) { e.preventDefault(); (document.getElementById('editor-form').classList.contains('adv-open')) ? await handlePublish() : await handleQuickPost(); }
 
         async function handlePublish() {
             const title = titleInput.value.trim(); const text = textInput.value.trim();
