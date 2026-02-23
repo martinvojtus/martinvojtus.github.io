@@ -144,7 +144,6 @@
         .status-title { font-size: var(--size-large); margin: 0; color: var(--black); font-weight: 700 !important; }
         .status-image { width: 100%; height: auto; border-radius: var(--border-radius); display: block; }
         
-        /* 🛠️ OPRAVA: Pridané späť white-space: pre-line pre natívne zalamovanie textu z textarea */
         .status-text { font-size: var(--size-small); color: var(--black); opacity: 0.8; white-space: pre-line; word-wrap: break-word; margin: 0; text-align: justify; -webkit-hyphens: auto; hyphens: auto; }
 
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; }
@@ -160,7 +159,6 @@
         #edit-author { display: none; margin-bottom: var(--gap-item); }
         #editor-form.adv-open #edit-author { display: flex; }
 
-        /* 🛠️ OPRAVA: Naspäť na klasickú textarea bez vizuálnych funkcií */
         .form-textarea {
             width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); 
             background: transparent; font-size: var(--size-small); padding: var(--gap-item); 
@@ -184,8 +182,12 @@
         #upload-container { display: flex; cursor: pointer; flex-grow: 1; overflow: hidden; }
         #file-name-display { color: var(--grey-50); text-align: right; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); }
         
+        /* 🛠️ Návrat klasickej miniatúry */
+        #upload-thumbnail { display: none; width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; }
+
         #upload-ui-wrapper.has-image #upload-action-label { display: none; }
         #upload-ui-wrapper.has-image #file-name-display { color: var(--black); text-align: left; }
+        #upload-ui-wrapper.has-image #upload-thumbnail { display: block; }
         #upload-ui-wrapper.has-image #clear-file-btn { display: flex; }
         #clear-file-btn { display: none; }
 
@@ -236,7 +238,7 @@
                 <button onclick="handleLogout()" class="submit-btn danger-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.3.8 • 2026</div>
+            <div class="footer-info">build v5.3.9 • 2026</div>
         </div>
     </nav>
 
@@ -260,6 +262,8 @@
                         <textarea id="edit-text" class="form-textarea" placeholder="Content"></textarea>
                         
                         <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
+                            <img id="upload-thumbnail" src="" alt="">
+                            
                             <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                             
                             <div id="upload-container" class="form-input solid-input" onclick="document.getElementById('edit-image').click()">
@@ -443,11 +447,26 @@
         function updateImageUIState() {
             const wrapper = document.getElementById('upload-ui-wrapper');
             const input = document.getElementById('edit-image');
+            const thumbnail = document.getElementById('upload-thumbnail');
             const hasNew = input.files.length > 0; const hasOld = currentImageUrl && !removeImageFlag;
+            
             if (hasNew || hasOld) {
                 wrapper.classList.add('has-image');
-                document.getElementById('file-name-display').innerText = hasNew ? input.files[0].name : "image.jpg";
-            } else { wrapper.classList.remove('has-image'); }
+                thumbnail.src = hasNew ? URL.createObjectURL(input.files[0]) : currentImageUrl;
+                
+                // 🛠️ OPRAVA: Získanie a zobrazenie reálneho názvu súboru pri edite aj pri nahrávaní nového
+                let fileName = "image.jpg";
+                if (hasNew) {
+                    fileName = input.files[0].name;
+                } else if (hasOld && currentImageUrl) {
+                    fileName = currentImageUrl.split('/').pop().split('?')[0]; 
+                }
+                document.getElementById('file-name-display').innerText = fileName;
+                
+            } else { 
+                wrapper.classList.remove('has-image'); 
+                thumbnail.src = "";
+            }
         }
 
         function clearImageSelection(e) {
