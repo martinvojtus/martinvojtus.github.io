@@ -180,9 +180,9 @@
         #editor-form.adv-open #advanced-section-wrapper { display: flex; }
         
         #upload-container { display: flex; cursor: pointer; flex-grow: 1; overflow: hidden; }
-        #file-name-display { color: var(--grey-50); text-align: right; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; font-size: var(--size-small); }
+        /* 🛠️ OPRAVA: Pridané white-space: nowrap; aby text neuskočil na dva riadky */
+        #file-name-display { color: var(--grey-50); text-align: right; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--size-small); }
         
-        /* 🛠️ Návrat klasickej miniatúry */
         #upload-thumbnail { display: none; width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; }
 
         #upload-ui-wrapper.has-image #upload-action-label { display: none; }
@@ -238,7 +238,7 @@
                 <button onclick="handleLogout()" class="submit-btn danger-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.3.9 • 2026</div>
+            <div class="footer-info">build v5.4.0 • 2026</div>
         </div>
     </nav>
 
@@ -263,7 +263,6 @@
                         
                         <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
                             <img id="upload-thumbnail" src="" alt="">
-                            
                             <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                             
                             <div id="upload-container" class="form-input solid-input" onclick="document.getElementById('edit-image').click()">
@@ -454,13 +453,18 @@
                 wrapper.classList.add('has-image');
                 thumbnail.src = hasNew ? URL.createObjectURL(input.files[0]) : currentImageUrl;
                 
-                // 🛠️ OPRAVA: Získanie a zobrazenie reálneho názvu súboru pri edite aj pri nahrávaní nového
                 let fileName = "image.jpg";
                 if (hasNew) {
                     fileName = input.files[0].name;
                 } else if (hasOld && currentImageUrl) {
                     fileName = currentImageUrl.split('/').pop().split('?')[0]; 
                 }
+                
+                // 🛠️ Vizuálne rozseknutie textu, ak je príliš dlhý
+                if (fileName.length > 22) {
+                    fileName = fileName.substring(0, 10) + "..." + fileName.substring(fileName.length - 9);
+                }
+                
                 document.getElementById('file-name-display').innerText = fileName;
                 
             } else { 
