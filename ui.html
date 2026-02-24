@@ -121,10 +121,10 @@
         body.is-logged-in #login-ui { display: none; }
         body.is-logged-in #logout-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
 
-        .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 0; }
-        .status-card { border-bottom: 1px solid var(--divider); padding: var(--gap-item) 0; display: flex; flex-direction: column; gap: var(--gap-item); }
-        .status-card:first-child { padding-top: 0; }
-        .status-card:last-child { border-bottom: none; }
+        /* 🛠️ OPRAVA: Prekopaná logika medzier pre zamedzenie Safari chyby */
+        .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: var(--gap-item); }
+        .status-card { border-bottom: 1px solid var(--divider); padding-bottom: var(--gap-item); display: flex; flex-direction: column; gap: var(--gap-item); }
+        .status-card:last-child { border-bottom: none; padding-bottom: 0; }
 
         .status-date, .status-edited, .status-author { 
             font-size: var(--size-small); color: var(--grey-50); 
@@ -238,7 +238,7 @@
                 <button onclick="handleLogout()" class="submit-btn danger-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.4.4 • 2026</div>
+            <div class="footer-info">build v5.4.5 • 2026</div>
         </div>
     </nav>
 
@@ -355,7 +355,6 @@
 
         function refreshFeedUI() { 
             if (globalPosts.length === 0) {
-                // 🛠️ OPRAVA: Zabraňuje prepísaniu "Loading" ak sa dáta ešte len ťahajú
                 if (!isLoading) {
                     document.getElementById('status-container').innerHTML = '<div class="loading-text">Nothing here yet.</div>';
                 }
@@ -401,7 +400,6 @@
                 if (newPosts.length < postsLimit) hasMorePosts = false;
                 currentOffset += newPosts.length; globalPosts = globalPosts.concat(newPosts);
                 
-                // 🛠️ OPRAVA: Pevné určenie, ako sa vloží obsah. Odstraňuje race condition so Safari.
                 if (globalPosts.length === 0) {
                     document.getElementById('status-container').innerHTML = '<div class="loading-text">Nothing here yet.</div>';
                 } else if (reset) {
