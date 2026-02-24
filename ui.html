@@ -106,25 +106,31 @@
         .menu-items { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); }
         .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; display: inline-block; padding: 0; border: none; background: transparent; text-align: left; margin: 0; }
 
-        /* 🛠️ OPRAVA: Odstránený gap, aby nevznikali nečakané medzery nad prvým feedom */
+        /* 🛠️ OPRAVA: Zmena na čisto blokový prvok, odstránenie rizika sčítavania flex medzier */
         main {
             padding: calc(3rem + var(--gap-item)) var(--gap-item) var(--gap-item); 
             width: 100%; max-width: var(--content-width); 
-            flex-grow: 1; display: flex; flex-direction: column; 
+            flex-grow: 1; display: block; 
         }
 
-        #section-feed { display: flex; flex-direction: column; }
+        #section-feed { display: block; }
         
-        /* 🛠️ OPRAVA: Pridaný margin-bottom pre exaktné oddelenie admin zóny len keď je viditeľná */
-        body.is-logged-in #feed-admin-zone { display: flex; }
-        #feed-admin-zone { display: none; flex-direction: column; gap: var(--gap-item); padding-bottom: var(--gap-item); margin-bottom: var(--gap-item); border-bottom: 1px solid var(--divider); }
+        /* 🛠️ OPRAVA: Skrytá zóna v predvolenom stave už nemá v CSS ŽIADNE okraje */
+        #feed-admin-zone { display: none; flex-direction: column; gap: var(--gap-item); }
+        
+        /* 🛠️ OPRAVA: Okraje sa naozaj vytvoria iba vtedy, ak je panel viditeľný */
+        body.is-logged-in #feed-admin-zone { 
+            display: flex; 
+            padding-bottom: var(--gap-item); 
+            margin-bottom: var(--gap-item); 
+            border-bottom: 1px solid var(--divider); 
+        }
 
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
         #logout-ui { display: none; }
         body.is-logged-in #login-ui { display: none; }
         body.is-logged-in #logout-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
 
-        /* 🛠️ OPRAVA: Pevný gap pre feed, príspevky už nemajú padding-top, takže Safari nemá čo pokaziť */
         .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: var(--gap-item); }
         .status-card { border-bottom: 1px solid var(--divider); padding-bottom: var(--gap-item); display: flex; flex-direction: column; gap: var(--gap-item); }
         .status-card:last-child { border-bottom: none; padding-bottom: 0; }
@@ -241,7 +247,7 @@
                 <button onclick="handleLogout()" class="submit-btn danger-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.4.6 • 2026</div>
+            <div class="footer-info">build v5.4.7 • 2026</div>
         </div>
     </nav>
 
@@ -441,7 +447,11 @@
             
             let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button onclick="startEdit(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20M19 5v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5M9 5V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg></button></div>` : '';
 
-            let topRowHtml = `<div style="display: flex; justify-content: space-between; align-items: center;"><div>${idBadgeHtml}${dateHtml}</div>${adminActionsHtml}</div>`;
+            // 🛠️ OPRAVA: Iba ak vrchný riadok naozaj obsahuje nejaké dáta, inak sa vôbec nevykreslí (odstraňuje prázdnu medzeru)
+            let topRowHtml = '';
+            if (idBadgeHtml || dateHtml || adminActionsHtml) {
+                topRowHtml = `<div style="display: flex; justify-content: space-between; align-items: center;"><div>${idBadgeHtml}${dateHtml}</div>${adminActionsHtml}</div>`;
+            }
             
             return `<div class="status-card">${topRowHtml}${titleHtml}${imageHtml}${textHtml}${bottomInfoHtml}</div>`;
         }
