@@ -146,7 +146,8 @@
         
         .status-text { font-size: var(--size-small); color: var(--black); opacity: 0.8; white-space: pre-line; word-wrap: break-word; margin: 0; text-align: justify; -webkit-hyphens: auto; hyphens: auto; }
 
-        .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; }
+        /* 🛠️ OPRAVA: Opacity fixne zaručuje 50% priehľadnosť, color sa zmenil na čistú var(--black) pre správnu fúziu */
+        .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
         .form-input, .submit-btn { 
             height: 3rem; border: 1px solid var(--black); border-radius: var(--border-radius); 
@@ -237,7 +238,7 @@
                 <button onclick="handleLogout()" class="submit-btn danger-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.4.1 • 2026</div>
+            <div class="footer-info">build v5.4.2 • 2026</div>
         </div>
     </nav>
 
@@ -352,7 +353,14 @@
             resetDeleteAllBtn(); refreshFeedUI();
         }
 
-        function refreshFeedUI() { document.getElementById('status-container').innerHTML = globalPosts.map(s => renderSinglePost(s)).join(''); }
+        function refreshFeedUI() { 
+            if (globalPosts.length === 0) {
+                document.getElementById('status-container').innerHTML = '<div class="loading-text">Nothing here yet.</div>';
+            } else {
+                document.getElementById('status-container').innerHTML = globalPosts.map(s => renderSinglePost(s)).join(''); 
+            }
+        }
+        
         function linkify(text) { 
             if (text.includes('<a href=')) return text; 
             return text.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" style="color: inherit; text-decoration: none; opacity: 0.6;">$1</a>'); 
@@ -389,8 +397,17 @@
                 const newPosts = await response.json();
                 if (newPosts.length < postsLimit) hasMorePosts = false;
                 currentOffset += newPosts.length; globalPosts = globalPosts.concat(newPosts);
-                document.getElementById('status-container').innerHTML += newPosts.map(s => renderSinglePost(s)).join('');
-            } catch (error) {} finally { isLoading = false; document.getElementById('loading-indicator').style.display = hasMorePosts ? 'block' : 'none'; }
+                
+                // 🛠️ OPRAVA: Zobrazenie textu pre prázdny stav
+                if (globalPosts.length === 0) {
+                    document.getElementById('status-container').innerHTML = '<div class="loading-text">Nothing here yet.</div>';
+                } else {
+                    document.getElementById('status-container').innerHTML += newPosts.map(s => renderSinglePost(s)).join('');
+                }
+            } catch (error) {} finally { 
+                isLoading = false; 
+                document.getElementById('loading-indicator').style.display = (hasMorePosts && globalPosts.length > 0) ? 'block' : 'none'; 
+            }
         }
 
         window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
@@ -468,7 +485,6 @@
             } else { 
                 wrapper.classList.remove('has-image'); 
                 thumbnail.src = "";
-                // 🛠️ OPRAVA: Okamžité vymazanie textu s názvom súboru
                 document.getElementById('file-name-display').innerText = "";
             }
         }
