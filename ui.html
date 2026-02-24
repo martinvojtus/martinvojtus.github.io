@@ -106,22 +106,25 @@
         .menu-items { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); }
         .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; display: inline-block; padding: 0; border: none; background: transparent; text-align: left; margin: 0; }
 
+        /* 🛠️ OPRAVA: Odstránený gap, aby nevznikali nečakané medzery nad prvým feedom */
         main {
             padding: calc(3rem + var(--gap-item)) var(--gap-item) var(--gap-item); 
             width: 100%; max-width: var(--content-width); 
-            flex-grow: 1; display: flex; flex-direction: column; gap: var(--gap-item);
+            flex-grow: 1; display: flex; flex-direction: column; 
         }
 
-        #section-feed { display: flex; flex-direction: column; gap: var(--gap-item); }
+        #section-feed { display: flex; flex-direction: column; }
+        
+        /* 🛠️ OPRAVA: Pridaný margin-bottom pre exaktné oddelenie admin zóny len keď je viditeľná */
         body.is-logged-in #feed-admin-zone { display: flex; }
-        #feed-admin-zone { display: none; flex-direction: column; gap: var(--gap-item); padding-bottom: var(--gap-item); border-bottom: 1px solid var(--divider); }
+        #feed-admin-zone { display: none; flex-direction: column; gap: var(--gap-item); padding-bottom: var(--gap-item); margin-bottom: var(--gap-item); border-bottom: 1px solid var(--divider); }
 
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
         #logout-ui { display: none; }
         body.is-logged-in #login-ui { display: none; }
         body.is-logged-in #logout-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
 
-        /* 🛠️ OPRAVA: Prekopaná logika medzier pre zamedzenie Safari chyby */
+        /* 🛠️ OPRAVA: Pevný gap pre feed, príspevky už nemajú padding-top, takže Safari nemá čo pokaziť */
         .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: var(--gap-item); }
         .status-card { border-bottom: 1px solid var(--divider); padding-bottom: var(--gap-item); display: flex; flex-direction: column; gap: var(--gap-item); }
         .status-card:last-child { border-bottom: none; padding-bottom: 0; }
@@ -238,7 +241,7 @@
                 <button onclick="handleLogout()" class="submit-btn danger-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.4.5 • 2026</div>
+            <div class="footer-info">build v5.4.6 • 2026</div>
         </div>
     </nav>
 
