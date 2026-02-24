@@ -238,7 +238,7 @@
                 <button onclick="handleLogout()" class="submit-btn danger-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.4.3 • 2026</div>
+            <div class="footer-info">build v5.4.4 • 2026</div>
         </div>
     </nav>
 
@@ -355,7 +355,10 @@
 
         function refreshFeedUI() { 
             if (globalPosts.length === 0) {
-                document.getElementById('status-container').innerHTML = '<div class="loading-text">Nothing here yet.</div>';
+                // 🛠️ OPRAVA: Zabraňuje prepísaniu "Loading" ak sa dáta ešte len ťahajú
+                if (!isLoading) {
+                    document.getElementById('status-container').innerHTML = '<div class="loading-text">Nothing here yet.</div>';
+                }
             } else {
                 document.getElementById('status-container').innerHTML = globalPosts.map(s => renderSinglePost(s)).join(''); 
             }
@@ -398,8 +401,11 @@
                 if (newPosts.length < postsLimit) hasMorePosts = false;
                 currentOffset += newPosts.length; globalPosts = globalPosts.concat(newPosts);
                 
+                // 🛠️ OPRAVA: Pevné určenie, ako sa vloží obsah. Odstraňuje race condition so Safari.
                 if (globalPosts.length === 0) {
                     document.getElementById('status-container').innerHTML = '<div class="loading-text">Nothing here yet.</div>';
+                } else if (reset) {
+                    document.getElementById('status-container').innerHTML = globalPosts.map(s => renderSinglePost(s)).join('');
                 } else {
                     document.getElementById('status-container').innerHTML += newPosts.map(s => renderSinglePost(s)).join('');
                 }
