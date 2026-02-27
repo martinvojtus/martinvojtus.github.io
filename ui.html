@@ -139,8 +139,6 @@
         }
 
         .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
-        
-        /* 🛠️ OPRAVA: Odkaz Delete v príspevkoch je teraz červený */
         .admin-delete-link { cursor: pointer; color: var(--danger); text-decoration: none; }
         .admin-delete-link.confirm { font-weight: 700; }
 
@@ -169,7 +167,6 @@
         .submit-btn { text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
         .icon-btn { width: 3rem; height: 3rem; flex-shrink: 0; padding: 0; }
         
-        /* 🛠️ OPRAVA: Tlačidlo Delete All má plnú červenú farbu a čierny text */
         .danger-btn { 
             background: var(--danger) !important; 
             color: #000000 !important; 
@@ -177,8 +174,7 @@
             -webkit-backdrop-filter: none !important;
         }
 
-        /* 🛠️ OPRAVA: Nové rozloženie vnútri upload poľa s textovým odkazom DELETE */
-        #upload-container { display: flex; flex-grow: 1; overflow: hidden; padding: 0; }
+        #upload-container { display: flex; cursor: pointer; flex-grow: 1; overflow: hidden; padding: 0; }
         .upload-click-area { flex-grow: 1; display: flex; align-items: center; padding: 0 var(--gap-item); cursor: pointer; overflow: hidden; }
         #file-name-display { color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: none; }
         
@@ -190,6 +186,11 @@
         #clear-file-link.confirm { font-weight: 700; }
         
         #upload-thumbnail { display: none; width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; }
+
+        #upload-ui-wrapper.has-image #upload-action-label { display: none; }
+        #upload-ui-wrapper.has-image #file-name-display { display: block; }
+        #upload-ui-wrapper.has-image #upload-thumbnail { display: block; }
+        #upload-ui-wrapper.has-image #clear-file-link { display: flex; }
 
         .custom-checkbox {
             appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black);
@@ -265,7 +266,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.5.7 • 2026</div>
+            <div class="footer-info">build v5.5.8 • 2026</div>
         </div>
     </nav>
 
@@ -415,6 +416,7 @@
         window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
 
         function renderSinglePost(s) {
+            const showDate = s.show_date !== false;
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
             let adminBarHtml = '';
@@ -446,8 +448,8 @@
             pubBtn.innerHTML = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>';
         }
 
-        // 🛠️ OPRAVA: Prepis zobrazenia prispôsobený novému textovému DELETE tlačidlu
         function updateImageUIState() {
+            const wrapper = document.getElementById('upload-ui-wrapper');
             const input = document.getElementById('edit-image');
             const thumbnail = document.getElementById('upload-thumbnail');
             const actionLabel = document.getElementById('upload-action-label');
@@ -455,30 +457,27 @@
             const clearLink = document.getElementById('clear-file-link');
 
             if (input.files.length > 0) {
+                wrapper.classList.add('has-image');
                 thumbnail.src = URL.createObjectURL(input.files[0]);
-                thumbnail.style.display = 'block';
                 
                 let fileName = input.files[0].name;
                 if (fileName.length > 22) fileName = fileName.substring(0, 10) + "..." + fileName.substring(fileName.length - 9);
                 
                 nameDisplay.innerText = fileName;
-                nameDisplay.style.display = 'block';
                 actionLabel.style.display = 'none';
-                clearLink.style.display = 'flex';
-            } else { 
-                thumbnail.src = "";
-                thumbnail.style.display = 'none';
-                nameDisplay.innerText = "";
-                nameDisplay.style.display = 'none';
-                actionLabel.style.display = 'block';
-                clearLink.style.display = 'none';
+                
+                // Odkaz resetujeme na predvoleny stav pri vybere noveho suboru
                 clearLink.dataset.confirm = "false";
                 clearLink.innerText = "DELETE";
                 clearLink.classList.remove('confirm');
+            } else { 
+                wrapper.classList.remove('has-image'); 
+                thumbnail.src = "";
+                nameDisplay.innerText = "";
+                actionLabel.style.display = 'block';
             }
         }
 
-        // 🛠️ OPRAVA: Funkcia pre mazanie prispôsobená pre textový odkaz
         function clearImageSelection(e) {
             e.stopPropagation();
             const link = document.getElementById('clear-file-link');
@@ -507,26 +506,37 @@
                 const uc = document.getElementById('upload-container'); uc.classList.add('input-error');
                 setTimeout(() => uc.classList.remove('input-error'), 2000); return; 
             }
+            
             const publishBtn = document.getElementById('publish-btn'); 
             publishBtn.disabled = true; publishBtn.style.opacity = '0.5';
             
-            let finalImageUrl = null;
-            const compressedFile = await compressImage(imageFile);
-            const formData = new FormData(); formData.append("file", compressedFile);
-            const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
-            const upData = await upRes.json();
-            finalImageUrl = upData.image_url;
+            try {
+                let finalImageUrl = null;
+                const compressedFile = await compressImage(imageFile);
+                const formData = new FormData(); formData.append("file", compressedFile);
+                
+                const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
+                if (!upRes.ok) throw new Error("Upload failed");
+                const upData = await upRes.json();
+                finalImageUrl = upData.image_url;
 
-            const res = await fetch(`${API_URL}/posts`, {
-                method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                body: JSON.stringify({ title: null, text: null, image_url: finalImageUrl, show_date: true, author: null })
-            });
-            
-            if (res.ok) { 
-                fetchStatuses(true); 
-                publishBtn.innerHTML = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 4 9 20 2 13"></polyline></svg>'; 
-                setTimeout(() => { resetEditor(); closeMenu(); publishBtn.disabled = false; publishBtn.style.opacity = '1'; }, 1000);
-            } else { publishBtn.disabled = false; publishBtn.style.opacity = '1'; }
+                // 🛠️ OPRAVA: Pre title a text teraz posielame tvrdé "", databáza to akceptuje
+                const res = await fetch(`${API_URL}/posts`, {
+                    method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
+                    body: JSON.stringify({ title: "", text: "", image_url: finalImageUrl, show_date: true, author: "" })
+                });
+                
+                if (res.ok) { 
+                    fetchStatuses(true); 
+                    publishBtn.innerHTML = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 4 9 20 2 13"></polyline></svg>'; 
+                    setTimeout(() => { resetEditor(); closeMenu(); publishBtn.disabled = false; publishBtn.style.opacity = '1'; }, 1000);
+                } else { 
+                    publishBtn.disabled = false; publishBtn.style.opacity = '1'; 
+                }
+            } catch (err) {
+                console.error(err);
+                publishBtn.disabled = false; publishBtn.style.opacity = '1'; 
+            }
         }
 
         async function handleDeleteFeed(id) {
