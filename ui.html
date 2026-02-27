@@ -78,21 +78,10 @@
             display: flex; justify-content: space-between; align-items: center; padding: 0 var(--gap-item); 
         }
 
-        .header-left-zone { display: flex; align-items: center; height: 1rem; }
-        .brand-svg { display: block; width: 1rem; height: 1rem; flex-shrink: 0; cursor: pointer; }
-        .build-text { 
-            display: none; font-size: var(--size-small); color: var(--black); 
-            opacity: 0.5; text-transform: uppercase; line-height: 1; 
-            user-select: none; white-space: nowrap; 
-        }
-        .brand-text { 
-            position: absolute; left: 50%; transform: translateX(-50%); 
-            font-size: var(--size-small); white-space: nowrap; line-height: 1; pointer-events: none; 
-        }
-        
-        body.menu-open .brand-svg { display: none; }
-        body.menu-open .brand-text { display: none; }
-        body.menu-open .build-text { display: block; }
+        /* 🛠️ OPRAVA: Návrat k štandardnému logu a nápisu */
+        .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
+        .header-left svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
+        .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; pointer-events: none; }
 
         .menu-toggle { 
             display: flex; justify-content: center; align-items: center; 
@@ -149,7 +138,7 @@
 
         .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
         .admin-delete-link { cursor: pointer; color: var(--danger); text-decoration: none; font-weight: 400; }
-        .admin-delete-link.confirm { font-weight: 700; }
+        .admin-delete-link.confirm, #clear-file-link.confirm { font-weight: 700; }
 
         .status-image { width: 100%; height: auto; display: block; border-radius: 0; }
         
@@ -175,23 +164,8 @@
             color: var(--danger) !important; 
         }
 
-        #upload-container { display: flex; cursor: pointer; flex-grow: 1; overflow: hidden; padding: 0; }
-        .upload-click-area { flex-grow: 1; display: flex; align-items: center; padding: 0 var(--gap-item); cursor: pointer; overflow: hidden; }
-        #file-name-display { color: var(--grey-50); text-align: right; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--size-small); }
-        
-        #clear-file-link { 
-            color: var(--danger); cursor: pointer; text-transform: uppercase; 
-            padding: 0 var(--gap-item); display: none; align-items: center; 
-            border-left: 1px solid var(--divider); flex-shrink: 0;
-        }
-        #clear-file-link.confirm { font-weight: 700; }
-        
-        #upload-thumbnail { display: none; width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; }
-
-        #upload-ui-wrapper.has-image #upload-action-label { display: none; }
-        #upload-ui-wrapper.has-image #file-name-display { color: var(--black); text-align: left; }
-        #upload-ui-wrapper.has-image #upload-thumbnail { display: block; }
-        #upload-ui-wrapper.has-image #clear-file-link { display: flex; }
+        /* 🛠️ OPRAVA: Prečistený CSS kód - miniatúra teraz spoľahlivo funguje a nemá display:none */
+        #upload-thumbnail { width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; cursor: pointer; background-color: var(--divider); }
 
         .custom-checkbox {
             appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black);
@@ -201,19 +175,24 @@
         .custom-checkbox:checked { background-color: var(--black); }
         .custom-checkbox:checked::before { opacity: 1; }
 
-        .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; }
+        /* 🛠️ OPRAVA: Vycentrovaná verzia build na 100% šírke */
+        .footer-info { 
+            font-size: var(--size-small); color: var(--grey-50); 
+            text-transform: uppercase; text-align: center; width: 100%; 
+        }
     </style>
 </head>
 <body>
 
     <header>
         <div class="header-content">
-            <div class="header-left-zone">
-                <svg class="brand-svg" onclick="window.scrollTo(0,0)" xmlns="http://www.w3.org/2000/svg" viewBox="72.35 270 935.31 810" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
-                <div class="build-text">BUILD V5.7.6 • 2026</div>
+            <div class="logo-link" onclick="window.scrollTo(0,0)">
+                <div class="header-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="72.35 270 935.31 810" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
+                </div>
             </div>
+            <div class="logo-text"><span>martinvojtus</span> • space</div>
             
-            <div class="brand-text"><span>martinvojtus</span> • space</div>
             <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">MENU</div>
         </div>
     </header>
@@ -243,9 +222,9 @@
                     </div>
 
                     <div id="upload-filled-state" style="display: none; gap: var(--gap-item); width: 100%;">
-                        <img id="upload-thumbnail" src="" alt="" style="width: 3rem; height: 3rem; border-radius: var(--border-radius); object-fit: cover; cursor: pointer; background: var(--divider);" onclick="document.getElementById('edit-image').click()">
+                        <img id="upload-thumbnail" src="" alt="" onclick="document.getElementById('edit-image').click()">
                         <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">UPLOAD</button>
-                        <div id="clear-file-link" class="submit-btn danger-btn" style="cursor: pointer;" onclick="clearImageSelection(event)" data-confirm="false">DELETE</div>
+                        <div id="clear-file-link" class="submit-btn danger-btn" onclick="clearImageSelection(event)" data-confirm="false">DELETE</div>
                     </div>
                     
                     <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
@@ -256,7 +235,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v5.7.6 • 2026</div>
+            <div class="footer-info">build v5.7.7 • 2026</div>
         </div>
     </nav>
 
@@ -287,13 +266,11 @@
         function toggleMenu() { 
             const isActive = menuToggle.classList.toggle('active'); 
             navOverlay.classList.toggle('active'); 
-            document.body.classList.toggle('menu-open', isActive);
             menuToggle.innerText = isActive ? 'CLOSE' : 'MENU';
         }
         function closeMenu() { 
             menuToggle.classList.remove('active'); 
             navOverlay.classList.remove('active'); 
-            document.body.classList.remove('menu-open');
             menuToggle.innerText = 'MENU';
             resetEditor(); 
         }
