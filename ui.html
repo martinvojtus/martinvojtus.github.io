@@ -26,6 +26,7 @@
             --border-radius: 1rem; 
             --gap-item: 1rem; 
             --letter-spacing: 0.05em;
+            /* 🛠️ Nastavenie je presné: 75% farba, 20px blur */
             --glass-opacity: 0.75; 
             --glass-blur: 20px;   
             --danger: #ff4444;
@@ -69,7 +70,8 @@
         header {
             position: fixed; top: 0; left: 0; width: 100%; 
             display: flex; justify-content: center; padding: var(--gap-item) 0; 
-            background: transparent; 
+            /* 🛠️ OPRAVA: Vrátené poctivé 75% tónovanie */
+            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 2000;
         }
@@ -92,7 +94,8 @@
 
         .nav-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: auto;
-            background: transparent; 
+            /* 🛠️ OPRAVA: Vrátené poctivé 75% tónovanie */
+            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 1500; 
             padding: calc(3rem + var(--gap-item)) 0 var(--gap-item) 0; 
@@ -123,12 +126,13 @@
             overflow: hidden;
             transform: translateZ(0); 
             min-height: 3rem;
-            background-color: transparent; 
+            background-color: var(--divider); /* Opravené späť na divider */
         }
 
         .status-glass-bar {
             height: 3rem; width: 100%;
-            background: transparent; 
+            /* 🛠️ OPRAVA: Vrátené poctivé 75% tónovanie */
+            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             position: absolute; top: 0; left: 0; right: 0;
             z-index: 10;
@@ -143,10 +147,10 @@
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
-        /* 🛠️ ÚPRAVA: Input polia si zachovali sklenený vzhľad */
         .form-input { 
             height: 3rem; border: none; border-radius: var(--border-radius); 
-            background-color: transparent; 
+            /* Form input zdedil jemné sklo */
+            background-color: var(--divider); 
             backdrop-filter: blur(var(--glass-blur)); 
             -webkit-backdrop-filter: blur(var(--glass-blur));
             transform: translateZ(0);
@@ -154,7 +158,7 @@
             outline: none; color: var(--black); display: flex; align-items: center; gap: var(--gap-item); 
         }
 
-        /* 🛠️ ÚPRAVA: Tlačidlá majú teraz plnú farbu s opačným textom bez rozostrenia */
+        /* 🛠️ TVRDÉ TLAČIDLÁ (Bez skla a blurru) */
         .submit-btn { 
             height: 3rem; border: none; border-radius: var(--border-radius); 
             background-color: var(--black); 
@@ -168,20 +172,18 @@
         .input-error span { color: var(--danger) !important; }
         .input-error::placeholder { color: var(--danger) !important; opacity: 1; }
 
-        /* 🛠️ ÚPRAVA: Delete tlačidlá sú plne červené s čiernym textom */
         .danger-btn { 
             background-color: var(--danger) !important; 
             color: #000000 !important; 
         }
 
-        /* 🛠️ ÚPRAVA: Success tlačidlo je plne zelené s čiernym textom */
         .success-btn {
             background-color: var(--success) !important;
             color: #000000 !important;
             pointer-events: none; 
         }
 
-        #upload-thumbnail { width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; cursor: pointer; background-color: transparent; }
+        #upload-thumbnail { width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; cursor: pointer; background-color: var(--divider); }
 
         .custom-checkbox {
             appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black);
@@ -198,7 +200,8 @@
 
         #delete-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: transparent; 
+            /* 🛠️ OPRAVA: Vrátené poctivé 75% tónovanie */
+            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 3000;
             display: none; flex-direction: column; justify-content: center; align-items: center;
@@ -212,7 +215,8 @@
 
         .status-confirm-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: transparent; 
+            /* 🛠️ OPRAVA: Vrátené poctivé 75% tónovanie */
+            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 20;
             display: none; flex-direction: column; justify-content: center; align-items: center;
@@ -282,7 +286,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v5.9.0 • 2026</div>
+            <div class="footer-info">build v5.9.1 • 2026</div>
         </div>
     </nav>
 
