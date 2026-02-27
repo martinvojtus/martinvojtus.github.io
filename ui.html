@@ -26,6 +26,7 @@
             --border-radius: 1rem; 
             --gap-item: 1rem; 
             --letter-spacing: 0.05em;
+            /* Opacity si necháme v root pre istotu, ale nevyužívame ju */
             --glass-opacity: 0.75; 
             --glass-blur: 20px;   
             --danger: #ff4444;
@@ -69,7 +70,7 @@
         header {
             position: fixed; top: 0; left: 0; width: 100%; 
             display: flex; justify-content: center; padding: var(--gap-item) 0; 
-            background: rgba(var(--glass-rgb), var(--glass-opacity));
+            background: transparent; /* 🛠️ EXPERIMENT: Priehľadnosť */
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 2000;
         }
@@ -92,7 +93,7 @@
 
         .nav-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: auto;
-            background: rgba(var(--glass-rgb), var(--glass-opacity));
+            background: transparent; /* 🛠️ EXPERIMENT: Priehľadnosť */
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 1500; 
             padding: calc(3rem + var(--gap-item)) 0 var(--gap-item) 0; 
@@ -123,12 +124,13 @@
             overflow: hidden;
             transform: translateZ(0); 
             min-height: 3rem;
-            background-color: var(--divider);
+            /* Odstránené pozadie media wrapperu pre čistejší efekt */
+            background-color: transparent; 
         }
 
         .status-glass-bar {
             height: 3rem; width: 100%;
-            background: rgba(var(--glass-rgb), var(--glass-opacity));
+            background: transparent; /* 🛠️ EXPERIMENT: Priehľadnosť */
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             position: absolute; top: 0; left: 0; right: 0;
             z-index: 10;
@@ -139,14 +141,13 @@
         .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
         .admin-delete-link { cursor: pointer; color: var(--danger); text-decoration: none; font-weight: 400; }
 
-        /* 🛠️ OPRAVA: Zaoblený obrázok - pixely už nemajú šancu vyskočiť */
         .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); }
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
         .form-input, .submit-btn { 
             height: 3rem; border: none; border-radius: var(--border-radius); 
-            background-color: var(--divider); 
+            background-color: transparent; /* 🛠️ EXPERIMENT: Priehľadnosť */
             backdrop-filter: blur(var(--glass-blur)); 
             -webkit-backdrop-filter: blur(var(--glass-blur));
             font-size: var(--size-small); padding: 0 var(--gap-item); 
@@ -160,17 +161,17 @@
         .submit-btn { text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
         
         .danger-btn { 
-            background-color: rgba(255, 68, 68, 0.1) !important; 
+            background-color: transparent !important; /* 🛠️ EXPERIMENT: Priehľadnosť */
             color: var(--danger) !important; 
         }
 
         .success-btn {
-            background-color: rgba(46, 204, 113, 0.1) !important;
+            background-color: transparent !important; /* 🛠️ EXPERIMENT: Priehľadnosť */
             color: var(--success) !important;
             pointer-events: none; 
         }
 
-        #upload-thumbnail { width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; cursor: pointer; background-color: var(--divider); }
+        #upload-thumbnail { width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; cursor: pointer; background-color: transparent; }
 
         .custom-checkbox {
             appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black);
@@ -187,7 +188,7 @@
 
         #delete-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(var(--glass-rgb), var(--glass-opacity));
+            background: transparent; /* 🛠️ EXPERIMENT: Priehľadnosť */
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 3000;
             display: none; flex-direction: column; justify-content: center; align-items: center;
@@ -201,7 +202,7 @@
 
         .status-confirm-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(var(--glass-rgb), var(--glass-opacity));
+            background: transparent; /* 🛠️ EXPERIMENT: Priehľadnosť */
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 20;
             display: none; flex-direction: column; justify-content: center; align-items: center;
@@ -271,7 +272,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v5.8.3 • 2026</div>
+            <div class="footer-info">build v5.8.4 • 2026</div>
         </div>
     </nav>
 
