@@ -127,43 +127,19 @@
             background-color: var(--divider);
         }
 
-        /* 🛠️ EXPERIMENT: Priehľadný kontajner pre rozloženie textu */
+        /* 🛠️ OPRAVA: Návrat k čistej sklenenej lište z verzie 5.5.9 */
         .status-glass-bar {
             height: 3rem; width: 100%;
+            background: rgba(var(--glass-rgb), var(--glass-opacity));
+            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             position: absolute; top: 0; left: 0; right: 0;
             z-index: 10;
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 var(--gap-item);
         }
 
-        /* 🛠️ EXPERIMENT: Zadefinovanie textu a pozície pre sklenený obláčik */
-        .admin-bar-item { 
-            font-size: var(--size-small); 
-            color: var(--black); 
-            text-transform: uppercase; 
-            position: relative; /* Nevyhnutné pre z-index a pseudo-element */
-            z-index: 1;
-            display: flex; justify-content: center; align-items: center;
-        }
+        .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
         
-        /* 🛠️ EXPERIMENT: Radial Gradient Blur (Sklenené obláčiky) */
-        .admin-bar-item::before {
-            content: "";
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: calc(100% + 4rem); /* Rozširuje sa ďaleko za text */
-            height: 4rem; /* Vysoký kruhový obrys */
-            background: rgba(var(--glass-rgb), var(--glass-opacity));
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            /* Tu sa odohráva kúzlo: maska, ktorá roztápa sklo do stratena */
-            mask-image: radial-gradient(ellipse closest-side, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 100%);
-            -webkit-mask-image: radial-gradient(ellipse closest-side, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 100%);
-            z-index: -1;
-            pointer-events: none; /* Klikanie ide skrz obláčik priamo na linky */
-        }
-
         .admin-delete-link { cursor: pointer; color: var(--danger); text-decoration: none; font-weight: 400; }
         .admin-delete-link.confirm { font-weight: 700; }
 
@@ -185,11 +161,10 @@
         .submit-btn { text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
         .icon-btn { width: 3rem; height: 3rem; flex-shrink: 0; padding: 0; }
         
+        /* 🛠️ OPRAVA: Delete All má teraz rovnaké 10% sklenené opacity ako ostatné polia, ale v červenej farbe */
         .danger-btn { 
-            background: var(--danger) !important; 
-            color: #000000 !important; 
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
+            background-color: rgba(255, 68, 68, 0.1) !important; 
+            color: var(--danger) !important; 
         }
 
         #upload-container { display: flex; cursor: pointer; flex-grow: 1; overflow: hidden; padding: 0; }
@@ -284,7 +259,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.6.0 • 2026</div>
+            <div class="footer-info">build v5.6.1 • 2026</div>
         </div>
     </nav>
 
@@ -436,11 +411,10 @@
         function renderSinglePost(s) {
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
-            // 🛠️ OPRAVA: Prečistené tak, aby sklenenú lištu a dátum (s obláčikom) videli 100% všetci!
             let barHtml = `
             <div class="status-glass-bar">
-                ${secretKey ? `<span class="admin-bar-item"><span style="opacity: 0.6;">#${s.id}</span></span>` : '<div></div>'}
-                <span class="admin-bar-item" style="position: absolute; left: 50%; transform: translateX(-50%);"><span style="opacity: 0.6;">${formattedDate}</span></span>
+                ${secretKey ? `<span class="admin-bar-item" style="opacity: 0.5;">#${s.id}</span>` : '<div></div>'}
+                <span class="admin-bar-item" style="position: absolute; left: 50%; transform: translateX(-50%); opacity: 0.5;">${formattedDate}</span>
                 ${secretKey ? `<span id="del-link-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>` : '<div></div>'}
             </div>`;
 
