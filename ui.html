@@ -102,7 +102,6 @@
         .nav-overlay.active { display: flex; }
         
         .menu-items { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); }
-        .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; display: inline-block; padding: 0; border: none; background: transparent; text-align: left; margin: 0; }
 
         main {
             padding: calc(3rem + var(--gap-item)) var(--gap-item) var(--gap-item); 
@@ -110,32 +109,43 @@
             flex-grow: 1; display: block; 
         }
 
+        #section-feed { display: block; }
+        
+        #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
+        #logout-ui { display: none; }
         #admin-upload-zone { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; }
-        body.is-logged-in #admin-upload-zone { display: flex; }
 
         .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: var(--gap-item); }
         .status-card { border-bottom: 1px solid var(--divider); padding-bottom: var(--gap-item); display: flex; flex-direction: column; }
         .status-card:last-child { border-bottom: none; padding-bottom: 0; }
 
-        .status-image { width: 100%; height: auto; border-radius: var(--border-radius); display: block; }
-        
-        /* 🛠️ NOVÝ GLASS ADMIN BAR */
+        /* 🛠️ OPRAVA: Wrapper oreže rohy dokonale a zamedzí presvitaniu hrán (bleeding pixel) */
+        .status-media-wrapper {
+            position: relative;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transform: translateZ(0); /* Vynútenie hardvérového maskovania v Safari */
+            min-height: 3rem;
+            background-color: var(--divider);
+        }
+
+        /* 🛠️ OPRAVA: Absolútna pozícia, zrušené zaoblenie zospodu (aj zhora, to už robí wrapper) */
         .status-admin-bar {
             height: 3rem; width: 100%;
             background: rgba(var(--glass-rgb), var(--glass-opacity));
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
-            border-radius: var(--border-radius);
-            margin-bottom: -3rem; /* Zasahuje cez obrazok */
+            position: absolute; top: 0; left: 0; right: 0;
             z-index: 10;
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 var(--gap-item);
-            position: relative;
         }
 
         .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
         .admin-delete-link { cursor: pointer; color: var(--black); text-decoration: none; }
         .admin-delete-link.confirm { color: var(--danger); font-weight: 700; }
 
+        .status-image { width: 100%; height: auto; display: block; border-radius: 0; }
+        
         .status-date { 
             font-size: var(--size-small); color: var(--grey-50); 
             background-color: var(--divider); padding: 0 var(--gap-item); height: 3rem; 
@@ -152,12 +162,19 @@
         }
 
         .solid-input { background-color: var(--divider) !important; border: none !important; }
+        
+        .input-error { border: 1px solid var(--danger) !important; }
+        .input-error span { color: var(--danger) !important; }
+        .input-error::placeholder { color: var(--danger) !important; opacity: 1; }
+
         .submit-btn { background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
         .icon-btn { width: 3rem; height: 3rem; flex-shrink: 0; padding: 0; }
+        .secondary-btn { background: transparent; color: var(--black); }
         .danger-btn { background: var(--danger) !important; color: #000000 !important; border: none !important; }
 
         #upload-container { display: flex; cursor: pointer; flex-grow: 1; overflow: hidden; }
         #file-name-display { color: var(--grey-50); text-align: right; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--size-small); }
+        
         #upload-thumbnail { display: none; width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; }
 
         #upload-ui-wrapper.has-image #upload-action-label { display: none; }
@@ -193,6 +210,7 @@
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
+            
             <div id="login-ui">
                 <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                     <div style="display: flex; width: 100%; gap: var(--gap-item);">
@@ -235,13 +253,13 @@
                 </form>
             </div>
 
-            <div id="logout-ui" style="display: none;">
+            <div id="logout-ui">
                 <div class="divider" style="margin-bottom: var(--gap-item);"></div>
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.5.2 • 2026</div>
+            <div class="footer-info">build v5.5.3 • 2026</div>
         </div>
     </nav>
 
@@ -276,6 +294,21 @@
             resetEditor(); 
         }
 
+        // 🛠️ OPRAVA: Ošetrenie zobrazenia panelov priamo cez JS (zamedzenie zobrazovania loginu po prihlásení)
+        function updateUIVisibility() {
+            if (secretKey) {
+                document.body.classList.add('is-logged-in');
+                document.getElementById('login-ui').style.display = 'none';
+                document.getElementById('admin-upload-zone').style.display = 'flex';
+                document.getElementById('logout-ui').style.display = 'block';
+            } else {
+                document.body.classList.remove('is-logged-in');
+                document.getElementById('login-ui').style.display = 'flex';
+                document.getElementById('admin-upload-zone').style.display = 'none';
+                document.getElementById('logout-ui').style.display = 'none';
+            }
+        }
+
         async function checkRememberedLogin() {
             const savedKey = localStorage.getItem('mv_admin_key');
             if (savedKey) {
@@ -283,12 +316,13 @@
                     const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': savedKey } });
                     if (res.ok) { 
                         secretKey = savedKey; 
-                        document.body.classList.add('is-logged-in'); 
-                        document.getElementById('logout-ui').style.display = 'block';
+                        updateUIVisibility();
                         refreshFeedUI(); 
                     } 
-                    else { localStorage.removeItem('mv_admin_key'); }
-                } catch (e) {}
+                    else { localStorage.removeItem('mv_admin_key'); updateUIVisibility(); }
+                } catch (e) { updateUIVisibility(); }
+            } else {
+                updateUIVisibility();
             }
         }
 
@@ -300,8 +334,7 @@
                 const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': tempKey } });
                 if (res.ok) { 
                     secretKey = tempKey; 
-                    document.body.classList.add('is-logged-in'); 
-                    document.getElementById('logout-ui').style.display = 'block';
+                    updateUIVisibility();
                     closeMenu(); 
                     refreshFeedUI(); 
                     passInput.value = ''; 
@@ -313,8 +346,7 @@
         function handleLogout() {
             secretKey = ""; passInput.value = ''; 
             localStorage.removeItem('mv_admin_key');
-            document.body.classList.remove('is-logged-in'); 
-            document.getElementById('logout-ui').style.display = 'none';
+            updateUIVisibility();
             closeMenu();
             resetDeleteAllBtn(); 
             refreshFeedUI();
@@ -381,23 +413,28 @@
             const showDate = s.show_date !== false;
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
-            // 🛠️ ADMIN BAR NAD FOTKOU (iba ak prihlásený)
             let adminBarHtml = '';
             if (secretKey) {
+                // 🛠️ OPRAVA: Transparentnosť na ID aj DATE pomocou štýlu opacity
                 adminBarHtml = `
                 <div class="status-admin-bar">
-                    <span class="admin-bar-item">#${s.id}</span>
-                    <span class="admin-bar-item" style="position: absolute; left: 50%; transform: translateX(-50%);">${formattedDate}</span>
+                    <span class="admin-bar-item" style="opacity: 0.5;">#${s.id}</span>
+                    <span class="admin-bar-item" style="position: absolute; left: 50%; transform: translateX(-50%); opacity: 0.5;">${formattedDate}</span>
                     <span id="del-link-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>
                 </div>`;
             }
 
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
             
-            // 🛠️ DÁTUM POD FOTKOU (iba ak nie je admin bar a je zapnutý showDate)
             let publicDateHtml = (!secretKey && showDate) ? `<div class="status-date">${formattedDate}</div>` : '';
             
-            return `<div class="status-card">${adminBarHtml}${imageHtml}${publicDateHtml}</div>`;
+            // 🛠️ OPRAVA: Použitý spoločný skrytý wrapper pre maskovanie zaoblených hrán
+            let mediaHtml = '';
+            if (imageHtml) {
+                mediaHtml = `<div class="status-media-wrapper">${adminBarHtml}${imageHtml}</div>`;
+            }
+
+            return `<div class="status-card">${mediaHtml}${publicDateHtml}</div>`;
         }
 
         function resetEditor() {
