@@ -26,7 +26,6 @@
             --border-radius: 1rem; 
             --gap-item: 1rem; 
             --letter-spacing: 0.05em;
-            /* 🛠️ ÚPRAVA: Silnejší blur a hutnejšia priesvitnosť */
             --glass-opacity: 0.75; 
             --glass-blur: 20px;   
             --danger: #ff4444;
@@ -85,12 +84,12 @@
         .header-left svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
         .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; }
 
-        /* 🛠️ ÚPRAVA: Menu ikonka je teraz čistý text (zrušené SVG čiary) */
+        /* 🛠️ OPRAVA: Fixná výška 1rem a line-height: 0 zaručia, že to už nenafúkne hlavičku */
         .menu-toggle { 
             display: flex; justify-content: center; align-items: center; 
             cursor: pointer; z-index: 2100; position: relative;
-            font-size: 2rem; font-weight: 400; user-select: none;
-            line-height: 1; width: 1rem;
+            font-size: 1.8rem; font-weight: 400; user-select: none;
+            line-height: 0; height: 1rem; width: 1rem;
         }
 
         .nav-overlay {
@@ -240,7 +239,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.7.0 • 2026</div>
+            <div class="footer-info">build v5.7.1 • 2026</div>
         </div>
     </nav>
 
@@ -268,7 +267,6 @@
             });
         }
 
-        // 🛠️ ÚPRAVA: Logika pre dynamickú zmenu znaku v menu
         function toggleMenu() { 
             const isActive = menuToggle.classList.toggle('active'); 
             navOverlay.classList.toggle('active'); 
@@ -422,7 +420,6 @@
             pubBtn.innerText = 'UPLOAD';
         }
 
-        // 🛠️ ÚPRAVA: Logika UI pre radikálne čistý upload layout
         function updateImageUIState() {
             const input = document.getElementById('edit-image');
             const emptyState = document.getElementById('upload-empty-state');
