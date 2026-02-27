@@ -26,8 +26,7 @@
             --border-radius: 1rem; 
             --gap-item: 1rem; 
             --letter-spacing: 0.05em;
-            /* Opacity si necháme v root pre istotu, ale nevyužívame ju */
-            --glass-opacity: 0.75; 
+            --glass-opacity: 0.75; /* Premennú nechávame pre istotu, no pozadia sú teraz transparentné */
             --glass-blur: 20px;   
             --danger: #ff4444;
             --success: #2ecc71;
@@ -70,7 +69,7 @@
         header {
             position: fixed; top: 0; left: 0; width: 100%; 
             display: flex; justify-content: center; padding: var(--gap-item) 0; 
-            background: transparent; /* 🛠️ EXPERIMENT: Priehľadnosť */
+            background: transparent; 
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 2000;
         }
@@ -93,7 +92,7 @@
 
         .nav-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: auto;
-            background: transparent; /* 🛠️ EXPERIMENT: Priehľadnosť */
+            background: transparent; 
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 1500; 
             padding: calc(3rem + var(--gap-item)) 0 var(--gap-item) 0; 
@@ -124,13 +123,12 @@
             overflow: hidden;
             transform: translateZ(0); 
             min-height: 3rem;
-            /* Odstránené pozadie media wrapperu pre čistejší efekt */
             background-color: transparent; 
         }
 
         .status-glass-bar {
             height: 3rem; width: 100%;
-            background: transparent; /* 🛠️ EXPERIMENT: Priehľadnosť */
+            background: transparent; 
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             position: absolute; top: 0; left: 0; right: 0;
             z-index: 10;
@@ -145,11 +143,13 @@
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
+        /* 🛠️ OPRAVA: Tlačidlám je vrátený blur a je VYNÚTENÉ jeho vykreslenie (dvojité sklo) cez translateZ(0) */
         .form-input, .submit-btn { 
             height: 3rem; border: none; border-radius: var(--border-radius); 
-            background-color: transparent; /* 🛠️ EXPERIMENT: Priehľadnosť */
+            background-color: transparent; 
             backdrop-filter: blur(var(--glass-blur)); 
             -webkit-backdrop-filter: blur(var(--glass-blur));
+            transform: translateZ(0); /* ⚡ Hack na vynútenie GPU vrstvy a dvojitého bluru! */
             font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; color: var(--black); display: flex; align-items: center; gap: var(--gap-item); 
         }
@@ -161,12 +161,12 @@
         .submit-btn { text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
         
         .danger-btn { 
-            background-color: transparent !important; /* 🛠️ EXPERIMENT: Priehľadnosť */
+            background-color: transparent !important; 
             color: var(--danger) !important; 
         }
 
         .success-btn {
-            background-color: transparent !important; /* 🛠️ EXPERIMENT: Priehľadnosť */
+            background-color: transparent !important;
             color: var(--success) !important;
             pointer-events: none; 
         }
@@ -188,7 +188,7 @@
 
         #delete-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: transparent; /* 🛠️ EXPERIMENT: Priehľadnosť */
+            background: transparent; 
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 3000;
             display: none; flex-direction: column; justify-content: center; align-items: center;
@@ -202,7 +202,7 @@
 
         .status-confirm-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: transparent; /* 🛠️ EXPERIMENT: Priehľadnosť */
+            background: transparent; 
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 20;
             display: none; flex-direction: column; justify-content: center; align-items: center;
@@ -272,7 +272,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v5.8.4 • 2026</div>
+            <div class="footer-info">build v5.8.6 • 2026</div>
         </div>
     </nav>
 
