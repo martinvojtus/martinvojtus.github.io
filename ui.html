@@ -27,7 +27,7 @@
             --gap-item: 1rem; 
             --letter-spacing: 0.05em;
             --glass-opacity: 0.6; 
-            --glass-blur: 15px;   /* 🛠️ OPRAVA: Znížený blur z 25px na jemnejších 15px */
+            --glass-blur: 15px;   
             --danger: #ff4444;
         }
 
@@ -146,9 +146,12 @@
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
+        /* 🛠️ OPRAVA: Pridaný blur priamo na polia a tlačidlá, čím sa efekt skla sčíta s pozadím */
         .form-input, .submit-btn { 
             height: 3rem; border: none; border-radius: var(--border-radius); 
             background-color: var(--divider); 
+            backdrop-filter: blur(var(--glass-blur)); 
+            -webkit-backdrop-filter: blur(var(--glass-blur));
             font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; color: var(--black); display: flex; align-items: center; gap: var(--gap-item); 
         }
@@ -257,7 +260,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.6.2 • 2026</div>
+            <div class="footer-info">build v5.6.3 • 2026</div>
         </div>
     </nav>
 
