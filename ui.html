@@ -139,7 +139,8 @@
         .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
         .admin-delete-link { cursor: pointer; color: var(--danger); text-decoration: none; font-weight: 400; }
 
-        .status-image { width: 100%; height: auto; display: block; border-radius: 0; }
+        /* 🛠️ OPRAVA: Zaoblený obrázok - pixely už nemajú šancu vyskočiť */
+        .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); }
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
@@ -207,7 +208,6 @@
             border-radius: var(--border-radius);
         }
 
-        /* 🛠️ OPRAVA: Odstránené fixné šírky, pridané vycentrovanie a ponechaný prísny gap */
         .status-confirm-actions {
             display: flex; flex-direction: row; gap: var(--gap-item); justify-content: center;
             width: 100%; padding: 0 var(--gap-item);
@@ -271,7 +271,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v5.8.2 • 2026</div>
+            <div class="footer-info">build v5.8.3 • 2026</div>
         </div>
     </nav>
 
@@ -450,7 +450,6 @@
             
             let mediaHtml = '';
             if (imageHtml) {
-                // 🛠️ OPRAVA: Zrušený style flex: 1 z kontextových tlačidiel, šírku si berú prirodzene
                 mediaHtml = `
                 <div class="status-media-wrapper">
                     ${barHtml}${imageHtml}
