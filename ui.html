@@ -63,7 +63,7 @@
             min-height: 100vh;
         }
 
-        .menu-link, .status-date, .status-edited, .footer-info, .submit-btn, .form-input, .logo-text, .status-title {
+        .menu-link, .status-date, .status-edited, .footer-info, .submit-btn, .form-input, .logo-text {
             line-height: 1;
         }
 
@@ -114,17 +114,12 @@
 
         #section-feed { display: block; }
         
-        #feed-admin-zone { display: none; flex-direction: column; gap: var(--gap-item); }
-        body.is-logged-in #feed-admin-zone { 
-            display: flex; 
-            padding-bottom: var(--gap-item); 
-            margin-bottom: var(--gap-item); 
-            border-bottom: 1px solid var(--divider); 
-        }
-
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
         #logout-ui { display: none; }
+        #admin-upload-zone { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; }
+
         body.is-logged-in #login-ui { display: none; }
+        body.is-logged-in #admin-upload-zone { display: flex; }
         body.is-logged-in #logout-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
 
         .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: var(--gap-item); }
@@ -146,11 +141,8 @@
         }
         .admin-action-btn svg, .icon-btn svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
 
-        .status-title { font-size: var(--size-large); margin: 0; color: var(--black); font-weight: 700 !important; }
         .status-image { width: 100%; height: auto; border-radius: var(--border-radius); display: block; }
         
-        .status-text { font-size: var(--size-small); color: var(--black); opacity: 0.8; white-space: pre-line; word-wrap: break-word; margin: 0; text-align: justify; -webkit-hyphens: auto; hyphens: auto; }
-
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
         .form-input, .submit-btn { 
@@ -161,7 +153,8 @@
 
         .solid-input { background-color: var(--divider) !important; border: none !important; }
         
-        .input-error { border-color: var(--danger) !important; }
+        .input-error { border: 1px solid var(--danger) !important; }
+        .input-error span { color: var(--danger) !important; }
         .input-error::placeholder { color: var(--danger) !important; opacity: 1; }
 
         .submit-btn { background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
@@ -169,15 +162,6 @@
         .secondary-btn { background: transparent; color: var(--black); }
         .danger-btn { background: var(--danger) !important; color: #000000 !important; border: none !important; }
 
-        /* 🛠️ OPRAVA: Odstránené zbytočné fixné šírky a okraje pre dokonalé zarovnanie do gridu/flexu */
-        #quick-buttons { display: flex; gap: var(--gap-item); }
-        #adv-buttons { display: none; }
-        #editor-form.adv-open #quick-buttons { display: none; }
-        #editor-form.adv-open #adv-buttons { display: flex; gap: var(--gap-item); }
-
-        #advanced-section-wrapper { display: none; flex-direction: column; gap: var(--gap-item); padding-top: var(--gap-item); }
-        #editor-form.adv-open #advanced-section-wrapper { display: flex; }
-        
         #upload-container { display: flex; cursor: pointer; flex-grow: 1; overflow: hidden; }
         #file-name-display { color: var(--grey-50); text-align: right; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--size-small); }
         
@@ -218,6 +202,7 @@
         <div class="menu-items">
             <a class="menu-link" onclick="window.scrollTo(0,0); closeMenu();"><span>Feed</span></a>
             <div class="divider"></div>
+            
             <div id="login-ui">
                 <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                     <div style="display: flex; width: 100%; gap: var(--gap-item);">
@@ -232,66 +217,44 @@
                     </label>
                 </form>
             </div>
+
+            <div id="admin-upload-zone">
+                <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
+                    <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
+                        <img id="upload-thumbnail" src="" alt="">
+                        <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
+                        
+                        <div id="upload-container" class="form-input solid-input" onclick="document.getElementById('edit-image').click()">
+                            <span id="upload-action-label" style="color: var(--black);">Upload image</span>
+                            <span id="file-name-display"></span>
+                        </div>
+                        <button type="button" id="clear-file-btn" data-confirm="false" class="submit-btn secondary-btn icon-btn solid-input" onclick="clearImageSelection(event)">
+                            <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20M19 5v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5M9 5V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </div>
+                    
+                    <div style="display: flex; gap: var(--gap-item); width: 100%;">
+                        <label class="form-input solid-input" style="cursor: pointer; justify-content: flex-start; user-select: none; flex-grow: 1;">
+                            <input type="checkbox" id="edit-show-date" class="custom-checkbox" checked>
+                            <span>Date & time</span>
+                        </label>
+                        <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
+                    </div>
+                    <div class="divider"></div>
+                    <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
+                </form>
+            </div>
+
             <div id="logout-ui">
                 <button onclick="handleLogout()" class="submit-btn danger-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.4.9 • 2026</div>
+            <div class="footer-info">build v5.5.0 • 2026</div>
         </div>
     </nav>
 
     <main>
         <div id="section-feed">
-            <div id="feed-admin-zone">
-                <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%;">
-                    
-                    <div style="display: flex; width: 100%; gap: var(--gap-item);">
-                        <input type="text" id="edit-title" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; min-width: 0;">
-                        
-                        <div id="quick-buttons">
-                            <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(true)"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg></button>
-                            <button type="submit" id="quick-btn" class="submit-btn icon-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg></button>
-                        </div>
-                        
-                        <div id="adv-buttons">
-                            <button type="submit" id="publish-btn" class="submit-btn icon-btn">
-                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div id="advanced-section-wrapper">
-                        
-                        <input type="text" id="edit-text" class="form-input" placeholder="Content" style="width: 100%;">
-                        
-                        <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
-                            <img id="upload-thumbnail" src="" alt="">
-                            <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
-                            
-                            <div id="upload-container" class="form-input solid-input" onclick="document.getElementById('edit-image').click()">
-                                <span id="upload-action-label" style="color: var(--black);">Upload image</span>
-                                <span id="file-name-display"></span>
-                            </div>
-                            <button type="button" id="clear-file-btn" data-confirm="false" class="submit-btn secondary-btn icon-btn solid-input" onclick="clearImageSelection(event)">
-                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20M19 5v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5M9 5V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg>
-                            </button>
-                        </div>
-                        
-                        <div style="display: flex; gap: var(--gap-item); width: 100%;">
-                            <label class="form-input solid-input" style="cursor: pointer; justify-content: flex-start; user-select: none; flex-grow: 1;">
-                                <input type="checkbox" id="edit-show-date" class="custom-checkbox" checked>
-                                <span>Date & time</span>
-                            </label>
-                            <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(false)">
-                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="2" y2="22"></line><line x1="2" y1="2" x2="22" y2="22"></line></svg>
-                            </button>
-                        </div>
-                        
-                        <div class="divider"></div>
-                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
-                    </div>
-                </form>
-            </div>
             <div id="status-container" class="status-feed"></div>
             <div id="loading-indicator" class="loading-text">Loading...</div>
         </div>
@@ -303,23 +266,21 @@
         let currentOffset = 0; const postsLimit = 10; let isLoading = false; let hasMorePosts = true;
         let deleteTimer = null;
 
-        const titleInput = document.getElementById('edit-title');
-        const textInput = document.getElementById('edit-text');
         const passInput = document.getElementById('admin-pass');
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
 
-        [titleInput, textInput, passInput].forEach(inp => {
-            if(inp) inp.addEventListener('input', () => {
-                inp.classList.remove('input-error');
-                if(inp.id === 'edit-title') inp.placeholder = document.getElementById('editor-form').classList.contains('adv-open') ? 'Title' : 'Quick thought...';
-                if(inp.id === 'edit-text') inp.placeholder = 'Content';
-                if(inp.id === 'admin-pass') inp.placeholder = 'Password...';
-            });
+        if(passInput) passInput.addEventListener('input', () => {
+            passInput.classList.remove('input-error');
+            passInput.placeholder = 'Password...';
         });
 
         function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
-        function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); }
+        function closeMenu() { 
+            menuToggle.classList.remove('active'); 
+            navOverlay.classList.remove('active'); 
+            resetEditor(); // Čistenie pri zatvorení menu
+        }
 
         async function checkRememberedLogin() {
             const savedKey = localStorage.getItem('mv_admin_key');
@@ -346,7 +307,7 @@
         }
 
         function handleLogout() {
-            secretKey = ""; passInput.value = ''; toggleAdvancedEditor(false);
+            secretKey = ""; passInput.value = ''; 
             localStorage.removeItem('mv_admin_key');
             document.body.classList.remove('is-logged-in'); closeMenu();
             resetDeleteAllBtn(); refreshFeedUI();
@@ -360,11 +321,6 @@
             } else {
                 document.getElementById('status-container').innerHTML = globalPosts.map(s => renderSinglePost(s)).join(''); 
             }
-        }
-        
-        function linkify(text) { 
-            if (text.includes('<a href=')) return text; 
-            return text.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" style="color: inherit; text-decoration: none; opacity: 0.6;">$1</a>'); 
         }
 
         function compressImage(file, maxWidth = 1200, quality = 0.8) {
@@ -423,13 +379,10 @@
             
             let bottomInfoHtml = '';
             if (editedHtml) {
-                bottomInfoHtml = `<div>${editedHtml}</div>`;
+                bottomInfoHtml = `<div style="display: flex; justify-content: space-between; width: 100%; gap: var(--gap-item);"><div>${editedHtml}</div></div>`;
             }
 
-            const titleHtml = s.title ? `<h3 class="status-title">${s.title}</h3>` : '';
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
-            
-            let textHtml = s.text ? `<div class="status-text">${linkify(s.text)}</div>` : '';
             
             let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button onclick="startEdit(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20M19 5v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5M9 5V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg></button></div>` : '';
 
@@ -438,25 +391,31 @@
                 topRowHtml = `<div style="display: flex; justify-content: space-between; align-items: center;"><div>${idBadgeHtml}${dateHtml}</div>${adminActionsHtml}</div>`;
             }
             
-            return `<div class="status-card">${topRowHtml}${titleHtml}${imageHtml}${textHtml}${bottomInfoHtml}</div>`;
+            return `<div class="status-card">${topRowHtml}${imageHtml}${bottomInfoHtml}</div>`;
         }
 
-        function toggleAdvancedEditor(show) {
-            const form = document.getElementById('editor-form');
-            titleInput.classList.remove('input-error'); textInput.classList.remove('input-error');
-            if (show) { form.classList.add('adv-open'); titleInput.placeholder = "Title"; } 
-            else { 
-                form.classList.remove('adv-open'); editingId = null; titleInput.value = ""; textInput.value = ""; document.getElementById('edit-image').value = ""; 
-                removeImageFlag = false; currentImageUrl = null; updateImageUIState(); titleInput.placeholder = "Quick thought..."; 
-            }
+        // 🛠️ Zjednodušená funkcia na čistenie editora pri zavretí alebo publikovaní
+        function resetEditor() {
+            editingId = null; 
+            document.getElementById('edit-image').value = ""; 
+            removeImageFlag = false; 
+            currentImageUrl = null; 
+            updateImageUIState(); 
+            document.getElementById('publish-btn').innerText = "PUBLISH"; 
+            document.getElementById('edit-show-date').checked = true;
         }
 
         function startEdit(id) {
             const post = globalPosts.find(p => p.id === id); if(!post) return;
             editingId = id; currentImageUrl = post.image_url; removeImageFlag = false;
-            titleInput.value = post.title || ""; textInput.value = post.text || "";
             document.getElementById('edit-show-date').checked = post.show_date !== false;
-            updateImageUIState(); toggleAdvancedEditor(true); window.scrollTo(0,0);
+            document.getElementById('publish-btn').innerText = "SAVE";
+            updateImageUIState(); 
+            
+            // Otvorí menu priamo na editáciu
+            menuToggle.classList.add('active'); 
+            navOverlay.classList.add('active');
+            window.scrollTo(0,0);
         }
 
         function updateImageUIState() {
@@ -497,17 +456,12 @@
 
         async function handleMainSubmit(e) { 
             e.preventDefault(); 
-            const isAdv = document.getElementById('editor-form').classList.contains('adv-open');
-            if (isAdv) await handlePublish(); else await handleQuickPost(); 
-        }
-
-        async function handlePublish() {
-            let textVal = textInput.value.trim();
-
+            
             const hasImg = document.getElementById('edit-image').files.length > 0 || (currentImageUrl && !removeImageFlag);
-            if (!textVal && !hasImg) { 
-                textInput.classList.add('input-error'); 
-                textInput.placeholder = 'Content required!'; 
+            if (!hasImg) { 
+                const uc = document.getElementById('upload-container');
+                uc.classList.add('input-error');
+                setTimeout(() => uc.classList.remove('input-error'), 2000);
                 return; 
             }
             
@@ -519,36 +473,27 @@
             const imageFile = document.getElementById('edit-image').files[0];
             
             if (imageFile) {
+                publishBtn.innerText = "UPLOADING...";
                 const compressedFile = await compressImage(imageFile);
                 const formData = new FormData(); formData.append("file", compressedFile);
                 const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
                 const upData = await upRes.json(); finalImageUrl = upData.image_url;
             }
             
+            publishBtn.innerText = "SAVING...";
+            // Title, Text aj Author posielame do databázy úplne prázdne (null)
             const res = await fetch(editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`, {
                 method: editingId ? "PUT" : "POST",
                 headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                body: JSON.stringify({ title: titleInput.value, text: textVal, image_url: finalImageUrl, show_date: document.getElementById('edit-show-date').checked, author: null })
+                body: JSON.stringify({ title: null, text: null, image_url: finalImageUrl, show_date: document.getElementById('edit-show-date').checked, author: null })
             });
-            if (res.ok) { fetchStatuses(true); toggleAdvancedEditor(false); }
+            
+            if (res.ok) { 
+                fetchStatuses(true); 
+                closeMenu(); 
+            }
             publishBtn.disabled = false;
             publishBtn.style.opacity = '1';
-        }
-
-        async function handleQuickPost() {
-            if (!titleInput.value.trim()) { titleInput.classList.add('input-error'); titleInput.placeholder = "Required!"; return; }
-            const btn = document.getElementById('quick-btn'); btn.disabled = true;
-            const res = await fetch(`${API_URL}/posts`, {
-                method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                body: JSON.stringify({ title: "", text: titleInput.value, image_url: null, show_date: true, author: null })
-            });
-            if (res.ok) { 
-                titleInput.value = ""; 
-                await fetchStatuses(true); 
-                btn.innerHTML = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 4 9 20 2 13"></polyline></svg>'; 
-                setTimeout(() => { btn.innerHTML = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>'; }, 1000); 
-            }
-            btn.disabled = false;
         }
 
         async function handleDeleteFeed(id) {
