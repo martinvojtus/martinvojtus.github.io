@@ -143,9 +143,9 @@
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
-        /* 🛠️ OPRAVA: Pridaný plný 1px rámček farby --black pre všetky polia a tlačidlá */
+        /* 🛠️ OPRAVA: Odstránené border: 1px solid - vrátené do čistého skleneného stavu bez okraja */
         .form-input, .submit-btn { 
-            height: 3rem; border: 1px solid var(--black); border-radius: var(--border-radius); 
+            height: 3rem; border: none; border-radius: var(--border-radius); 
             background-color: var(--divider); 
             backdrop-filter: blur(var(--glass-blur)); 
             -webkit-backdrop-filter: blur(var(--glass-blur));
@@ -159,11 +159,10 @@
 
         .submit-btn { text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
         
-        /* 🛠️ OPRAVA: Pridaný plný červený rámček pre nebezpečné akcie */
+        /* 🛠️ OPRAVA: Odstránený červený border */
         .danger-btn { 
             background-color: rgba(255, 68, 68, 0.1) !important; 
             color: var(--danger) !important; 
-            border: 1px solid var(--danger) !important;
         }
 
         #upload-thumbnail { width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; cursor: pointer; background-color: var(--divider); }
@@ -235,7 +234,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v5.7.8 • 2026</div>
+            <div class="footer-info">build v5.7.9 • 2026</div>
         </div>
     </nav>
 
