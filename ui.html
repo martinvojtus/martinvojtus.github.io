@@ -103,7 +103,7 @@
 
         main {
             padding: calc(3rem + var(--gap-item)) var(--gap-item) var(--gap-item); 
-            width: 100%; max-width: var(--content-width); 
+            width: 00%; max-width: var(--content-width); 
             flex-grow: 1; display: block; 
         }
 
@@ -135,6 +135,11 @@
             padding: 0 var(--gap-item);
         }
 
+        /* 🛠️ ÚPRAVA: Ak je užívateľ prihlásený, panel nad fotkou má červený gradient sprava doľava, presne ako DELETE button */
+        body.is-logged-in .status-glass-bar {
+            background: linear-gradient(270deg, rgba(255, 68, 68, 0.1) 0%, rgba(var(--glass-rgb), var(--glass-opacity)) 100%);
+        }
+
         .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
         .admin-delete-link { cursor: pointer; color: var(--danger); text-decoration: none; font-weight: 400; }
         .admin-delete-link.confirm, #clear-file-link.confirm { font-weight: 700; }
@@ -143,7 +148,6 @@
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
-        /* 🛠️ OPRAVA: Odstránené border: 1px solid - vrátené do čistého skleneného stavu bez okraja */
         .form-input, .submit-btn { 
             height: 3rem; border: none; border-radius: var(--border-radius); 
             background-color: var(--divider); 
@@ -159,7 +163,6 @@
 
         .submit-btn { text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
         
-        /* 🛠️ OPRAVA: Odstránený červený border */
         .danger-btn { 
             background-color: rgba(255, 68, 68, 0.1) !important; 
             color: var(--danger) !important; 
@@ -234,7 +237,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v5.7.9 • 2026</div>
+            <div class="footer-info">build v5.8.0 • 2026</div>
         </div>
     </nav>
 
