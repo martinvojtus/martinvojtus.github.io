@@ -26,8 +26,9 @@
             --border-radius: 1rem; 
             --gap-item: 1rem; 
             --letter-spacing: 0.05em;
-            --glass-opacity: 0.6; 
-            --glass-blur: 15px;   
+            /* 🛠️ ÚPRAVA: Silnejší blur a hutnejšia priesvitnosť */
+            --glass-opacity: 0.75; 
+            --glass-blur: 20px;   
             --danger: #ff4444;
         }
 
@@ -84,12 +85,13 @@
         .header-left svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
         .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; }
 
-        .menu-toggle { width: 1rem; height: 1rem; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 2100; position: relative; }
-        .line { width: 1rem; height: 1px; background-color: var(--black); position: absolute; border-radius: 1px; }
-        .line:nth-child(1) { transform: translateY(-0.25rem); }
-        .line:nth-child(2) { transform: translateY(0.25rem); }
-        .menu-toggle.active .line:nth-child(1) { transform: translateY(0) rotate(45deg) scaleX(1.4); }
-        .menu-toggle.active .line:nth-child(2) { transform: translateY(0) rotate(-45deg) scaleX(1.4); }
+        /* 🛠️ ÚPRAVA: Menu ikonka je teraz čistý text (zrušené SVG čiary) */
+        .menu-toggle { 
+            display: flex; justify-content: center; align-items: center; 
+            cursor: pointer; z-index: 2100; position: relative;
+            font-size: 2rem; font-weight: 400; user-select: none;
+            line-height: 1; width: 1rem;
+        }
 
         .nav-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: auto;
@@ -138,15 +140,20 @@
         }
 
         .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
-        
         .admin-delete-link { cursor: pointer; color: var(--danger); text-decoration: none; font-weight: 400; }
         .admin-delete-link.confirm { font-weight: 700; }
 
         .status-image { width: 100%; height: auto; display: block; border-radius: 0; }
         
+        .status-date { 
+            font-size: var(--size-small); color: var(--grey-50); 
+            background-color: var(--divider); padding: 0 var(--gap-item); height: 3rem; 
+            border-radius: var(--border-radius); display: inline-flex; align-items: center; width: fit-content;
+            text-transform: uppercase; margin-top: var(--gap-item);
+        }
+
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
-        /* 🛠️ OPRAVA: Pridaný blur priamo na polia a tlačidlá, čím sa efekt skla sčíta s pozadím */
         .form-input, .submit-btn { 
             height: 3rem; border: none; border-radius: var(--border-radius); 
             background-color: var(--divider); 
@@ -161,30 +168,11 @@
         .input-error::placeholder { color: var(--danger) !important; opacity: 1; }
 
         .submit-btn { text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
-        .icon-btn { width: 3rem; height: 3rem; flex-shrink: 0; padding: 0; }
         
         .danger-btn { 
             background-color: rgba(255, 68, 68, 0.1) !important; 
             color: var(--danger) !important; 
         }
-
-        #upload-container { display: flex; cursor: pointer; flex-grow: 1; overflow: hidden; padding: 0; }
-        .upload-click-area { flex-grow: 1; display: flex; align-items: center; padding: 0 var(--gap-item); cursor: pointer; overflow: hidden; }
-        #file-name-display { color: var(--grey-50); text-align: right; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--size-small); }
-        
-        #clear-file-link { 
-            color: var(--danger); cursor: pointer; text-transform: uppercase; 
-            padding: 0 var(--gap-item); display: none; align-items: center; 
-            border-left: 1px solid var(--divider); flex-shrink: 0;
-        }
-        #clear-file-link.confirm { font-weight: 700; }
-        
-        #upload-thumbnail { display: none; width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; }
-
-        #upload-ui-wrapper.has-image #upload-action-label { display: none; }
-        #upload-ui-wrapper.has-image #file-name-display { color: var(--black); text-align: left; }
-        #upload-ui-wrapper.has-image #upload-thumbnail { display: block; }
-        #upload-ui-wrapper.has-image #clear-file-link { display: flex; }
 
         .custom-checkbox {
             appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black);
@@ -207,7 +195,7 @@
                 </div>
                 <div class="logo-text"><span>martinvojtus</span> • space</div>
             </div>
-            <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()"><div class="line"></div><div class="line"></div></div>
+            <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">+</div>
         </div>
     </header>
 
@@ -218,9 +206,7 @@
                 <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                     <div style="display: flex; width: 100%; gap: var(--gap-item);">
                         <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="flex-grow: 1; min-width: 0;">
-                        <button type="submit" id="login-btn" class="submit-btn icon-btn">
-                            <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>
-                        </button>
+                        <button type="submit" id="login-btn" class="submit-btn">LOGIN</button>
                     </div>
                     <label class="form-input" style="cursor: pointer; justify-content: flex-start; user-select: none;">
                         <input type="checkbox" id="remember-login" class="custom-checkbox">
@@ -231,22 +217,16 @@
 
             <div id="admin-upload-zone">
                 <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
-                    <div style="display: flex; gap: var(--gap-item); width: 100%;">
-                        <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); flex-grow: 1; min-width: 0;">
-                            <img id="upload-thumbnail" src="" alt="">
-                            <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
-                            
-                            <div id="upload-container" class="form-input">
-                                <div class="upload-click-area" onclick="document.getElementById('edit-image').click()">
-                                    <span id="upload-action-label" style="color: var(--black);">Upload image</span>
-                                    <span id="file-name-display"></span>
-                                </div>
-                                <div id="clear-file-link" onclick="clearImageSelection(event)" data-confirm="false">DELETE</div>
-                            </div>
-                        </div>
-                        <button type="submit" id="publish-btn" class="submit-btn icon-btn">
-                            <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>
-                        </button>
+                    <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
+                    
+                    <div id="upload-empty-state" class="form-input" style="cursor: pointer; justify-content: center;" onclick="document.getElementById('edit-image').click()">
+                        <span>+ ADD IMAGE</span>
+                    </div>
+
+                    <div id="upload-filled-state" style="display: none; gap: var(--gap-item); width: 100%;">
+                        <img id="upload-thumbnail" src="" alt="" style="width: 3rem; height: 3rem; border-radius: var(--border-radius); object-fit: cover; cursor: pointer; background: var(--divider);" onclick="document.getElementById('edit-image').click()">
+                        <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">UPLOAD</button>
+                        <div id="clear-file-link" class="submit-btn danger-btn" style="cursor: pointer;" onclick="clearImageSelection(event)" data-confirm="false">DELETE</div>
                     </div>
                     
                     <div class="divider"></div>
@@ -260,7 +240,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.6.3 • 2026</div>
+            <div class="footer-info">build v5.7.0 • 2026</div>
         </div>
     </nav>
 
@@ -288,10 +268,16 @@
             });
         }
 
-        function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
+        // 🛠️ ÚPRAVA: Logika pre dynamickú zmenu znaku v menu
+        function toggleMenu() { 
+            const isActive = menuToggle.classList.toggle('active'); 
+            navOverlay.classList.toggle('active'); 
+            menuToggle.innerText = isActive ? '×' : '+';
+        }
         function closeMenu() { 
             menuToggle.classList.remove('active'); 
             navOverlay.classList.remove('active'); 
+            menuToggle.innerText = '+';
             resetEditor(); 
         }
 
@@ -433,35 +419,29 @@
             document.getElementById('edit-image').value = ""; 
             updateImageUIState(); 
             const pubBtn = document.getElementById('publish-btn');
-            pubBtn.innerHTML = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>';
+            pubBtn.innerText = 'UPLOAD';
         }
 
+        // 🛠️ ÚPRAVA: Logika UI pre radikálne čistý upload layout
         function updateImageUIState() {
-            const wrapper = document.getElementById('upload-ui-wrapper');
             const input = document.getElementById('edit-image');
+            const emptyState = document.getElementById('upload-empty-state');
+            const filledState = document.getElementById('upload-filled-state');
             const thumbnail = document.getElementById('upload-thumbnail');
-            const actionLabel = document.getElementById('upload-action-label');
-            const nameDisplay = document.getElementById('file-name-display');
             const clearLink = document.getElementById('clear-file-link');
 
             if (input.files.length > 0) {
-                wrapper.classList.add('has-image');
                 thumbnail.src = URL.createObjectURL(input.files[0]);
-                
-                let fileName = input.files[0].name;
-                if (fileName.length > 22) fileName = fileName.substring(0, 10) + "..." + fileName.substring(fileName.length - 9);
-                
-                nameDisplay.innerText = fileName;
-                actionLabel.style.display = 'none';
+                emptyState.style.display = 'none';
+                filledState.style.display = 'flex';
                 
                 clearLink.dataset.confirm = "false";
                 clearLink.innerText = "DELETE";
                 clearLink.classList.remove('confirm');
             } else { 
-                wrapper.classList.remove('has-image'); 
                 thumbnail.src = "";
-                nameDisplay.innerText = "";
-                actionLabel.style.display = 'block';
+                emptyState.style.display = 'flex';
+                filledState.style.display = 'none';
             }
         }
 
@@ -489,13 +469,11 @@
         async function handleMainSubmit(e) { 
             e.preventDefault(); 
             const imageFile = document.getElementById('edit-image').files[0];
-            if (!imageFile) { 
-                const uc = document.getElementById('upload-container'); uc.classList.add('input-error');
-                setTimeout(() => uc.classList.remove('input-error'), 2000); return; 
-            }
+            if (!imageFile) { return; }
             
             const publishBtn = document.getElementById('publish-btn'); 
             publishBtn.disabled = true; publishBtn.style.opacity = '0.5';
+            publishBtn.innerText = 'UPLOADING...';
             
             try {
                 let finalImageUrl = null;
@@ -514,13 +492,15 @@
                 
                 if (res.ok) { 
                     fetchStatuses(true); 
-                    publishBtn.innerHTML = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 4 9 20 2 13"></polyline></svg>'; 
+                    publishBtn.innerText = 'DONE'; 
                     setTimeout(() => { resetEditor(); closeMenu(); publishBtn.disabled = false; publishBtn.style.opacity = '1'; }, 1000);
                 } else { 
+                    publishBtn.innerText = 'UPLOAD';
                     publishBtn.disabled = false; publishBtn.style.opacity = '1'; 
                 }
             } catch (err) {
                 console.error(err);
+                publishBtn.innerText = 'UPLOAD';
                 publishBtn.disabled = false; publishBtn.style.opacity = '1'; 
             }
         }
