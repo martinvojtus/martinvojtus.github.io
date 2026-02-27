@@ -103,7 +103,7 @@
 
         main {
             padding: calc(3rem + var(--gap-item)) var(--gap-item) var(--gap-item); 
-            width: 00%; max-width: var(--content-width); 
+            width: 100%; max-width: var(--content-width); /* 🛠️ OPRAVA preklepu: šírka je späť 100% */
             flex-grow: 1; display: block; 
         }
 
@@ -135,7 +135,6 @@
             padding: 0 var(--gap-item);
         }
 
-        /* 🛠️ ÚPRAVA: Ak je užívateľ prihlásený, panel nad fotkou má červený gradient sprava doľava, presne ako DELETE button */
         body.is-logged-in .status-glass-bar {
             background: linear-gradient(270deg, rgba(255, 68, 68, 0.1) 0%, rgba(var(--glass-rgb), var(--glass-opacity)) 100%);
         }
@@ -237,7 +236,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v5.8.0 • 2026</div>
+            <div class="footer-info">build v5.8.1 • 2026</div>
         </div>
     </nav>
 
