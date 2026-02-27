@@ -126,7 +126,7 @@
         .status-card { border-bottom: 1px solid var(--divider); padding-bottom: var(--gap-item); display: flex; flex-direction: column; gap: var(--gap-item); }
         .status-card:last-child { border-bottom: none; padding-bottom: 0; }
 
-        .status-date, .status-edited { 
+        .status-date { 
             font-size: var(--size-small); color: var(--grey-50); 
             background-color: var(--divider); padding: 0 var(--gap-item); height: 3rem; 
             border-radius: var(--border-radius); display: inline-flex; align-items: center; width: fit-content;
@@ -220,36 +220,43 @@
 
             <div id="admin-upload-zone">
                 <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
-                    <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
-                        <img id="upload-thumbnail" src="" alt="">
-                        <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
-                        
-                        <div id="upload-container" class="form-input solid-input" onclick="document.getElementById('edit-image').click()">
-                            <span id="upload-action-label" style="color: var(--black);">Upload image</span>
-                            <span id="file-name-display"></span>
+                    
+                    <div style="display: flex; gap: var(--gap-item); width: 100%;">
+                        <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); flex-grow: 1; min-width: 0;">
+                            <img id="upload-thumbnail" src="" alt="">
+                            <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
+                            
+                            <div id="upload-container" class="form-input solid-input" onclick="document.getElementById('edit-image').click()">
+                                <span id="upload-action-label" style="color: var(--black);">Upload image</span>
+                                <span id="file-name-display"></span>
+                            </div>
+                            <button type="button" id="clear-file-btn" data-confirm="false" class="submit-btn secondary-btn icon-btn solid-input" onclick="clearImageSelection(event)">
+                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20M19 5v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5M9 5V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
                         </div>
-                        <button type="button" id="clear-file-btn" data-confirm="false" class="submit-btn secondary-btn icon-btn solid-input" onclick="clearImageSelection(event)">
-                            <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20M19 5v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5M9 5V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg>
+                        
+                        <button type="submit" id="publish-btn" class="submit-btn icon-btn">
+                            <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>
                         </button>
                     </div>
                     
-                    <div style="display: flex; gap: var(--gap-item); width: 100%;">
-                        <label class="form-input solid-input" style="cursor: pointer; justify-content: flex-start; user-select: none; flex-grow: 1;">
-                            <input type="checkbox" id="edit-show-date" class="custom-checkbox" checked>
-                            <span>Date & time</span>
-                        </label>
-                        <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
-                    </div>
+                    <label class="form-input solid-input" style="cursor: pointer; justify-content: flex-start; user-select: none;">
+                        <input type="checkbox" id="edit-show-date" class="custom-checkbox" checked>
+                        <span>Date & time</span>
+                    </label>
+                    
                     <div class="divider"></div>
                     <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
                 </form>
             </div>
 
             <div id="logout-ui">
-                <button onclick="handleLogout()" class="submit-btn danger-btn" style="width: 100%;">LOGOUT</button>
+                <div class="divider"></div>
+                <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
+            
             <div class="divider"></div>
-            <div class="footer-info">build v5.5.0 • 2026</div>
+            <div class="footer-info">build v5.5.1 • 2026</div>
         </div>
     </nav>
 
@@ -262,7 +269,7 @@
 
     <script>
         const API_URL = "https://mv-backend-ak8l.onrender.com";
-        let secretKey = ""; let editingId = null; let globalPosts = []; let currentImageUrl = null; let removeImageFlag = false; 
+        let secretKey = ""; let globalPosts = []; 
         let currentOffset = 0; const postsLimit = 10; let isLoading = false; let hasMorePosts = true;
         let deleteTimer = null;
 
@@ -270,16 +277,18 @@
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
 
-        if(passInput) passInput.addEventListener('input', () => {
-            passInput.classList.remove('input-error');
-            passInput.placeholder = 'Password...';
-        });
+        if(passInput) {
+            passInput.addEventListener('input', () => {
+                passInput.classList.remove('input-error');
+                passInput.placeholder = 'Password...';
+            });
+        }
 
         function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
         function closeMenu() { 
             menuToggle.classList.remove('active'); 
             navOverlay.classList.remove('active'); 
-            resetEditor(); // Čistenie pri zatvorení menu
+            resetEditor(); 
         }
 
         async function checkRememberedLogin() {
@@ -375,72 +384,41 @@
             let dateHtml = showDate ? `<span class="status-date">${new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}</span>` : '';
             let idBadgeHtml = secretKey ? `<span class="status-date" style="margin-right: var(--gap-item);">#${s.id}</span>` : '';
             
-            let editedHtml = (showDate && s.updated_at) ? `<div class="status-edited">EDITED: ${new Date(s.updated_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}</div>` : '';
-            
-            let bottomInfoHtml = '';
-            if (editedHtml) {
-                bottomInfoHtml = `<div style="display: flex; justify-content: space-between; width: 100%; gap: var(--gap-item);"><div>${editedHtml}</div></div>`;
-            }
-
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
             
-            let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button onclick="startEdit(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20M19 5v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5M9 5V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg></button></div>` : '';
+            // 🛠️ Ponechané len tlačidlo na zmazanie príspevku
+            let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20M19 5v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5M9 5V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg></button></div>` : '';
 
             let topRowHtml = '';
             if (idBadgeHtml || dateHtml || adminActionsHtml) {
                 topRowHtml = `<div style="display: flex; justify-content: space-between; align-items: center;"><div>${idBadgeHtml}${dateHtml}</div>${adminActionsHtml}</div>`;
             }
             
-            return `<div class="status-card">${topRowHtml}${imageHtml}${bottomInfoHtml}</div>`;
+            return `<div class="status-card">${topRowHtml}${imageHtml}</div>`;
         }
 
-        // 🛠️ Zjednodušená funkcia na čistenie editora pri zavretí alebo publikovaní
         function resetEditor() {
-            editingId = null; 
             document.getElementById('edit-image').value = ""; 
-            removeImageFlag = false; 
-            currentImageUrl = null; 
             updateImageUIState(); 
-            document.getElementById('publish-btn').innerText = "PUBLISH"; 
+            const pubBtn = document.getElementById('publish-btn');
+            pubBtn.innerHTML = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>';
             document.getElementById('edit-show-date').checked = true;
-        }
-
-        function startEdit(id) {
-            const post = globalPosts.find(p => p.id === id); if(!post) return;
-            editingId = id; currentImageUrl = post.image_url; removeImageFlag = false;
-            document.getElementById('edit-show-date').checked = post.show_date !== false;
-            document.getElementById('publish-btn').innerText = "SAVE";
-            updateImageUIState(); 
-            
-            // Otvorí menu priamo na editáciu
-            menuToggle.classList.add('active'); 
-            navOverlay.classList.add('active');
-            window.scrollTo(0,0);
         }
 
         function updateImageUIState() {
             const wrapper = document.getElementById('upload-ui-wrapper');
             const input = document.getElementById('edit-image');
             const thumbnail = document.getElementById('upload-thumbnail');
-            const hasNew = input.files.length > 0; const hasOld = currentImageUrl && !removeImageFlag;
             
-            if (hasNew || hasOld) {
+            if (input.files.length > 0) {
                 wrapper.classList.add('has-image');
-                thumbnail.src = hasNew ? URL.createObjectURL(input.files[0]) : currentImageUrl;
+                thumbnail.src = URL.createObjectURL(input.files[0]);
                 
-                let fileName = "image.jpg";
-                if (hasNew) {
-                    fileName = input.files[0].name;
-                } else if (hasOld && currentImageUrl) {
-                    fileName = currentImageUrl.split('/').pop().split('?')[0]; 
-                }
-                
+                let fileName = input.files[0].name;
                 if (fileName.length > 22) {
                     fileName = fileName.substring(0, 10) + "..." + fileName.substring(fileName.length - 9);
                 }
-                
                 document.getElementById('file-name-display').innerText = fileName;
-                
             } else { 
                 wrapper.classList.remove('has-image'); 
                 thumbnail.src = "";
@@ -449,16 +427,27 @@
         }
 
         function clearImageSelection(e) {
+            e.stopPropagation();
             const btn = e.currentTarget;
-            if (btn.dataset.confirm === "true") { document.getElementById('edit-image').value = ""; removeImageFlag = true; btn.classList.remove('danger-btn'); btn.dataset.confirm = "false"; updateImageUIState(); }
-            else { btn.classList.add('danger-btn'); btn.dataset.confirm = "true"; setTimeout(() => { btn.classList.remove('danger-btn'); btn.dataset.confirm = "false"; }, 3000); }
+            if (btn.dataset.confirm === "true") { 
+                document.getElementById('edit-image').value = ""; 
+                btn.classList.remove('danger-btn'); 
+                btn.dataset.confirm = "false"; 
+                updateImageUIState(); 
+            } else { 
+                btn.classList.add('danger-btn'); 
+                btn.dataset.confirm = "true"; 
+                setTimeout(() => { btn.classList.remove('danger-btn'); btn.dataset.confirm = "false"; }, 3000); 
+            }
         }
 
         async function handleMainSubmit(e) { 
             e.preventDefault(); 
             
-            const hasImg = document.getElementById('edit-image').files.length > 0 || (currentImageUrl && !removeImageFlag);
-            if (!hasImg) { 
+            const imageFile = document.getElementById('edit-image').files[0];
+            
+            // Už neposielame príspevok, ak nie je nahratý obrázok!
+            if (!imageFile) { 
                 const uc = document.getElementById('upload-container');
                 uc.classList.add('input-error');
                 setTimeout(() => uc.classList.remove('input-error'), 2000);
@@ -469,31 +458,32 @@
             publishBtn.disabled = true;
             publishBtn.style.opacity = '0.5';
             
-            let finalImageUrl = currentImageUrl; if (removeImageFlag) finalImageUrl = null;
-            const imageFile = document.getElementById('edit-image').files[0];
+            let finalImageUrl = null;
             
-            if (imageFile) {
-                publishBtn.innerText = "UPLOADING...";
-                const compressedFile = await compressImage(imageFile);
-                const formData = new FormData(); formData.append("file", compressedFile);
-                const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
-                const upData = await upRes.json(); finalImageUrl = upData.image_url;
-            }
+            const compressedFile = await compressImage(imageFile);
+            const formData = new FormData(); formData.append("file", compressedFile);
+            const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
+            const upData = await upRes.json(); finalImageUrl = upData.image_url;
             
-            publishBtn.innerText = "SAVING...";
-            // Title, Text aj Author posielame do databázy úplne prázdne (null)
-            const res = await fetch(editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`, {
-                method: editingId ? "PUT" : "POST",
+            const res = await fetch(`${API_URL}/posts`, {
+                method: "POST",
                 headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
                 body: JSON.stringify({ title: null, text: null, image_url: finalImageUrl, show_date: document.getElementById('edit-show-date').checked, author: null })
             });
             
             if (res.ok) { 
                 fetchStatuses(true); 
-                closeMenu(); 
+                publishBtn.innerHTML = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 4 9 20 2 13"></polyline></svg>'; 
+                setTimeout(() => { 
+                    resetEditor();
+                    closeMenu(); 
+                    publishBtn.disabled = false;
+                    publishBtn.style.opacity = '1';
+                }, 1000);
+            } else {
+                publishBtn.disabled = false;
+                publishBtn.style.opacity = '1';
             }
-            publishBtn.disabled = false;
-            publishBtn.style.opacity = '1';
         }
 
         async function handleDeleteFeed(id) {
