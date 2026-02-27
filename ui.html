@@ -61,7 +61,7 @@
             min-height: 100vh;
         }
 
-        .menu-link, .status-date, .footer-info, .submit-btn, .form-input, .logo-text, .admin-bar-item {
+        .menu-link, .footer-info, .submit-btn, .form-input, .logo-text, .admin-bar-item {
             line-height: 1;
         }
 
@@ -116,8 +116,7 @@
         #admin-upload-zone { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; }
 
         .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: var(--gap-item); }
-        .status-card { border-bottom: 1px solid var(--divider); padding-bottom: var(--gap-item); display: flex; flex-direction: column; }
-        .status-card:last-child { border-bottom: none; padding-bottom: 0; }
+        .status-card { display: flex; flex-direction: column; }
 
         .status-media-wrapper {
             position: relative;
@@ -128,7 +127,8 @@
             background-color: var(--divider);
         }
 
-        .status-admin-bar {
+        /* 🛠️ OPRAVA: Premenované na glass-bar, keďže slúži pre všetkých na zobrazenie dátumu */
+        .status-glass-bar {
             height: 3rem; width: 100%;
             background: rgba(var(--glass-rgb), var(--glass-opacity));
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
@@ -144,13 +144,6 @@
 
         .status-image { width: 100%; height: auto; display: block; border-radius: 0; }
         
-        .status-date { 
-            font-size: var(--size-small); color: var(--grey-50); 
-            background-color: var(--divider); padding: 0 var(--gap-item); height: 3rem; 
-            border-radius: var(--border-radius); display: inline-flex; align-items: center; width: fit-content;
-            text-transform: uppercase; margin-top: var(--gap-item);
-        }
-
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
         .form-input, .submit-btn { 
@@ -176,7 +169,7 @@
 
         #upload-container { display: flex; cursor: pointer; flex-grow: 1; overflow: hidden; padding: 0; }
         .upload-click-area { flex-grow: 1; display: flex; align-items: center; padding: 0 var(--gap-item); cursor: pointer; overflow: hidden; }
-        #file-name-display { color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: none; }
+        #file-name-display { color: var(--grey-50); text-align: right; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--size-small); }
         
         #clear-file-link { 
             color: var(--danger); cursor: pointer; text-transform: uppercase; 
@@ -188,7 +181,7 @@
         #upload-thumbnail { display: none; width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; }
 
         #upload-ui-wrapper.has-image #upload-action-label { display: none; }
-        #upload-ui-wrapper.has-image #file-name-display { display: block; }
+        #upload-ui-wrapper.has-image #file-name-display { color: var(--black); text-align: left; }
         #upload-ui-wrapper.has-image #upload-thumbnail { display: block; }
         #upload-ui-wrapper.has-image #clear-file-link { display: flex; }
 
@@ -223,7 +216,7 @@
             <div id="login-ui">
                 <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                     <div style="display: flex; width: 100%; gap: var(--gap-item);">
-                        <input type="password" id="admin-pass" class="form-input" placeholder="Password...">
+                        <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="flex-grow: 1; min-width: 0;">
                         <button type="submit" id="login-btn" class="submit-btn icon-btn">
                             <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>
                         </button>
@@ -266,7 +259,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.5.8 • 2026</div>
+            <div class="footer-info">build v5.5.9 • 2026</div>
         </div>
     </nav>
 
@@ -416,29 +409,24 @@
         window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
 
         function renderSinglePost(s) {
-            const showDate = s.show_date !== false;
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
-            let adminBarHtml = '';
-            if (secretKey) {
-                adminBarHtml = `
-                <div class="status-admin-bar">
-                    <span class="admin-bar-item" style="opacity: 0.5;">#${s.id}</span>
-                    <span class="admin-bar-item" style="position: absolute; left: 50%; transform: translateX(-50%); opacity: 0.5;">${formattedDate}</span>
-                    <span id="del-link-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>
-                </div>`;
-            }
+            // 🛠️ OPRAVA: Jednotný sklenený overlay pre dátum (pre každého), a ID s košíkom iba pre admina
+            let barHtml = `
+            <div class="status-glass-bar">
+                ${secretKey ? `<span class="admin-bar-item" style="opacity: 0.5;">#${s.id}</span>` : ''}
+                <span class="admin-bar-item" style="position: absolute; left: 50%; transform: translateX(-50%); opacity: 0.5;">${formattedDate}</span>
+                ${secretKey ? `<span id="del-link-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>` : ''}
+            </div>`;
 
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
             
-            let publicDateHtml = (!secretKey) ? `<div class="status-date">${formattedDate}</div>` : '';
-            
             let mediaHtml = '';
             if (imageHtml) {
-                mediaHtml = `<div class="status-media-wrapper">${adminBarHtml}${imageHtml}</div>`;
+                mediaHtml = `<div class="status-media-wrapper">${barHtml}${imageHtml}</div>`;
             }
 
-            return `<div class="status-card">${mediaHtml}${publicDateHtml}</div>`;
+            return `<div class="status-card">${mediaHtml}</div>`;
         }
 
         function resetEditor() {
@@ -466,7 +454,6 @@
                 nameDisplay.innerText = fileName;
                 actionLabel.style.display = 'none';
                 
-                // Odkaz resetujeme na predvoleny stav pri vybere noveho suboru
                 clearLink.dataset.confirm = "false";
                 clearLink.innerText = "DELETE";
                 clearLink.classList.remove('confirm');
@@ -520,7 +507,6 @@
                 const upData = await upRes.json();
                 finalImageUrl = upData.image_url;
 
-                // 🛠️ OPRAVA: Pre title a text teraz posielame tvrdé "", databáza to akceptuje
                 const res = await fetch(`${API_URL}/posts`, {
                     method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
                     body: JSON.stringify({ title: "", text: "", image_url: finalImageUrl, show_date: true, author: "" })
