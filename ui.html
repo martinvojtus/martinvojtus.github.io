@@ -29,6 +29,7 @@
             --glass-opacity: 0.75; 
             --glass-blur: 20px;   
             --danger: #ff4444;
+            --success: #2ecc71; /* 🛠️ NOVÉ: Zelená farba pre potvrdenie */
         }
 
         @media (prefers-color-scheme: dark) {
@@ -137,13 +138,11 @@
 
         .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
         .admin-delete-link { cursor: pointer; color: var(--danger); text-decoration: none; font-weight: 400; }
-        .admin-delete-link.confirm, #clear-file-link.confirm { font-weight: 700; }
 
         .status-image { width: 100%; height: auto; display: block; border-radius: 0; }
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
-        /* 🛠️ OPRAVA: Odstránené border: 1px solid - vrátené do čistého skleneného stavu bez okraja */
         .form-input, .submit-btn { 
             height: 3rem; border: none; border-radius: var(--border-radius); 
             background-color: var(--divider); 
@@ -159,10 +158,16 @@
 
         .submit-btn { text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
         
-        /* 🛠️ OPRAVA: Odstránený červený border */
         .danger-btn { 
             background-color: rgba(255, 68, 68, 0.1) !important; 
             color: var(--danger) !important; 
+        }
+
+        /* 🛠️ NOVÉ: Zelené tlačidlo pre úspešné zmazanie */
+        .success-btn {
+            background-color: rgba(46, 204, 113, 0.1) !important;
+            color: var(--success) !important;
+            pointer-events: none; /* Nedá sa naň kliknúť */
         }
 
         #upload-thumbnail { width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; cursor: pointer; background-color: var(--divider); }
@@ -178,6 +183,21 @@
         .footer-info { 
             font-size: var(--size-small); color: var(--grey-50); 
             text-transform: uppercase; text-align: center; width: 100%; 
+        }
+
+        /* 🛠️ NOVÉ: CSS pre celoobrazovkový Delete Modal */
+        #delete-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(var(--glass-rgb), var(--glass-opacity));
+            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+            z-index: 3000;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+        }
+
+        .modal-content {
+            width: 100%; max-width: var(--content-width);
+            display: flex; flex-direction: column; gap: var(--gap-item);
+            padding: 0 var(--gap-item);
         }
     </style>
 </head>
@@ -223,10 +243,10 @@
                     <div id="upload-filled-state" style="display: none; gap: var(--gap-item); width: 100%;">
                         <img id="upload-thumbnail" src="" alt="" onclick="document.getElementById('edit-image').click()">
                         <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">UPLOAD</button>
-                        <div id="clear-file-link" class="submit-btn danger-btn" onclick="clearImageSelection(event)" data-confirm="false">DELETE</div>
+                        <div class="submit-btn danger-btn" onclick="clearImageSelection(event)">DELETE</div>
                     </div>
                     
-                    <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
+                    <button type="button" class="submit-btn danger-btn" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
                 </form>
             </div>
 
@@ -234,7 +254,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v5.7.9 • 2026</div>
+            <div class="footer-info">build v5.8.0 • 2026</div>
         </div>
     </nav>
 
@@ -245,11 +265,24 @@
         </div>
     </main>
 
+    <div id="delete-modal">
+        <div id="modal-action-zone" class="modal-content">
+            <button class="submit-btn danger-btn" style="width: 100%;" onclick="executeModalDelete()">DELETE</button>
+            <button class="submit-btn" style="width: 100%;" onclick="closeDeleteModal()">CANCEL</button>
+        </div>
+        <div id="modal-success-zone" class="modal-content" style="display: none;">
+            <div class="submit-btn success-btn" style="width: 100%;">DELETED</div>
+        </div>
+    </div>
+
     <script>
         const API_URL = "https://mv-backend-ak8l.onrender.com";
         let secretKey = ""; let globalPosts = []; 
         let currentOffset = 0; const postsLimit = 10; let isLoading = false; let hasMorePosts = true;
-        let deleteTimer = null;
+        
+        // 🛠️ NOVÉ: Premenné pre správu Delete Modalu
+        let deleteActionType = null;
+        let deleteTargetId = null;
 
         const passInput = document.getElementById('admin-pass');
         const menuToggle = document.getElementById('menuToggle');
@@ -327,7 +360,6 @@
             localStorage.removeItem('mv_admin_key');
             updateUIVisibility();
             closeMenu();
-            resetDeleteAllBtn(); 
             refreshFeedUI();
         }
 
@@ -391,11 +423,12 @@
         function renderSinglePost(s) {
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
+            // 🛠️ OPRAVA: Klik na DELETE otvorí modal
             let barHtml = `
             <div class="status-glass-bar">
                 ${secretKey ? `<span class="admin-bar-item" style="opacity: 0.5;">#${s.id}</span>` : '<div></div>'}
                 <span class="admin-bar-item" style="position: absolute; left: 50%; transform: translateX(-50%); opacity: 0.5;">${formattedDate}</span>
-                ${secretKey ? `<span id="del-link-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>` : '<div></div>'}
+                ${secretKey ? `<span onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>` : '<div></div>'}
             </div>`;
 
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
@@ -420,16 +453,11 @@
             const emptyState = document.getElementById('upload-empty-state');
             const filledState = document.getElementById('upload-filled-state');
             const thumbnail = document.getElementById('upload-thumbnail');
-            const clearLink = document.getElementById('clear-file-link');
 
             if (input.files.length > 0) {
                 thumbnail.src = URL.createObjectURL(input.files[0]);
                 emptyState.style.display = 'none';
                 filledState.style.display = 'flex';
-                
-                clearLink.dataset.confirm = "false";
-                clearLink.innerText = "DELETE";
-                clearLink.classList.remove('confirm');
             } else { 
                 thumbnail.src = "";
                 emptyState.style.display = 'flex';
@@ -437,25 +465,60 @@
             }
         }
 
+        // 🛠️ NOVÉ: Logika Delete Modalu
+        function openDeleteModal(type, id = null) {
+            deleteActionType = type;
+            deleteTargetId = id;
+            document.getElementById('modal-action-zone').style.display = 'flex';
+            document.getElementById('modal-success-zone').style.display = 'none';
+            document.getElementById('delete-modal').style.display = 'flex';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').style.display = 'none';
+            deleteActionType = null;
+            deleteTargetId = null;
+        }
+
+        async function executeModalDelete() {
+            if (deleteActionType === 'post') {
+                await fetch(`${API_URL}/posts/${deleteTargetId}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
+                fetchStatuses(true);
+            } else if (deleteActionType === 'clear_upload') {
+                document.getElementById('edit-image').value = ""; 
+                updateImageUIState(); 
+            } else if (deleteActionType === 'delete_all') {
+                const res = await fetch(`${API_URL}/posts?skip=0&limit=100`);
+                const posts = await res.json();
+                for (const p of posts) { 
+                    await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); 
+                }
+                fetchStatuses(true);
+                closeMenu();
+            }
+
+            // Ostrá zmena na zelené potvrdenie
+            document.getElementById('modal-action-zone').style.display = 'none';
+            document.getElementById('modal-success-zone').style.display = 'flex';
+            
+            // Zatvorenie po 1 sekunde
+            setTimeout(() => {
+                closeDeleteModal();
+            }, 1000);
+        }
+
+        // 🛠️ OPRAVA: Prepojenie existujúcich tlačidiel na Modal
         function clearImageSelection(e) {
             e.stopPropagation();
-            const link = document.getElementById('clear-file-link');
-            if (link.dataset.confirm === "true") { 
-                document.getElementById('edit-image').value = ""; 
-                link.classList.remove('confirm'); 
-                link.innerText = "DELETE";
-                link.dataset.confirm = "false"; 
-                updateImageUIState(); 
-            } else { 
-                link.classList.add('confirm'); 
-                link.innerText = "CONFIRM?";
-                link.dataset.confirm = "true"; 
-                setTimeout(() => { 
-                    link.classList.remove('confirm'); 
-                    link.innerText = "DELETE";
-                    link.dataset.confirm = "false"; 
-                }, 3000); 
-            }
+            openDeleteModal('clear_upload');
+        }
+
+        function handleDeleteFeed(id) {
+            openDeleteModal('post', id);
+        }
+
+        function handleDeleteAllClick() {
+            openDeleteModal('delete_all');
         }
 
         async function handleMainSubmit(e) { 
@@ -495,34 +558,6 @@
                 publishBtn.innerText = 'UPLOAD';
                 publishBtn.disabled = false; publishBtn.style.opacity = '1'; 
             }
-        }
-
-        async function handleDeleteFeed(id) {
-            const link = document.getElementById(`del-link-${id}`);
-            if (link.dataset.confirm === "true") { await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); fetchStatuses(true); }
-            else { link.classList.add('confirm'); link.innerText = "CONFIRM?"; link.dataset.confirm = "true"; setTimeout(() => { link.classList.remove('confirm'); link.innerText = "DELETE"; link.dataset.confirm = "false"; }, 3000); }
-        }
-
-        function handleDeleteAllClick() {
-            const btn = document.getElementById('delete-all-btn');
-            if (btn.dataset.state === "0") { btn.dataset.state = "1"; btn.innerText = "CLICK TO CONFIRM"; setTimeout(() => { if(btn.dataset.state === "1") resetDeleteAllBtn(); }, 3000); }
-            else if (btn.dataset.state === "1") { btn.dataset.state = "2"; startDeleteCountdown(5); }
-            else if (btn.dataset.state === "2") { stopDeleteCountdown(); }
-        }
-
-        function startDeleteCountdown(seconds) {
-            const btn = document.getElementById('delete-all-btn'); let left = seconds; btn.innerText = `CANCEL IN ${left}S`;
-            deleteTimer = setInterval(() => { left--; if (left <= 0) { clearInterval(deleteTimer); btn.innerText = "DELETING..."; btn.disabled = true; executeDeleteAll(); } else { btn.innerText = `CANCEL IN ${left}S`; } }, 1000);
-        }
-
-        function stopDeleteCountdown() { clearInterval(deleteTimer); resetDeleteAllBtn(); }
-        function resetDeleteAllBtn() { const btn = document.getElementById('delete-all-btn'); btn.dataset.state = "0"; btn.innerText = "DELETE ALL POSTS"; btn.disabled = false; }
-
-        async function executeDeleteAll() {
-            const res = await fetch(`${API_URL}/posts?skip=0&limit=100`);
-            const posts = await res.json();
-            for (const p of posts) { await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); }
-            fetchStatuses(true); resetDeleteAllBtn(); closeMenu();
         }
 
         checkRememberedLogin();
