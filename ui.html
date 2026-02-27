@@ -119,17 +119,15 @@
         .status-card { border-bottom: 1px solid var(--divider); padding-bottom: var(--gap-item); display: flex; flex-direction: column; }
         .status-card:last-child { border-bottom: none; padding-bottom: 0; }
 
-        /* 🛠️ OPRAVA: Wrapper oreže rohy dokonale a zamedzí presvitaniu hrán (bleeding pixel) */
         .status-media-wrapper {
             position: relative;
             border-radius: var(--border-radius);
             overflow: hidden;
-            transform: translateZ(0); /* Vynútenie hardvérového maskovania v Safari */
+            transform: translateZ(0); 
             min-height: 3rem;
             background-color: var(--divider);
         }
 
-        /* 🛠️ OPRAVA: Absolútna pozícia, zrušené zaoblenie zospodu (aj zhora, to už robí wrapper) */
         .status-admin-bar {
             height: 3rem; width: 100%;
             background: rgba(var(--glass-rgb), var(--glass-opacity));
@@ -155,22 +153,38 @@
 
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
+        /* 🛠️ OPRAVA: Plný Glass efekt pre všetky inputy a tlačidlá v menu */
         .form-input, .submit-btn { 
-            height: 3rem; border: 1px solid var(--black); border-radius: var(--border-radius); 
-            background: transparent; font-size: var(--size-small); padding: 0 var(--gap-item); 
-            outline: none; color: var(--black); display: flex; align-items: center; gap: var(--gap-item); 
+            height: 3rem; 
+            border: 1px solid var(--divider); /* Jemný okraj pre oddelenie od skleneného pozadia */
+            border-radius: var(--border-radius); 
+            background: rgba(var(--glass-rgb), var(--glass-opacity));
+            backdrop-filter: blur(var(--glass-blur)); 
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            font-size: var(--size-small); 
+            padding: 0 var(--gap-item); 
+            outline: none; 
+            color: var(--black); 
+            display: flex; 
+            align-items: center; 
+            gap: var(--gap-item); 
         }
-
-        .solid-input { background-color: var(--divider) !important; border: none !important; }
         
         .input-error { border: 1px solid var(--danger) !important; }
         .input-error span { color: var(--danger) !important; }
         .input-error::placeholder { color: var(--danger) !important; opacity: 1; }
 
-        .submit-btn { background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
+        .submit-btn { text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
         .icon-btn { width: 3rem; height: 3rem; flex-shrink: 0; padding: 0; }
-        .secondary-btn { background: transparent; color: var(--black); }
-        .danger-btn { background: var(--danger) !important; color: #000000 !important; border: none !important; }
+        
+        /* 🛠️ OPRAVA: Sklenený červený efekt pre nebezpečné tlačidlá */
+        .danger-btn { 
+            background: rgba(255, 68, 68, var(--glass-opacity)) !important; 
+            backdrop-filter: blur(var(--glass-blur)) !important;
+            -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
+            color: #ffffff !important; 
+            border: 1px solid rgba(255, 68, 68, 0.3) !important; 
+        }
 
         #upload-container { display: flex; cursor: pointer; flex-grow: 1; overflow: hidden; }
         #file-name-display { color: var(--grey-50); text-align: right; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--size-small); }
@@ -219,7 +233,7 @@
                             <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>
                         </button>
                     </div>
-                    <label class="form-input solid-input" style="cursor: pointer; justify-content: flex-start; user-select: none;">
+                    <label class="form-input" style="cursor: pointer; justify-content: flex-start; user-select: none;">
                         <input type="checkbox" id="remember-login" class="custom-checkbox">
                         <span>Remember me</span>
                     </label>
@@ -232,11 +246,11 @@
                         <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); flex-grow: 1; min-width: 0;">
                             <img id="upload-thumbnail" src="" alt="">
                             <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
-                            <div id="upload-container" class="form-input solid-input" onclick="document.getElementById('edit-image').click()">
+                            <div id="upload-container" class="form-input" onclick="document.getElementById('edit-image').click()">
                                 <span id="upload-action-label" style="color: var(--black);">Upload image</span>
                                 <span id="file-name-display"></span>
                             </div>
-                            <button type="button" id="clear-file-btn" data-confirm="false" class="submit-btn secondary-btn icon-btn solid-input" onclick="clearImageSelection(event)">
+                            <button type="button" id="clear-file-btn" data-confirm="false" class="submit-btn icon-btn" onclick="clearImageSelection(event)">
                                 <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20M19 5v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5M9 5V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg>
                             </button>
                         </div>
@@ -244,22 +258,19 @@
                             <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>
                         </button>
                     </div>
-                    <label class="form-input solid-input" style="cursor: pointer; justify-content: flex-start; user-select: none;">
-                        <input type="checkbox" id="edit-show-date" class="custom-checkbox" checked>
-                        <span>Date & time</span>
-                    </label>
+                    
                     <div class="divider"></div>
                     <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
                 </form>
             </div>
 
-            <div id="logout-ui">
+            <div id="logout-ui" style="display: none;">
                 <div class="divider" style="margin-bottom: var(--gap-item);"></div>
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.5.3 • 2026</div>
+            <div class="footer-info">build v5.5.4 • 2026</div>
         </div>
     </nav>
 
@@ -294,7 +305,6 @@
             resetEditor(); 
         }
 
-        // 🛠️ OPRAVA: Ošetrenie zobrazenia panelov priamo cez JS (zamedzenie zobrazovania loginu po prihlásení)
         function updateUIVisibility() {
             if (secretKey) {
                 document.body.classList.add('is-logged-in');
@@ -415,7 +425,6 @@
             
             let adminBarHtml = '';
             if (secretKey) {
-                // 🛠️ OPRAVA: Transparentnosť na ID aj DATE pomocou štýlu opacity
                 adminBarHtml = `
                 <div class="status-admin-bar">
                     <span class="admin-bar-item" style="opacity: 0.5;">#${s.id}</span>
@@ -428,7 +437,6 @@
             
             let publicDateHtml = (!secretKey && showDate) ? `<div class="status-date">${formattedDate}</div>` : '';
             
-            // 🛠️ OPRAVA: Použitý spoločný skrytý wrapper pre maskovanie zaoblených hrán
             let mediaHtml = '';
             if (imageHtml) {
                 mediaHtml = `<div class="status-media-wrapper">${adminBarHtml}${imageHtml}</div>`;
@@ -442,7 +450,6 @@
             updateImageUIState(); 
             const pubBtn = document.getElementById('publish-btn');
             pubBtn.innerHTML = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>';
-            document.getElementById('edit-show-date').checked = true;
         }
 
         function updateImageUIState() {
@@ -478,14 +485,20 @@
             }
             const publishBtn = document.getElementById('publish-btn'); 
             publishBtn.disabled = true; publishBtn.style.opacity = '0.5';
+            
+            let finalImageUrl = null;
             const compressedFile = await compressImage(imageFile);
             const formData = new FormData(); formData.append("file", compressedFile);
             const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
             const upData = await upRes.json();
+            finalImageUrl = upData.image_url;
+
+            // 🛠️ Dátum sa po novom posiela tvrdo ako true
             const res = await fetch(`${API_URL}/posts`, {
                 method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                body: JSON.stringify({ title: null, text: null, image_url: upData.image_url, show_date: document.getElementById('edit-show-date').checked, author: null })
+                body: JSON.stringify({ title: null, text: null, image_url: finalImageUrl, show_date: true, author: null })
             });
+            
             if (res.ok) { 
                 fetchStatuses(true); 
                 publishBtn.innerHTML = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 4 9 20 2 13"></polyline></svg>'; 
