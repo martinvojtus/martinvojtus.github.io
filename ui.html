@@ -153,10 +153,10 @@
 
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
-        /* 🛠️ OPRAVA: Plný Glass efekt pre všetky inputy a tlačidlá v menu */
+        /* 🛠️ OPRAVA: Odstránený border pre dokonalý "frameless" sklenený efekt */
         .form-input, .submit-btn { 
             height: 3rem; 
-            border: 1px solid var(--divider); /* Jemný okraj pre oddelenie od skleneného pozadia */
+            border: none; 
             border-radius: var(--border-radius); 
             background: rgba(var(--glass-rgb), var(--glass-opacity));
             backdrop-filter: blur(var(--glass-blur)); 
@@ -177,13 +177,13 @@
         .submit-btn { text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
         .icon-btn { width: 3rem; height: 3rem; flex-shrink: 0; padding: 0; }
         
-        /* 🛠️ OPRAVA: Sklenený červený efekt pre nebezpečné tlačidlá */
+        /* 🛠️ OPRAVA: Červené sklo bez okraja */
         .danger-btn { 
             background: rgba(255, 68, 68, var(--glass-opacity)) !important; 
             backdrop-filter: blur(var(--glass-blur)) !important;
             -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
             color: #ffffff !important; 
-            border: 1px solid rgba(255, 68, 68, 0.3) !important; 
+            border: none !important; 
         }
 
         #upload-container { display: flex; cursor: pointer; flex-grow: 1; overflow: hidden; }
@@ -270,7 +270,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.5.4 • 2026</div>
+            <div class="footer-info">build v5.5.5 • 2026</div>
         </div>
     </nav>
 
@@ -493,7 +493,6 @@
             const upData = await upRes.json();
             finalImageUrl = upData.image_url;
 
-            // 🛠️ Dátum sa po novom posiela tvrdo ako true
             const res = await fetch(`${API_URL}/posts`, {
                 method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
                 body: JSON.stringify({ title: null, text: null, image_url: finalImageUrl, show_date: true, author: null })
