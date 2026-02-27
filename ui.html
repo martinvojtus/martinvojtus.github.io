@@ -115,8 +115,6 @@
         #admin-upload-zone { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; }
 
         .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: var(--gap-item); }
-        
-        /* 🛠️ ÚPRAVA: Status card musí mať relative pre overlay */
         .status-card { display: flex; flex-direction: column; position: relative; }
 
         .status-media-wrapper {
@@ -200,7 +198,6 @@
             padding: 0 var(--gap-item);
         }
 
-        /* 🛠️ NOVÉ: Kontextový Delete Overlay pre konkrétnu fotku */
         .status-confirm-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(var(--glass-rgb), var(--glass-opacity));
@@ -210,15 +207,14 @@
             border-radius: var(--border-radius);
         }
 
-        /* Kontajner pre tlačidlá vedľa seba */
+        /* 🛠️ OPRAVA: Odstránené fixné šírky, pridané vycentrovanie a ponechaný prísny gap */
         .status-confirm-actions {
-            display: flex; flex-direction: row; gap: var(--gap-item);
-            width: 100%; max-width: 320px;
-            padding: 0 var(--gap-item);
+            display: flex; flex-direction: row; gap: var(--gap-item); justify-content: center;
+            width: 100%; padding: 0 var(--gap-item);
         }
 
         .status-confirm-success {
-            display: none; width: 100%; max-width: 200px; padding: 0 var(--gap-item);
+            display: none; flex-direction: row; justify-content: center; width: 100%; padding: 0 var(--gap-item);
         }
     </style>
 </head>
@@ -275,7 +271,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v5.8.1 • 2026</div>
+            <div class="footer-info">build v5.8.2 • 2026</div>
         </div>
     </nav>
 
@@ -301,7 +297,6 @@
         let secretKey = ""; let globalPosts = []; 
         let currentOffset = 0; const postsLimit = 10; let isLoading = false; let hasMorePosts = true;
         
-        // Premenné pre správu Modalu (iba pre clear_upload a delete_all)
         let deleteActionType = null;
         let deleteTargetId = null;
 
@@ -453,20 +448,20 @@
 
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
             
-            // 🛠️ NOVÉ: Kontextový Overlay pre každú kartu
             let mediaHtml = '';
             if (imageHtml) {
+                // 🛠️ OPRAVA: Zrušený style flex: 1 z kontextových tlačidiel, šírku si berú prirodzene
                 mediaHtml = `
                 <div class="status-media-wrapper">
                     ${barHtml}${imageHtml}
                     ${secretKey ? `
                     <div id="confirm-overlay-${s.id}" class="status-confirm-overlay">
                         <div id="confirm-actions-${s.id}" class="status-confirm-actions">
-                            <button class="submit-btn danger-btn" style="flex: 1;" onclick="executeFeedDelete(${s.id})">DELETE</button>
-                            <button class="submit-btn" style="flex: 1;" onclick="closeFeedDelete(${s.id})">CANCEL</button>
+                            <button class="submit-btn danger-btn" onclick="executeFeedDelete(${s.id})">DELETE</button>
+                            <button class="submit-btn" onclick="closeFeedDelete(${s.id})">CANCEL</button>
                         </div>
                         <div id="confirm-success-${s.id}" class="status-confirm-success">
-                            <div class="submit-btn success-btn" style="width: 100%;">DELETED</div>
+                            <div class="submit-btn success-btn">DELETED</div>
                         </div>
                     </div>
                     ` : ''}
@@ -500,9 +495,7 @@
             }
         }
 
-        // 🛠️ NOVÉ: Logika kontextového mazania príspevku
         function handleDeleteFeed(id) {
-            // Skryjeme bar, aby nezavadzal rozmazaniu
             const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
             card.querySelector('.status-glass-bar').style.display = 'none';
             
@@ -513,26 +506,21 @@
 
         function closeFeedDelete(id) {
             document.getElementById(`confirm-overlay-${id}`).style.display = 'none';
-            // Vrátime bar späť
             const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
             card.querySelector('.status-glass-bar').style.display = 'flex';
         }
 
         async function executeFeedDelete(id) {
-            // Ostrá zmena na zelené potvrdenie
             document.getElementById(`confirm-actions-${id}`).style.display = 'none';
             document.getElementById(`confirm-success-${id}`).style.display = 'flex';
             
-            // Fyzické zmazanie
             await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
             
-            // Zatvorenie a refresh po 1 sekunde
             setTimeout(() => {
                 fetchStatuses(true);
             }, 1000);
         }
 
-        // Logika pre Modal (clear_upload a delete_all zostáva)
         function openDeleteModal(type) {
             deleteActionType = type;
             document.getElementById('modal-action-zone').style.display = 'flex';
