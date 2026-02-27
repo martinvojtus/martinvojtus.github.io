@@ -53,8 +53,6 @@
             animation: none !important;
         }
 
-        b, strong { font-weight: 700 !important; }
-
         body {
             margin: 0; padding: 0;
             background-color: var(--white); color: var(--black);
@@ -63,7 +61,7 @@
             min-height: 100vh;
         }
 
-        .menu-link, .status-date, .status-edited, .footer-info, .submit-btn, .form-input, .logo-text {
+        .menu-link, .status-date, .footer-info, .submit-btn, .form-input, .logo-text, .admin-bar-item {
             line-height: 1;
         }
 
@@ -112,37 +110,39 @@
             flex-grow: 1; display: block; 
         }
 
-        #section-feed { display: block; }
-        
-        #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
-        #logout-ui { display: none; }
         #admin-upload-zone { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; }
-
-        body.is-logged-in #login-ui { display: none; }
         body.is-logged-in #admin-upload-zone { display: flex; }
-        body.is-logged-in #logout-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
 
         .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: var(--gap-item); }
-        .status-card { border-bottom: 1px solid var(--divider); padding-bottom: var(--gap-item); display: flex; flex-direction: column; gap: var(--gap-item); }
+        .status-card { border-bottom: 1px solid var(--divider); padding-bottom: var(--gap-item); display: flex; flex-direction: column; }
         .status-card:last-child { border-bottom: none; padding-bottom: 0; }
+
+        .status-image { width: 100%; height: auto; border-radius: var(--border-radius); display: block; }
+        
+        /* 🛠️ NOVÝ GLASS ADMIN BAR */
+        .status-admin-bar {
+            height: 3rem; width: 100%;
+            background: rgba(var(--glass-rgb), var(--glass-opacity));
+            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+            border-radius: var(--border-radius);
+            margin-bottom: -3rem; /* Zasahuje cez obrazok */
+            z-index: 10;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 var(--gap-item);
+            position: relative;
+        }
+
+        .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
+        .admin-delete-link { cursor: pointer; color: var(--black); text-decoration: none; }
+        .admin-delete-link.confirm { color: var(--danger); font-weight: 700; }
 
         .status-date { 
             font-size: var(--size-small); color: var(--grey-50); 
             background-color: var(--divider); padding: 0 var(--gap-item); height: 3rem; 
             border-radius: var(--border-radius); display: inline-flex; align-items: center; width: fit-content;
-            text-transform: uppercase;
+            text-transform: uppercase; margin-top: var(--gap-item);
         }
 
-        .admin-action-btn { 
-            background-color: var(--divider); border: none; border-radius: var(--border-radius); 
-            color: var(--black); cursor: pointer; 
-            width: 3rem; height: 3rem; 
-            display: inline-flex; justify-content: center; align-items: center; flex-shrink: 0;
-        }
-        .admin-action-btn svg, .icon-btn svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
-
-        .status-image { width: 100%; height: auto; border-radius: var(--border-radius); display: block; }
-        
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
         .form-input, .submit-btn { 
@@ -152,19 +152,12 @@
         }
 
         .solid-input { background-color: var(--divider) !important; border: none !important; }
-        
-        .input-error { border: 1px solid var(--danger) !important; }
-        .input-error span { color: var(--danger) !important; }
-        .input-error::placeholder { color: var(--danger) !important; opacity: 1; }
-
         .submit-btn { background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
         .icon-btn { width: 3rem; height: 3rem; flex-shrink: 0; padding: 0; }
-        .secondary-btn { background: transparent; color: var(--black); }
         .danger-btn { background: var(--danger) !important; color: #000000 !important; border: none !important; }
 
         #upload-container { display: flex; cursor: pointer; flex-grow: 1; overflow: hidden; }
         #file-name-display { color: var(--grey-50); text-align: right; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--size-small); }
-        
         #upload-thumbnail { display: none; width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; }
 
         #upload-ui-wrapper.has-image #upload-action-label { display: none; }
@@ -200,9 +193,6 @@
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
-            <a class="menu-link" onclick="window.scrollTo(0,0); closeMenu();"><span>Feed</span></a>
-            <div class="divider"></div>
-            
             <div id="login-ui">
                 <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                     <div style="display: flex; width: 100%; gap: var(--gap-item);">
@@ -220,12 +210,10 @@
 
             <div id="admin-upload-zone">
                 <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
-                    
                     <div style="display: flex; gap: var(--gap-item); width: 100%;">
                         <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); flex-grow: 1; min-width: 0;">
                             <img id="upload-thumbnail" src="" alt="">
                             <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
-                            
                             <div id="upload-container" class="form-input solid-input" onclick="document.getElementById('edit-image').click()">
                                 <span id="upload-action-label" style="color: var(--black);">Upload image</span>
                                 <span id="file-name-display"></span>
@@ -234,29 +222,26 @@
                                 <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20M19 5v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5M9 5V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg>
                             </button>
                         </div>
-                        
                         <button type="submit" id="publish-btn" class="submit-btn icon-btn">
                             <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>
                         </button>
                     </div>
-                    
                     <label class="form-input solid-input" style="cursor: pointer; justify-content: flex-start; user-select: none;">
                         <input type="checkbox" id="edit-show-date" class="custom-checkbox" checked>
                         <span>Date & time</span>
                     </label>
-                    
                     <div class="divider"></div>
                     <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
                 </form>
             </div>
 
-            <div id="logout-ui">
-                <div class="divider"></div>
+            <div id="logout-ui" style="display: none;">
+                <div class="divider" style="margin-bottom: var(--gap-item);"></div>
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.5.1 • 2026</div>
+            <div class="footer-info">build v5.5.2 • 2026</div>
         </div>
     </nav>
 
@@ -296,7 +281,12 @@
             if (savedKey) {
                 try {
                     const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': savedKey } });
-                    if (res.ok) { secretKey = savedKey; document.body.classList.add('is-logged-in'); refreshFeedUI(); } 
+                    if (res.ok) { 
+                        secretKey = savedKey; 
+                        document.body.classList.add('is-logged-in'); 
+                        document.getElementById('logout-ui').style.display = 'block';
+                        refreshFeedUI(); 
+                    } 
                     else { localStorage.removeItem('mv_admin_key'); }
                 } catch (e) {}
             }
@@ -309,7 +299,12 @@
             try {
                 const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': tempKey } });
                 if (res.ok) { 
-                    secretKey = tempKey; document.body.classList.add('is-logged-in'); closeMenu(); refreshFeedUI(); passInput.value = ''; 
+                    secretKey = tempKey; 
+                    document.body.classList.add('is-logged-in'); 
+                    document.getElementById('logout-ui').style.display = 'block';
+                    closeMenu(); 
+                    refreshFeedUI(); 
+                    passInput.value = ''; 
                     if (rememberMe) { localStorage.setItem('mv_admin_key', secretKey); } else { localStorage.removeItem('mv_admin_key'); }
                 } else { passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; }
             } catch (err) { passInput.classList.add('input-error'); }
@@ -318,8 +313,11 @@
         function handleLogout() {
             secretKey = ""; passInput.value = ''; 
             localStorage.removeItem('mv_admin_key');
-            document.body.classList.remove('is-logged-in'); closeMenu();
-            resetDeleteAllBtn(); refreshFeedUI();
+            document.body.classList.remove('is-logged-in'); 
+            document.getElementById('logout-ui').style.display = 'none';
+            closeMenu();
+            resetDeleteAllBtn(); 
+            refreshFeedUI();
         }
 
         function refreshFeedUI() { 
@@ -381,20 +379,25 @@
 
         function renderSinglePost(s) {
             const showDate = s.show_date !== false;
-            let dateHtml = showDate ? `<span class="status-date">${new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}</span>` : '';
-            let idBadgeHtml = secretKey ? `<span class="status-date" style="margin-right: var(--gap-item);">#${s.id}</span>` : '';
+            const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
+            // 🛠️ ADMIN BAR NAD FOTKOU (iba ak prihlásený)
+            let adminBarHtml = '';
+            if (secretKey) {
+                adminBarHtml = `
+                <div class="status-admin-bar">
+                    <span class="admin-bar-item">#${s.id}</span>
+                    <span class="admin-bar-item" style="position: absolute; left: 50%; transform: translateX(-50%);">${formattedDate}</span>
+                    <span id="del-link-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>
+                </div>`;
+            }
+
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
             
-            // 🛠️ Ponechané len tlačidlo na zmazanie príspevku
-            let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20M19 5v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5M9 5V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg></button></div>` : '';
-
-            let topRowHtml = '';
-            if (idBadgeHtml || dateHtml || adminActionsHtml) {
-                topRowHtml = `<div style="display: flex; justify-content: space-between; align-items: center;"><div>${idBadgeHtml}${dateHtml}</div>${adminActionsHtml}</div>`;
-            }
+            // 🛠️ DÁTUM POD FOTKOU (iba ak nie je admin bar a je zapnutý showDate)
+            let publicDateHtml = (!secretKey && showDate) ? `<div class="status-date">${formattedDate}</div>` : '';
             
-            return `<div class="status-card">${topRowHtml}${imageHtml}</div>`;
+            return `<div class="status-card">${adminBarHtml}${imageHtml}${publicDateHtml}</div>`;
         }
 
         function resetEditor() {
@@ -409,15 +412,11 @@
             const wrapper = document.getElementById('upload-ui-wrapper');
             const input = document.getElementById('edit-image');
             const thumbnail = document.getElementById('upload-thumbnail');
-            
             if (input.files.length > 0) {
                 wrapper.classList.add('has-image');
                 thumbnail.src = URL.createObjectURL(input.files[0]);
-                
                 let fileName = input.files[0].name;
-                if (fileName.length > 22) {
-                    fileName = fileName.substring(0, 10) + "..." + fileName.substring(fileName.length - 9);
-                }
+                if (fileName.length > 22) fileName = fileName.substring(0, 10) + "..." + fileName.substring(fileName.length - 9);
                 document.getElementById('file-name-display').innerText = fileName;
             } else { 
                 wrapper.classList.remove('has-image'); 
@@ -429,67 +428,38 @@
         function clearImageSelection(e) {
             e.stopPropagation();
             const btn = e.currentTarget;
-            if (btn.dataset.confirm === "true") { 
-                document.getElementById('edit-image').value = ""; 
-                btn.classList.remove('danger-btn'); 
-                btn.dataset.confirm = "false"; 
-                updateImageUIState(); 
-            } else { 
-                btn.classList.add('danger-btn'); 
-                btn.dataset.confirm = "true"; 
-                setTimeout(() => { btn.classList.remove('danger-btn'); btn.dataset.confirm = "false"; }, 3000); 
-            }
+            if (btn.dataset.confirm === "true") { document.getElementById('edit-image').value = ""; btn.classList.remove('danger-btn'); btn.dataset.confirm = "false"; updateImageUIState(); }
+            else { btn.classList.add('danger-btn'); btn.dataset.confirm = "true"; setTimeout(() => { btn.classList.remove('danger-btn'); btn.dataset.confirm = "false"; }, 3000); }
         }
 
         async function handleMainSubmit(e) { 
             e.preventDefault(); 
-            
             const imageFile = document.getElementById('edit-image').files[0];
-            
-            // Už neposielame príspevok, ak nie je nahratý obrázok!
             if (!imageFile) { 
-                const uc = document.getElementById('upload-container');
-                uc.classList.add('input-error');
-                setTimeout(() => uc.classList.remove('input-error'), 2000);
-                return; 
+                const uc = document.getElementById('upload-container'); uc.classList.add('input-error');
+                setTimeout(() => uc.classList.remove('input-error'), 2000); return; 
             }
-            
             const publishBtn = document.getElementById('publish-btn'); 
-            publishBtn.disabled = true;
-            publishBtn.style.opacity = '0.5';
-            
-            let finalImageUrl = null;
-            
+            publishBtn.disabled = true; publishBtn.style.opacity = '0.5';
             const compressedFile = await compressImage(imageFile);
             const formData = new FormData(); formData.append("file", compressedFile);
             const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
-            const upData = await upRes.json(); finalImageUrl = upData.image_url;
-            
+            const upData = await upRes.json();
             const res = await fetch(`${API_URL}/posts`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                body: JSON.stringify({ title: null, text: null, image_url: finalImageUrl, show_date: document.getElementById('edit-show-date').checked, author: null })
+                method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
+                body: JSON.stringify({ title: null, text: null, image_url: upData.image_url, show_date: document.getElementById('edit-show-date').checked, author: null })
             });
-            
             if (res.ok) { 
                 fetchStatuses(true); 
                 publishBtn.innerHTML = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 4 9 20 2 13"></polyline></svg>'; 
-                setTimeout(() => { 
-                    resetEditor();
-                    closeMenu(); 
-                    publishBtn.disabled = false;
-                    publishBtn.style.opacity = '1';
-                }, 1000);
-            } else {
-                publishBtn.disabled = false;
-                publishBtn.style.opacity = '1';
-            }
+                setTimeout(() => { resetEditor(); closeMenu(); publishBtn.disabled = false; publishBtn.style.opacity = '1'; }, 1000);
+            } else { publishBtn.disabled = false; publishBtn.style.opacity = '1'; }
         }
 
         async function handleDeleteFeed(id) {
-            const btn = document.getElementById(`feed-del-btn-${id}`);
-            if (btn.dataset.confirm === "true") { await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); fetchStatuses(true); }
-            else { btn.classList.add('danger-btn'); btn.dataset.confirm = "true"; setTimeout(() => { btn.classList.remove('danger-btn'); btn.dataset.confirm = "false"; }, 3000); }
+            const link = document.getElementById(`del-link-${id}`);
+            if (link.dataset.confirm === "true") { await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); fetchStatuses(true); }
+            else { link.classList.add('confirm'); link.innerText = "CONFIRM?"; link.dataset.confirm = "true"; setTimeout(() => { link.classList.remove('confirm'); link.innerText = "DELETE"; link.dataset.confirm = "false"; }, 3000); }
         }
 
         function handleDeleteAllClick() {
