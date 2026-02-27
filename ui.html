@@ -61,11 +61,9 @@
             min-height: 100vh;
         }
 
-        .menu-link, .footer-info, .submit-btn, .form-input, .logo-text, .admin-bar-item {
+        .submit-btn, .form-input, .admin-bar-item {
             line-height: 1;
         }
-
-        .divider { width: 100%; height: 1px; background-color: var(--divider); }
 
         header {
             position: fixed; top: 0; left: 0; width: 100%; 
@@ -80,11 +78,23 @@
             display: flex; justify-content: space-between; align-items: center; padding: 0 var(--gap-item); 
         }
 
-        .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
-        .header-left svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
-        .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; }
+        /* 🛠️ OPRAVA: Nová logika prepínania hlavičky */
+        .header-left-zone { display: flex; align-items: center; height: 1rem; }
+        .brand-svg { display: block; width: 1rem; height: 1rem; flex-shrink: 0; cursor: pointer; }
+        .build-text { 
+            display: none; font-size: var(--size-small); color: var(--black); 
+            opacity: 0.5; text-transform: uppercase; line-height: 1; 
+            user-select: none; white-space: nowrap; 
+        }
+        .brand-text { 
+            position: absolute; left: 50%; transform: translateX(-50%); 
+            font-size: var(--size-small); white-space: nowrap; line-height: 1; pointer-events: none; 
+        }
+        
+        body.menu-open .brand-svg { display: none; }
+        body.menu-open .brand-text { display: none; }
+        body.menu-open .build-text { display: block; }
 
-        /* 🛠️ OPRAVA: Zrušená fixná šírka, aby sa text MENU/CLOSE pekne zmestil, ale zachováva štíhlosť hlavičky vďaka line-height: 1 */
         .menu-toggle { 
             display: flex; justify-content: center; align-items: center; 
             cursor: pointer; z-index: 2100; position: relative;
@@ -144,13 +154,6 @@
 
         .status-image { width: 100%; height: auto; display: block; border-radius: 0; }
         
-        .status-date { 
-            font-size: var(--size-small); color: var(--grey-50); 
-            background-color: var(--divider); padding: 0 var(--gap-item); height: 3rem; 
-            border-radius: var(--border-radius); display: inline-flex; align-items: center; width: fit-content;
-            text-transform: uppercase; margin-top: var(--gap-item);
-        }
-
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
         .form-input, .submit-btn { 
@@ -173,6 +176,24 @@
             color: var(--danger) !important; 
         }
 
+        #upload-container { display: flex; cursor: pointer; flex-grow: 1; overflow: hidden; padding: 0; }
+        .upload-click-area { flex-grow: 1; display: flex; align-items: center; padding: 0 var(--gap-item); cursor: pointer; overflow: hidden; }
+        #file-name-display { color: var(--grey-50); text-align: right; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--size-small); }
+        
+        #clear-file-link { 
+            color: var(--danger); cursor: pointer; text-transform: uppercase; 
+            padding: 0 var(--gap-item); display: none; align-items: center; 
+            border-left: 1px solid var(--divider); flex-shrink: 0;
+        }
+        #clear-file-link.confirm { font-weight: 700; }
+        
+        #upload-thumbnail { display: none; width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; }
+
+        #upload-ui-wrapper.has-image #upload-action-label { display: none; }
+        #upload-ui-wrapper.has-image #file-name-display { color: var(--black); text-align: left; }
+        #upload-ui-wrapper.has-image #upload-thumbnail { display: block; }
+        #upload-ui-wrapper.has-image #clear-file-link { display: flex; }
+
         .custom-checkbox {
             appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black);
             border-radius: calc(var(--border-radius) / 3); cursor: pointer; display: grid; place-content: center;
@@ -180,20 +201,18 @@
         .custom-checkbox::before { content: ""; width: 0.25rem; height: 0.5rem; border: solid var(--white); border-width: 0 1px 1px 0; transform: rotate(45deg); opacity: 0; margin-top: -0.125rem; }
         .custom-checkbox:checked { background-color: var(--black); }
         .custom-checkbox:checked::before { opacity: 1; }
-
-        .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="header-content">
-            <div class="logo-link" onclick="window.scrollTo(0,0)">
-                <div class="header-left">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="72.35 270 935.31 810" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
-                </div>
-                <div class="logo-text"><span>martinvojtus</span> • space</div>
+            <div class="header-left-zone">
+                <svg class="brand-svg" onclick="window.scrollTo(0,0)" xmlns="http://www.w3.org/2000/svg" viewBox="72.35 270 935.31 810" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
+                <div class="build-text">BUILD V5.7.4 • 2026</div>
             </div>
+            
+            <div class="brand-text"><span>martinvojtus</span> • space</div>
             <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">MENU</div>
         </div>
     </header>
@@ -228,18 +247,14 @@
                         <div id="clear-file-link" class="submit-btn danger-btn" style="cursor: pointer; padding: 0 1.5rem;" onclick="clearImageSelection(event)" data-confirm="false">DELETE</div>
                     </div>
                     
-                    <div class="divider"></div>
                     <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
                 </form>
             </div>
 
             <div id="logout-ui" style="display: none;">
-                <div class="divider" style="margin-bottom: var(--gap-item);"></div>
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="divider"></div>
-            <div class="footer-info">build v5.7.3 • 2026</div>
         </div>
     </nav>
 
@@ -267,15 +282,17 @@
             });
         }
 
+        // 🛠️ OPRAVA: JS prepínanie triedy menu-open pre skrytie loga a zobrazenie textu s verziou
         function toggleMenu() { 
             const isActive = menuToggle.classList.toggle('active'); 
             navOverlay.classList.toggle('active'); 
-            // 🛠️ OPRAVA: Dynamické prepínanie slov MENU / CLOSE
+            document.body.classList.toggle('menu-open', isActive);
             menuToggle.innerText = isActive ? 'CLOSE' : 'MENU';
         }
         function closeMenu() { 
             menuToggle.classList.remove('active'); 
             navOverlay.classList.remove('active'); 
+            document.body.classList.remove('menu-open');
             menuToggle.innerText = 'MENU';
             resetEditor(); 
         }
@@ -397,7 +414,6 @@
         function renderSinglePost(s) {
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
-            // 🛠️ OPRAVA: Tlačidlo pre zmazanie v feede má znova slovo DELETE
             let barHtml = `
             <div class="status-glass-bar">
                 ${secretKey ? `<span class="admin-bar-item" style="opacity: 0.5;">#${s.id}</span>` : '<div></div>'}
@@ -435,7 +451,6 @@
                 filledState.style.display = 'flex';
                 
                 clearLink.dataset.confirm = "false";
-                // 🛠️ OPRAVA: Prečistenie linku po uploadnutí vráti nápis DELETE
                 clearLink.innerText = "DELETE";
                 clearLink.classList.remove('confirm');
             } else { 
