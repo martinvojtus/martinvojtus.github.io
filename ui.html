@@ -84,12 +84,12 @@
         .header-left svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
         .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; }
 
-        /* 🛠️ OPRAVA: Ikonka má rovnakú veľkosť 1rem ako všetok text na webe, žiadne nafukovanie */
+        /* 🛠️ OPRAVA: Zrušená fixná šírka, aby sa text MENU/CLOSE pekne zmestil, ale zachováva štíhlosť hlavičky vďaka line-height: 1 */
         .menu-toggle { 
             display: flex; justify-content: center; align-items: center; 
             cursor: pointer; z-index: 2100; position: relative;
             font-size: var(--size-small); font-weight: 400; user-select: none;
-            height: 1rem; width: 1rem;
+            line-height: 1; text-transform: uppercase;
         }
 
         .nav-overlay {
@@ -194,7 +194,7 @@
                 </div>
                 <div class="logo-text"><span>martinvojtus</span> • space</div>
             </div>
-            <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">+</div>
+            <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">MENU</div>
         </div>
     </header>
 
@@ -225,7 +225,7 @@
                     <div id="upload-filled-state" style="display: none; gap: var(--gap-item); width: 100%;">
                         <img id="upload-thumbnail" src="" alt="" style="width: 3rem; height: 3rem; border-radius: var(--border-radius); object-fit: cover; cursor: pointer; background: var(--divider);" onclick="document.getElementById('edit-image').click()">
                         <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">UPLOAD</button>
-                        <div id="clear-file-link" class="submit-btn danger-btn" style="cursor: pointer; padding: 0 1.5rem;" onclick="clearImageSelection(event)" data-confirm="false">×</div>
+                        <div id="clear-file-link" class="submit-btn danger-btn" style="cursor: pointer; padding: 0 1.5rem;" onclick="clearImageSelection(event)" data-confirm="false">DELETE</div>
                     </div>
                     
                     <div class="divider"></div>
@@ -239,7 +239,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.7.2 • 2026</div>
+            <div class="footer-info">build v5.7.3 • 2026</div>
         </div>
     </nav>
 
@@ -270,12 +270,13 @@
         function toggleMenu() { 
             const isActive = menuToggle.classList.toggle('active'); 
             navOverlay.classList.toggle('active'); 
-            menuToggle.innerText = isActive ? '×' : '+';
+            // 🛠️ OPRAVA: Dynamické prepínanie slov MENU / CLOSE
+            menuToggle.innerText = isActive ? 'CLOSE' : 'MENU';
         }
         function closeMenu() { 
             menuToggle.classList.remove('active'); 
             navOverlay.classList.remove('active'); 
-            menuToggle.innerText = '+';
+            menuToggle.innerText = 'MENU';
             resetEditor(); 
         }
 
@@ -396,12 +397,12 @@
         function renderSinglePost(s) {
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
-            // 🛠️ OPRAVA: Názov linku zmenený na "×" namiesto DELETE
+            // 🛠️ OPRAVA: Tlačidlo pre zmazanie v feede má znova slovo DELETE
             let barHtml = `
             <div class="status-glass-bar">
                 ${secretKey ? `<span class="admin-bar-item" style="opacity: 0.5;">#${s.id}</span>` : '<div></div>'}
                 <span class="admin-bar-item" style="position: absolute; left: 50%; transform: translateX(-50%); opacity: 0.5;">${formattedDate}</span>
-                ${secretKey ? `<span id="del-link-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">×</span>` : '<div></div>'}
+                ${secretKey ? `<span id="del-link-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>` : '<div></div>'}
             </div>`;
 
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
@@ -434,8 +435,8 @@
                 filledState.style.display = 'flex';
                 
                 clearLink.dataset.confirm = "false";
-                // 🛠️ OPRAVA: Prečistenie linku po uploadnutí
-                clearLink.innerText = "×";
+                // 🛠️ OPRAVA: Prečistenie linku po uploadnutí vráti nápis DELETE
+                clearLink.innerText = "DELETE";
                 clearLink.classList.remove('confirm');
             } else { 
                 thumbnail.src = "";
@@ -450,7 +451,7 @@
             if (link.dataset.confirm === "true") { 
                 document.getElementById('edit-image').value = ""; 
                 link.classList.remove('confirm'); 
-                link.innerText = "×";
+                link.innerText = "DELETE";
                 link.dataset.confirm = "false"; 
                 updateImageUIState(); 
             } else { 
@@ -459,7 +460,7 @@
                 link.dataset.confirm = "true"; 
                 setTimeout(() => { 
                     link.classList.remove('confirm'); 
-                    link.innerText = "×";
+                    link.innerText = "DELETE";
                     link.dataset.confirm = "false"; 
                 }, 3000); 
             }
@@ -507,7 +508,7 @@
         async function handleDeleteFeed(id) {
             const link = document.getElementById(`del-link-${id}`);
             if (link.dataset.confirm === "true") { await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); fetchStatuses(true); }
-            else { link.classList.add('confirm'); link.innerText = "CONFIRM?"; link.dataset.confirm = "true"; setTimeout(() => { link.classList.remove('confirm'); link.innerText = "×"; link.dataset.confirm = "false"; }, 3000); }
+            else { link.classList.add('confirm'); link.innerText = "CONFIRM?"; link.dataset.confirm = "true"; setTimeout(() => { link.classList.remove('confirm'); link.innerText = "DELETE"; link.dataset.confirm = "false"; }, 3000); }
         }
 
         function handleDeleteAllClick() {
