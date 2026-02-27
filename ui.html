@@ -63,7 +63,7 @@
             min-height: 100vh;
         }
 
-        .menu-link, .status-date, .status-edited, .status-author, .footer-info, .submit-btn, .form-input, .logo-text, .status-title {
+        .menu-link, .status-date, .status-edited, .footer-info, .submit-btn, .form-input, .logo-text, .status-title {
             line-height: 1;
         }
 
@@ -131,13 +131,12 @@
         .status-card { border-bottom: 1px solid var(--divider); padding-bottom: var(--gap-item); display: flex; flex-direction: column; gap: var(--gap-item); }
         .status-card:last-child { border-bottom: none; padding-bottom: 0; }
 
-        .status-date, .status-edited, .status-author { 
+        .status-date, .status-edited { 
             font-size: var(--size-small); color: var(--grey-50); 
             background-color: var(--divider); padding: 0 var(--gap-item); height: 3rem; 
             border-radius: var(--border-radius); display: inline-flex; align-items: center; width: fit-content;
+            text-transform: uppercase;
         }
-        .status-date, .status-edited { text-transform: uppercase; }
-        .status-author { font-weight: 400; }
 
         .admin-action-btn { 
             background-color: var(--divider); border: none; border-radius: var(--border-radius); 
@@ -162,12 +161,6 @@
 
         .solid-input { background-color: var(--divider) !important; border: none !important; }
         
-        /* 🛠️ OPRAVA: CSS logika pre 50:50 rozloženie Title a Author */
-        #edit-title { flex-grow: 1; min-width: 0; }
-        #edit-author { display: none; }
-        #editor-form.adv-open #edit-author { display: flex; flex: 1; min-width: 0; }
-        #editor-form.adv-open #edit-title { flex: 1; min-width: 0; }
-
         .input-error { border-color: var(--danger) !important; }
         .input-error::placeholder { color: var(--danger) !important; opacity: 1; }
 
@@ -176,8 +169,12 @@
         .secondary-btn { background: transparent; color: var(--black); }
         .danger-btn { background: var(--danger) !important; color: #000000 !important; border: none !important; }
 
-        #quick-buttons { display: flex; gap: var(--gap-item); width: calc(6rem + var(--gap-item)); margin-left: var(--gap-item); }
+        /* 🛠️ OPRAVA: Odstránené zbytočné fixné šírky a okraje pre dokonalé zarovnanie do gridu/flexu */
+        #quick-buttons { display: flex; gap: var(--gap-item); }
+        #adv-buttons { display: none; }
         #editor-form.adv-open #quick-buttons { display: none; }
+        #editor-form.adv-open #adv-buttons { display: flex; gap: var(--gap-item); }
+
         #advanced-section-wrapper { display: none; flex-direction: column; gap: var(--gap-item); padding-top: var(--gap-item); }
         #editor-form.adv-open #advanced-section-wrapper { display: flex; }
         
@@ -239,7 +236,7 @@
                 <button onclick="handleLogout()" class="submit-btn danger-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.4.8 • 2026</div>
+            <div class="footer-info">build v5.4.9 • 2026</div>
         </div>
     </nav>
 
@@ -249,22 +246,23 @@
                 <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%;">
                     
                     <div style="display: flex; width: 100%; gap: var(--gap-item);">
-                        <input type="text" id="edit-author" class="form-input" placeholder="Author (optional)">
-                        <input type="text" id="edit-title" class="form-input" placeholder="Quick thought...">
+                        <input type="text" id="edit-title" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; min-width: 0;">
+                        
                         <div id="quick-buttons">
                             <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(true)"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg></button>
                             <button type="submit" id="quick-btn" class="submit-btn icon-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg></button>
+                        </div>
+                        
+                        <div id="adv-buttons">
+                            <button type="submit" id="publish-btn" class="submit-btn icon-btn">
+                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>
+                            </button>
                         </div>
                     </div>
                     
                     <div id="advanced-section-wrapper">
                         
-                        <div style="display: flex; gap: var(--gap-item); width: 100%;">
-                            <input type="text" id="edit-text" class="form-input" placeholder="Content" style="flex-grow: 1; min-width: 0;">
-                            <button type="submit" id="publish-btn" class="submit-btn icon-btn">
-                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>
-                            </button>
-                        </div>
+                        <input type="text" id="edit-text" class="form-input" placeholder="Content" style="width: 100%;">
                         
                         <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
                             <img id="upload-thumbnail" src="" alt="">
@@ -282,7 +280,7 @@
                         <div style="display: flex; gap: var(--gap-item); width: 100%;">
                             <label class="form-input solid-input" style="cursor: pointer; justify-content: flex-start; user-select: none; flex-grow: 1;">
                                 <input type="checkbox" id="edit-show-date" class="custom-checkbox" checked>
-                                <span>Show date & time post</span>
+                                <span>Date & time</span>
                             </label>
                             <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(false)">
                                 <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="2" y2="22"></line><line x1="2" y1="2" x2="22" y2="22"></line></svg>
@@ -308,17 +306,15 @@
         const titleInput = document.getElementById('edit-title');
         const textInput = document.getElementById('edit-text');
         const passInput = document.getElementById('admin-pass');
-        const authorInput = document.getElementById('edit-author');
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
 
-        [titleInput, textInput, passInput, authorInput].forEach(inp => {
+        [titleInput, textInput, passInput].forEach(inp => {
             if(inp) inp.addEventListener('input', () => {
                 inp.classList.remove('input-error');
                 if(inp.id === 'edit-title') inp.placeholder = document.getElementById('editor-form').classList.contains('adv-open') ? 'Title' : 'Quick thought...';
                 if(inp.id === 'edit-text') inp.placeholder = 'Content';
                 if(inp.id === 'admin-pass') inp.placeholder = 'Password...';
-                if(inp.id === 'edit-author') inp.placeholder = 'Author (optional)';
             });
         });
 
@@ -424,14 +420,10 @@
             let idBadgeHtml = secretKey ? `<span class="status-date" style="margin-right: var(--gap-item);">#${s.id}</span>` : '';
             
             let editedHtml = (showDate && s.updated_at) ? `<div class="status-edited">EDITED: ${new Date(s.updated_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}</div>` : '';
-            let authorHtml = (s.author && s.author.trim() !== "") ? `<div class="status-author">${s.author.trim()}</div>` : '';
             
             let bottomInfoHtml = '';
-            if (editedHtml || authorHtml) {
-                bottomInfoHtml = `<div style="display: flex; justify-content: space-between; width: 100%; gap: var(--gap-item);">
-                    <div>${editedHtml}</div>
-                    <div style="margin-left: auto;">${authorHtml}</div>
-                </div>`;
+            if (editedHtml) {
+                bottomInfoHtml = `<div>${editedHtml}</div>`;
             }
 
             const titleHtml = s.title ? `<h3 class="status-title">${s.title}</h3>` : '';
@@ -451,10 +443,10 @@
 
         function toggleAdvancedEditor(show) {
             const form = document.getElementById('editor-form');
-            titleInput.classList.remove('input-error'); textInput.classList.remove('input-error'); authorInput.classList.remove('input-error');
+            titleInput.classList.remove('input-error'); textInput.classList.remove('input-error');
             if (show) { form.classList.add('adv-open'); titleInput.placeholder = "Title"; } 
             else { 
-                form.classList.remove('adv-open'); editingId = null; titleInput.value = ""; textInput.value = ""; authorInput.value = ""; document.getElementById('edit-image').value = ""; 
+                form.classList.remove('adv-open'); editingId = null; titleInput.value = ""; textInput.value = ""; document.getElementById('edit-image').value = ""; 
                 removeImageFlag = false; currentImageUrl = null; updateImageUIState(); titleInput.placeholder = "Quick thought..."; 
             }
         }
@@ -462,7 +454,7 @@
         function startEdit(id) {
             const post = globalPosts.find(p => p.id === id); if(!post) return;
             editingId = id; currentImageUrl = post.image_url; removeImageFlag = false;
-            titleInput.value = post.title || ""; textInput.value = post.text || ""; authorInput.value = post.author || "";
+            titleInput.value = post.title || ""; textInput.value = post.text || "";
             document.getElementById('edit-show-date').checked = post.show_date !== false;
             updateImageUIState(); toggleAdvancedEditor(true); window.scrollTo(0,0);
         }
@@ -533,11 +525,10 @@
                 const upData = await upRes.json(); finalImageUrl = upData.image_url;
             }
             
-            const authorVal = authorInput.value.trim();
             const res = await fetch(editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`, {
                 method: editingId ? "PUT" : "POST",
                 headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                body: JSON.stringify({ title: titleInput.value, text: textVal, image_url: finalImageUrl, show_date: document.getElementById('edit-show-date').checked, author: authorVal })
+                body: JSON.stringify({ title: titleInput.value, text: textVal, image_url: finalImageUrl, show_date: document.getElementById('edit-show-date').checked, author: null })
             });
             if (res.ok) { fetchStatuses(true); toggleAdvancedEditor(false); }
             publishBtn.disabled = false;
