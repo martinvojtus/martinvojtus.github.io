@@ -106,7 +106,6 @@
         .menu-items { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); }
         .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; display: inline-block; padding: 0; border: none; background: transparent; text-align: left; margin: 0; }
 
-        /* 🛠️ OPRAVA: Zmena na čisto blokový prvok, odstránenie rizika sčítavania flex medzier */
         main {
             padding: calc(3rem + var(--gap-item)) var(--gap-item) var(--gap-item); 
             width: 100%; max-width: var(--content-width); 
@@ -115,10 +114,7 @@
 
         #section-feed { display: block; }
         
-        /* 🛠️ OPRAVA: Skrytá zóna v predvolenom stave už nemá v CSS ŽIADNE okraje */
         #feed-admin-zone { display: none; flex-direction: column; gap: var(--gap-item); }
-        
-        /* 🛠️ OPRAVA: Okraje sa naozaj vytvoria iba vtedy, ak je panel viditeľný */
         body.is-logged-in #feed-admin-zone { 
             display: flex; 
             padding-bottom: var(--gap-item); 
@@ -166,15 +162,11 @@
 
         .solid-input { background-color: var(--divider) !important; border: none !important; }
         
-        #edit-author { display: none; margin-bottom: var(--gap-item); }
-        #editor-form.adv-open #edit-author { display: flex; }
-
-        .form-textarea {
-            width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); 
-            background: transparent; font-size: var(--size-small); padding: var(--gap-item); 
-            outline: none; color: var(--black); min-height: 5rem; resize: vertical;
-            text-align: justify; -webkit-hyphens: auto; hyphens: auto; display: block;
-        }
+        /* 🛠️ OPRAVA: CSS logika pre 50:50 rozloženie Title a Author */
+        #edit-title { flex-grow: 1; min-width: 0; }
+        #edit-author { display: none; }
+        #editor-form.adv-open #edit-author { display: flex; flex: 1; min-width: 0; }
+        #editor-form.adv-open #edit-title { flex: 1; min-width: 0; }
 
         .input-error { border-color: var(--danger) !important; }
         .input-error::placeholder { color: var(--danger) !important; opacity: 1; }
@@ -247,7 +239,7 @@
                 <button onclick="handleLogout()" class="submit-btn danger-btn" style="width: 100%;">LOGOUT</button>
             </div>
             <div class="divider"></div>
-            <div class="footer-info">build v5.4.7 • 2026</div>
+            <div class="footer-info">build v5.4.8 • 2026</div>
         </div>
     </nav>
 
@@ -256,10 +248,9 @@
             <div id="feed-admin-zone">
                 <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%;">
                     
-                    <input type="text" id="edit-author" class="form-input" placeholder="Author (optional)">
-
-                    <div style="display: flex; width: 100%;">
-                        <input type="text" id="edit-title" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; min-width: 0;">
+                    <div style="display: flex; width: 100%; gap: var(--gap-item);">
+                        <input type="text" id="edit-author" class="form-input" placeholder="Author (optional)">
+                        <input type="text" id="edit-title" class="form-input" placeholder="Quick thought...">
                         <div id="quick-buttons">
                             <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(true)"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg></button>
                             <button type="submit" id="quick-btn" class="submit-btn icon-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg></button>
@@ -268,7 +259,12 @@
                     
                     <div id="advanced-section-wrapper">
                         
-                        <textarea id="edit-text" class="form-textarea" placeholder="Content"></textarea>
+                        <div style="display: flex; gap: var(--gap-item); width: 100%;">
+                            <input type="text" id="edit-text" class="form-input" placeholder="Content" style="flex-grow: 1; min-width: 0;">
+                            <button type="submit" id="publish-btn" class="submit-btn icon-btn">
+                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>
+                            </button>
+                        </div>
                         
                         <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
                             <img id="upload-thumbnail" src="" alt="">
@@ -283,18 +279,16 @@
                             </button>
                         </div>
                         
-                        <label class="form-input solid-input" style="cursor: pointer; justify-content: flex-start; user-select: none;">
-                            <input type="checkbox" id="edit-show-date" class="custom-checkbox" checked>
-                            <span>Show date & time post</span>
-                        </label>
-                        
-                        <div class="divider"></div>
-                        <div style="display: flex; gap: var(--gap-item);">
-                            <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
+                        <div style="display: flex; gap: var(--gap-item); width: 100%;">
+                            <label class="form-input solid-input" style="cursor: pointer; justify-content: flex-start; user-select: none; flex-grow: 1;">
+                                <input type="checkbox" id="edit-show-date" class="custom-checkbox" checked>
+                                <span>Show date & time post</span>
+                            </label>
                             <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(false)">
                                 <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="2" y2="22"></line><line x1="2" y1="2" x2="22" y2="22"></line></svg>
                             </button>
                         </div>
+                        
                         <div class="divider"></div>
                         <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
                     </div>
@@ -447,7 +441,6 @@
             
             let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button onclick="startEdit(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20M19 5v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5M9 5V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg></button></div>` : '';
 
-            // 🛠️ OPRAVA: Iba ak vrchný riadok naozaj obsahuje nejaké dáta, inak sa vôbec nevykreslí (odstraňuje prázdnu medzeru)
             let topRowHtml = '';
             if (idBadgeHtml || dateHtml || adminActionsHtml) {
                 topRowHtml = `<div style="display: flex; justify-content: space-between; align-items: center;"><div>${idBadgeHtml}${dateHtml}</div>${adminActionsHtml}</div>`;
@@ -462,7 +455,7 @@
             if (show) { form.classList.add('adv-open'); titleInput.placeholder = "Title"; } 
             else { 
                 form.classList.remove('adv-open'); editingId = null; titleInput.value = ""; textInput.value = ""; authorInput.value = ""; document.getElementById('edit-image').value = ""; 
-                removeImageFlag = false; currentImageUrl = null; updateImageUIState(); titleInput.placeholder = "Quick thought..."; document.getElementById('publish-btn').innerText = "PUBLISH"; 
+                removeImageFlag = false; currentImageUrl = null; updateImageUIState(); titleInput.placeholder = "Quick thought..."; 
             }
         }
 
@@ -471,7 +464,6 @@
             editingId = id; currentImageUrl = post.image_url; removeImageFlag = false;
             titleInput.value = post.title || ""; textInput.value = post.text || ""; authorInput.value = post.author || "";
             document.getElementById('edit-show-date').checked = post.show_date !== false;
-            document.getElementById('publish-btn').innerText = "SAVE CHANGES";
             updateImageUIState(); toggleAdvancedEditor(true); window.scrollTo(0,0);
         }
 
@@ -527,19 +519,20 @@
                 return; 
             }
             
-            const publishBtn = document.getElementById('publish-btn'); publishBtn.disabled = true;
+            const publishBtn = document.getElementById('publish-btn'); 
+            publishBtn.disabled = true;
+            publishBtn.style.opacity = '0.5';
+            
             let finalImageUrl = currentImageUrl; if (removeImageFlag) finalImageUrl = null;
             const imageFile = document.getElementById('edit-image').files[0];
             
             if (imageFile) {
-                publishBtn.innerText = "UPLOADING...";
                 const compressedFile = await compressImage(imageFile);
                 const formData = new FormData(); formData.append("file", compressedFile);
                 const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
                 const upData = await upRes.json(); finalImageUrl = upData.image_url;
             }
             
-            publishBtn.innerText = "SAVING...";
             const authorVal = authorInput.value.trim();
             const res = await fetch(editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`, {
                 method: editingId ? "PUT" : "POST",
@@ -548,6 +541,7 @@
             });
             if (res.ok) { fetchStatuses(true); toggleAdvancedEditor(false); }
             publishBtn.disabled = false;
+            publishBtn.style.opacity = '1';
         }
 
         async function handleQuickPost() {
