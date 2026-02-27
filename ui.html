@@ -27,7 +27,7 @@
             --gap-item: 1rem; 
             --letter-spacing: 0.05em;
             --glass-opacity: 0.6; 
-            --glass-blur: 25px;   
+            --glass-blur: 15px;   /* 🛠️ OPRAVA: Znížený blur z 25px na jemnejších 15px */
             --danger: #ff4444;
         }
 
@@ -127,7 +127,6 @@
             background-color: var(--divider);
         }
 
-        /* 🛠️ OPRAVA: Návrat k čistej sklenenej lište z verzie 5.5.9 */
         .status-glass-bar {
             height: 3rem; width: 100%;
             background: rgba(var(--glass-rgb), var(--glass-opacity));
@@ -161,7 +160,6 @@
         .submit-btn { text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
         .icon-btn { width: 3rem; height: 3rem; flex-shrink: 0; padding: 0; }
         
-        /* 🛠️ OPRAVA: Delete All má teraz rovnaké 10% sklenené opacity ako ostatné polia, ale v červenej farbe */
         .danger-btn { 
             background-color: rgba(255, 68, 68, 0.1) !important; 
             color: var(--danger) !important; 
@@ -259,7 +257,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.6.1 • 2026</div>
+            <div class="footer-info">build v5.6.2 • 2026</div>
         </div>
     </nav>
 
