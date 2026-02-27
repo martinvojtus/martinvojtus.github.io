@@ -26,7 +26,6 @@
             --border-radius: 1rem; 
             --gap-item: 1rem; 
             --letter-spacing: 0.05em;
-            /* 🛠️ ÚPRAVA: Jemnejšia priesvitnosť (0.5) a systémový blur (1rem) */
             --glass-opacity: 0.5; 
             --glass-blur: 1rem;   
             --danger: #ff4444;
@@ -246,14 +245,12 @@
             
             <div id="login-ui">
                 <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
-                    <div style="display: flex; width: 100%; gap: var(--gap-item);">
-                        <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="flex-grow: 1; min-width: 0;">
-                        <button type="submit" id="login-btn" class="submit-btn">LOGIN</button>
-                    </div>
-                    <label class="form-input" style="cursor: pointer; justify-content: flex-start; user-select: none;">
+                    <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="width: 100%;">
+                    <label class="form-input" style="cursor: pointer; justify-content: flex-start; user-select: none; width: 100%;">
                         <input type="checkbox" id="remember-login" class="custom-checkbox">
                         <span>Remember me</span>
                     </label>
+                    <button type="submit" id="login-btn" class="submit-btn" style="width: 100%;">LOGIN</button>
                 </form>
             </div>
 
@@ -261,7 +258,7 @@
                 <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                     <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                     
-                    <div id="upload-empty-state" class="submit-btn" style="width: 100%;" onclick="document.getElementById('edit-image').click()">
+                    <div id="upload-empty-state" class="form-input" style="cursor: pointer; justify-content: center; width: 100%;" onclick="document.getElementById('edit-image').click()">
                         + ADD IMAGE
                     </div>
 
@@ -279,7 +276,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v5.9.3 • 2026</div>
+            <div class="footer-info">build v5.9.4 • 2026</div>
         </div>
     </nav>
 
