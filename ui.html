@@ -29,7 +29,7 @@
             --glass-opacity: 0.75; 
             --glass-blur: 20px;   
             --danger: #ff4444;
-            --success: #2ecc71; /* 🛠️ NOVÉ: Zelená farba pre potvrdenie */
+            --success: #2ecc71;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -115,7 +115,9 @@
         #admin-upload-zone { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; }
 
         .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: var(--gap-item); }
-        .status-card { display: flex; flex-direction: column; }
+        
+        /* 🛠️ ÚPRAVA: Status card musí mať relative pre overlay */
+        .status-card { display: flex; flex-direction: column; position: relative; }
 
         .status-media-wrapper {
             position: relative;
@@ -163,11 +165,10 @@
             color: var(--danger) !important; 
         }
 
-        /* 🛠️ NOVÉ: Zelené tlačidlo pre úspešné zmazanie */
         .success-btn {
             background-color: rgba(46, 204, 113, 0.1) !important;
             color: var(--success) !important;
-            pointer-events: none; /* Nedá sa naň kliknúť */
+            pointer-events: none; 
         }
 
         #upload-thumbnail { width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; cursor: pointer; background-color: var(--divider); }
@@ -185,7 +186,6 @@
             text-transform: uppercase; text-align: center; width: 100%; 
         }
 
-        /* 🛠️ NOVÉ: CSS pre celoobrazovkový Delete Modal */
         #delete-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(var(--glass-rgb), var(--glass-opacity));
@@ -198,6 +198,27 @@
             width: 100%; max-width: var(--content-width);
             display: flex; flex-direction: column; gap: var(--gap-item);
             padding: 0 var(--gap-item);
+        }
+
+        /* 🛠️ NOVÉ: Kontextový Delete Overlay pre konkrétnu fotku */
+        .status-confirm-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(var(--glass-rgb), var(--glass-opacity));
+            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+            z-index: 20;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            border-radius: var(--border-radius);
+        }
+
+        /* Kontajner pre tlačidlá vedľa seba */
+        .status-confirm-actions {
+            display: flex; flex-direction: row; gap: var(--gap-item);
+            width: 100%; max-width: 320px;
+            padding: 0 var(--gap-item);
+        }
+
+        .status-confirm-success {
+            display: none; width: 100%; max-width: 200px; padding: 0 var(--gap-item);
         }
     </style>
 </head>
@@ -254,7 +275,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v5.8.0 • 2026</div>
+            <div class="footer-info">build v5.8.1 • 2026</div>
         </div>
     </nav>
 
@@ -280,7 +301,7 @@
         let secretKey = ""; let globalPosts = []; 
         let currentOffset = 0; const postsLimit = 10; let isLoading = false; let hasMorePosts = true;
         
-        // 🛠️ NOVÉ: Premenné pre správu Delete Modalu
+        // Premenné pre správu Modalu (iba pre clear_upload a delete_all)
         let deleteActionType = null;
         let deleteTargetId = null;
 
@@ -423,7 +444,6 @@
         function renderSinglePost(s) {
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
-            // 🛠️ OPRAVA: Klik na DELETE otvorí modal
             let barHtml = `
             <div class="status-glass-bar">
                 ${secretKey ? `<span class="admin-bar-item" style="opacity: 0.5;">#${s.id}</span>` : '<div></div>'}
@@ -433,9 +453,24 @@
 
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
             
+            // 🛠️ NOVÉ: Kontextový Overlay pre každú kartu
             let mediaHtml = '';
             if (imageHtml) {
-                mediaHtml = `<div class="status-media-wrapper">${barHtml}${imageHtml}</div>`;
+                mediaHtml = `
+                <div class="status-media-wrapper">
+                    ${barHtml}${imageHtml}
+                    ${secretKey ? `
+                    <div id="confirm-overlay-${s.id}" class="status-confirm-overlay">
+                        <div id="confirm-actions-${s.id}" class="status-confirm-actions">
+                            <button class="submit-btn danger-btn" style="flex: 1;" onclick="executeFeedDelete(${s.id})">DELETE</button>
+                            <button class="submit-btn" style="flex: 1;" onclick="closeFeedDelete(${s.id})">CANCEL</button>
+                        </div>
+                        <div id="confirm-success-${s.id}" class="status-confirm-success">
+                            <div class="submit-btn success-btn" style="width: 100%;">DELETED</div>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>`;
             }
 
             return `<div class="status-card">${mediaHtml}</div>`;
@@ -465,10 +500,41 @@
             }
         }
 
-        // 🛠️ NOVÉ: Logika Delete Modalu
-        function openDeleteModal(type, id = null) {
+        // 🛠️ NOVÉ: Logika kontextového mazania príspevku
+        function handleDeleteFeed(id) {
+            // Skryjeme bar, aby nezavadzal rozmazaniu
+            const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
+            card.querySelector('.status-glass-bar').style.display = 'none';
+            
+            document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
+            document.getElementById(`confirm-actions-${id}`).style.display = 'flex';
+            document.getElementById(`confirm-success-${id}`).style.display = 'none';
+        }
+
+        function closeFeedDelete(id) {
+            document.getElementById(`confirm-overlay-${id}`).style.display = 'none';
+            // Vrátime bar späť
+            const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
+            card.querySelector('.status-glass-bar').style.display = 'flex';
+        }
+
+        async function executeFeedDelete(id) {
+            // Ostrá zmena na zelené potvrdenie
+            document.getElementById(`confirm-actions-${id}`).style.display = 'none';
+            document.getElementById(`confirm-success-${id}`).style.display = 'flex';
+            
+            // Fyzické zmazanie
+            await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
+            
+            // Zatvorenie a refresh po 1 sekunde
+            setTimeout(() => {
+                fetchStatuses(true);
+            }, 1000);
+        }
+
+        // Logika pre Modal (clear_upload a delete_all zostáva)
+        function openDeleteModal(type) {
             deleteActionType = type;
-            deleteTargetId = id;
             document.getElementById('modal-action-zone').style.display = 'flex';
             document.getElementById('modal-success-zone').style.display = 'none';
             document.getElementById('delete-modal').style.display = 'flex';
@@ -477,14 +543,10 @@
         function closeDeleteModal() {
             document.getElementById('delete-modal').style.display = 'none';
             deleteActionType = null;
-            deleteTargetId = null;
         }
 
         async function executeModalDelete() {
-            if (deleteActionType === 'post') {
-                await fetch(`${API_URL}/posts/${deleteTargetId}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
-                fetchStatuses(true);
-            } else if (deleteActionType === 'clear_upload') {
+            if (deleteActionType === 'clear_upload') {
                 document.getElementById('edit-image').value = ""; 
                 updateImageUIState(); 
             } else if (deleteActionType === 'delete_all') {
@@ -497,24 +559,17 @@
                 closeMenu();
             }
 
-            // Ostrá zmena na zelené potvrdenie
             document.getElementById('modal-action-zone').style.display = 'none';
             document.getElementById('modal-success-zone').style.display = 'flex';
             
-            // Zatvorenie po 1 sekunde
             setTimeout(() => {
                 closeDeleteModal();
             }, 1000);
         }
 
-        // 🛠️ OPRAVA: Prepojenie existujúcich tlačidiel na Modal
         function clearImageSelection(e) {
             e.stopPropagation();
             openDeleteModal('clear_upload');
-        }
-
-        function handleDeleteFeed(id) {
-            openDeleteModal('post', id);
         }
 
         function handleDeleteAllClick() {
