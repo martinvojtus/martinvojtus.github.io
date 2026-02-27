@@ -28,7 +28,7 @@
             --letter-spacing: 0.05em;
             --glass-opacity: 0.6; 
             --glass-blur: 25px;   
-            --danger: #ff4444; /* Sýta červená */
+            --danger: #ff4444;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -140,7 +140,7 @@
 
         .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
         
-        /* 🛠️ OPRAVA: Delete odkaz je natvrdo červený */
+        /* 🛠️ OPRAVA: Odkaz Delete v príspevkoch je teraz červený */
         .admin-delete-link { cursor: pointer; color: var(--danger); text-decoration: none; }
         .admin-delete-link.confirm { font-weight: 700; }
 
@@ -169,27 +169,27 @@
         .submit-btn { text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
         .icon-btn { width: 3rem; height: 3rem; flex-shrink: 0; padding: 0; }
         
-        /* 🛠️ OPRAVA: Tlačidlo Delete All s plne sýtou červenou farbou a čiernym textom bez skla */
+        /* 🛠️ OPRAVA: Tlačidlo Delete All má plnú červenú farbu a čierny text */
         .danger-btn { 
-            background: #ff4444 !important; 
+            background: var(--danger) !important; 
             color: #000000 !important; 
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
-            border: none !important; 
         }
 
-        #upload-container { display: flex; cursor: pointer; flex-grow: 1; overflow: hidden; align-items: center; }
-        #file-name-display { color: var(--grey-50); text-align: right; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--size-small); }
+        /* 🛠️ OPRAVA: Nové rozloženie vnútri upload poľa s textovým odkazom DELETE */
+        #upload-container { display: flex; flex-grow: 1; overflow: hidden; padding: 0; }
+        .upload-click-area { flex-grow: 1; display: flex; align-items: center; padding: 0 var(--gap-item); cursor: pointer; overflow: hidden; }
+        #file-name-display { color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: none; }
+        
+        #clear-file-link { 
+            color: var(--danger); cursor: pointer; text-transform: uppercase; 
+            padding: 0 var(--gap-item); display: none; align-items: center; 
+            border-left: 1px solid var(--divider); flex-shrink: 0;
+        }
+        #clear-file-link.confirm { font-weight: 700; }
         
         #upload-thumbnail { display: none; width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; }
-
-        #upload-ui-wrapper.has-image #upload-action-label { display: none; }
-        #upload-ui-wrapper.has-image #file-name-display { color: var(--black); text-align: left; }
-        #upload-ui-wrapper.has-image #upload-thumbnail { display: block; }
-        
-        /* 🛠️ OPRAVA: Textový odkaz DELETE priamo v inpute, nahrádza starú SVG ikonku */
-        #upload-ui-wrapper.has-image #clear-file-text { display: block; }
-        #clear-file-text { display: none; color: var(--danger); cursor: pointer; flex-shrink: 0; text-transform: uppercase; font-size: var(--size-small); }
 
         .custom-checkbox {
             appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black);
@@ -241,10 +241,12 @@
                             <img id="upload-thumbnail" src="" alt="">
                             <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                             
-                            <div id="upload-container" class="form-input" onclick="document.getElementById('edit-image').click()">
-                                <span id="upload-action-label" style="color: var(--black);">Upload image</span>
-                                <span id="file-name-display"></span>
-                                <span id="clear-file-text" onclick="clearImageSelection(event)">DELETE</span>
+                            <div id="upload-container" class="form-input">
+                                <div class="upload-click-area" onclick="document.getElementById('edit-image').click()">
+                                    <span id="upload-action-label" style="color: var(--black);">Upload image</span>
+                                    <span id="file-name-display"></span>
+                                </div>
+                                <div id="clear-file-link" onclick="clearImageSelection(event)" data-confirm="false">DELETE</div>
                             </div>
                         </div>
                         <button type="submit" id="publish-btn" class="submit-btn icon-btn">
@@ -287,3 +289,277 @@
         if(passInput) {
             passInput.addEventListener('input', () => {
                 passInput.classList.remove('input-error');
+                passInput.placeholder = 'Password...';
+            });
+        }
+
+        function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
+        function closeMenu() { 
+            menuToggle.classList.remove('active'); 
+            navOverlay.classList.remove('active'); 
+            resetEditor(); 
+        }
+
+        function updateUIVisibility() {
+            if (secretKey) {
+                document.body.classList.add('is-logged-in');
+                document.getElementById('login-ui').style.display = 'none';
+                document.getElementById('admin-upload-zone').style.display = 'flex';
+                document.getElementById('logout-ui').style.display = 'block';
+            } else {
+                document.body.classList.remove('is-logged-in');
+                document.getElementById('login-ui').style.display = 'flex';
+                document.getElementById('admin-upload-zone').style.display = 'none';
+                document.getElementById('logout-ui').style.display = 'none';
+            }
+        }
+
+        async function checkRememberedLogin() {
+            const savedKey = localStorage.getItem('mv_admin_key');
+            if (savedKey) {
+                try {
+                    const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': savedKey } });
+                    if (res.ok) { 
+                        secretKey = savedKey; 
+                        updateUIVisibility();
+                        refreshFeedUI(); 
+                    } 
+                    else { localStorage.removeItem('mv_admin_key'); updateUIVisibility(); }
+                } catch (e) { updateUIVisibility(); }
+            } else {
+                updateUIVisibility();
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const tempKey = passInput.value;
+            const rememberMe = document.getElementById('remember-login').checked;
+            try {
+                const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': tempKey } });
+                if (res.ok) { 
+                    secretKey = tempKey; 
+                    updateUIVisibility();
+                    closeMenu(); 
+                    refreshFeedUI(); 
+                    passInput.value = ''; 
+                    if (rememberMe) { localStorage.setItem('mv_admin_key', secretKey); } else { localStorage.removeItem('mv_admin_key'); }
+                } else { passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; }
+            } catch (err) { passInput.classList.add('input-error'); }
+        }
+
+        function handleLogout() {
+            secretKey = ""; passInput.value = ''; 
+            localStorage.removeItem('mv_admin_key');
+            updateUIVisibility();
+            closeMenu();
+            resetDeleteAllBtn(); 
+            refreshFeedUI();
+        }
+
+        function refreshFeedUI() { 
+            if (globalPosts.length === 0) {
+                if (!isLoading) {
+                    document.getElementById('status-container').innerHTML = '<div class="loading-text">Nothing here yet.</div>';
+                }
+            } else {
+                document.getElementById('status-container').innerHTML = globalPosts.map(s => renderSinglePost(s)).join(''); 
+            }
+        }
+
+        function compressImage(file, maxWidth = 1200, quality = 0.8) {
+            return new Promise((resolve) => {
+                const reader = new FileReader(); 
+                reader.readAsDataURL(file);
+                reader.onload = event => {
+                    const img = new Image(); 
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width, h = img.height;
+                        if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        const newName = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
+                        canvas.toBlob(blob => { 
+                            resolve(new File([blob], newName, { type: 'image/jpeg', lastModified: Date.now() })); 
+                        }, 'image/jpeg', quality);
+                    };
+                };
+            });
+        }
+
+        async function fetchStatuses(reset = false) {
+            if (reset) { currentOffset = 0; hasMorePosts = true; globalPosts = []; document.getElementById('status-container').innerHTML = ''; }
+            if (isLoading || !hasMorePosts) return;
+            isLoading = true;
+            try {
+                const response = await fetch(`${API_URL}/posts?skip=${currentOffset}&limit=${postsLimit}`);
+                const newPosts = await response.json();
+                if (newPosts.length < postsLimit) hasMorePosts = false;
+                currentOffset += newPosts.length; globalPosts = globalPosts.concat(newPosts);
+                
+                if (globalPosts.length === 0) {
+                    document.getElementById('status-container').innerHTML = '<div class="loading-text">Nothing here yet.</div>';
+                } else if (reset) {
+                    document.getElementById('status-container').innerHTML = globalPosts.map(s => renderSinglePost(s)).join('');
+                } else {
+                    document.getElementById('status-container').innerHTML += newPosts.map(s => renderSinglePost(s)).join('');
+                }
+            } catch (error) {} finally { 
+                isLoading = false; 
+                document.getElementById('loading-indicator').style.display = (hasMorePosts && globalPosts.length > 0) ? 'block' : 'none'; 
+            }
+        }
+
+        window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
+
+        function renderSinglePost(s) {
+            const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
+            
+            let adminBarHtml = '';
+            if (secretKey) {
+                adminBarHtml = `
+                <div class="status-admin-bar">
+                    <span class="admin-bar-item" style="opacity: 0.5;">#${s.id}</span>
+                    <span class="admin-bar-item" style="position: absolute; left: 50%; transform: translateX(-50%); opacity: 0.5;">${formattedDate}</span>
+                    <span id="del-link-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>
+                </div>`;
+            }
+
+            const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
+            
+            let publicDateHtml = (!secretKey) ? `<div class="status-date">${formattedDate}</div>` : '';
+            
+            let mediaHtml = '';
+            if (imageHtml) {
+                mediaHtml = `<div class="status-media-wrapper">${adminBarHtml}${imageHtml}</div>`;
+            }
+
+            return `<div class="status-card">${mediaHtml}${publicDateHtml}</div>`;
+        }
+
+        function resetEditor() {
+            document.getElementById('edit-image').value = ""; 
+            updateImageUIState(); 
+            const pubBtn = document.getElementById('publish-btn');
+            pubBtn.innerHTML = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>';
+        }
+
+        // 🛠️ OPRAVA: Prepis zobrazenia prispôsobený novému textovému DELETE tlačidlu
+        function updateImageUIState() {
+            const input = document.getElementById('edit-image');
+            const thumbnail = document.getElementById('upload-thumbnail');
+            const actionLabel = document.getElementById('upload-action-label');
+            const nameDisplay = document.getElementById('file-name-display');
+            const clearLink = document.getElementById('clear-file-link');
+
+            if (input.files.length > 0) {
+                thumbnail.src = URL.createObjectURL(input.files[0]);
+                thumbnail.style.display = 'block';
+                
+                let fileName = input.files[0].name;
+                if (fileName.length > 22) fileName = fileName.substring(0, 10) + "..." + fileName.substring(fileName.length - 9);
+                
+                nameDisplay.innerText = fileName;
+                nameDisplay.style.display = 'block';
+                actionLabel.style.display = 'none';
+                clearLink.style.display = 'flex';
+            } else { 
+                thumbnail.src = "";
+                thumbnail.style.display = 'none';
+                nameDisplay.innerText = "";
+                nameDisplay.style.display = 'none';
+                actionLabel.style.display = 'block';
+                clearLink.style.display = 'none';
+                clearLink.dataset.confirm = "false";
+                clearLink.innerText = "DELETE";
+                clearLink.classList.remove('confirm');
+            }
+        }
+
+        // 🛠️ OPRAVA: Funkcia pre mazanie prispôsobená pre textový odkaz
+        function clearImageSelection(e) {
+            e.stopPropagation();
+            const link = document.getElementById('clear-file-link');
+            if (link.dataset.confirm === "true") { 
+                document.getElementById('edit-image').value = ""; 
+                link.classList.remove('confirm'); 
+                link.innerText = "DELETE";
+                link.dataset.confirm = "false"; 
+                updateImageUIState(); 
+            } else { 
+                link.classList.add('confirm'); 
+                link.innerText = "CONFIRM?";
+                link.dataset.confirm = "true"; 
+                setTimeout(() => { 
+                    link.classList.remove('confirm'); 
+                    link.innerText = "DELETE";
+                    link.dataset.confirm = "false"; 
+                }, 3000); 
+            }
+        }
+
+        async function handleMainSubmit(e) { 
+            e.preventDefault(); 
+            const imageFile = document.getElementById('edit-image').files[0];
+            if (!imageFile) { 
+                const uc = document.getElementById('upload-container'); uc.classList.add('input-error');
+                setTimeout(() => uc.classList.remove('input-error'), 2000); return; 
+            }
+            const publishBtn = document.getElementById('publish-btn'); 
+            publishBtn.disabled = true; publishBtn.style.opacity = '0.5';
+            
+            let finalImageUrl = null;
+            const compressedFile = await compressImage(imageFile);
+            const formData = new FormData(); formData.append("file", compressedFile);
+            const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
+            const upData = await upRes.json();
+            finalImageUrl = upData.image_url;
+
+            const res = await fetch(`${API_URL}/posts`, {
+                method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
+                body: JSON.stringify({ title: null, text: null, image_url: finalImageUrl, show_date: true, author: null })
+            });
+            
+            if (res.ok) { 
+                fetchStatuses(true); 
+                publishBtn.innerHTML = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 4 9 20 2 13"></polyline></svg>'; 
+                setTimeout(() => { resetEditor(); closeMenu(); publishBtn.disabled = false; publishBtn.style.opacity = '1'; }, 1000);
+            } else { publishBtn.disabled = false; publishBtn.style.opacity = '1'; }
+        }
+
+        async function handleDeleteFeed(id) {
+            const link = document.getElementById(`del-link-${id}`);
+            if (link.dataset.confirm === "true") { await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); fetchStatuses(true); }
+            else { link.classList.add('confirm'); link.innerText = "CONFIRM?"; link.dataset.confirm = "true"; setTimeout(() => { link.classList.remove('confirm'); link.innerText = "DELETE"; link.dataset.confirm = "false"; }, 3000); }
+        }
+
+        function handleDeleteAllClick() {
+            const btn = document.getElementById('delete-all-btn');
+            if (btn.dataset.state === "0") { btn.dataset.state = "1"; btn.innerText = "CLICK TO CONFIRM"; setTimeout(() => { if(btn.dataset.state === "1") resetDeleteAllBtn(); }, 3000); }
+            else if (btn.dataset.state === "1") { btn.dataset.state = "2"; startDeleteCountdown(5); }
+            else if (btn.dataset.state === "2") { stopDeleteCountdown(); }
+        }
+
+        function startDeleteCountdown(seconds) {
+            const btn = document.getElementById('delete-all-btn'); let left = seconds; btn.innerText = `CANCEL IN ${left}S`;
+            deleteTimer = setInterval(() => { left--; if (left <= 0) { clearInterval(deleteTimer); btn.innerText = "DELETING..."; btn.disabled = true; executeDeleteAll(); } else { btn.innerText = `CANCEL IN ${left}S`; } }, 1000);
+        }
+
+        function stopDeleteCountdown() { clearInterval(deleteTimer); resetDeleteAllBtn(); }
+        function resetDeleteAllBtn() { const btn = document.getElementById('delete-all-btn'); btn.dataset.state = "0"; btn.innerText = "DELETE ALL POSTS"; btn.disabled = false; }
+
+        async function executeDeleteAll() {
+            const res = await fetch(`${API_URL}/posts?skip=0&limit=100`);
+            const posts = await res.json();
+            for (const p of posts) { await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); }
+            fetchStatuses(true); resetDeleteAllBtn(); closeMenu();
+        }
+
+        checkRememberedLogin();
+        fetchStatuses(true);
+        document.addEventListener('click', (e) => { if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); });
+    </script>
+</body>
+</html>
