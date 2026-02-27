@@ -153,21 +153,12 @@
 
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
-        /* 🛠️ OPRAVA: Odstránený border pre dokonalý "frameless" sklenený efekt */
+        /* 🛠️ OPRAVA: Odstránený duplikovaný backdrop-filter. Používa sa len jemná 10% farba na vytvorenie výrezu na už rozmazanom pozadí menu */
         .form-input, .submit-btn { 
-            height: 3rem; 
-            border: none; 
-            border-radius: var(--border-radius); 
-            background: rgba(var(--glass-rgb), var(--glass-opacity));
-            backdrop-filter: blur(var(--glass-blur)); 
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            font-size: var(--size-small); 
-            padding: 0 var(--gap-item); 
-            outline: none; 
-            color: var(--black); 
-            display: flex; 
-            align-items: center; 
-            gap: var(--gap-item); 
+            height: 3rem; border: none; border-radius: var(--border-radius); 
+            background-color: var(--divider); 
+            font-size: var(--size-small); padding: 0 var(--gap-item); 
+            outline: none; color: var(--black); display: flex; align-items: center; gap: var(--gap-item); 
         }
         
         .input-error { border: 1px solid var(--danger) !important; }
@@ -177,13 +168,10 @@
         .submit-btn { text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
         .icon-btn { width: 3rem; height: 3rem; flex-shrink: 0; padding: 0; }
         
-        /* 🛠️ OPRAVA: Červené sklo bez okraja */
+        /* 🛠️ OPRAVA: Tlačidlo Delete s 50% priehľadnou červenou farbou a bielym textom bez zbytočného zdvojenia bluru */
         .danger-btn { 
-            background: rgba(255, 68, 68, var(--glass-opacity)) !important; 
-            backdrop-filter: blur(var(--glass-blur)) !important;
-            -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
+            background-color: rgba(255, 68, 68, 0.5) !important; 
             color: #ffffff !important; 
-            border: none !important; 
         }
 
         #upload-container { display: flex; cursor: pointer; flex-grow: 1; overflow: hidden; }
@@ -228,7 +216,7 @@
             <div id="login-ui">
                 <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                     <div style="display: flex; width: 100%; gap: var(--gap-item);">
-                        <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="flex-grow: 1;">
+                        <input type="password" id="admin-pass" class="form-input" placeholder="Password...">
                         <button type="submit" id="login-btn" class="submit-btn icon-btn">
                             <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>
                         </button>
@@ -270,7 +258,7 @@
             </div>
             
             <div class="divider"></div>
-            <div class="footer-info">build v5.5.5 • 2026</div>
+            <div class="footer-info">build v5.5.6 • 2026</div>
         </div>
     </nav>
 
@@ -420,7 +408,6 @@
         window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
 
         function renderSinglePost(s) {
-            const showDate = s.show_date !== false;
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
             let adminBarHtml = '';
@@ -435,7 +422,7 @@
 
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
             
-            let publicDateHtml = (!secretKey && showDate) ? `<div class="status-date">${formattedDate}</div>` : '';
+            let publicDateHtml = (!secretKey) ? `<div class="status-date">${formattedDate}</div>` : '';
             
             let mediaHtml = '';
             if (imageHtml) {
