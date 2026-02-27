@@ -69,7 +69,7 @@
         header {
             position: fixed; top: 0; left: 0; width: 100%; 
             display: flex; justify-content: center; padding: var(--gap-item) 0; 
-            background: rgba(var(--glass-rgb), var(--glass-opacity));
+            background: transparent; 
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 2000;
         }
@@ -92,7 +92,7 @@
 
         .nav-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: auto;
-            background: rgba(var(--glass-rgb), var(--glass-opacity));
+            background: transparent; 
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 1500; 
             padding: calc(3rem + var(--gap-item)) 0 var(--gap-item) 0; 
@@ -123,12 +123,12 @@
             overflow: hidden;
             transform: translateZ(0); 
             min-height: 3rem;
-            background-color: var(--divider);
+            background-color: transparent; 
         }
 
         .status-glass-bar {
             height: 3rem; width: 100%;
-            background: rgba(var(--glass-rgb), var(--glass-opacity));
+            background: transparent; 
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             position: absolute; top: 0; left: 0; right: 0;
             z-index: 10;
@@ -143,33 +143,45 @@
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
-        .form-input, .submit-btn { 
+        /* 🛠️ ÚPRAVA: Input polia si zachovali sklenený vzhľad */
+        .form-input { 
             height: 3rem; border: none; border-radius: var(--border-radius); 
-            background-color: var(--divider); 
+            background-color: transparent; 
             backdrop-filter: blur(var(--glass-blur)); 
             -webkit-backdrop-filter: blur(var(--glass-blur));
+            transform: translateZ(0);
             font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; color: var(--black); display: flex; align-items: center; gap: var(--gap-item); 
+        }
+
+        /* 🛠️ ÚPRAVA: Tlačidlá majú teraz plnú farbu s opačným textom bez rozostrenia */
+        .submit-btn { 
+            height: 3rem; border: none; border-radius: var(--border-radius); 
+            background-color: var(--black); 
+            color: var(--white);
+            font-size: var(--size-small); padding: 0 var(--gap-item); 
+            outline: none; display: flex; align-items: center; justify-content: center; gap: var(--gap-item); 
+            text-transform: uppercase; cursor: pointer; white-space: nowrap;
         }
         
         .input-error { border: 1px solid var(--danger) !important; }
         .input-error span { color: var(--danger) !important; }
         .input-error::placeholder { color: var(--danger) !important; opacity: 1; }
 
-        .submit-btn { text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
-        
+        /* 🛠️ ÚPRAVA: Delete tlačidlá sú plne červené s čiernym textom */
         .danger-btn { 
-            background-color: rgba(255, 68, 68, 0.1) !important; 
-            color: var(--danger) !important; 
+            background-color: var(--danger) !important; 
+            color: #000000 !important; 
         }
 
+        /* 🛠️ ÚPRAVA: Success tlačidlo je plne zelené s čiernym textom */
         .success-btn {
-            background-color: rgba(46, 204, 113, 0.1) !important;
-            color: var(--success) !important;
+            background-color: var(--success) !important;
+            color: #000000 !important;
             pointer-events: none; 
         }
 
-        #upload-thumbnail { width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; cursor: pointer; background-color: var(--divider); }
+        #upload-thumbnail { width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; cursor: pointer; background-color: transparent; }
 
         .custom-checkbox {
             appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black);
@@ -186,7 +198,7 @@
 
         #delete-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(var(--glass-rgb), var(--glass-opacity));
+            background: transparent; 
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 3000;
             display: none; flex-direction: column; justify-content: center; align-items: center;
@@ -200,7 +212,7 @@
 
         .status-confirm-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(var(--glass-rgb), var(--glass-opacity));
+            background: transparent; 
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 20;
             display: none; flex-direction: column; justify-content: center; align-items: center;
@@ -252,8 +264,8 @@
                 <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                     <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                     
-                    <div id="upload-empty-state" class="form-input" style="cursor: pointer; justify-content: center;" onclick="document.getElementById('edit-image').click()">
-                        <span>+ ADD IMAGE</span>
+                    <div id="upload-empty-state" class="submit-btn" style="width: 100%;" onclick="document.getElementById('edit-image').click()">
+                        + ADD IMAGE
                     </div>
 
                     <div id="upload-filled-state" style="display: none; gap: var(--gap-item); width: 100%;">
@@ -270,7 +282,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v5.8.7 • 2026</div>
+            <div class="footer-info">build v5.9.0 • 2026</div>
         </div>
     </nav>
 
