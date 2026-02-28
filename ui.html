@@ -65,7 +65,8 @@
             line-height: 1;
         }
 
-        header, .nav-overlay, .status-glass-bar, .status-glass-bar-bottom, .status-confirm-overlay, #delete-modal {
+        /* 🛠️ Pridané pravidlo pre hardvérovú akceleráciu nového rozostrenia */
+        header, .nav-overlay, .status-glass-bar, .status-glass-bar-bottom, .status-confirm-overlay, #delete-modal, .status-text-overlay {
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
         }
@@ -134,7 +135,8 @@
 
         .status-feed.view-grid .status-glass-bar,
         .status-feed.view-grid .status-glass-bar-bottom,
-        .status-feed.view-grid .status-confirm-overlay {
+        .status-feed.view-grid .status-confirm-overlay,
+        .status-feed.view-grid .status-text-overlay {
             display: none !important;
         }
         .status-feed.view-grid .status-media-wrapper {
@@ -182,7 +184,7 @@
         .status-text-content {
             font-size: var(--size-small); color: var(--grey-50);
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            flex-grow: 1; text-align: left;
+            flex-grow: 1; text-align: left; cursor: pointer;
         }
 
         .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
@@ -219,7 +221,6 @@
             border: none !important;
         }
 
-        /* 🛠️ OPRAVA: Vizuálne deaktivané tlačidlo (transparentné, sivé, bez reakcie) */
         .btn-tonal-disabled {
             background-color: transparent !important;
             color: var(--grey-50) !important;
@@ -317,6 +318,40 @@
             z-index: -1;
         }
 
+        /* 🛠️ Nové rozostrené okno (Read Mode) s využitím Safari-safe::before */
+        .status-text-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 15;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            border-radius: var(--border-radius);
+            background: transparent;
+            cursor: pointer;
+        }
+        .status-text-overlay::before {
+            content: "";
+            position: absolute; inset: 0;
+            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
+            backdrop-filter: blur(var(--glass-blur)); 
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border-radius: inherit;
+            z-index: -1;
+        }
+        .status-text-overlay-content {
+            font-size: var(--size-small); 
+            color: var(--black);
+            text-align: justify; /* 🛠️ Zarovnanie do bloku */
+            padding: calc(var(--gap-item) * 2); /* Okraje od stien */
+            max-height: 100%; /* Obmedzenie aby sa zmestilo */
+            overflow-y: auto; /* Ak je text masívny, dá sa v ňom rolovať */
+            width: 100%;
+            line-height: 1.6;
+            -ms-overflow-style: none;  /* Schová škaredý scrollbar pre IE */
+            scrollbar-width: none;  /* Schová scrollbar pre Firefox */
+        }
+        .status-text-overlay-content::-webkit-scrollbar {
+            display: none; /* Schová scrollbar pre Chrome/Safari */
+        }
+
         #delete-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 3000;
@@ -406,7 +441,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.4.10 • 2026</div>
+            <div class="footer-info">build v6.5.0 • 2026</div>
         </div>
     </nav>
 
@@ -701,6 +736,25 @@
             }
         }
 
+        // 🛠️ JS Logika pre otváranie "Read Mode"
+        function toggleTextOverlay(e, id) {
+            if (e) e.stopPropagation();
+            
+            const overlay = document.getElementById(`text-overlay-${id}`);
+            if (overlay) {
+                const card = overlay.closest('.status-card');
+                const bars = card.querySelectorAll('.status-glass-bar, .status-glass-bar-bottom');
+                
+                if (overlay.style.display === 'none' || overlay.style.display === '') {
+                    overlay.style.display = 'flex';
+                    bars.forEach(b => b.style.display = 'none'); // Skryje obláčiky pre čisté čítanie
+                } else {
+                    overlay.style.display = 'none';
+                    bars.forEach(b => b.style.display = 'flex'); // Vráti obláčiky
+                }
+            }
+        }
+
         function handleEditPost(e, id) {
             e.stopPropagation(); 
             
@@ -733,12 +787,22 @@
             </div>`;
 
             let barHtmlBottom = '';
+            let textOverlayHtml = '';
+
+            // 🛠️ Vytvorenie HTML pre textový Read Mode (Overlay)
             if (s.text || secretKey) {
                 barHtmlBottom = `
                 <div class="status-glass-bar-bottom">
-                    <span class="status-text-content">${s.text || ''}</span>
+                    <span class="status-text-content" onclick="toggleTextOverlay(event, ${s.id})">${s.text || ''}</span>
                     ${secretKey ? `<span onclick="handleEditPost(event, ${s.id})" class="admin-bar-item admin-delete-link" style="margin-left: var(--gap-item);">EDIT</span>` : ''}
                 </div>`;
+
+                if (s.text) {
+                    textOverlayHtml = `
+                    <div id="text-overlay-${s.id}" class="status-text-overlay" onclick="toggleTextOverlay(event, ${s.id})">
+                        <div class="status-text-overlay-content">${s.text}</div>
+                    </div>`;
+                }
             }
 
             const imageHtml = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="status-image" alt="image" loading="lazy" onclick="toggleGlassBar(this, ${s.id})">` : '';
@@ -750,6 +814,7 @@
                     ${barHtmlTop}
                     ${imageHtml}
                     ${barHtmlBottom}
+                    ${textOverlayHtml}
                     ${secretKey ? `
                     <div id="confirm-overlay-${s.id}" class="status-confirm-overlay">
                         <div id="confirm-actions-${s.id}" class="action-row" style="padding: 0 var(--gap-item);">
@@ -900,14 +965,13 @@
             }
         }
 
-        // 🛠️ OPRAVA: Po vymazaní fotky (DELETE) sa tlačidlo prepne na deaktivaný štýl
         function clearImageSelection(e) {
             e.stopPropagation();
             document.getElementById('edit-image').value = ""; 
             existingImageUrl = null; 
             
             const delBtn = document.getElementById('clear-upload-btn');
-            if(delBtn) delBtn.className = "submit-btn btn-tonal-disabled"; // Aplikácia neaktívneho štýlu
+            if(delBtn) delBtn.className = "submit-btn btn-tonal-disabled"; 
             
             updateImageUIState();
         }
