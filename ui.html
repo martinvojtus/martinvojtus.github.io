@@ -137,7 +137,6 @@
         .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
         .admin-delete-link { cursor: pointer; color: var(--black); text-decoration: none; }
 
-        /* 🛠️ ÚPRAVA: Pridaný kurzor pointer, aby bolo jasné, že sa na to dá kliknúť */
         .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); cursor: pointer; }
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
@@ -274,7 +273,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-outline" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.0.2 • 2026</div>
+            <div class="footer-info">build v6.0.1 • 2026</div>
         </div>
     </nav>
 
@@ -457,11 +456,24 @@
 
         window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
 
-        // 🛠️ ÚPRAVA: Prepínač na zobrazenie/skrytie panelu s dátumom
+        // 🛠️ ÚPRAVA: Nová funkcia na schovanie skla po kliknutí a jeho auto-návrat po 5s
         function toggleGlassBar(img) {
             const bar = img.parentElement.querySelector('.status-glass-bar');
             if (bar) {
-                bar.style.display = bar.style.display === 'none' ? 'flex' : 'none';
+                if (bar.style.display === 'none') {
+                    // Manuálny návrat (užívateľ klikol skôr ako vypršal čas)
+                    bar.style.display = 'flex';
+                    clearTimeout(img.glassTimer);
+                } else {
+                    // Skrytie
+                    bar.style.display = 'none';
+                    clearTimeout(img.glassTimer); // Vyčistenie starého časovača pre istotu
+                    
+                    // Automatický návrat po 5 sekundách
+                    img.glassTimer = setTimeout(() => {
+                        bar.style.display = 'flex';
+                    }, 5000);
+                }
             }
         }
 
@@ -475,7 +487,7 @@
                 ${secretKey ? `<span onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>` : '<div></div>'}
             </div>`;
 
-            // 🛠️ ÚPRAVA: Pridaný onclick na img tag
+            // Onclick napojený priamo na fotku
             const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy" onclick="toggleGlassBar(this)">` : '';
             
             let mediaHtml = '';
@@ -544,7 +556,7 @@
         function closeFeedDelete(id) {
             document.getElementById(`confirm-overlay-${id}`).style.display = 'none';
             const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
-            card.querySelector('.status-glass-bar').style.display = 'flex'; // Zrušenie overlayu vždy vráti lištu späť
+            card.querySelector('.status-glass-bar').style.display = 'flex';
         }
 
         async function executeFeedDelete(id) {
