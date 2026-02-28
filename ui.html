@@ -200,11 +200,12 @@
         .input-error { border: 1px solid var(--black) !important; }
         .input-error span { color: var(--black) !important; }
 
+        /* 🛠️ OPRAVA: Zmazané aspect-ratio, pridané rozmery a rámček. Celý "contain" formát fotky. */
         .image-preview-container {
-            width: 100%;
-            aspect-ratio: 1 / 1;
+            width: 3rem;
+            height: 3rem;
             background-color: var(--divider);
-            border: none;
+            border: 1px solid var(--black);
             border-radius: var(--border-radius);
             display: flex;
             justify-content: center;
@@ -215,7 +216,7 @@
         .image-preview-img {
             width: 100%;
             height: 100%;
-            object-fit: contain; 
+            object-fit: cover; 
         }
 
         .custom-checkbox {
@@ -325,7 +326,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-outline" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.2.2 • 2026</div>
+            <div class="footer-info">build v6.2.3 • 2026</div>
         </div>
     </nav>
 
@@ -611,6 +612,7 @@
             document.getElementById('upload-loading-row').style.display = 'none';
             document.getElementById('upload-success-row').style.display = 'none';
             
+            // 🛠️ JS template pre resetovaný formulár. Rozloženie s miniatúrou.
             document.getElementById('upload-action-row').innerHTML = `
                 <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">UPLOAD</button>
                 <div id="clear-upload-btn" class="submit-btn btn-outline" onclick="clearImageSelection(event)">DELETE</div>
@@ -618,7 +620,6 @@
             updateImageUIState(); 
         }
 
-        // 🛠️ ÚPRAVA: Logika pre zobrazenie poľa + ADD IMAGE v prípade zmazania fotky v EDIT režime
         function updateImageUIState() {
             const input = document.getElementById('edit-image');
             const emptyState = document.getElementById('upload-empty-state');
@@ -647,14 +648,12 @@
                         pubBtn.style.opacity = '1';
                     }
                 } else {
-                    // Fotka zmazaná v režime editácie
                     if(thumbnail) {
                         thumbnail.src = "";
                         thumbnail.style.display = 'none';
                     }
                     if(previewAddText) previewAddText.style.display = 'block';
                     
-                    // Zamedzíme uloženiu, kým nie je zvolená nová fotka
                     if(pubBtn) {
                         pubBtn.disabled = true;
                         pubBtn.style.opacity = '0.5';
