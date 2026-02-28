@@ -319,10 +319,11 @@
             z-index: -1;
         }
 
+        /* 🛠️ OPRAVA: Zarovnanie hore (flex-start) namiesto centrovania */
         .status-text-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 15;
-            display: none; flex-direction: column; justify-content: center; align-items: center;
+            display: none; flex-direction: column; justify-content: flex-start; align-items: flex-start;
             border-radius: var(--border-radius);
             background: transparent;
             cursor: pointer;
@@ -339,7 +340,7 @@
         .status-text-overlay-content {
             font-size: var(--size-small); 
             color: var(--black);
-            padding: calc(var(--gap-item) * 2); 
+            padding: calc(var(--gap-item) * 1.5); /* O niečo menší padding pre vzdušnejšie čítanie od zhora */
             max-height: 100%; 
             overflow-y: auto; 
             width: 100%;
@@ -359,12 +360,16 @@
             text-transform: uppercase;
             word-wrap: break-word;
         }
+        
+        /* 🛠️ OPRAVA: Poistka aj pre veľmi dlhé texty alebo URL bez medzier */
         .status-text-overlay-body {
             text-align: justify;
             white-space: pre-wrap; 
             -webkit-hyphens: auto;
             -ms-hyphens: auto;
             hyphens: auto;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         #delete-modal {
@@ -464,7 +469,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.5.5 • 2026</div>
+            <div class="footer-info">build v6.5.6 • 2026</div>
         </div>
     </nav>
 
@@ -886,10 +891,10 @@
                             <button class="submit-btn btn-tonal" onclick="closeFeedDelete(${s.id})">CANCEL</button>
                         </div>
                         <div id="confirm-loading-${s.id}" class="action-row" style="display: none; padding: 0 var(--gap-item);">
-                            <div class="submit-btn btn-loading" style="width: 100%;">DELETING...</div>
+                            <div class="submit-btn btn-loading">DELETING...</div>
                         </div>
                         <div id="confirm-success-${s.id}" class="action-row" style="display: none; padding: 0 var(--gap-item);">
-                            <div class="submit-btn btn-ghost" style="width: 100%;">DELETED</div>
+                            <div class="submit-btn btn-ghost">DELETED</div>
                         </div>
                     </div>
                     ` : ''}
@@ -964,7 +969,6 @@
             }
         }
 
-        // 🛠️ Úplne čistá funkcia na zmazanie fotky z editora (všetko ostatné riadi updateImageUIState)
         function clearImageSelection(e) {
             e.stopPropagation();
             document.getElementById('edit-image').value = ""; 
