@@ -344,11 +344,11 @@
             z-index: -1;
         }
         
-        /* 🛠️ OPRAVA: Padding presne 1rem (var(--gap-item)) */
+        /* 🛠️ OPRAVA PADDINGU: Natvrdo nastavené na 1rem pre absolútnu dokonalosť mriežky */
         .status-text-overlay-content {
             font-size: var(--size-small); 
             color: var(--black);
-            padding: var(--gap-item); 
+            padding: 1rem; 
             max-height: 100%; 
             overflow-y: auto; 
             width: 100%;
@@ -476,7 +476,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.5.7 • 2026</div>
+            <div class="footer-info">build v6.5.8 • 2026</div>
         </div>
     </nav>
 
@@ -661,7 +661,6 @@
             const container = document.getElementById('status-container');
             const deleteAllBtn = document.getElementById('delete-all-btn');
 
-            // 🛠️ OPRAVA: Dynamické vypínanie tlačidla DELETE ALL, ak nie sú žiadne príspevky
             if (deleteAllBtn) {
                 if (globalPosts.length === 0) {
                     deleteAllBtn.disabled = true;
