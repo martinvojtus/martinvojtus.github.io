@@ -112,11 +112,13 @@
             flex-grow: 1; display: block; 
         }
 
-        #section-feed { display: block; }
+        #section-feed { display: block; width: 100%; }
         
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
         #logout-ui { display: none; }
-        #admin-upload-zone { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; }
+        
+        /* 🛠️ Editor teraz sedí priamo vo feede, skrytý je len keď nie si prihlásený */
+        #admin-upload-zone { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; margin-bottom: var(--gap-item); }
 
         .status-feed { 
             max-width: var(--content-width); width: 100%; margin: 0 auto; 
@@ -344,7 +346,6 @@
             z-index: -1;
         }
         
-        /* 🛠️ OPRAVA PADDINGU: Natvrdo nastavené na 1rem pre absolútnu dokonalosť mriežky */
         .status-text-overlay-content {
             font-size: var(--size-small); 
             color: var(--black);
@@ -423,7 +424,6 @@
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
-            
             <div id="login-ui">
                 <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                     <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="width: 100%;">
@@ -435,52 +435,52 @@
                 </form>
             </div>
 
-            <div id="admin-upload-zone">
-                <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
-                    <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
-                    
-                    <div id="upload-empty-state" class="submit-btn btn-tonal" style="width: 100%;" onclick="document.getElementById('edit-image').click()">
-                        + ADD IMAGE
-                    </div>
-
-                    <div id="upload-filled-state" class="action-row" style="display: none;">
-                        <div class="thumbnail-container" onclick="document.getElementById('edit-image').click()">
-                            <img id="upload-preview-img" class="thumbnail-img" src="" alt="">
-                        </div>
-                        <div class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="clearImageSelection(event)">DELETE IMAGE</div>
-                    </div>
-
-                    <div id="upload-details-zone" style="display: none; flex-direction: column; gap: var(--gap-item); width: 100%;">
-                        
-                        <input type="text" id="edit-title" class="form-input" placeholder="Image title..." style="width: 100%;" oninput="updateTextUIState()">
-                        <textarea id="edit-text" class="form-input" placeholder="Image description..." style="width: 100%;" oninput="autoResizeTextarea(this); updateTextUIState();"></textarea>
-                        
-                        <div id="upload-action-row" class="action-row" style="padding: 0;">
-                            <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
-                            <div id="clear-text-btn" class="submit-btn btn-tonal-disabled" onclick="clearTextFields(event)">CLEAR</div>
-                            <div class="submit-btn btn-tonal" onclick="closeMenu()">CANCEL</div>
-                        </div>
-                        <div id="upload-loading-row" class="action-row" style="display: none; padding: 0;">
-                            <div id="upload-loading-btn" class="submit-btn btn-loading" style="flex-grow: 1;">UPLOADING...</div>
-                        </div>
-                        <div id="upload-success-row" class="action-row" style="display: none; padding: 0;">
-                            <div id="upload-success-btn" class="submit-btn btn-ghost" style="flex-grow: 1;">UPLOADED</div>
-                        </div>
-                    </div>
-                    
-                    <button type="button" id="delete-all-btn" class="submit-btn btn-danger" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
-                </form>
-            </div>
-
             <div id="logout-ui" style="display: none;">
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.5.8 • 2026</div>
+            <div class="footer-info">build v6.5.9 • 2026</div>
         </div>
     </nav>
 
     <main>
+        <div id="admin-upload-zone">
+            <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
+                <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
+                
+                <div id="upload-empty-state" class="submit-btn btn-tonal" style="width: 100%;" onclick="document.getElementById('edit-image').click()">
+                    + ADD IMAGE
+                </div>
+
+                <div id="upload-filled-state" class="action-row" style="display: none;">
+                    <div class="thumbnail-container" onclick="document.getElementById('edit-image').click()">
+                        <img id="upload-preview-img" class="thumbnail-img" src="" alt="">
+                    </div>
+                    <div class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="clearImageSelection(event)">DELETE IMAGE</div>
+                </div>
+
+                <div id="upload-details-zone" style="display: none; flex-direction: column; gap: var(--gap-item); width: 100%;">
+                    
+                    <input type="text" id="edit-title" class="form-input" placeholder="Image title..." style="width: 100%;" oninput="updateTextUIState()">
+                    <textarea id="edit-text" class="form-input" placeholder="Image description..." style="width: 100%;" oninput="autoResizeTextarea(this); updateTextUIState();"></textarea>
+                    
+                    <div id="upload-action-row" class="action-row" style="padding: 0;">
+                        <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
+                        <div id="clear-text-btn" class="submit-btn btn-tonal-disabled" onclick="clearTextFields(event)">CLEAR</div>
+                        <div class="submit-btn btn-tonal" onclick="resetEditor()">CANCEL</div>
+                    </div>
+                    <div id="upload-loading-row" class="action-row" style="display: none; padding: 0;">
+                        <div id="upload-loading-btn" class="submit-btn btn-loading" style="flex-grow: 1;">UPLOADING...</div>
+                    </div>
+                    <div id="upload-success-row" class="action-row" style="display: none; padding: 0;">
+                        <div id="upload-success-btn" class="submit-btn btn-ghost" style="flex-grow: 1;">UPLOADED</div>
+                    </div>
+                </div>
+                
+                <button type="button" id="delete-all-btn" class="submit-btn btn-danger" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
+            </form>
+        </div>
+
         <div id="section-feed">
             <div id="status-container" class="status-feed view-grid"></div>
             <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
@@ -560,34 +560,25 @@
             refreshFeedUI();
         }
 
-        function openEditor(e) {
-            if (e) e.stopPropagation();
-            if (!navOverlay.classList.contains('active')) {
-                toggleMenu();
-            }
-            window.scrollTo(0,0);
-        }
-
         function toggleMenu() { 
             const isActive = menuToggle.classList.toggle('active'); 
             navOverlay.classList.toggle('active'); 
             menuToggle.innerText = isActive ? 'CLOSE' : 'MENU';
             
-            if (!isActive) resetEditor();
+            // Reštart editora sme odstránili pri zatváraní menu, lebo editor už nie je v menu
         }
         function closeMenu() { 
             menuToggle.classList.remove('active'); 
             navOverlay.classList.remove('active'); 
             menuToggle.innerText = 'MENU';
-            resetEditor(); 
         }
 
         function updateUIVisibility() {
             if (secretKey) {
                 document.body.classList.add('is-logged-in');
                 document.getElementById('login-ui').style.display = 'none';
-                document.getElementById('admin-upload-zone').style.display = 'flex';
-                document.getElementById('logout-ui').style.display = 'block';
+                document.getElementById('admin-upload-zone').style.display = 'flex'; // Zobrazí editor nad feedom
+                document.getElementById('logout-ui').style.display = 'flex';
             } else {
                 document.body.classList.remove('is-logged-in');
                 document.getElementById('login-ui').style.display = 'flex';
@@ -614,7 +605,7 @@
                     secretKey = tempKey; 
                     setTimeout(() => {
                         updateUIVisibility();
-                        closeMenu(); 
+                        closeMenu(); // Pri úspechu zavrie menu
                         refreshFeedUI(); 
                         passInput.value = ''; 
                         if (rememberMe) { localStorage.setItem('mv_admin_key', secretKey); } else { localStorage.removeItem('mv_admin_key'); }
@@ -654,6 +645,7 @@
             localStorage.removeItem('mv_admin_key');
             updateUIVisibility();
             closeMenu();
+            resetEditor(); // Pri odhlásení vyčistíme rozrobené zmeny
             refreshFeedUI();
         }
 
@@ -673,18 +665,14 @@
             
             if (globalPosts.length === 0) {
                 container.className = 'status-feed view-feed';
-                if (secretKey) {
-                    container.innerHTML = `
-                        <div class="submit-btn btn-tonal" onclick="openEditor(event)" style="width: 100%;">
-                            + ADD IMAGE
-                        </div>
-                    `;
-                } else {
+                if (!secretKey) {
                     container.innerHTML = `
                         <div class="submit-btn btn-tonal-disabled" style="width: 100%; cursor: default;">
                             NOTHING HERE YET.
                         </div>
                     `;
+                } else {
+                    container.innerHTML = ''; // Editor je už zobrazený navrchu, feed je len prázdny
                 }
                 return;
             }
@@ -848,12 +836,8 @@
                 updateTextUIState(); 
             }, 0); 
             
-            if (!navOverlay.classList.contains('active')) {
-                menuToggle.classList.add('active'); 
-                navOverlay.classList.add('active'); 
-                menuToggle.innerText = 'CLOSE';
-            }
-            window.scrollTo(0,0);
+            // 🛠️ Scroll plynule hore k editoru (už neotvára menu)
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             
             updateImageUIState();
         }
@@ -939,7 +923,7 @@
             document.getElementById('upload-action-row').innerHTML = `
                 <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
                 <div id="clear-text-btn" class="submit-btn btn-tonal-disabled" onclick="clearTextFields(event)">CLEAR</div>
-                <div class="submit-btn btn-tonal" onclick="closeMenu()">CANCEL</div>
+                <div class="submit-btn btn-tonal" onclick="resetEditor()">CANCEL</div>
             `;
             
             updateImageUIState(); 
@@ -1062,7 +1046,6 @@
                 setTimeout(() => {
                     fetchStatuses(true);
                     closeDeleteModal();
-                    closeMenu();
                 }, 1000);
             }
         }
@@ -1119,7 +1102,7 @@
                     document.getElementById('upload-loading-row').style.display = 'none';
                     document.getElementById('upload-success-row').style.display = 'flex';
                     document.getElementById('upload-success-btn').innerText = editingPostId ? 'SAVED' : 'UPLOADED';
-                    setTimeout(() => { resetEditor(); closeMenu(); }, 1000);
+                    setTimeout(() => { resetEditor(); }, 1000);
                 } else { 
                     resetEditor(); 
                 }
