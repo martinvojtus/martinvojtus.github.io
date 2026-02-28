@@ -15,10 +15,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --black: #000000;
+            /* Design System Opacity Scale */
+            --black: #000000;         /* 100% (1.0) */
             --white: #ffffff;
-            --grey-50: rgba(0, 0, 0, 0.5);
-            --divider: rgba(0, 0, 0, 0.1);
+            --grey-50: rgba(0, 0, 0, 0.5); /* 50% (0.5) */
+            --divider: rgba(0, 0, 0, 0.1); /* 10% (0.1) */
+            
             --glass-rgb: 255, 255, 255; 
             --content-width: 540px; 
             --border-radius: 1rem; 
@@ -26,6 +28,7 @@
             --letter-spacing: 0.05em;
             --glass-opacity: 0.5; 
             --glass-blur: 1rem;   
+            --size-small: 0.8125rem; /* 13px */
         }
 
         @media (prefers-color-scheme: dark) {
@@ -200,12 +203,12 @@
         .input-error { border: 1px solid var(--black) !important; }
         .input-error span { color: var(--black) !important; }
 
-        /* 🛠️ Návrat k veľkému 1:1 náhľadu s jemnými okrajmi z farby divider */
+        /* 🛠️ OPRAVA: Odstránený rámček (border: none;). */
         .image-preview-container {
             width: 100%;
             aspect-ratio: 1 / 1;
             background-color: transparent;
-            border: 1px solid var(--black);
+            border: none; /* Rámček odstránený */
             border-radius: var(--border-radius);
             display: flex;
             justify-content: center;
@@ -218,7 +221,7 @@
             width: 100%;
             height: 100%;
             object-fit: contain; 
-            background-color: var(--divider); /* Vyplní prázdny priestor pri formátoch 16:9, 4:3 atď. */
+            background-color: var(--divider); /* Zachované pre výplň neštvorcových fotiek */
         }
         
         #preview-add-text {
@@ -332,7 +335,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-outline" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.2.4 • 2026</div>
+            <div class="footer-info">build v6.2.5 • 2026</div>
         </div>
     </nav>
 
@@ -625,7 +628,6 @@
             updateImageUIState(); 
         }
 
-        // 🛠️ ÚPRAVA: Smart logika zobrazovania/skrývania zóny pre detaily postu
         function updateImageUIState() {
             const input = document.getElementById('edit-image');
             const detailsZone = document.getElementById('upload-details-zone');
@@ -635,7 +637,6 @@
 
             const hasImage = (input && input.files && input.files.length > 0) || existingImageUrl;
 
-            // Spracovanie náhľadu vo štvorci
             if (hasImage) {
                 if (input && input.files && input.files.length > 0) {
                     if(thumbnail) thumbnail.src = URL.createObjectURL(input.files[0]);
@@ -652,18 +653,15 @@
                 if(previewAddText) previewAddText.style.display = 'block';
             }
 
-            // Spracovanie spodných detailov a tlačidiel
             if (hasImage || editingPostId) {
                 if(detailsZone) detailsZone.style.display = 'flex';
                 
                 if (hasImage) {
-                    // Máme fotku = môžeme odoslať
                     if(pubBtn) {
                         pubBtn.disabled = false;
                         pubBtn.style.opacity = '1';
                     }
                 } else {
-                    // Editujeme, ale zmazali sme fotku = nedá sa odoslať kým nedáme novú
                     if(pubBtn) {
                         pubBtn.disabled = true;
                         pubBtn.style.opacity = '0.5';
@@ -672,7 +670,6 @@
                 
                 if(pubBtn) pubBtn.innerText = editingPostId ? 'SAVE' : 'UPLOAD';
             } else { 
-                // Úplne nový post bez fotky = detaily sú schované
                 if(detailsZone) detailsZone.style.display = 'none';
             }
         }
