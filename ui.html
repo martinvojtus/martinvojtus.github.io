@@ -135,8 +135,6 @@
         }
 
         .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
-        
-        /* 🛠️ ÚPRAVA: Zmazaný font-weight: 700, text je teraz štandardný */
         .admin-delete-link { cursor: pointer; color: var(--black); text-decoration: none; }
 
         .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); }
@@ -149,7 +147,6 @@
             outline: none; display: flex; align-items: center; gap: var(--gap-item); 
         }
 
-        /* 🛠️ ÚPRAVA: Zákaz predvolených systémových tieňov pre input polia cez box-shadow: none a appearance: none */
         .form-input { 
             background-color: transparent; 
             color: var(--black);
@@ -170,11 +167,12 @@
             color: var(--black);
         }
 
+        /* 🛠️ ÚPRAVA: Ghost stav (Duch). Má 1px sivý rámček, sivý text a je neklikateľný */
         .btn-ghost {
-            background-color: transparent; 
-            color: var(--grey-50); 
-            border-color: var(--grey-50);
-            pointer-events: none; 
+            background-color: transparent !important; 
+            color: var(--grey-50) !important; 
+            border: 1px solid var(--grey-50) !important;
+            pointer-events: none !important; 
         }
 
         .input-error { border: 1px solid var(--black) !important; opacity: 0.5; }
@@ -265,7 +263,7 @@
                     <div id="upload-filled-state" style="display: none; gap: var(--gap-item); width: 100%;">
                         <img id="upload-thumbnail" src="" alt="" onclick="document.getElementById('edit-image').click()">
                         <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">UPLOAD</button>
-                        <div class="submit-btn btn-outline" onclick="clearImageSelection(event)">DELETE</div>
+                        <div id="clear-upload-btn" class="submit-btn btn-outline" onclick="clearImageSelection(event)">DELETE</div>
                     </div>
                     
                     <button type="button" class="submit-btn" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
@@ -276,7 +274,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-outline" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.0.0 • 2026</div>
+            <div class="footer-info">build v6.0.1 • 2026</div>
         </div>
     </nav>
 
@@ -289,11 +287,8 @@
 
     <div id="delete-modal">
         <div id="modal-action-zone" class="action-row">
-            <button class="submit-btn" onclick="executeModalDelete()">DELETE</button>
-            <button class="submit-btn btn-outline" onclick="closeDeleteModal()">CANCEL</button>
-        </div>
-        <div id="modal-success-zone" class="action-row" style="display: none;">
-            <div class="submit-btn btn-ghost">DELETED</div>
+            <button id="modal-del-btn" class="submit-btn" onclick="executeModalDelete()">DELETE</button>
+            <button id="modal-cancel-btn" class="submit-btn btn-outline" onclick="closeDeleteModal()">CANCEL</button>
         </div>
     </div>
 
@@ -342,6 +337,45 @@
             }
         }
 
+        // 🛠️ ÚPRAVA LOGIN: Rovnaký Loading flow
+        async function handleLogin(e) {
+            e.preventDefault();
+            const loginBtn = document.getElementById('login-btn');
+            loginBtn.innerText = 'LOGGING IN...';
+            loginBtn.style.opacity = '0.5';
+            loginBtn.disabled = true;
+
+            const tempKey = passInput.value;
+            const rememberMe = document.getElementById('remember-login').checked;
+            try {
+                const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': tempKey } });
+                if (res.ok) { 
+                    loginBtn.innerText = 'SUCCESS';
+                    loginBtn.style.opacity = '1';
+                    loginBtn.classList.add('btn-ghost');
+                    
+                    secretKey = tempKey; 
+                    setTimeout(() => {
+                        updateUIVisibility();
+                        closeMenu(); 
+                        refreshFeedUI(); 
+                        passInput.value = ''; 
+                        if (rememberMe) { localStorage.setItem('mv_admin_key', secretKey); } else { localStorage.removeItem('mv_admin_key'); }
+                        
+                        loginBtn.innerText = 'LOGIN';
+                        loginBtn.disabled = false;
+                        loginBtn.classList.remove('btn-ghost');
+                    }, 1000);
+                } else { 
+                    passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; 
+                    loginBtn.innerText = 'LOGIN'; loginBtn.style.opacity = '1'; loginBtn.disabled = false;
+                }
+            } catch (err) { 
+                passInput.classList.add('input-error'); 
+                loginBtn.innerText = 'LOGIN'; loginBtn.style.opacity = '1'; loginBtn.disabled = false;
+            }
+        }
+
         async function checkRememberedLogin() {
             const savedKey = localStorage.getItem('mv_admin_key');
             if (savedKey) {
@@ -357,23 +391,6 @@
             } else {
                 updateUIVisibility();
             }
-        }
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            const tempKey = passInput.value;
-            const rememberMe = document.getElementById('remember-login').checked;
-            try {
-                const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': tempKey } });
-                if (res.ok) { 
-                    secretKey = tempKey; 
-                    updateUIVisibility();
-                    closeMenu(); 
-                    refreshFeedUI(); 
-                    passInput.value = ''; 
-                    if (rememberMe) { localStorage.setItem('mv_admin_key', secretKey); } else { localStorage.removeItem('mv_admin_key'); }
-                } else { passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; }
-            } catch (err) { passInput.classList.add('input-error'); }
         }
 
         function handleLogout() {
@@ -455,17 +472,15 @@
             
             let mediaHtml = '';
             if (imageHtml) {
+                // 🛠️ ÚPRAVA: Presunutie logiky na konkrétne tlačidlá s ich ID, bez samostatného divu pre úspech
                 mediaHtml = `
                 <div class="status-media-wrapper">
                     ${barHtml}${imageHtml}
                     ${secretKey ? `
                     <div id="confirm-overlay-${s.id}" class="status-confirm-overlay">
                         <div id="confirm-actions-${s.id}" class="action-row">
-                            <button class="submit-btn" onclick="executeFeedDelete(${s.id})">DELETE</button>
-                            <button class="submit-btn btn-outline" onclick="closeFeedDelete(${s.id})">CANCEL</button>
-                        </div>
-                        <div id="confirm-success-${s.id}" class="action-row" style="display: none;">
-                            <div class="submit-btn btn-ghost">DELETED</div>
+                            <button id="feed-del-btn-${s.id}" class="submit-btn" onclick="executeFeedDelete(${s.id})">DELETE</button>
+                            <button id="feed-cancel-btn-${s.id}" class="submit-btn btn-outline" onclick="closeFeedDelete(${s.id})">CANCEL</button>
                         </div>
                     </div>
                     ` : ''}
@@ -475,11 +490,18 @@
             return `<div class="status-card">${mediaHtml}</div>`;
         }
 
+        // 🛠️ ÚPRAVA: Čistý reset tlačidiel
         function resetEditor() {
             document.getElementById('edit-image').value = ""; 
             updateImageUIState(); 
             const pubBtn = document.getElementById('publish-btn');
             pubBtn.innerText = 'UPLOAD';
+            pubBtn.classList.remove('btn-ghost');
+            pubBtn.disabled = false;
+            pubBtn.style.opacity = '1';
+            
+            const clearBtn = document.getElementById('clear-upload-btn');
+            if (clearBtn) clearBtn.style.display = 'flex';
         }
 
         function updateImageUIState() {
@@ -502,10 +524,16 @@
         function handleDeleteFeed(id) {
             const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
             card.querySelector('.status-glass-bar').style.display = 'none';
-            
             document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
-            document.getElementById(`confirm-actions-${id}`).style.display = 'flex';
-            document.getElementById(`confirm-success-${id}`).style.display = 'none';
+            
+            // Reset pre istotu
+            const delBtn = document.getElementById(`feed-del-btn-${id}`);
+            const cancelBtn = document.getElementById(`feed-cancel-btn-${id}`);
+            delBtn.innerText = 'DELETE';
+            delBtn.style.opacity = '1';
+            delBtn.disabled = false;
+            delBtn.classList.remove('btn-ghost');
+            cancelBtn.style.display = 'flex';
         }
 
         function closeFeedDelete(id) {
@@ -514,11 +542,21 @@
             card.querySelector('.status-glass-bar').style.display = 'flex';
         }
 
+        // 🛠️ ÚPRAVA: Rovnaký Delete flow priamo cez tlačidlo
         async function executeFeedDelete(id) {
-            document.getElementById(`confirm-actions-${id}`).style.display = 'none';
-            document.getElementById(`confirm-success-${id}`).style.display = 'flex';
+            const delBtn = document.getElementById(`feed-del-btn-${id}`);
+            const cancelBtn = document.getElementById(`feed-cancel-btn-${id}`);
+            
+            delBtn.innerText = 'DELETING...';
+            delBtn.style.opacity = '0.5';
+            delBtn.disabled = true;
+            cancelBtn.style.display = 'none'; // skryje cancel
             
             await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
+            
+            delBtn.style.opacity = '1';
+            delBtn.classList.add('btn-ghost');
+            delBtn.innerText = 'DELETED';
             
             setTimeout(() => {
                 fetchStatuses(true);
@@ -527,36 +565,59 @@
 
         function openDeleteModal(type) {
             deleteActionType = type;
-            document.getElementById('modal-action-zone').style.display = 'flex';
-            document.getElementById('modal-success-zone').style.display = 'none';
             document.getElementById('delete-modal').style.display = 'flex';
         }
 
         function closeDeleteModal() {
             document.getElementById('delete-modal').style.display = 'none';
             deleteActionType = null;
+            
+            const delBtn = document.getElementById('modal-del-btn');
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+            delBtn.innerText = 'DELETE';
+            delBtn.style.opacity = '1';
+            delBtn.disabled = false;
+            delBtn.classList.remove('btn-ghost');
+            cancelBtn.style.display = 'flex';
         }
 
+        // 🛠️ ÚPRAVA: Rovnaký Delete All / Clear Upload flow
         async function executeModalDelete() {
+            const delBtn = document.getElementById('modal-del-btn');
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+
             if (deleteActionType === 'clear_upload') {
                 document.getElementById('edit-image').value = ""; 
                 updateImageUIState(); 
-            } else if (deleteActionType === 'delete_all') {
+                
+                delBtn.classList.add('btn-ghost');
+                delBtn.innerText = 'DELETED';
+                cancelBtn.style.display = 'none';
+                
+                setTimeout(() => { closeDeleteModal(); }, 1000);
+            } 
+            else if (deleteActionType === 'delete_all') {
+                delBtn.innerText = 'DELETING...';
+                delBtn.style.opacity = '0.5';
+                delBtn.disabled = true;
+                cancelBtn.style.display = 'none';
+
                 const res = await fetch(`${API_URL}/posts?skip=0&limit=100`);
                 const posts = await res.json();
                 for (const p of posts) { 
                     await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); 
                 }
-                fetchStatuses(true);
-                closeMenu();
+                
+                delBtn.style.opacity = '1';
+                delBtn.classList.add('btn-ghost');
+                delBtn.innerText = 'DELETED';
+                
+                setTimeout(() => {
+                    fetchStatuses(true);
+                    closeDeleteModal();
+                    closeMenu();
+                }, 1000);
             }
-
-            document.getElementById('modal-action-zone').style.display = 'none';
-            document.getElementById('modal-success-zone').style.display = 'flex';
-            
-            setTimeout(() => {
-                closeDeleteModal();
-            }, 1000);
         }
 
         function clearImageSelection(e) {
@@ -568,14 +629,19 @@
             openDeleteModal('delete_all');
         }
 
+        // 🛠️ ÚPRAVA: Rovnaký UPLOAD flow (skryje sa DELETE vedľa neho)
         async function handleMainSubmit(e) { 
             e.preventDefault(); 
             const imageFile = document.getElementById('edit-image').files[0];
             if (!imageFile) { return; }
             
             const publishBtn = document.getElementById('publish-btn'); 
-            publishBtn.disabled = true; publishBtn.style.opacity = '0.5';
+            const clearBtn = document.getElementById('clear-upload-btn');
+            
+            publishBtn.disabled = true; 
+            publishBtn.style.opacity = '0.5';
             publishBtn.innerText = 'UPLOADING...';
+            if (clearBtn) clearBtn.style.display = 'none'; 
             
             try {
                 let finalImageUrl = null;
@@ -594,16 +660,20 @@
                 
                 if (res.ok) { 
                     fetchStatuses(true); 
-                    publishBtn.innerText = 'DONE'; 
-                    setTimeout(() => { resetEditor(); closeMenu(); publishBtn.disabled = false; publishBtn.style.opacity = '1'; }, 1000);
+                    publishBtn.style.opacity = '1';
+                    publishBtn.classList.add('btn-ghost');
+                    publishBtn.innerText = 'UPLOADED'; 
+                    setTimeout(() => { resetEditor(); closeMenu(); }, 1000);
                 } else { 
                     publishBtn.innerText = 'UPLOAD';
                     publishBtn.disabled = false; publishBtn.style.opacity = '1'; 
+                    if (clearBtn) clearBtn.style.display = 'flex';
                 }
             } catch (err) {
                 console.error(err);
                 publishBtn.innerText = 'UPLOAD';
                 publishBtn.disabled = false; publishBtn.style.opacity = '1'; 
+                if (clearBtn) clearBtn.style.display = 'flex';
             }
         }
 
