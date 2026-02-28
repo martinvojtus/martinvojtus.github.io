@@ -20,8 +20,7 @@
             --black: #000000;
             --white: #ffffff;
             --grey-50: rgba(0, 0, 0, 0.5);
-            /* 🛠️ Premenované z divider na btn-bg pre všetky sklenené polia a tlačidlá */
-            --btn-bg: rgba(0, 0, 0, 0.1);
+            --divider: rgba(0, 0, 0, 0.1);
             --glass-rgb: 255, 255, 255; 
             --content-width: 540px; 
             --border-radius: 1rem; 
@@ -38,7 +37,7 @@
                 --black: #ffffff;       
                 --white: #000000;       
                 --grey-50: rgba(255, 255, 255, 0.5); 
-                --btn-bg: rgba(255, 255, 255, 0.1); 
+                --divider: rgba(255, 255, 255, 0.1); 
                 --glass-rgb: 0, 0, 0;   
             }
         }
@@ -124,7 +123,7 @@
             overflow: hidden;
             transform: translateZ(0); 
             min-height: 3rem;
-            background-color: var(--btn-bg);
+            background-color: var(--divider);
         }
 
         .status-glass-bar {
@@ -144,27 +143,28 @@
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
-        /* 🛠️ ÚPRAVA: Zlúčené vlastnosti pre vstupné polia a tlačidlá - rovnaké 10% sklo */
+        /* 🛠️ ÚPRAVA: Všetky polia a tlačidlá sú teraz PLNE vyfarbené (čierne/biele) a text je opačný */
         .form-input, .submit-btn { 
             height: 3rem; border: none; border-radius: var(--border-radius); 
-            background-color: var(--btn-bg); 
-            backdrop-filter: blur(var(--glass-blur)); 
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            transform: translateZ(0);
+            background-color: var(--black); 
+            color: var(--white);
             font-size: var(--size-small); padding: 0 var(--gap-item); 
-            outline: none; color: var(--black); display: flex; align-items: center; gap: var(--gap-item); 
+            outline: none; display: flex; align-items: center; gap: var(--gap-item); 
         }
 
-        /* Špecifické vlastnosti len pre tlačidlá */
+        /* Špecifické pre tlačidlá */
         .submit-btn { 
             justify-content: center; text-transform: uppercase; cursor: pointer; white-space: nowrap;
         }
+
+        /* 🛠️ ÚPRAVA: Placeholder musí byť svetlý, keďže pozadie je čierne (a naopak) */
+        .form-input::placeholder { color: var(--white); opacity: 0.5; }
         
         .input-error { border: 1px solid var(--danger) !important; }
         .input-error span { color: var(--danger) !important; }
         .input-error::placeholder { color: var(--danger) !important; opacity: 1; }
 
-        /* 🛠️ ÚPRAVA: Iba farba textu (bez zmeny pozadia) */
+        /* 🛠️ ÚPRAVA: Delete a Deleted si držia len svoju textovú farbu, pozadie dedia z var(--black) */
         .danger-btn { 
             color: var(--danger) !important; 
         }
@@ -174,14 +174,15 @@
             pointer-events: none; 
         }
 
-        #upload-thumbnail { width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; cursor: pointer; background-color: var(--btn-bg); }
+        #upload-thumbnail { width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; cursor: pointer; background-color: var(--divider); }
 
+        /* 🛠️ ÚPRAVA: Checkbox je teraz invertovaný, aby bol viditeľný na plnom pozadí */
         .custom-checkbox {
-            appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black);
+            appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--white);
             border-radius: calc(var(--border-radius) / 3); cursor: pointer; display: grid; place-content: center;
         }
-        .custom-checkbox::before { content: ""; width: 0.25rem; height: 0.5rem; border: solid var(--white); border-width: 0 1px 1px 0; transform: rotate(45deg); opacity: 0; margin-top: -0.125rem; }
-        .custom-checkbox:checked { background-color: var(--black); }
+        .custom-checkbox::before { content: ""; width: 0.25rem; height: 0.5rem; border: solid var(--black); border-width: 0 1px 1px 0; transform: rotate(45deg); opacity: 0; margin-top: -0.125rem; }
+        .custom-checkbox:checked { background-color: var(--white); }
         .custom-checkbox:checked::before { opacity: 1; }
 
         .footer-info { 
@@ -197,6 +198,12 @@
             display: none; flex-direction: column; justify-content: center; align-items: center;
         }
 
+        .modal-content {
+            width: 100%; max-width: var(--content-width);
+            display: flex; flex-direction: column; gap: var(--gap-item);
+            padding: 0 var(--gap-item);
+        }
+
         .status-confirm-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(var(--glass-rgb), var(--glass-opacity)); 
@@ -206,7 +213,6 @@
             border-radius: var(--border-radius);
         }
 
-        /* 🛠️ ÚPRAVA: Zjednotená trieda pre tlačidlá vedľa seba (použitá v Modale aj v Overlayi nad fotkou) */
         .action-row {
             display: flex; flex-direction: row; gap: var(--gap-item); justify-content: center;
             width: 100%; padding: 0 var(--gap-item);
@@ -246,7 +252,7 @@
                 <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                     <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                     
-                    <div id="upload-empty-state" class="submit-btn" style="width: 100%;" onclick="document.getElementById('edit-image').click()">
+                    <div id="upload-empty-state" class="form-input" style="cursor: pointer; justify-content: center; width: 100%;" onclick="document.getElementById('edit-image').click()">
                         + ADD IMAGE
                     </div>
 
@@ -264,7 +270,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v5.9.5 • 2026</div>
+            <div class="footer-info">build v5.9.6 • 2026</div>
         </div>
     </nav>
 
@@ -443,7 +449,6 @@
             
             let mediaHtml = '';
             if (imageHtml) {
-                // 🛠️ ÚPRAVA: Rovnako aplikovaná trieda action-row pre zjednotenie
                 mediaHtml = `
                 <div class="status-media-wrapper">
                     ${barHtml}${imageHtml}
