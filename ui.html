@@ -147,7 +147,6 @@
             padding: 0 var(--gap-item);
         }
 
-        /* 🛠️ ÚPRAVA: Farba textu popisu zmenená na var(--grey-50) pre 0.5 opacity efekt */
         .status-text-content {
             font-size: var(--size-small); color: var(--grey-50);
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -300,6 +299,7 @@
 
                     <div id="upload-filled-state" style="display: none; flex-direction: column; gap: var(--gap-item); width: 100%;">
                         <div class="image-preview-container" onclick="document.getElementById('edit-image').click()">
+                            <span id="preview-add-text" style="display: none; font-size: var(--size-small); color: var(--black);">+ ADD IMAGE</span>
                             <img id="upload-preview-img" class="image-preview-img" src="" alt="">
                         </div>
                         
@@ -325,7 +325,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-outline" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.2.1 • 2026</div>
+            <div class="footer-info">build v6.2.2 • 2026</div>
         </div>
     </nav>
 
@@ -532,7 +532,6 @@
             }
         }
 
-        // 🛠️ OPRAVA: Pridaný parameter "e" a e.stopPropagation() na zastavenie okamžitého zatvorenia
         function handleEditPost(e, id) {
             e.stopPropagation(); 
             
@@ -566,7 +565,6 @@
 
             let barHtmlBottom = '';
             if (s.text || secretKey) {
-                // 🛠️ OPRAVA: Tu odovzdávame event do funkcie
                 barHtmlBottom = `
                 <div class="status-glass-bar-bottom">
                     <span class="status-text-content">${s.text || ''}</span>
@@ -620,24 +618,51 @@
             updateImageUIState(); 
         }
 
+        // 🛠️ ÚPRAVA: Logika pre zobrazenie poľa + ADD IMAGE v prípade zmazania fotky v EDIT režime
         function updateImageUIState() {
             const input = document.getElementById('edit-image');
             const emptyState = document.getElementById('upload-empty-state');
             const filledState = document.getElementById('upload-filled-state');
             const thumbnail = document.getElementById('upload-preview-img');
+            const previewAddText = document.getElementById('preview-add-text');
             const pubBtn = document.getElementById('publish-btn');
 
-            if ((input && input.files && input.files.length > 0) || existingImageUrl) {
-                if (input && input.files && input.files.length > 0) {
-                    if(thumbnail) thumbnail.src = URL.createObjectURL(input.files[0]);
-                } else {
-                    if(thumbnail) thumbnail.src = existingImageUrl;
-                }
-                
-                if(pubBtn && editingPostId) pubBtn.innerText = 'SAVE';
-                
+            const hasImage = (input && input.files && input.files.length > 0) || existingImageUrl;
+
+            if (hasImage || editingPostId) {
                 emptyState.style.display = 'none';
                 filledState.style.display = 'flex';
+                
+                if (hasImage) {
+                    if (input && input.files && input.files.length > 0) {
+                        if(thumbnail) thumbnail.src = URL.createObjectURL(input.files[0]);
+                    } else {
+                        if(thumbnail) thumbnail.src = existingImageUrl;
+                    }
+                    if(thumbnail) thumbnail.style.display = 'block';
+                    if(previewAddText) previewAddText.style.display = 'none';
+                    
+                    if(pubBtn) {
+                        pubBtn.disabled = false;
+                        pubBtn.style.opacity = '1';
+                    }
+                } else {
+                    // Fotka zmazaná v režime editácie
+                    if(thumbnail) {
+                        thumbnail.src = "";
+                        thumbnail.style.display = 'none';
+                    }
+                    if(previewAddText) previewAddText.style.display = 'block';
+                    
+                    // Zamedzíme uloženiu, kým nie je zvolená nová fotka
+                    if(pubBtn) {
+                        pubBtn.disabled = true;
+                        pubBtn.style.opacity = '0.5';
+                    }
+                }
+                
+                if(pubBtn) pubBtn.innerText = editingPostId ? 'SAVE' : 'UPLOAD';
+                
             } else { 
                 if(thumbnail) thumbnail.src = "";
                 emptyState.style.display = 'flex';
