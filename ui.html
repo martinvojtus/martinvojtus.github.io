@@ -137,7 +137,8 @@
         .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
         .admin-delete-link { cursor: pointer; color: var(--black); text-decoration: none; }
 
-        .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); }
+        /* 🛠️ ÚPRAVA: Pridaný kurzor pointer, aby bolo jasné, že sa na to dá kliknúť */
+        .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); cursor: pointer; }
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
@@ -167,12 +168,11 @@
             color: var(--black);
         }
 
-        /* 🛠️ ÚPRAVA: Ghost stav (Duch). Má 1px sivý rámček, sivý text a je neklikateľný */
         .btn-ghost {
-            background-color: transparent !important; 
-            color: var(--grey-50) !important; 
-            border: 1px solid var(--grey-50) !important;
-            pointer-events: none !important; 
+            background-color: transparent; 
+            color: var(--grey-50); 
+            border-color: var(--grey-50);
+            pointer-events: none; 
         }
 
         .input-error { border: 1px solid var(--black) !important; opacity: 0.5; }
@@ -274,7 +274,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-outline" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.0.1 • 2026</div>
+            <div class="footer-info">build v6.0.2 • 2026</div>
         </div>
     </nav>
 
@@ -337,7 +337,6 @@
             }
         }
 
-        // 🛠️ ÚPRAVA LOGIN: Rovnaký Loading flow
         async function handleLogin(e) {
             e.preventDefault();
             const loginBtn = document.getElementById('login-btn');
@@ -458,6 +457,14 @@
 
         window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
 
+        // 🛠️ ÚPRAVA: Prepínač na zobrazenie/skrytie panelu s dátumom
+        function toggleGlassBar(img) {
+            const bar = img.parentElement.querySelector('.status-glass-bar');
+            if (bar) {
+                bar.style.display = bar.style.display === 'none' ? 'flex' : 'none';
+            }
+        }
+
         function renderSinglePost(s) {
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
@@ -468,11 +475,11 @@
                 ${secretKey ? `<span onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>` : '<div></div>'}
             </div>`;
 
-            const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
+            // 🛠️ ÚPRAVA: Pridaný onclick na img tag
+            const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy" onclick="toggleGlassBar(this)">` : '';
             
             let mediaHtml = '';
             if (imageHtml) {
-                // 🛠️ ÚPRAVA: Presunutie logiky na konkrétne tlačidlá s ich ID, bez samostatného divu pre úspech
                 mediaHtml = `
                 <div class="status-media-wrapper">
                     ${barHtml}${imageHtml}
@@ -490,7 +497,6 @@
             return `<div class="status-card">${mediaHtml}</div>`;
         }
 
-        // 🛠️ ÚPRAVA: Čistý reset tlačidiel
         function resetEditor() {
             document.getElementById('edit-image').value = ""; 
             updateImageUIState(); 
@@ -526,7 +532,6 @@
             card.querySelector('.status-glass-bar').style.display = 'none';
             document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
             
-            // Reset pre istotu
             const delBtn = document.getElementById(`feed-del-btn-${id}`);
             const cancelBtn = document.getElementById(`feed-cancel-btn-${id}`);
             delBtn.innerText = 'DELETE';
@@ -539,10 +544,9 @@
         function closeFeedDelete(id) {
             document.getElementById(`confirm-overlay-${id}`).style.display = 'none';
             const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
-            card.querySelector('.status-glass-bar').style.display = 'flex';
+            card.querySelector('.status-glass-bar').style.display = 'flex'; // Zrušenie overlayu vždy vráti lištu späť
         }
 
-        // 🛠️ ÚPRAVA: Rovnaký Delete flow priamo cez tlačidlo
         async function executeFeedDelete(id) {
             const delBtn = document.getElementById(`feed-del-btn-${id}`);
             const cancelBtn = document.getElementById(`feed-cancel-btn-${id}`);
@@ -550,7 +554,7 @@
             delBtn.innerText = 'DELETING...';
             delBtn.style.opacity = '0.5';
             delBtn.disabled = true;
-            cancelBtn.style.display = 'none'; // skryje cancel
+            cancelBtn.style.display = 'none'; 
             
             await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
             
@@ -581,7 +585,6 @@
             cancelBtn.style.display = 'flex';
         }
 
-        // 🛠️ ÚPRAVA: Rovnaký Delete All / Clear Upload flow
         async function executeModalDelete() {
             const delBtn = document.getElementById('modal-del-btn');
             const cancelBtn = document.getElementById('modal-cancel-btn');
@@ -629,7 +632,6 @@
             openDeleteModal('delete_all');
         }
 
-        // 🛠️ ÚPRAVA: Rovnaký UPLOAD flow (skryje sa DELETE vedľa neho)
         async function handleMainSubmit(e) { 
             e.preventDefault(); 
             const imageFile = document.getElementById('edit-image').files[0];
