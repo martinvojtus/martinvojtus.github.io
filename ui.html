@@ -65,7 +65,7 @@
             line-height: 1;
         }
 
-        header, .nav-overlay, .status-glass-bar, .status-glass-bar-bottom {
+        header, .nav-overlay, .status-glass-bar, .status-glass-bar-bottom, .status-confirm-overlay, #delete-modal {
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
         }
@@ -118,34 +118,40 @@
         #logout-ui { display: none; }
         #admin-upload-zone { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; }
 
-        /* 🛠️ OPRAVA ŠÍRKY: Z 600px na var(--content-width) pre dokonalé zarovnanie */
         .status-feed { 
             max-width: var(--content-width); width: 100%; margin: 0 auto; 
         }
-        
+
+        /* 🛠️ Nová logika MASONRY cez Javascript + Flexbox */
         .status-feed.view-feed {
             display: flex; flex-direction: column; gap: var(--gap-item);
         }
-
         .status-feed.view-grid {
-            display: block;
-            column-count: 2;
-            column-gap: var(--gap-item);
+            display: flex; flex-direction: row; gap: var(--gap-item); align-items: flex-start;
         }
-        .status-feed.view-grid .status-card {
-            -webkit-column-break-inside: avoid;
-            page-break-inside: avoid;
-            break-inside: avoid;
-            margin-bottom: var(--gap-item);
-            display: block; 
+        .masonry-col {
+            display: flex; flex-direction: column; gap: var(--gap-item); flex: 1; min-width: 0;
         }
-        .status-feed.view-grid .status-media-wrapper {
-            background-color: transparent; 
-        }
+
+        /* Skrytie prvkov v Grid Režime */
         .status-feed.view-grid .status-glass-bar,
         .status-feed.view-grid .status-glass-bar-bottom,
         .status-feed.view-grid .status-confirm-overlay {
             display: none !important;
+        }
+        .status-feed.view-grid .status-media-wrapper {
+            background-color: transparent; 
+        }
+
+        /* 🛠️ Dizajn jednoduchého prepínača */
+        .feed-toggle-wrapper {
+            display: flex; justify-content: flex-end; padding: 0 var(--gap-item); width: 100%;
+        }
+        .grid-toggle-wrapper {
+            display: flex; justify-content: flex-end; width: 100%; line-height: 1;
+        }
+        .view-toggle-text {
+            font-size: var(--size-small); color: var(--grey-50); cursor: pointer; text-transform: uppercase; user-select: none; line-height: 1;
         }
 
         .status-card { display: flex; flex-direction: column; position: relative; }
@@ -190,11 +196,7 @@
 
         .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); cursor: pointer; }
         
-        /* 🛠️ OPRAVA GRID TEXTU: Pridaný column-span, aby text vycentrovalo cez oba stĺpce */
-        .loading-text { 
-            text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0;
-            column-span: all; -webkit-column-span: all;
-        }
+        .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
 
         .form-input, .submit-btn { 
             height: 3rem; border: 1px solid var(--black); border-radius: var(--border-radius); 
@@ -236,7 +238,6 @@
         .input-error { border: 1px solid var(--black) !important; }
         .input-error span { color: var(--black) !important; }
 
-        /* 🛠️ OPRAVA ROHOV FOTKY: Pridaný mask-image pre Safari, vynúti zaoblenie pre overflow */
         .image-preview-container {
             width: 100%;
             aspect-ratio: 1 / 1;
@@ -278,7 +279,6 @@
             text-transform: uppercase; text-align: center; width: 100%; 
         }
 
-        /* 🛠️ OPRAVA SAFARI DUCHOV: Rozostrenie prenesené na ::before pseudo-element */
         .status-confirm-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 20;
@@ -385,17 +385,12 @@
                 <button onclick="handleLogout()" class="submit-btn btn-outline" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.3.2 • 2026</div>
+            <div class="footer-info">build v6.4.0 • 2026</div>
         </div>
     </nav>
 
     <main>
         <div id="section-feed">
-            
-            <div style="max-width: var(--content-width); width: 100%; margin: 0 auto calc(var(--gap-item) / 2) auto; display: flex; justify-content: flex-end; padding: 0 var(--gap-item);">
-                <span id="view-toggle-text" onclick="toggleViewMode()" style="font-size: var(--size-small); color: var(--grey-50); cursor: pointer; text-transform: uppercase; user-select: none;">GRID VIEW</span>
-            </div>
-
             <div id="status-container" class="status-feed view-feed"></div>
             <div id="loading-indicator" class="loading-text">Loading...</div>
         </div>
@@ -436,30 +431,13 @@
             });
         }
 
+        // 🛠️ JS MASONRY & VIEW TOGGLE
         function toggleViewMode() {
             const newMode = currentViewMode === 'feed' ? 'grid' : 'feed';
-            setViewMode(newMode);
+            currentViewMode = newMode;
+            localStorage.setItem('mv_view_mode', newMode);
+            refreshFeedUI(); // Kompletne prestavia štruktúru HTML
         }
-
-        function setViewMode(mode) {
-            currentViewMode = mode;
-            localStorage.setItem('mv_view_mode', mode);
-            
-            const toggleText = document.getElementById('view-toggle-text');
-            const container = document.getElementById('status-container');
-            
-            if (mode === 'grid') {
-                if(toggleText) toggleText.innerText = 'FEED VIEW';
-                container.classList.add('view-grid');
-                container.classList.remove('view-feed');
-            } else {
-                if(toggleText) toggleText.innerText = 'GRID VIEW'; 
-                container.classList.add('view-feed');
-                container.classList.remove('view-grid');
-            }
-        }
-
-        setViewMode(currentViewMode);
 
         function toggleMenu() { 
             const isActive = menuToggle.classList.toggle('active'); 
@@ -550,13 +528,45 @@
             refreshFeedUI();
         }
 
+        // 🛠️ HLAVNÝ GENERÁTOR OBRAZOVIEK
         function refreshFeedUI() { 
+            const container = document.getElementById('status-container');
+            
             if (globalPosts.length === 0) {
-                if (!isLoading) {
-                    document.getElementById('status-container').innerHTML = '<div class="loading-text">Nothing here yet.</div>';
-                }
+                container.innerHTML = '<div class="loading-text">Nothing here yet.</div>';
+                return;
+            }
+
+            if (currentViewMode === 'feed') {
+                container.className = 'status-feed view-feed';
+                let html = `
+                    <div class="feed-toggle-wrapper">
+                        <span class="view-toggle-text" onclick="toggleViewMode()">GRID VIEW</span>
+                    </div>
+                `;
+                globalPosts.forEach(post => { html += renderSinglePost(post); });
+                container.innerHTML = html;
             } else {
-                document.getElementById('status-container').innerHTML = globalPosts.map(s => renderSinglePost(s)).join(''); 
+                container.className = 'status-feed view-grid';
+                let leftCol = '<div class="masonry-col col-left">';
+                let rightCol = '<div class="masonry-col col-right">';
+
+                // Text v pravom stĺpci, ktorý prirodzene posunie prvú fotku dole (Masonry Stagger)
+                rightCol += `
+                    <div class="grid-toggle-wrapper">
+                        <span class="view-toggle-text" onclick="toggleViewMode()">FEED VIEW</span>
+                    </div>
+                `;
+
+                globalPosts.forEach((post, index) => {
+                    if (index % 2 === 0) leftCol += renderSinglePost(post);
+                    else rightCol += renderSinglePost(post);
+                });
+
+                leftCol += '</div>';
+                rightCol += '</div>';
+
+                container.innerHTML = leftCol + rightCol;
             }
         }
 
@@ -592,12 +602,27 @@
                 if (newPosts.length < postsLimit) hasMorePosts = false;
                 currentOffset += newPosts.length; globalPosts = globalPosts.concat(newPosts);
                 
-                if (globalPosts.length === 0) {
-                    document.getElementById('status-container').innerHTML = '<div class="loading-text">Nothing here yet.</div>';
-                } else if (reset) {
-                    document.getElementById('status-container').innerHTML = globalPosts.map(s => renderSinglePost(s)).join('');
+                if (reset) {
+                    refreshFeedUI();
                 } else {
-                    document.getElementById('status-container').innerHTML += newPosts.map(s => renderSinglePost(s)).join('');
+                    // Pridávanie počas scrollovania podľa aktuálneho módu
+                    if (currentViewMode === 'feed') {
+                        let html = '';
+                        newPosts.forEach(p => html += renderSinglePost(p));
+                        document.getElementById('status-container').insertAdjacentHTML('beforeend', html);
+                    } else {
+                        const leftCol = document.querySelector('.col-left');
+                        const rightCol = document.querySelector('.col-right');
+                        let currentCount = globalPosts.length - newPosts.length;
+                        newPosts.forEach((post, i) => {
+                            const postHtml = renderSinglePost(post);
+                            if ((currentCount + i) % 2 === 0) {
+                                if (leftCol) leftCol.insertAdjacentHTML('beforeend', postHtml);
+                            } else {
+                                if (rightCol) rightCol.insertAdjacentHTML('beforeend', postHtml);
+                            }
+                        });
+                    }
                 }
             } catch (error) {} finally { 
                 isLoading = false; 
@@ -607,25 +632,29 @@
 
         window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
 
-        function toggleGlassBar(img) {
+        // 🛠️ Okamžitý preskok z Gridu do Feedu a zameranie fotky
+        function toggleGlassBar(imgElement, id) {
             if (currentViewMode === 'grid') {
-                setViewMode('feed');
+                currentViewMode = 'feed';
+                localStorage.setItem('mv_view_mode', 'feed');
+                refreshFeedUI();
                 setTimeout(() => {
-                    img.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const newImg = document.getElementById(`post-img-${id}`);
+                    if(newImg) newImg.scrollIntoView({ block: 'center' }); // Ostrý strih (bez animácie)
                 }, 50);
                 return;
             }
 
-            const bars = img.parentElement.querySelectorAll('.status-glass-bar, .status-glass-bar-bottom');
+            const bars = imgElement.parentElement.querySelectorAll('.status-glass-bar, .status-glass-bar-bottom');
             if (bars.length > 0) {
                 const isHidden = bars[0].style.display === 'none';
                 if (isHidden) {
                     bars.forEach(b => b.style.display = 'flex');
-                    clearTimeout(img.glassTimer);
+                    clearTimeout(imgElement.glassTimer);
                 } else {
                     bars.forEach(b => b.style.display = 'none');
-                    clearTimeout(img.glassTimer); 
-                    img.glassTimer = setTimeout(() => {
+                    clearTimeout(imgElement.glassTimer); 
+                    imgElement.glassTimer = setTimeout(() => {
                         bars.forEach(b => b.style.display = 'flex');
                     }, 5000);
                 }
@@ -672,7 +701,8 @@
                 </div>`;
             }
 
-            const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy" onclick="toggleGlassBar(this)">` : '';
+            // Odkazujeme ID aj do argumentu onclick, aby grid vedel kam odscrolllovat
+            const imageHtml = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="status-image" alt="image" loading="lazy" onclick="toggleGlassBar(this, ${s.id})">` : '';
             
             let mediaHtml = '';
             if (imageHtml) {
