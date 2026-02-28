@@ -64,6 +64,12 @@
             line-height: 1;
         }
 
+        /* 🛠️ OPRAVA: Všetky sklenené vrstvy majú teraz transform na vynútenie čistého renderovania GPU (bráni duchom v Safari) */
+        header, .nav-overlay, .status-glass-bar, .status-confirm-overlay, #delete-modal {
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+
         header {
             position: fixed; top: 0; left: 0; width: 100%; 
             display: flex; justify-content: center; padding: var(--gap-item) 0; 
@@ -141,18 +147,17 @@
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
+        /* 🛠️ OPRAVA: Doplnený striktný reset na appearance a box-shadow pre Safari */
         .form-input, .submit-btn { 
             height: 3rem; border: 1px solid var(--black); border-radius: var(--border-radius); 
             font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; display: flex; align-items: center; gap: var(--gap-item); 
+            box-shadow: none; -webkit-appearance: none; appearance: none; margin: 0;
         }
 
         .form-input { 
             background-color: transparent; 
             color: var(--black);
-            box-shadow: none;
-            -webkit-appearance: none;
-            appearance: none;
         }
         .form-input::placeholder { color: var(--black); opacity: 0.5; }
 
@@ -278,7 +283,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-outline" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.0.5 • 2026</div>
+            <div class="footer-info">build v6.0.6 • 2026</div>
         </div>
     </nav>
 
@@ -291,8 +296,8 @@
 
     <div id="delete-modal">
         <div id="modal-action-zone" class="action-row">
-            <button id="modal-del-btn" class="submit-btn" onclick="executeModalDelete()">DELETE</button>
-            <button id="modal-cancel-btn" class="submit-btn btn-outline" onclick="closeDeleteModal()">CANCEL</button>
+            <button class="submit-btn" onclick="executeModalDelete()">DELETE</button>
+            <button class="submit-btn btn-outline" onclick="closeDeleteModal()">CANCEL</button>
         </div>
     </div>
 
@@ -302,7 +307,6 @@
         let currentOffset = 0; const postsLimit = 10; let isLoading = false; let hasMorePosts = true;
         
         let deleteActionType = null;
-        let deleteTargetId = null;
 
         const passInput = document.getElementById('admin-pass');
         const menuToggle = document.getElementById('menuToggle');
@@ -345,6 +349,7 @@
             e.preventDefault();
             const loginBtn = document.getElementById('login-btn');
             loginBtn.innerText = 'LOGGING IN...';
+            loginBtn.classList.add('btn-ghost');
             loginBtn.style.opacity = '0.5';
             loginBtn.disabled = true;
 
@@ -355,7 +360,6 @@
                 if (res.ok) { 
                     loginBtn.innerText = 'SUCCESS';
                     loginBtn.style.opacity = '1';
-                    loginBtn.classList.add('btn-ghost');
                     
                     secretKey = tempKey; 
                     setTimeout(() => {
@@ -371,11 +375,11 @@
                     }, 1000);
                 } else { 
                     passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; 
-                    loginBtn.innerText = 'LOGIN'; loginBtn.style.opacity = '1'; loginBtn.disabled = false;
+                    loginBtn.innerText = 'LOGIN'; loginBtn.style.opacity = '1'; loginBtn.disabled = false; loginBtn.classList.remove('btn-ghost');
                 }
             } catch (err) { 
                 passInput.classList.add('input-error'); 
-                loginBtn.innerText = 'LOGIN'; loginBtn.style.opacity = '1'; loginBtn.disabled = false;
+                loginBtn.innerText = 'LOGIN'; loginBtn.style.opacity = '1'; loginBtn.disabled = false; loginBtn.classList.remove('btn-ghost');
             }
         }
 
@@ -497,8 +501,8 @@
                     ${secretKey ? `
                     <div id="confirm-overlay-${s.id}" class="status-confirm-overlay">
                         <div id="confirm-actions-${s.id}" class="action-row">
-                            <button id="feed-del-btn-${s.id}" class="submit-btn" onclick="executeFeedDelete(${s.id})">DELETE</button>
-                            <button id="feed-cancel-btn-${s.id}" class="submit-btn btn-outline" onclick="closeFeedDelete(${s.id})">CANCEL</button>
+                            <button class="submit-btn" onclick="executeFeedDelete(${s.id})">DELETE</button>
+                            <button class="submit-btn btn-outline" onclick="closeFeedDelete(${s.id})">CANCEL</button>
                         </div>
                     </div>
                     ` : ''}
@@ -510,15 +514,13 @@
 
         function resetEditor() {
             document.getElementById('edit-image').value = ""; 
+            // Vrátenie pôvodnej štruktúry pre upload
+            document.getElementById('upload-filled-state').innerHTML = `
+                <img id="upload-thumbnail" src="" alt="" onclick="document.getElementById('edit-image').click()">
+                <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">UPLOAD</button>
+                <div id="clear-upload-btn" class="submit-btn btn-outline" onclick="clearImageSelection(event)">DELETE</div>
+            `;
             updateImageUIState(); 
-            const pubBtn = document.getElementById('publish-btn');
-            pubBtn.innerText = 'UPLOAD';
-            pubBtn.classList.remove('btn-ghost');
-            pubBtn.disabled = false;
-            pubBtn.style.opacity = '1';
-            
-            const clearBtn = document.getElementById('clear-upload-btn');
-            if (clearBtn) clearBtn.style.display = 'flex';
         }
 
         function updateImageUIState() {
@@ -527,12 +529,12 @@
             const filledState = document.getElementById('upload-filled-state');
             const thumbnail = document.getElementById('upload-thumbnail');
 
-            if (input.files.length > 0) {
-                thumbnail.src = URL.createObjectURL(input.files[0]);
+            if (input && input.files && input.files.length > 0) {
+                if(thumbnail) thumbnail.src = URL.createObjectURL(input.files[0]);
                 emptyState.style.display = 'none';
                 filledState.style.display = 'flex';
             } else { 
-                thumbnail.src = "";
+                if(thumbnail) thumbnail.src = "";
                 emptyState.style.display = 'flex';
                 filledState.style.display = 'none';
             }
@@ -543,13 +545,12 @@
             card.querySelector('.status-glass-bar').style.display = 'none';
             document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
             
-            const delBtn = document.getElementById(`feed-del-btn-${id}`);
-            const cancelBtn = document.getElementById(`feed-cancel-btn-${id}`);
-            delBtn.innerText = 'DELETE';
-            delBtn.style.opacity = '1';
-            delBtn.disabled = false;
-            delBtn.classList.remove('btn-ghost');
-            cancelBtn.style.display = 'flex';
+            // Re-render pôvodného stavu v prípade, že by bolo znovu otvorené
+            const actionRow = document.getElementById(`confirm-actions-${id}`);
+            actionRow.innerHTML = `
+                <button class="submit-btn" onclick="executeFeedDelete(${id})">DELETE</button>
+                <button class="submit-btn btn-outline" onclick="closeFeedDelete(${id})">CANCEL</button>
+            `;
         }
 
         function closeFeedDelete(id) {
@@ -558,20 +559,15 @@
             card.querySelector('.status-glass-bar').style.display = 'flex';
         }
 
+        // 🛠️ OPRAVA: Pre bezchybné zobrazenie v Safari ničíme celý riadok namiesto skrývania tlačidiel
         async function executeFeedDelete(id) {
-            const delBtn = document.getElementById(`feed-del-btn-${id}`);
-            const cancelBtn = document.getElementById(`feed-cancel-btn-${id}`);
+            const actionRow = document.getElementById(`confirm-actions-${id}`);
             
-            delBtn.innerText = 'DELETING...';
-            delBtn.style.opacity = '0.5';
-            delBtn.disabled = true;
-            cancelBtn.style.display = 'none'; 
+            actionRow.innerHTML = `<div class="submit-btn btn-ghost" style="opacity: 0.5;">DELETING...</div>`;
             
             await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
             
-            delBtn.style.opacity = '1';
-            delBtn.classList.add('btn-ghost');
-            delBtn.innerText = 'DELETED';
+            actionRow.innerHTML = `<div class="submit-btn btn-ghost">DELETED</div>`;
             
             setTimeout(() => {
                 fetchStatuses(true);
@@ -583,28 +579,23 @@
             document.getElementById('delete-modal').style.display = 'flex';
         }
 
+        // 🛠️ OPRAVA: Reštart modalu zničením a postavením nových prvkov
         function closeDeleteModal() {
             document.getElementById('delete-modal').style.display = 'none';
             deleteActionType = null;
             
-            const delBtn = document.getElementById('modal-del-btn');
-            const cancelBtn = document.getElementById('modal-cancel-btn');
-            delBtn.innerText = 'DELETE';
-            delBtn.style.opacity = '1';
-            delBtn.disabled = false;
-            delBtn.classList.remove('btn-ghost');
-            cancelBtn.style.display = 'flex';
+            const actionRow = document.getElementById('modal-action-zone');
+            actionRow.innerHTML = `
+                <button class="submit-btn" onclick="executeModalDelete()">DELETE</button>
+                <button class="submit-btn btn-outline" onclick="closeDeleteModal()">CANCEL</button>
+            `;
         }
 
         async function executeModalDelete() {
-            const delBtn = document.getElementById('modal-del-btn');
-            const cancelBtn = document.getElementById('modal-cancel-btn');
+            const actionRow = document.getElementById('modal-action-zone');
 
             if (deleteActionType === 'delete_all') {
-                delBtn.innerText = 'DELETING...';
-                delBtn.style.opacity = '0.5';
-                delBtn.disabled = true;
-                cancelBtn.style.display = 'none';
+                actionRow.innerHTML = `<div class="submit-btn btn-ghost" style="opacity: 0.5;">DELETING...</div>`;
 
                 const res = await fetch(`${API_URL}/posts?skip=0&limit=100`);
                 const posts = await res.json();
@@ -612,9 +603,7 @@
                     await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); 
                 }
                 
-                delBtn.style.opacity = '1';
-                delBtn.classList.add('btn-ghost');
-                delBtn.innerText = 'DELETED';
+                actionRow.innerHTML = `<div class="submit-btn btn-ghost">DELETED</div>`;
                 
                 setTimeout(() => {
                     fetchStatuses(true);
@@ -634,18 +623,19 @@
             openDeleteModal('delete_all');
         }
 
+        // 🛠️ OPRAVA: Aj pri uploade nahradzujeme uzol, aby sme sa vyhli duchom po zmiznutom tlačidle
         async function handleMainSubmit(e) { 
             e.preventDefault(); 
             const imageFile = document.getElementById('edit-image').files[0];
             if (!imageFile) { return; }
             
-            const publishBtn = document.getElementById('publish-btn'); 
-            const clearBtn = document.getElementById('clear-upload-btn');
+            const filledState = document.getElementById('upload-filled-state');
+            const imgUrl = document.getElementById('upload-thumbnail').src;
             
-            publishBtn.disabled = true; 
-            publishBtn.style.opacity = '0.5';
-            publishBtn.innerText = 'UPLOADING...';
-            if (clearBtn) clearBtn.style.display = 'none'; 
+            filledState.innerHTML = `
+                <img id="upload-thumbnail" src="${imgUrl}" alt="" style="border: 1px solid var(--black);">
+                <div class="submit-btn btn-ghost" style="flex-grow: 1; opacity: 0.5;">UPLOADING...</div>
+            `;
             
             try {
                 let finalImageUrl = null;
@@ -664,20 +654,17 @@
                 
                 if (res.ok) { 
                     fetchStatuses(true); 
-                    publishBtn.style.opacity = '1';
-                    publishBtn.classList.add('btn-ghost');
-                    publishBtn.innerText = 'UPLOADED'; 
+                    filledState.innerHTML = `
+                        <img id="upload-thumbnail" src="${imgUrl}" alt="" style="border: 1px solid var(--black);">
+                        <div class="submit-btn btn-ghost" style="flex-grow: 1;">UPLOADED</div>
+                    `;
                     setTimeout(() => { resetEditor(); closeMenu(); }, 1000);
                 } else { 
-                    publishBtn.innerText = 'UPLOAD';
-                    publishBtn.disabled = false; publishBtn.style.opacity = '1'; 
-                    if (clearBtn) clearBtn.style.display = 'flex';
+                    resetEditor(); 
                 }
             } catch (err) {
                 console.error(err);
-                publishBtn.innerText = 'UPLOAD';
-                publishBtn.disabled = false; publishBtn.style.opacity = '1'; 
-                if (clearBtn) clearBtn.style.display = 'flex';
+                resetEditor();
             }
         }
 
