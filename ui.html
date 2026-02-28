@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -12,7 +12,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=2">
     
     <title>martinvojtus.space</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
             --black: #000000;
@@ -208,15 +208,14 @@
         }
         .form-input::placeholder { color: var(--grey-50); } 
 
-        /* 🛠️ Špecifické nastavenie pre flexibilnú textareu */
         textarea.form-input {
-            height: auto; /* Zruší fixných 3rem */
-            min-height: 3rem; /* Zabezpečí, že nebude menšia ako bežný input */
+            height: auto; 
+            min-height: 3rem; 
             padding-top: 0.8rem;
             padding-bottom: 0.8rem;
             line-height: 1.5;
-            resize: none; /* Užívateľ nemôže manuálne naťahovať rohy, riadi to JS */
-            overflow: hidden; /* Skryje posuvník pri automatickom naťahovaní */
+            resize: none; 
+            overflow: hidden; 
         }
 
         .submit-btn { 
@@ -330,7 +329,6 @@
             z-index: -1;
         }
 
-        /* 🛠️ Rozostrené okno (Read Mode) */
         .status-text-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 15;
@@ -363,18 +361,21 @@
             display: none; 
         }
         
-        /* 🛠️ Nový CSS štýl pre Titulok a Odsadenie textu v Read Mode */
         .status-text-overlay-title {
             font-size: var(--size-large);
-            font-weight: 700;
+            font-weight: 400; /* 🛠️ Obyčajná hrúbka textu (nie bold) */
             line-height: 1.1;
             margin-bottom: var(--gap-item);
             text-transform: uppercase;
             word-wrap: break-word;
         }
         .status-text-overlay-body {
-            text-align: justify; /* Text zarovnaný do bloku */
-            white-space: pre-wrap; /* Automaticky zachováva riadky a Entery z textarey */
+            text-align: justify;
+            white-space: pre-wrap; 
+            /* 🛠️ Pridané automatické delenie slov so slovenským slovníkom */
+            -webkit-hyphens: auto;
+            -ms-hyphens: auto;
+            hyphens: auto;
         }
 
         #delete-modal {
@@ -467,7 +468,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.5.0 • 2026</div>
+            <div class="footer-info">build v6.5.1 • 2026</div>
         </div>
     </nav>
 
@@ -513,10 +514,9 @@
             });
         }
 
-        // 🛠️ Funkcia na automatické prispôsobenie výšky textarei
         function autoResizeTextarea(el) {
-            el.style.height = 'auto'; // Reset, aby sa zmenšilo ak zmažeš text
-            el.style.height = el.scrollHeight + 'px'; // Natiahne sa podľa obsahu
+            el.style.height = 'auto'; 
+            el.style.height = el.scrollHeight + 'px'; 
         }
 
         function toggleViewMode() {
@@ -795,11 +795,10 @@
             editingPostId = post.id;
             existingImageUrl = post.image_url;
 
-            // 🛠️ Počas editu načítame aj titulok a prispôsobíme výšku textarei
             document.getElementById('edit-title').value = post.title || '';
             const textInput = document.getElementById('edit-text');
             textInput.value = post.text || '';
-            setTimeout(() => autoResizeTextarea(textInput), 0); // Vynúti prepočet po načítaní
+            setTimeout(() => autoResizeTextarea(textInput), 0); 
             
             if (!navOverlay.classList.contains('active')) {
                 menuToggle.classList.add('active'); 
@@ -824,9 +823,7 @@
             let barHtmlBottom = '';
             let textOverlayHtml = '';
 
-            // 🛠️ Ak má fotka titulok alebo text, vytvoríme spodnú lištu a overlay pre Read Mode
             if (s.title || s.text || secretKey) {
-                // Pre spodnú lištu použijeme title (ak neexistuje, použijeme záložné 'UNTITLED')
                 let displayTitle = s.title || 'UNTITLED';
                 
                 barHtmlBottom = `
@@ -885,7 +882,7 @@
             document.getElementById('edit-title').value = ""; 
             const textInput = document.getElementById('edit-text');
             textInput.value = "";
-            textInput.style.height = 'auto'; // Resetuje výšku textarei po odoslaní
+            textInput.style.height = 'auto'; 
             
             document.getElementById('upload-action-row').style.display = 'flex';
             document.getElementById('upload-loading-row').style.display = 'none';
@@ -1032,7 +1029,6 @@
             
             if (!imageFile && !existingImageUrl) { return; }
             
-            // 🛠️ Získame údaje z oboch polí (Titulok aj Popis)
             const postTitle = document.getElementById('edit-title').value;
             const postText = document.getElementById('edit-text').value;
             
@@ -1055,7 +1051,6 @@
                     finalImageUrl = upData.image_url;
                 }
 
-                // 🛠️ Odosielame payload aj s Title
                 const payload = { title: postTitle, text: postText, image_url: finalImageUrl, show_date: true, author: "" };
                 
                 let res;
