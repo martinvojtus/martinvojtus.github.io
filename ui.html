@@ -143,7 +143,6 @@
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
-        /* 🛠️ ÚPRAVA: Všetky polia a tlačidlá sú teraz PLNE vyfarbené (čierne/biele) a text je opačný */
         .form-input, .submit-btn { 
             height: 3rem; border: none; border-radius: var(--border-radius); 
             background-color: var(--black); 
@@ -152,37 +151,39 @@
             outline: none; display: flex; align-items: center; gap: var(--gap-item); 
         }
 
-        /* Špecifické pre tlačidlá */
         .submit-btn { 
             justify-content: center; text-transform: uppercase; cursor: pointer; white-space: nowrap;
         }
 
-        /* 🛠️ ÚPRAVA: Placeholder musí byť svetlý, keďže pozadie je čierne (a naopak) */
-        .form-input::placeholder { color: var(--white); opacity: 0.5; }
+        /* 🛠️ OPRAVA: Placeholder a text sú čierne (resp. biele v tmavom režime), keďže pozadie je priehľadné */
+        .form-input::placeholder { color: var(--black); opacity: 0.5; }
+        .form-input { color: var(--black); }
         
         .input-error { border: 1px solid var(--danger) !important; }
         .input-error span { color: var(--danger) !important; }
         .input-error::placeholder { color: var(--danger) !important; opacity: 1; }
 
-        /* 🛠️ ÚPRAVA: Delete a Deleted si držia len svoju textovú farbu, pozadie dedia z var(--black) */
+        /* 🛠️ OPRAVA: Delete je celé červené a Deleted je celé zelené, obe majú čierny text */
         .danger-btn { 
-            color: var(--danger) !important; 
+            background-color: var(--danger) !important; 
+            color: #000000 !important; 
         }
 
         .success-btn {
-            color: var(--success) !important;
+            background-color: var(--success) !important;
+            color: #000000 !important;
             pointer-events: none; 
         }
 
         #upload-thumbnail { width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; cursor: pointer; background-color: var(--divider); }
 
-        /* 🛠️ ÚPRAVA: Checkbox je teraz invertovaný, aby bol viditeľný na plnom pozadí */
+        /* 🛠️ OPRAVA: Checkbox je viditeľný na priehľadnom pozadí (čierny rámček a čierna fajočka) */
         .custom-checkbox {
-            appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--white);
+            appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black);
             border-radius: calc(var(--border-radius) / 3); cursor: pointer; display: grid; place-content: center;
         }
-        .custom-checkbox::before { content: ""; width: 0.25rem; height: 0.5rem; border: solid var(--black); border-width: 0 1px 1px 0; transform: rotate(45deg); opacity: 0; margin-top: -0.125rem; }
-        .custom-checkbox:checked { background-color: var(--white); }
+        .custom-checkbox::before { content: ""; width: 0.25rem; height: 0.5rem; border: solid var(--white); border-width: 0 1px 1px 0; transform: rotate(45deg); opacity: 0; margin-top: -0.125rem; }
+        .custom-checkbox:checked { background-color: var(--black); }
         .custom-checkbox:checked::before { opacity: 1; }
 
         .footer-info { 
@@ -239,10 +240,10 @@
             
             <div id="login-ui">
                 <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
-                    <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="width: 100%;">
-                    <label class="form-input" style="cursor: pointer; justify-content: flex-start; user-select: none; width: 100%;">
+                    <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="width: 100%; background-color: transparent; border: 1px solid var(--divider);">
+                    <label class="form-input" style="cursor: pointer; justify-content: flex-start; user-select: none; width: 100%; background-color: transparent;">
                         <input type="checkbox" id="remember-login" class="custom-checkbox">
-                        <span>Remember me</span>
+                        <span style="color: var(--black);">Remember me</span>
                     </label>
                     <button type="submit" id="login-btn" class="submit-btn" style="width: 100%;">LOGIN</button>
                 </form>
@@ -252,8 +253,8 @@
                 <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                     <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                     
-                    <div id="upload-empty-state" class="form-input" style="cursor: pointer; justify-content: center; width: 100%;" onclick="document.getElementById('edit-image').click()">
-                        + ADD IMAGE
+                    <div id="upload-empty-state" class="form-input" style="cursor: pointer; justify-content: center; width: 100%; background-color: transparent; border: 1px solid var(--divider);" onclick="document.getElementById('edit-image').click()">
+                        <span style="color: var(--black);">+ ADD IMAGE</span>
                     </div>
 
                     <div id="upload-filled-state" style="display: none; gap: var(--gap-item); width: 100%;">
@@ -270,7 +271,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v5.9.6 • 2026</div>
+            <div class="footer-info">build v5.9.7 • 2026</div>
         </div>
     </nav>
 
