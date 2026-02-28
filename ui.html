@@ -219,6 +219,15 @@
             border: none !important;
         }
 
+        /* 🛠️ OPRAVA: Vizuálne deaktivané tlačidlo (transparentné, sivé, bez reakcie) */
+        .btn-tonal-disabled {
+            background-color: transparent !important;
+            color: var(--grey-50) !important;
+            border: 1px solid var(--divider) !important;
+            cursor: default !important;
+            pointer-events: none !important;
+        }
+
         .btn-danger {
             background-color: #ff3333 !important;
             color: #000000 !important;
@@ -397,7 +406,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.4.9 • 2026</div>
+            <div class="footer-info">build v6.4.10 • 2026</div>
         </div>
     </nav>
 
@@ -771,7 +780,6 @@
             document.getElementById('upload-loading-row').style.display = 'none';
             document.getElementById('upload-success-row').style.display = 'none';
             
-            /* 🛠️ OPRAVA JS ŠABLÓNY: UPLOAD je 10% Tonal, DELETE je 100% Plné */
             document.getElementById('upload-action-row').innerHTML = `
                 <button type="submit" id="publish-btn" class="submit-btn btn-tonal" style="flex-grow: 1;">UPLOAD</button>
                 <div id="clear-upload-btn" class="submit-btn" onclick="clearImageSelection(event)">DELETE</div>
@@ -892,10 +900,15 @@
             }
         }
 
+        // 🛠️ OPRAVA: Po vymazaní fotky (DELETE) sa tlačidlo prepne na deaktivaný štýl
         function clearImageSelection(e) {
             e.stopPropagation();
             document.getElementById('edit-image').value = ""; 
             existingImageUrl = null; 
+            
+            const delBtn = document.getElementById('clear-upload-btn');
+            if(delBtn) delBtn.className = "submit-btn btn-tonal-disabled"; // Aplikácia neaktívneho štýlu
+            
             updateImageUIState();
         }
 
