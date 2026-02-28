@@ -192,8 +192,9 @@
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
 
+        /* 🛠️ Oddelené pravidlá pre zjemnenie rámčeka na form-input */
         .form-input, .submit-btn { 
-            height: 3rem; border: 1px solid var(--black); border-radius: var(--border-radius); 
+            height: 3rem; border-radius: var(--border-radius); 
             font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; display: flex; align-items: center; gap: var(--gap-item); 
             box-shadow: none; -webkit-appearance: none; appearance: none; margin: 0;
@@ -202,12 +203,14 @@
         .form-input { 
             background-color: transparent; 
             color: var(--black);
+            border: 1px solid var(--divider); /* 10% jemný rámček namiesto ostrej čiernej */
         }
         .form-input::placeholder { color: var(--grey-50); } 
 
         .submit-btn { 
             background-color: var(--black); 
             color: var(--white);
+            border: 1px solid var(--black); /* Tlačidlo zostáva ohraničené a vyplnené 100% farbou */
             justify-content: center; text-transform: uppercase; cursor: pointer; white-space: nowrap;
         }
 
@@ -217,7 +220,6 @@
             border: none !important;
         }
 
-        /* 🛠️ Nové deštruktívne tlačidlo */
         .btn-danger {
             background-color: #ff3333 !important;
             color: #000000 !important;
@@ -227,6 +229,7 @@
         .btn-outline {
             background-color: transparent; 
             color: var(--black);
+            border: 1px solid var(--black);
         }
 
         .btn-loading {
@@ -276,12 +279,13 @@
             position: absolute;
         }
 
+        /* 🛠️ Úprava Checkboxu pre zladenie dizajnu */
         .custom-checkbox {
-            appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black);
+            appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--divider); /* Jemný 10% rámček */
             border-radius: calc(var(--border-radius) / 3); cursor: pointer; display: grid; place-content: center;
         }
         .custom-checkbox::before { content: ""; width: 0.25rem; height: 0.5rem; border: solid var(--white); border-width: 0 1px 1px 0; transform: rotate(45deg); opacity: 0; margin-top: -0.125rem; }
-        .custom-checkbox:checked { background-color: var(--black); }
+        .custom-checkbox:checked { background-color: var(--black); border-color: var(--black); } /* Pri checknutí celočierne */
         .custom-checkbox:checked::before { opacity: 1; }
 
         .footer-info { 
@@ -395,7 +399,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.4.5 • 2026</div>
+            <div class="footer-info">build v6.4.6 • 2026</div>
         </div>
     </nav>
 
@@ -448,7 +452,6 @@
             refreshFeedUI();
         }
 
-        // 🛠️ OPRAVA: Zastavenie prebublávania eventu a bezpečné otvorenie editora
         function openEditor(e) {
             if (e) e.stopPropagation();
             if (!navOverlay.classList.contains('active')) {
@@ -552,7 +555,6 @@
             if (globalPosts.length === 0) {
                 container.className = 'status-feed view-feed';
                 if (secretKey) {
-                    // 🛠️ Tu je upravený onclick s odovzdaním eventu
                     container.innerHTML = `
                         <div class="image-preview-container" onclick="openEditor(event)" style="width: 100%;">
                             <span class="preview-add-text">+ ADD IMAGE</span>
