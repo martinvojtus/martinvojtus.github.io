@@ -15,11 +15,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Design System Opacity Scale */
-            --black: #000000;         /* 100% (1.0) */
+            --black: #000000;
             --white: #ffffff;
-            --grey-50: rgba(0, 0, 0, 0.5); /* 50% (0.5) */
-            --divider: rgba(0, 0, 0, 0.1); /* 10% (0.1) */
+            --grey-50: rgba(0, 0, 0, 0.5);
+            --divider: rgba(0, 0, 0, 0.1);
             
             --glass-rgb: 255, 255, 255; 
             --content-width: 540px; 
@@ -29,7 +28,7 @@
             --glass-opacity: 0.5; 
             --glass-blur: 1rem;   
             --size-large: 2.0rem;
-            --size-small: 1.0rem; /* 🛠️ OPRAVA: Vrátené späť na 1.0rem (pôvodná veľkosť) */
+            --size-small: 1.0rem;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -119,7 +118,39 @@
         #logout-ui { display: none; }
         #admin-upload-zone { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; }
 
-        .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: var(--gap-item); }
+        /* 🛠️ FEED vs GRID LAYOUT CSS */
+        .status-feed { 
+            max-width: 600px; width: 100%; margin: 0 auto; 
+        }
+        
+        /* Klasický FEED */
+        .status-feed.view-feed {
+            display: flex; flex-direction: column; gap: var(--gap-item);
+        }
+
+        /* 🛠️ CIK-CAK GRID (Masonry) */
+        .status-feed.view-grid {
+            display: block;
+            column-count: 2;
+            column-gap: var(--gap-item);
+        }
+        .status-feed.view-grid .status-card {
+            -webkit-column-break-inside: avoid;
+            page-break-inside: avoid;
+            break-inside: avoid;
+            margin-bottom: var(--gap-item);
+            display: block; /* Override flex z defaultu */
+        }
+        .status-feed.view-grid .status-media-wrapper {
+            background-color: transparent; /* Zrušiť 10% pozadie pre čisté okraje fotiek */
+        }
+        /* V Grid móde skryjeme všetky obláčiky s textom */
+        .status-feed.view-grid .status-glass-bar,
+        .status-feed.view-grid .status-glass-bar-bottom,
+        .status-feed.view-grid .status-confirm-overlay {
+            display: none !important;
+        }
+
         .status-card { display: flex; flex-direction: column; position: relative; }
 
         .status-media-wrapper {
@@ -204,11 +235,10 @@
         .input-error { border: 1px solid var(--black) !important; }
         .input-error span { color: var(--black) !important; }
 
-        /* 🛠️ OPRAVA: Kontajner má teraz natvrdo 10% pozadie, aby bolo jasné, kde je zóna na kliknutie */
         .image-preview-container {
             width: 100%;
             aspect-ratio: 1 / 1;
-            background-color: var(--divider); /* Jemných 10% miesto transparent */
+            background-color: var(--divider);
             border: none;
             border-radius: var(--border-radius);
             display: flex;
@@ -335,13 +365,19 @@
                 <button onclick="handleLogout()" class="submit-btn btn-outline" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.2.6 • 2026</div>
+            <div class="footer-info">build v6.3.0 • 2026</div>
         </div>
     </nav>
 
     <main>
         <div id="section-feed">
-            <div id="status-container" class="status-feed"></div>
+            
+            <div style="max-width: 600px; width: 100%; margin: 0 auto var(--gap-item) auto; padding: 0;" class="action-row">
+                <button id="btn-view-grid" class="submit-btn btn-outline" style="flex-grow: 1;" onclick="setViewMode('grid')">GRID</button>
+                <button id="btn-view-feed" class="submit-btn" style="flex-grow: 1;" onclick="setViewMode('feed')">FEED</button>
+            </div>
+
+            <div id="status-container" class="status-feed view-feed"></div>
             <div id="loading-indicator" class="loading-text">Loading...</div>
         </div>
     </main>
@@ -367,6 +403,9 @@
         let deleteActionType = null;
         let editingPostId = null;
         let existingImageUrl = null;
+        
+        // 🛠️ Pamäť pre View Mode
+        let currentViewMode = localStorage.getItem('mv_view_mode') || 'feed';
 
         const passInput = document.getElementById('admin-pass');
         const menuToggle = document.getElementById('menuToggle');
@@ -378,6 +417,31 @@
                 passInput.placeholder = 'Password...';
             });
         }
+
+        // 🛠️ Funkcia na prepínanie GRID / FEED
+        function setViewMode(mode) {
+            currentViewMode = mode;
+            localStorage.setItem('mv_view_mode', mode);
+            
+            const btnGrid = document.getElementById('btn-view-grid');
+            const btnFeed = document.getElementById('btn-view-feed');
+            const container = document.getElementById('status-container');
+            
+            if (mode === 'grid') {
+                btnGrid.classList.remove('btn-outline');
+                btnFeed.classList.add('btn-outline');
+                container.classList.add('view-grid');
+                container.classList.remove('view-feed');
+            } else {
+                btnFeed.classList.remove('btn-outline');
+                btnGrid.classList.add('btn-outline');
+                container.classList.add('view-feed');
+                container.classList.remove('view-grid');
+            }
+        }
+
+        // Aplikujeme mód pri načítaní
+        setViewMode(currentViewMode);
 
         function toggleMenu() { 
             const isActive = menuToggle.classList.toggle('active'); 
@@ -526,6 +590,15 @@
         window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
 
         function toggleGlassBar(img) {
+            // 🛠️ Ak klikneš na fotku v GRID móde, prepne ťa to do FEED módu a zascrolluje na fotku
+            if (currentViewMode === 'grid') {
+                setViewMode('feed');
+                setTimeout(() => {
+                    img.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 50);
+                return;
+            }
+
             const bars = img.parentElement.querySelectorAll('.status-glass-bar, .status-glass-bar-bottom');
             if (bars.length > 0) {
                 const isHidden = bars[0].style.display === 'none';
