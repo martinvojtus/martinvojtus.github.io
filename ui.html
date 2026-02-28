@@ -122,7 +122,6 @@
             max-width: var(--content-width); width: 100%; margin: 0 auto; 
         }
 
-        /* 🛠️ Nová logika MASONRY cez Javascript + Flexbox */
         .status-feed.view-feed {
             display: flex; flex-direction: column; gap: var(--gap-item);
         }
@@ -133,7 +132,6 @@
             display: flex; flex-direction: column; gap: var(--gap-item); flex: 1; min-width: 0;
         }
 
-        /* Skrytie prvkov v Grid Režime */
         .status-feed.view-grid .status-glass-bar,
         .status-feed.view-grid .status-glass-bar-bottom,
         .status-feed.view-grid .status-confirm-overlay {
@@ -143,15 +141,11 @@
             background-color: transparent; 
         }
 
-        /* 🛠️ Dizajn jednoduchého prepínača */
         .feed-toggle-wrapper {
-            display: flex; justify-content: flex-end; padding: 0 var(--gap-item); width: 100%;
+            display: flex; justify-content: center; width: 100%;
         }
         .grid-toggle-wrapper {
-            display: flex; justify-content: flex-end; width: 100%; line-height: 1;
-        }
-        .view-toggle-text {
-            font-size: var(--size-small); color: var(--grey-50); cursor: pointer; text-transform: uppercase; user-select: none; line-height: 1;
+            display: flex; justify-content: center; width: 100%; 
         }
 
         .status-card { display: flex; flex-direction: column; position: relative; }
@@ -217,6 +211,12 @@
             justify-content: center; text-transform: uppercase; cursor: pointer; white-space: nowrap;
         }
 
+        .btn-tonal {
+            background-color: var(--divider) !important;
+            color: var(--black) !important;
+            border: none !important;
+        }
+
         .btn-outline {
             background-color: transparent; 
             color: var(--black);
@@ -259,7 +259,7 @@
             object-fit: contain; 
         }
         
-        #preview-add-text {
+        .preview-add-text {
             font-size: var(--size-small);
             color: var(--black);
             text-transform: uppercase;
@@ -357,7 +357,7 @@
                     <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                     
                     <div class="image-preview-container" onclick="document.getElementById('edit-image').click()">
-                        <span id="preview-add-text">+ ADD IMAGE</span>
+                        <span id="preview-add-text-menu" class="preview-add-text">+ ADD IMAGE</span>
                         <img id="upload-preview-img" class="image-preview-img" src="" alt="" style="display: none;">
                     </div>
 
@@ -385,14 +385,14 @@
                 <button onclick="handleLogout()" class="submit-btn btn-outline" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.4.0 • 2026</div>
+            <div class="footer-info">build v6.4.2 • 2026</div>
         </div>
     </nav>
 
     <main>
         <div id="section-feed">
             <div id="status-container" class="status-feed view-feed"></div>
-            <div id="loading-indicator" class="loading-text">Loading...</div>
+            <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
         </div>
     </main>
 
@@ -431,12 +431,19 @@
             });
         }
 
-        // 🛠️ JS MASONRY & VIEW TOGGLE
         function toggleViewMode() {
             const newMode = currentViewMode === 'feed' ? 'grid' : 'feed';
             currentViewMode = newMode;
             localStorage.setItem('mv_view_mode', newMode);
-            refreshFeedUI(); // Kompletne prestavia štruktúru HTML
+            refreshFeedUI();
+        }
+
+        // 🛠️ Rýchlejšie a spoľahlivejšie otvorenie editora z prázdneho stavu
+        function openEditor() {
+            if (!navOverlay.classList.contains('active')) {
+                toggleMenu();
+            }
+            window.scrollTo(0,0);
         }
 
         function toggleMenu() { 
@@ -528,12 +535,26 @@
             refreshFeedUI();
         }
 
-        // 🛠️ HLAVNÝ GENERÁTOR OBRAZOVIEK
+        // 🛠️ Renderovanie s novým logickým prázdnym stavom (Empty State)
         function refreshFeedUI() { 
             const container = document.getElementById('status-container');
             
+            // 🛠️ SMART EMPTY STATE: Vizuálne zjednotený s upload poľom
             if (globalPosts.length === 0) {
-                container.innerHTML = '<div class="loading-text">Nothing here yet.</div>';
+                container.className = 'status-feed view-feed';
+                if (secretKey) {
+                    container.innerHTML = `
+                        <div class="image-preview-container" onclick="openEditor()" style="width: 100%;">
+                            <span class="preview-add-text">+ ADD IMAGE</span>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="image-preview-container" style="width: 100%; cursor: default;">
+                            <span class="preview-add-text" style="color: var(--grey-50);">NOTHING HERE YET.</span>
+                        </div>
+                    `;
+                }
                 return;
             }
 
@@ -541,7 +562,7 @@
                 container.className = 'status-feed view-feed';
                 let html = `
                     <div class="feed-toggle-wrapper">
-                        <span class="view-toggle-text" onclick="toggleViewMode()">GRID VIEW</span>
+                        <button class="submit-btn btn-tonal" style="width: 100%;" onclick="toggleViewMode()">GRID VIEW</button>
                     </div>
                 `;
                 globalPosts.forEach(post => { html += renderSinglePost(post); });
@@ -551,10 +572,9 @@
                 let leftCol = '<div class="masonry-col col-left">';
                 let rightCol = '<div class="masonry-col col-right">';
 
-                // Text v pravom stĺpci, ktorý prirodzene posunie prvú fotku dole (Masonry Stagger)
                 rightCol += `
                     <div class="grid-toggle-wrapper">
-                        <span class="view-toggle-text" onclick="toggleViewMode()">FEED VIEW</span>
+                        <button class="submit-btn btn-tonal" style="width: 100%;" onclick="toggleViewMode()">FEED VIEW</button>
                     </div>
                 `;
 
@@ -605,7 +625,6 @@
                 if (reset) {
                     refreshFeedUI();
                 } else {
-                    // Pridávanie počas scrollovania podľa aktuálneho módu
                     if (currentViewMode === 'feed') {
                         let html = '';
                         newPosts.forEach(p => html += renderSinglePost(p));
@@ -632,16 +651,18 @@
 
         window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
 
-        // 🛠️ Okamžitý preskok z Gridu do Feedu a zameranie fotky
         function toggleGlassBar(imgElement, id) {
             if (currentViewMode === 'grid') {
                 currentViewMode = 'feed';
                 localStorage.setItem('mv_view_mode', 'feed');
                 refreshFeedUI();
+                
                 setTimeout(() => {
-                    const newImg = document.getElementById(`post-img-${id}`);
-                    if(newImg) newImg.scrollIntoView({ block: 'center' }); // Ostrý strih (bez animácie)
-                }, 50);
+                    const targetImg = document.getElementById(`post-img-${id}`);
+                    if (targetImg) {
+                        targetImg.closest('.status-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 100); 
                 return;
             }
 
@@ -701,7 +722,6 @@
                 </div>`;
             }
 
-            // Odkazujeme ID aj do argumentu onclick, aby grid vedel kam odscrolllovat
             const imageHtml = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="status-image" alt="image" loading="lazy" onclick="toggleGlassBar(this, ${s.id})">` : '';
             
             let mediaHtml = '';
@@ -718,10 +738,10 @@
                             <button class="submit-btn btn-outline" onclick="closeFeedDelete(${s.id})">CANCEL</button>
                         </div>
                         <div id="confirm-loading-${s.id}" class="action-row" style="display: none; padding: 0 var(--gap-item);">
-                            <div class="submit-btn btn-outline btn-loading">DELETING...</div>
+                            <div class="submit-btn btn-outline btn-loading" style="width: 100%;">DELETING...</div>
                         </div>
                         <div id="confirm-success-${s.id}" class="action-row" style="display: none; padding: 0 var(--gap-item);">
-                            <div class="submit-btn btn-ghost">DELETED</div>
+                            <div class="submit-btn btn-ghost" style="width: 100%;">DELETED</div>
                         </div>
                     </div>
                     ` : ''}
@@ -752,7 +772,7 @@
             const input = document.getElementById('edit-image');
             const detailsZone = document.getElementById('upload-details-zone');
             const thumbnail = document.getElementById('upload-preview-img');
-            const previewAddText = document.getElementById('preview-add-text');
+            const previewAddText = document.getElementById('preview-add-text-menu');
             const pubBtn = document.getElementById('publish-btn');
 
             const hasImage = (input && input.files && input.files.length > 0) || existingImageUrl;
