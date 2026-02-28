@@ -167,11 +167,12 @@
             color: var(--black);
         }
 
-        /* 🛠️ ÚPRAVA: Tlačidlo sa mení na voľný text (len zneviditeľníme pozadie a farbu rámčeka, aby nedošlo k poskočeniu veľkosti) */
-        .btn-text-only {
+        /* 🛠️ ÚPRAVA: Ghost Outline stav. Plný rámček zamedzí artefaktom, 50% opacity ukotví prvok v pozadí ako "vybavený" */
+        .btn-status {
             background-color: transparent !important; 
-            border-color: transparent !important; 
             color: var(--black) !important;
+            border: 1px solid var(--black) !important;
+            opacity: 0.5 !important;
             pointer-events: none !important; 
         }
 
@@ -279,7 +280,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-outline" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.0.3 • 2026</div>
+            <div class="footer-info">build v6.0.4 • 2026</div>
         </div>
     </nav>
 
@@ -342,12 +343,12 @@
             }
         }
 
+        // 🛠️ ÚPRAVA: Vyčistený kód - opacity ovláda čisto CSS .btn-status
         async function handleLogin(e) {
             e.preventDefault();
             const loginBtn = document.getElementById('login-btn');
             loginBtn.innerText = 'LOGGING IN...';
-            loginBtn.classList.add('btn-text-only'); // 🛠️ Aplikuje sa text-only mód
-            loginBtn.style.opacity = '0.5';
+            loginBtn.classList.add('btn-status'); 
             loginBtn.disabled = true;
 
             const tempKey = passInput.value;
@@ -367,16 +368,15 @@
                         
                         loginBtn.innerText = 'LOGIN';
                         loginBtn.disabled = false;
-                        loginBtn.style.opacity = '1';
-                        loginBtn.classList.remove('btn-text-only');
+                        loginBtn.classList.remove('btn-status');
                     }, 1000);
                 } else { 
                     passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; 
-                    loginBtn.innerText = 'LOGIN'; loginBtn.style.opacity = '1'; loginBtn.disabled = false; loginBtn.classList.remove('btn-text-only');
+                    loginBtn.innerText = 'LOGIN'; loginBtn.disabled = false; loginBtn.classList.remove('btn-status');
                 }
             } catch (err) { 
                 passInput.classList.add('input-error'); 
-                loginBtn.innerText = 'LOGIN'; loginBtn.style.opacity = '1'; loginBtn.disabled = false; loginBtn.classList.remove('btn-text-only');
+                loginBtn.innerText = 'LOGIN'; loginBtn.disabled = false; loginBtn.classList.remove('btn-status');
             }
         }
 
@@ -514,9 +514,8 @@
             updateImageUIState(); 
             const pubBtn = document.getElementById('publish-btn');
             pubBtn.innerText = 'UPLOAD';
-            pubBtn.classList.remove('btn-text-only');
+            pubBtn.classList.remove('btn-status');
             pubBtn.disabled = false;
-            pubBtn.style.opacity = '1';
             
             const clearBtn = document.getElementById('clear-upload-btn');
             if (clearBtn) clearBtn.style.display = 'flex';
@@ -547,9 +546,8 @@
             const delBtn = document.getElementById(`feed-del-btn-${id}`);
             const cancelBtn = document.getElementById(`feed-cancel-btn-${id}`);
             delBtn.innerText = 'DELETE';
-            delBtn.style.opacity = '1';
             delBtn.disabled = false;
-            delBtn.classList.remove('btn-text-only');
+            delBtn.classList.remove('btn-status');
             cancelBtn.style.display = 'flex';
         }
 
@@ -564,8 +562,7 @@
             const cancelBtn = document.getElementById(`feed-cancel-btn-${id}`);
             
             delBtn.innerText = 'DELETING...';
-            delBtn.classList.add('btn-text-only'); // 🛠️ Aplikuje sa text-only mód
-            delBtn.style.opacity = '0.5';
+            delBtn.classList.add('btn-status'); 
             delBtn.disabled = true;
             cancelBtn.style.display = 'none'; 
             
@@ -590,9 +587,8 @@
             const delBtn = document.getElementById('modal-del-btn');
             const cancelBtn = document.getElementById('modal-cancel-btn');
             delBtn.innerText = 'DELETE';
-            delBtn.style.opacity = '1';
             delBtn.disabled = false;
-            delBtn.classList.remove('btn-text-only');
+            delBtn.classList.remove('btn-status');
             cancelBtn.style.display = 'flex';
         }
 
@@ -602,8 +598,7 @@
 
             if (deleteActionType === 'delete_all') {
                 delBtn.innerText = 'DELETING...';
-                delBtn.classList.add('btn-text-only'); // 🛠️ Aplikuje sa text-only mód
-                delBtn.style.opacity = '0.5';
+                delBtn.classList.add('btn-status'); 
                 delBtn.disabled = true;
                 cancelBtn.style.display = 'none';
 
@@ -642,8 +637,7 @@
             const clearBtn = document.getElementById('clear-upload-btn');
             
             publishBtn.disabled = true; 
-            publishBtn.classList.add('btn-text-only'); // 🛠️ Aplikuje sa text-only mód
-            publishBtn.style.opacity = '0.5';
+            publishBtn.classList.add('btn-status'); 
             publishBtn.innerText = 'UPLOADING...';
             if (clearBtn) clearBtn.style.display = 'none'; 
             
@@ -668,13 +662,13 @@
                     setTimeout(() => { resetEditor(); closeMenu(); }, 1000);
                 } else { 
                     publishBtn.innerText = 'UPLOAD';
-                    publishBtn.disabled = false; publishBtn.style.opacity = '1'; publishBtn.classList.remove('btn-text-only');
+                    publishBtn.disabled = false; publishBtn.classList.remove('btn-status');
                     if (clearBtn) clearBtn.style.display = 'flex';
                 }
             } catch (err) {
                 console.error(err);
                 publishBtn.innerText = 'UPLOAD';
-                publishBtn.disabled = false; publishBtn.style.opacity = '1'; publishBtn.classList.remove('btn-text-only');
+                publishBtn.disabled = false; publishBtn.classList.remove('btn-status');
                 if (clearBtn) clearBtn.style.display = 'flex';
             }
         }
