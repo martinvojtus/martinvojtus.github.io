@@ -222,15 +222,20 @@
             color: var(--black);
         }
 
+        /* 🛠️ OPRAVA: Procesné tlačidlá (10% pozadie, 50% opacity na text) */
         .btn-loading {
-            opacity: 0.5 !important;
+            background-color: var(--divider) !important;
+            color: var(--grey-50) !important; /* Polovičná priehľadnosť pre text počas procesu */
+            border: none !important;
             pointer-events: none !important;
+            opacity: 1 !important; /* Celé tlačidlo nesmie stratiť farbu, len text */
         }
 
+        /* 🛠️ OPRAVA: Hotové tlačidlá - Success/Done (10% pozadie, 100% opacity na text) */
         .btn-ghost {
-            background-color: transparent !important; 
-            color: var(--grey-50) !important; 
-            border-color: var(--grey-50) !important;
+            background-color: var(--divider) !important; 
+            color: var(--black) !important; /* Ostrá farba na znak úspešného dokončenia */
+            border: none !important;
             pointer-events: none !important; 
             opacity: 1 !important; 
         }
@@ -367,10 +372,10 @@
                         
                         <div id="upload-action-row" class="action-row" style="padding: 0;">
                             <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">UPLOAD</button>
-                            <div id="clear-upload-btn" class="submit-btn btn-outline" onclick="clearImageSelection(event)">DELETE</div>
+                            <div id="clear-upload-btn" class="submit-btn btn-tonal" onclick="clearImageSelection(event)">DELETE</div>
                         </div>
                         <div id="upload-loading-row" class="action-row" style="display: none; padding: 0;">
-                            <div id="upload-loading-btn" class="submit-btn btn-outline btn-loading" style="flex-grow: 1;">UPLOADING...</div>
+                            <div id="upload-loading-btn" class="submit-btn btn-loading" style="flex-grow: 1;">UPLOADING...</div>
                         </div>
                         <div id="upload-success-row" class="action-row" style="display: none; padding: 0;">
                             <div id="upload-success-btn" class="submit-btn btn-ghost" style="flex-grow: 1;">UPLOADED</div>
@@ -382,10 +387,10 @@
             </div>
 
             <div id="logout-ui" style="display: none;">
-                <button onclick="handleLogout()" class="submit-btn btn-outline" style="width: 100%;">LOGOUT</button>
+                <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.4.2 • 2026</div>
+            <div class="footer-info">build v6.4.4 • 2026</div>
         </div>
     </nav>
 
@@ -399,13 +404,13 @@
     <div id="delete-modal">
         <div id="modal-action-zone" class="action-row">
             <button id="modal-del-btn" class="submit-btn" onclick="executeModalDelete()">DELETE</button>
-            <button id="modal-cancel-btn" class="submit-btn btn-outline" onclick="closeDeleteModal()">CANCEL</button>
+            <button id="modal-cancel-btn" class="submit-btn btn-tonal" onclick="closeDeleteModal()">CANCEL</button>
         </div>
         <div id="modal-loading-zone" class="action-row" style="display: none;">
-            <div class="submit-btn btn-outline btn-loading">DELETING...</div>
+            <div class="submit-btn btn-loading" style="width: 100%;">DELETING...</div>
         </div>
         <div id="modal-success-zone" class="action-row" style="display: none;">
-            <div class="submit-btn btn-ghost">DELETED</div>
+            <div class="submit-btn btn-ghost" style="width: 100%;">DELETED</div>
         </div>
     </div>
 
@@ -438,7 +443,6 @@
             refreshFeedUI();
         }
 
-        // 🛠️ Rýchlejšie a spoľahlivejšie otvorenie editora z prázdneho stavu
         function openEditor() {
             if (!navOverlay.classList.contains('active')) {
                 toggleMenu();
@@ -535,11 +539,9 @@
             refreshFeedUI();
         }
 
-        // 🛠️ Renderovanie s novým logickým prázdnym stavom (Empty State)
         function refreshFeedUI() { 
             const container = document.getElementById('status-container');
             
-            // 🛠️ SMART EMPTY STATE: Vizuálne zjednotený s upload poľom
             if (globalPosts.length === 0) {
                 container.className = 'status-feed view-feed';
                 if (secretKey) {
@@ -735,10 +737,10 @@
                     <div id="confirm-overlay-${s.id}" class="status-confirm-overlay">
                         <div id="confirm-actions-${s.id}" class="action-row" style="padding: 0 var(--gap-item);">
                             <button class="submit-btn" onclick="executeFeedDelete(${s.id})">DELETE</button>
-                            <button class="submit-btn btn-outline" onclick="closeFeedDelete(${s.id})">CANCEL</button>
+                            <button class="submit-btn btn-tonal" onclick="closeFeedDelete(${s.id})">CANCEL</button>
                         </div>
                         <div id="confirm-loading-${s.id}" class="action-row" style="display: none; padding: 0 var(--gap-item);">
-                            <div class="submit-btn btn-outline btn-loading" style="width: 100%;">DELETING...</div>
+                            <div class="submit-btn btn-loading" style="width: 100%;">DELETING...</div>
                         </div>
                         <div id="confirm-success-${s.id}" class="action-row" style="display: none; padding: 0 var(--gap-item);">
                             <div class="submit-btn btn-ghost" style="width: 100%;">DELETED</div>
@@ -763,7 +765,7 @@
             
             document.getElementById('upload-action-row').innerHTML = `
                 <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">UPLOAD</button>
-                <div id="clear-upload-btn" class="submit-btn btn-outline" onclick="clearImageSelection(event)">DELETE</div>
+                <div id="clear-upload-btn" class="submit-btn btn-tonal" onclick="clearImageSelection(event)">DELETE</div>
             `;
             updateImageUIState(); 
         }
