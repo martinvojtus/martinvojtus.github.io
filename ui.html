@@ -345,10 +345,11 @@
             z-index: -1;
         }
         
+        /* 🛠️ Padding zväčšený na 2rem pre lepší zážitok z čítania */
         .status-text-overlay-content {
             font-size: var(--size-small); 
             color: var(--black);
-            padding: 1rem; 
+            padding: 2rem; 
             max-height: 100%; 
             overflow-y: auto; 
             width: 100%;
@@ -360,12 +361,12 @@
             display: none; 
         }
         
+        /* 🛠️ Odstránený text-transform: uppercase pre prirodzený titulok */
         .status-text-overlay-title {
             font-size: var(--size-large);
             font-weight: 400; 
             line-height: 1.1;
             margin-bottom: var(--gap-item);
-            text-transform: uppercase;
             word-wrap: break-word;
         }
         
@@ -438,7 +439,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.6.0 • 2026</div>
+            <div class="footer-info">build v6.6.1 • 2026</div>
         </div>
     </nav>
 
@@ -555,7 +556,6 @@
             updateTextUIState(); 
         }
 
-        // 🛠️ Funkcie pre vysúvanie a schovávanie celého editora
         function expandEditor() {
             document.getElementById('editor-collapsed-state').style.display = 'none';
             document.getElementById('editor-form').style.display = 'flex';
@@ -564,7 +564,7 @@
         function collapseEditor() {
             document.getElementById('editor-collapsed-state').style.display = 'flex';
             document.getElementById('editor-form').style.display = 'none';
-            resetEditor(); // Pri zatvorení vyčistíme rozrobenú robotu
+            resetEditor(); 
         }
 
         function toggleViewMode() {
@@ -590,7 +590,7 @@
                 document.body.classList.add('is-logged-in');
                 document.getElementById('login-ui').style.display = 'none';
                 document.getElementById('admin-upload-zone').style.display = 'flex';
-                document.getElementById('logout-ui').style.display = 'block';
+                document.getElementById('logout-ui').style.display = 'flex';
             } else {
                 document.body.classList.remove('is-logged-in');
                 document.getElementById('login-ui').style.display = 'flex';
@@ -680,7 +680,6 @@
             if (globalPosts.length === 0) {
                 container.className = 'status-feed view-feed';
                 if (secretKey) {
-                    // Ak je prihlásený, feed bude opticky prázdny, pretože na vrchu už tróni tlačidlo + (Editor)
                     container.innerHTML = ``;
                 } else {
                     container.innerHTML = `
@@ -847,7 +846,6 @@
             const textInput = document.getElementById('edit-text');
             textInput.value = post.text || '';
             
-            // 🛠️ Otvorí editor, vyplní údaje a preskroluje hore
             expandEditor();
             setTimeout(() => {
                 autoResizeTextarea(textInput);
@@ -875,10 +873,11 @@
             if (s.title || s.text || secretKey) {
                 let displayTitle = s.title || 'UNTITLED';
                 
+                // 🛠️ Tlačidlo zmenené na READ MORE
                 barHtmlBottom = `
                 <div class="status-glass-bar-bottom">
                     <span class="status-text-content" onclick="toggleTextOverlay(event, ${s.id})">${displayTitle}</span>
-                    <span class="admin-bar-item admin-delete-link" onclick="toggleTextOverlay(event, ${s.id})" style="margin-left: var(--gap-item);">MORE</span>
+                    <span class="admin-bar-item admin-delete-link" onclick="toggleTextOverlay(event, ${s.id})" style="margin-left: var(--gap-item);">READ MORE</span>
                     ${secretKey ? `<span onclick="handleEditPost(event, ${s.id})" class="admin-bar-item admin-delete-link" style="margin-left: var(--gap-item);">EDIT</span>` : ''}
                 </div>`;
 
@@ -1053,7 +1052,7 @@
                 setTimeout(() => {
                     fetchStatuses(true);
                     closeDeleteModal();
-                    collapseEditor(); // Po zmazaní všetkého zbalíme editor
+                    collapseEditor();
                 }, 1000);
             }
         }
@@ -1111,7 +1110,7 @@
                     document.getElementById('upload-success-row').style.display = 'flex';
                     document.getElementById('upload-success-btn').innerText = editingPostId ? 'SAVED' : 'UPLOADED';
                     setTimeout(() => { 
-                        collapseEditor(); // Po úspešnom odoslaní sa editor zavrie
+                        collapseEditor(); 
                     }, 1000);
                 } else { 
                     resetEditor(); 
