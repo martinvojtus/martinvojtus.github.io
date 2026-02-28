@@ -167,18 +167,18 @@
             color: var(--black);
         }
 
-        .btn-ghost {
-            background-color: transparent; 
-            color: var(--grey-50); 
-            border-color: var(--grey-50);
-            pointer-events: none; 
+        /* 🛠️ ÚPRAVA: Tlačidlo sa mení na voľný text (len zneviditeľníme pozadie a farbu rámčeka, aby nedošlo k poskočeniu veľkosti) */
+        .btn-text-only {
+            background-color: transparent !important; 
+            border-color: transparent !important; 
+            color: var(--black) !important;
+            pointer-events: none !important; 
         }
 
         .input-error { border: 1px solid var(--black) !important; opacity: 0.5; }
         .input-error span { color: var(--black) !important; }
         .input-error::placeholder { color: var(--black) !important; opacity: 1; }
 
-        /* 🛠️ ÚPRAVA: Pridaný plný 1px rámček farby var(--black) pre miniatúru */
         #upload-thumbnail { 
             width: 3rem; height: 3rem; flex-shrink: 0; 
             border-radius: var(--border-radius); object-fit: cover; cursor: pointer; 
@@ -279,7 +279,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-outline" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.0.2 • 2026</div>
+            <div class="footer-info">build v6.0.3 • 2026</div>
         </div>
     </nav>
 
@@ -346,6 +346,7 @@
             e.preventDefault();
             const loginBtn = document.getElementById('login-btn');
             loginBtn.innerText = 'LOGGING IN...';
+            loginBtn.classList.add('btn-text-only'); // 🛠️ Aplikuje sa text-only mód
             loginBtn.style.opacity = '0.5';
             loginBtn.disabled = true;
 
@@ -355,8 +356,6 @@
                 const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': tempKey } });
                 if (res.ok) { 
                     loginBtn.innerText = 'SUCCESS';
-                    loginBtn.style.opacity = '1';
-                    loginBtn.classList.add('btn-ghost');
                     
                     secretKey = tempKey; 
                     setTimeout(() => {
@@ -368,15 +367,16 @@
                         
                         loginBtn.innerText = 'LOGIN';
                         loginBtn.disabled = false;
-                        loginBtn.classList.remove('btn-ghost');
+                        loginBtn.style.opacity = '1';
+                        loginBtn.classList.remove('btn-text-only');
                     }, 1000);
                 } else { 
                     passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; 
-                    loginBtn.innerText = 'LOGIN'; loginBtn.style.opacity = '1'; loginBtn.disabled = false;
+                    loginBtn.innerText = 'LOGIN'; loginBtn.style.opacity = '1'; loginBtn.disabled = false; loginBtn.classList.remove('btn-text-only');
                 }
             } catch (err) { 
                 passInput.classList.add('input-error'); 
-                loginBtn.innerText = 'LOGIN'; loginBtn.style.opacity = '1'; loginBtn.disabled = false;
+                loginBtn.innerText = 'LOGIN'; loginBtn.style.opacity = '1'; loginBtn.disabled = false; loginBtn.classList.remove('btn-text-only');
             }
         }
 
@@ -514,7 +514,7 @@
             updateImageUIState(); 
             const pubBtn = document.getElementById('publish-btn');
             pubBtn.innerText = 'UPLOAD';
-            pubBtn.classList.remove('btn-ghost');
+            pubBtn.classList.remove('btn-text-only');
             pubBtn.disabled = false;
             pubBtn.style.opacity = '1';
             
@@ -549,7 +549,7 @@
             delBtn.innerText = 'DELETE';
             delBtn.style.opacity = '1';
             delBtn.disabled = false;
-            delBtn.classList.remove('btn-ghost');
+            delBtn.classList.remove('btn-text-only');
             cancelBtn.style.display = 'flex';
         }
 
@@ -564,14 +564,13 @@
             const cancelBtn = document.getElementById(`feed-cancel-btn-${id}`);
             
             delBtn.innerText = 'DELETING...';
+            delBtn.classList.add('btn-text-only'); // 🛠️ Aplikuje sa text-only mód
             delBtn.style.opacity = '0.5';
             delBtn.disabled = true;
             cancelBtn.style.display = 'none'; 
             
             await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
             
-            delBtn.style.opacity = '1';
-            delBtn.classList.add('btn-ghost');
             delBtn.innerText = 'DELETED';
             
             setTimeout(() => {
@@ -593,7 +592,7 @@
             delBtn.innerText = 'DELETE';
             delBtn.style.opacity = '1';
             delBtn.disabled = false;
-            delBtn.classList.remove('btn-ghost');
+            delBtn.classList.remove('btn-text-only');
             cancelBtn.style.display = 'flex';
         }
 
@@ -603,6 +602,7 @@
 
             if (deleteActionType === 'delete_all') {
                 delBtn.innerText = 'DELETING...';
+                delBtn.classList.add('btn-text-only'); // 🛠️ Aplikuje sa text-only mód
                 delBtn.style.opacity = '0.5';
                 delBtn.disabled = true;
                 cancelBtn.style.display = 'none';
@@ -613,8 +613,6 @@
                     await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); 
                 }
                 
-                delBtn.style.opacity = '1';
-                delBtn.classList.add('btn-ghost');
                 delBtn.innerText = 'DELETED';
                 
                 setTimeout(() => {
@@ -625,7 +623,6 @@
             }
         }
 
-        // 🛠️ ÚPRAVA: Bleskové odstránenie z pamäte bez modalu (vymazaný parameter 'clear_upload' z executeModalDelete)
         function clearImageSelection(e) {
             e.stopPropagation();
             document.getElementById('edit-image').value = ""; 
@@ -645,6 +642,7 @@
             const clearBtn = document.getElementById('clear-upload-btn');
             
             publishBtn.disabled = true; 
+            publishBtn.classList.add('btn-text-only'); // 🛠️ Aplikuje sa text-only mód
             publishBtn.style.opacity = '0.5';
             publishBtn.innerText = 'UPLOADING...';
             if (clearBtn) clearBtn.style.display = 'none'; 
@@ -666,19 +664,17 @@
                 
                 if (res.ok) { 
                     fetchStatuses(true); 
-                    publishBtn.style.opacity = '1';
-                    publishBtn.classList.add('btn-ghost');
                     publishBtn.innerText = 'UPLOADED'; 
                     setTimeout(() => { resetEditor(); closeMenu(); }, 1000);
                 } else { 
                     publishBtn.innerText = 'UPLOAD';
-                    publishBtn.disabled = false; publishBtn.style.opacity = '1'; 
+                    publishBtn.disabled = false; publishBtn.style.opacity = '1'; publishBtn.classList.remove('btn-text-only');
                     if (clearBtn) clearBtn.style.display = 'flex';
                 }
             } catch (err) {
                 console.error(err);
                 publishBtn.innerText = 'UPLOAD';
-                publishBtn.disabled = false; publishBtn.style.opacity = '1'; 
+                publishBtn.disabled = false; publishBtn.style.opacity = '1'; publishBtn.classList.remove('btn-text-only');
                 if (clearBtn) clearBtn.style.display = 'flex';
             }
         }
