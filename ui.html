@@ -62,7 +62,6 @@
             line-height: 1;
         }
 
-        /* 🛠️ Pridaný spodný sklenený bar do zoznamu pre hardvérovú akceleráciu */
         header, .nav-overlay, .status-glass-bar, .status-glass-bar-bottom, .status-confirm-overlay, #delete-modal {
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
@@ -128,7 +127,6 @@
             background-color: var(--divider); 
         }
 
-        /* HORNÝ OBLÁČIK */
         .status-glass-bar {
             height: 3rem; width: 100%;
             background: rgba(var(--glass-rgb), var(--glass-opacity)); 
@@ -139,7 +137,6 @@
             padding: 0 var(--gap-item);
         }
 
-        /* 🛠️ SPODNÝ OBLÁČIK PRE TEXT */
         .status-glass-bar-bottom {
             height: 3rem; width: 100%;
             background: rgba(var(--glass-rgb), var(--glass-opacity)); 
@@ -203,12 +200,12 @@
         .input-error { border: 1px solid var(--black) !important; }
         .input-error span { color: var(--black) !important; }
 
-        /* 🛠️ VEĽKÝ ŠTVORCOVÝ NÁHĽAD (1:1 Aspect Ratio) */
+        /* 🛠️ OPRAVA: Zmazaný rámček. Čistý 1:1 kontajner a stopercentný "contain" formát fotky */
         .image-preview-container {
             width: 100%;
             aspect-ratio: 1 / 1;
             background-color: var(--divider);
-            border: 1px solid var(--black);
+            border: none;
             border-radius: var(--border-radius);
             display: flex;
             justify-content: center;
@@ -217,9 +214,9 @@
             cursor: pointer;
         }
         .image-preview-img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain; /* 🛠️ Celý obrázok sa zmestí dnu, zvyšok vyplní 10% farba */
+            width: 100%;
+            height: 100%;
+            object-fit: contain; 
         }
 
         .custom-checkbox {
@@ -260,7 +257,7 @@
 
         .action-row {
             display: flex; flex-direction: row; gap: var(--gap-item); justify-content: center;
-            width: 100%; padding: 0;
+            width: 100%; padding: 0 var(--gap-item); /* Pôvodný padding pre riadok v modale */
         }
     </style>
 </head>
@@ -302,18 +299,22 @@
                     </div>
 
                     <div id="upload-filled-state" style="display: none; flex-direction: column; gap: var(--gap-item); width: 100%;">
-                        
                         <div class="image-preview-container" onclick="document.getElementById('edit-image').click()">
-                            <img id="upload-thumbnail" class="image-preview-img" src="" alt="">
+                            <img id="upload-preview-img" class="image-preview-img" src="" alt="">
                         </div>
                         
                         <input type="text" id="edit-text" class="form-input" placeholder="Image description..." style="width: 100%;">
                         
-                        <div id="upload-action-row" class="action-row">
-                            <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">UPLOAD</button>
-                            <div id="clear-upload-btn" class="submit-btn btn-outline" onclick="clearImageSelection(event)">DELETE</div>
+                        <div id="upload-action-row" class="action-row" style="padding: 0;">
+                            <button type="submit" class="submit-btn" style="flex-grow: 1;">UPLOAD</button>
+                            <div class="submit-btn btn-outline" onclick="clearImageSelection(event)">DELETE</div>
                         </div>
-
+                        <div id="upload-loading-row" class="action-row" style="display: none; padding: 0;">
+                            <div class="submit-btn btn-outline btn-loading" style="flex-grow: 1;">UPLOADING...</div>
+                        </div>
+                        <div id="upload-success-row" class="action-row" style="display: none; padding: 0;">
+                            <div class="submit-btn btn-ghost" style="flex-grow: 1;">UPLOADED</div>
+                        </div>
                     </div>
                     
                     <button type="button" class="submit-btn" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
@@ -324,7 +325,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-outline" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.1.0 • 2026</div>
+            <div class="footer-info">build v6.1.1 • 2026</div>
         </div>
     </nav>
 
@@ -336,9 +337,15 @@
     </main>
 
     <div id="delete-modal">
-        <div id="modal-action-zone" class="action-row" style="padding: 0 var(--gap-item);">
-            <button id="modal-del-btn" class="submit-btn" onclick="executeModalDelete()">DELETE</button>
-            <button id="modal-cancel-btn" class="submit-btn btn-outline" onclick="closeDeleteModal()">CANCEL</button>
+        <div id="modal-action-zone" class="action-row">
+            <button class="submit-btn" onclick="executeModalDelete()">DELETE</button>
+            <button class="submit-btn btn-outline" onclick="closeDeleteModal()">CANCEL</button>
+        </div>
+        <div id="modal-loading-zone" class="action-row" style="display: none;">
+            <div class="submit-btn btn-outline btn-loading">DELETING...</div>
+        </div>
+        <div id="modal-success-zone" class="action-row" style="display: none;">
+            <div class="submit-btn btn-ghost">DELETED</div>
         </div>
     </div>
 
@@ -504,12 +511,10 @@
 
         window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
 
-        // 🛠️ ÚPRAVA: Prepínač reaguje na horný aj spodný bar naraz
         function toggleGlassBar(img) {
             const bars = img.parentElement.querySelectorAll('.status-glass-bar, .status-glass-bar-bottom');
             if (bars.length > 0) {
                 const isHidden = bars[0].style.display === 'none';
-                
                 if (isHidden) {
                     bars.forEach(b => b.style.display = 'flex');
                     clearTimeout(img.glassTimer);
@@ -533,7 +538,6 @@
                 ${secretKey ? `<span onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>` : '<div></div>'}
             </div>`;
 
-            // 🛠️ Ak fotka obsahuje popis, vygeneruje sa spodný obláčik
             let barHtmlBottom = '';
             if (s.text) {
                 barHtmlBottom = `
@@ -546,6 +550,7 @@
             
             let mediaHtml = '';
             if (imageHtml) {
+                /* 🛠️ Samostatné riadky na zamedzenie Safari artefaktom pre Context Delete */
                 mediaHtml = `
                 <div class="status-media-wrapper">
                     ${barHtmlTop}
@@ -557,6 +562,12 @@
                             <button class="submit-btn" onclick="executeFeedDelete(${s.id})">DELETE</button>
                             <button class="submit-btn btn-outline" onclick="closeFeedDelete(${s.id})">CANCEL</button>
                         </div>
+                        <div id="confirm-loading-${s.id}" class="action-row" style="display: none; padding: 0 var(--gap-item);">
+                            <div class="submit-btn btn-outline btn-loading">DELETING...</div>
+                        </div>
+                        <div id="confirm-success-${s.id}" class="action-row" style="display: none; padding: 0 var(--gap-item);">
+                            <div class="submit-btn btn-ghost">DELETED</div>
+                        </div>
                     </div>
                     ` : ''}
                 </div>`;
@@ -565,15 +576,12 @@
             return `<div class="status-card">${mediaHtml}</div>`;
         }
 
-        // 🛠️ ÚPRAVA: Komplexný reset zahŕňa aj vyčistenie popisu
         function resetEditor() {
             document.getElementById('edit-image').value = ""; 
             document.getElementById('edit-text').value = "";
-            
-            document.getElementById('upload-action-row').innerHTML = `
-                <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">UPLOAD</button>
-                <div id="clear-upload-btn" class="submit-btn btn-outline" onclick="clearImageSelection(event)">DELETE</div>
-            `;
+            document.getElementById('upload-action-row').style.display = 'flex';
+            document.getElementById('upload-loading-row').style.display = 'none';
+            document.getElementById('upload-success-row').style.display = 'none';
             updateImageUIState(); 
         }
 
@@ -581,7 +589,7 @@
             const input = document.getElementById('edit-image');
             const emptyState = document.getElementById('upload-empty-state');
             const filledState = document.getElementById('upload-filled-state');
-            const thumbnail = document.getElementById('upload-thumbnail');
+            const thumbnail = document.getElementById('upload-preview-img');
 
             if (input && input.files && input.files.length > 0) {
                 if(thumbnail) thumbnail.src = URL.createObjectURL(input.files[0]);
@@ -596,35 +604,30 @@
 
         function handleDeleteFeed(id) {
             const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
-            // Skryje oba obláčiky pri mazaní
             const bars = card.querySelectorAll('.status-glass-bar, .status-glass-bar-bottom');
             bars.forEach(b => b.style.display = 'none');
             
             document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
-            
-            const actionRow = document.getElementById(`confirm-actions-${id}`);
-            actionRow.innerHTML = `
-                <button class="submit-btn" onclick="executeFeedDelete(${id})">DELETE</button>
-                <button class="submit-btn btn-outline" onclick="closeFeedDelete(${id})">CANCEL</button>
-            `;
+            document.getElementById(`confirm-actions-${id}`).style.display = 'flex';
+            document.getElementById(`confirm-loading-${id}`).style.display = 'none';
+            document.getElementById(`confirm-success-${id}`).style.display = 'none';
         }
 
         function closeFeedDelete(id) {
             document.getElementById(`confirm-overlay-${id}`).style.display = 'none';
             const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
-            // Zobrazí späť oba obláčiky
             const bars = card.querySelectorAll('.status-glass-bar, .status-glass-bar-bottom');
             bars.forEach(b => b.style.display = 'flex');
         }
 
         async function executeFeedDelete(id) {
-            const actionRow = document.getElementById(`confirm-actions-${id}`);
-            
-            actionRow.innerHTML = `<div class="submit-btn btn-outline btn-loading">DELETING...</div>`;
+            document.getElementById(`confirm-actions-${id}`).style.display = 'none';
+            document.getElementById(`confirm-loading-${id}`).style.display = 'flex';
             
             await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
             
-            actionRow.innerHTML = `<div class="submit-btn btn-ghost">DELETED</div>`;
+            document.getElementById(`confirm-loading-${id}`).style.display = 'none';
+            document.getElementById(`confirm-success-${id}`).style.display = 'flex';
             
             setTimeout(() => {
                 fetchStatuses(true);
@@ -634,24 +637,20 @@
         function openDeleteModal(type) {
             deleteActionType = type;
             document.getElementById('delete-modal').style.display = 'flex';
+            document.getElementById('modal-action-zone').style.display = 'flex';
+            document.getElementById('modal-loading-zone').style.display = 'none';
+            document.getElementById('modal-success-zone').style.display = 'none';
         }
 
         function closeDeleteModal() {
             document.getElementById('delete-modal').style.display = 'none';
             deleteActionType = null;
-            
-            const actionRow = document.getElementById('modal-action-zone');
-            actionRow.innerHTML = `
-                <button class="submit-btn" onclick="executeModalDelete()">DELETE</button>
-                <button class="submit-btn btn-outline" onclick="closeDeleteModal()">CANCEL</button>
-            `;
         }
 
         async function executeModalDelete() {
-            const actionRow = document.getElementById('modal-action-zone');
-
             if (deleteActionType === 'delete_all') {
-                actionRow.innerHTML = `<div class="submit-btn btn-outline btn-loading">DELETING...</div>`;
+                document.getElementById('modal-action-zone').style.display = 'none';
+                document.getElementById('modal-loading-zone').style.display = 'flex';
 
                 const res = await fetch(`${API_URL}/posts?skip=0&limit=100`);
                 const posts = await res.json();
@@ -659,7 +658,8 @@
                     await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); 
                 }
                 
-                actionRow.innerHTML = `<div class="submit-btn btn-ghost">DELETED</div>`;
+                document.getElementById('modal-loading-zone').style.display = 'none';
+                document.getElementById('modal-success-zone').style.display = 'flex';
                 
                 setTimeout(() => {
                     fetchStatuses(true);
@@ -685,10 +685,10 @@
             const imageFile = document.getElementById('edit-image').files[0];
             if (!imageFile) { return; }
             
-            const actionRow = document.getElementById('upload-action-row');
             const postText = document.getElementById('edit-text').value;
             
-            actionRow.innerHTML = `<div class="submit-btn btn-loading" style="flex-grow: 1;">UPLOADING...</div>`;
+            document.getElementById('upload-action-row').style.display = 'none';
+            document.getElementById('upload-loading-row').style.display = 'flex';
             
             try {
                 let finalImageUrl = null;
@@ -700,7 +700,6 @@
                 const upData = await upRes.json();
                 finalImageUrl = upData.image_url;
 
-                // 🛠️ ÚPRAVA: Do payloadu sa odosiela aj text z textového poľa
                 const res = await fetch(`${API_URL}/posts`, {
                     method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
                     body: JSON.stringify({ title: "", text: postText, image_url: finalImageUrl, show_date: true, author: "" })
@@ -708,7 +707,8 @@
                 
                 if (res.ok) { 
                     fetchStatuses(true); 
-                    actionRow.innerHTML = `<div class="submit-btn btn-ghost" style="flex-grow: 1;">UPLOADED</div>`;
+                    document.getElementById('upload-loading-row').style.display = 'none';
+                    document.getElementById('upload-success-row').style.display = 'flex';
                     setTimeout(() => { resetEditor(); closeMenu(); }, 1000);
                 } else { 
                     resetEditor(); 
