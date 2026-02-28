@@ -232,11 +232,11 @@
             border: none !important;
         }
 
-        /* 🛠️ Nový neaktívny štýl pre Save a Delete Image ( transparentné, sivé) */
+        /* 🛠️ OPRAVA: 10% pozadie, 50% text, ŽIADEN rámček */
         .btn-tonal-disabled {
-            background-color: transparent !important;
+            background-color: var(--divider) !important;
             color: var(--grey-50) !important;
-            border: 1px solid var(--divider) !important;
+            border: none !important;
             cursor: default !important;
             pointer-events: none !important;
         }
@@ -447,19 +447,19 @@
 
                     <div id="upload-details-zone" style="display: none; flex-direction: column; gap: var(--gap-item); width: 100%;">
                         
-                        <input type="text" id="edit-title" class="form-input" placeholder="Image title..." style="width: 100%;">
-                        <textarea id="edit-text" class="form-input" placeholder="Image description..." style="width: 100%;" oninput="autoResizeTextarea(this)"></textarea>
+                        <input type="text" id="edit-title" class="form-input" placeholder="Image title..." style="width: 100%;" oninput="updateTextUIState()">
+                        <textarea id="edit-text" class="form-input" placeholder="Image description..." style="width: 100%;" oninput="autoResizeTextarea(this); updateTextUIState();"></textarea>
                         
                         <div id="upload-action-row" class="action-row" style="padding: 0;">
-                            <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">SAVE</button>
-                            <div class="submit-btn btn-tonal" onclick="clearTextFields(event)">CLEAR</div>
+                            <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
+                            <div id="clear-text-btn" class="submit-btn btn-tonal-disabled" onclick="clearTextFields(event)">CLEAR</div>
                             <div class="submit-btn btn-tonal" onclick="closeMenu()">CANCEL</div>
                         </div>
                         <div id="upload-loading-row" class="action-row" style="display: none; padding: 0;">
-                            <div id="upload-loading-btn" class="submit-btn btn-loading" style="flex-grow: 1;">SAVING...</div>
+                            <div id="upload-loading-btn" class="submit-btn btn-loading" style="flex-grow: 1;">UPLOADING...</div>
                         </div>
                         <div id="upload-success-row" class="action-row" style="display: none; padding: 0;">
-                            <div id="upload-success-btn" class="submit-btn btn-ghost" style="flex-grow: 1;">SAVED</div>
+                            <div id="upload-success-btn" class="submit-btn btn-ghost" style="flex-grow: 1;">UPLOADED</div>
                         </div>
                     </div>
                     
@@ -471,7 +471,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.5.2 • 2026</div>
+            <div class="footer-info">build v6.5.3 • 2026</div>
         </div>
     </nav>
 
@@ -517,9 +517,38 @@
             });
         }
 
+        // 🛠️ Logika pre rozťahovanie poľa
         function autoResizeTextarea(el) {
             el.style.height = 'auto'; 
             el.style.height = el.scrollHeight + 'px'; 
+        }
+
+        // 🛠️ Inteligentná kontrola stavu pre tlačidlo CLEAR
+        function updateTextUIState() {
+            const titleInput = document.getElementById('edit-title');
+            const textInput = document.getElementById('edit-text');
+            const clearBtn = document.getElementById('clear-text-btn');
+            
+            if (!clearBtn) return;
+
+            const hasText = (titleInput && titleInput.value.trim().length > 0) || 
+                            (textInput && textInput.value.trim().length > 0);
+                            
+            if (hasText) {
+                clearBtn.className = "submit-btn btn-tonal";
+            } else {
+                clearBtn.className = "submit-btn btn-tonal-disabled";
+            }
+        }
+
+        // 🛠️ Funkcia na vyčistenie textových polí
+        function clearTextFields(e) {
+            if(e) e.stopPropagation();
+            document.getElementById('edit-title').value = "";
+            const textInput = document.getElementById('edit-text');
+            textInput.value = "";
+            autoResizeTextarea(textInput);
+            updateTextUIState(); // Aktualizácia farby po vymazaní
         }
 
         function toggleViewMode() {
@@ -801,7 +830,10 @@
             document.getElementById('edit-title').value = post.title || '';
             const textInput = document.getElementById('edit-text');
             textInput.value = post.text || '';
-            setTimeout(() => autoResizeTextarea(textInput), 0); 
+            setTimeout(() => {
+                autoResizeTextarea(textInput);
+                updateTextUIState(); // Aktivácia CLEAR podľa načítaných dát
+            }, 0); 
             
             if (!navOverlay.classList.contains('active')) {
                 menuToggle.classList.add('active'); 
@@ -891,25 +923,15 @@
             document.getElementById('upload-loading-row').style.display = 'none';
             document.getElementById('upload-success-row').style.display = 'none';
             
-            // 🛠️ OPRAVA ŠABLÓNY: Save a Delete Image sú enabled pri Uploade
+            // 🛠️ OPRAVA JS Šablóny: Pôvodne Tonal pre Upload/Save, Disabled pre Clear
             document.getElementById('upload-action-row').innerHTML = `
-                <button type="submit" id="publish-btn" class="submit-btn btn-tonal" style="flex-grow: 1;">UPLOAD</button>
-                <div class="submit-btn btn-tonal" onclick="clearTextFields(event)">CLEAR</div>
+                <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
+                <div id="clear-text-btn" class="submit-btn btn-tonal-disabled" onclick="clearTextFields(event)">CLEAR</div>
                 <div class="submit-btn btn-tonal" onclick="closeMenu()">CANCEL</div>
             `;
-            // Tlačidlo DELETE IMAGE je pri Uploade tonal, nie disabled
-            document.getElementById('clear-upload-btn').className = "submit-btn btn-tonal";
-
+            
             updateImageUIState(); 
-        }
-
-        // 🛠️ Nová funkcia na vyčistenie textových polí
-        function clearTextFields(e) {
-            if(e) e.stopPropagation();
-            document.getElementById('edit-title').value = "";
-            const textInput = document.getElementById('edit-text');
-            textInput.value = "";
-            autoResizeTextarea(textInput);
+            updateTextUIState(); 
         }
 
         function updateImageUIState() {
@@ -931,7 +953,7 @@
                 if(thumbnail) thumbnail.style.display = 'block';
                 if(previewAddText) previewAddText.style.display = 'none';
                 
-                // 🛠️ Ak máme obrázok, DELETE IMAGE je tonal a enabled
+                // Zmazanie fotky je aktívne
                 if(delBtn) delBtn.className = "submit-btn btn-tonal";
             } else {
                 if(thumbnail) {
@@ -940,8 +962,8 @@
                 }
                 if(previewAddText) previewAddText.style.display = 'block';
                 
-                // 🛠️ Ak nemáme obrázok, DELETE IMAGE je disabled len v Edite
-                if (editingPostId && delBtn) delBtn.className = "submit-btn btn-tonal-disabled";
+                // Zmazanie fotky je disabled (nedá sa zmazať prázdno)
+                if(delBtn) delBtn.className = "submit-btn btn-tonal-disabled";
             }
 
             if (hasImage || editingPostId) {
@@ -950,25 +972,31 @@
                 if (hasImage) {
                     if(pubBtn) {
                         pubBtn.disabled = false;
-                        pubBtn.style.opacity = '1';
+                        pubBtn.className = "submit-btn btn-tonal";
                     }
                 } else {
                     if(pubBtn) {
                         pubBtn.disabled = true;
-                        pubBtn.style.opacity = '0.5';
+                        pubBtn.className = "submit-btn btn-tonal-disabled";
                     }
                 }
                 
-                if(pubBtn) {
-                    // 🛠️ Text Save len v Edite
-                    pubBtn.innerText = editingPostId ? 'SAVE' : 'UPLOAD';
-                    // 🛠️ Disabled štýl pre Save, len ak nie je obrázok v Edite
-                    if(editingPostId && !hasImage) pubBtn.className = "submit-btn btn-tonal-disabled";
-                    else if(!editingPostId && hasImage) pubBtn.className = "submit-btn btn-tonal";
-                }
+                if(pubBtn) pubBtn.innerText = editingPostId ? 'SAVE' : 'UPLOAD';
             } else { 
                 if(detailsZone) detailsZone.style.display = 'none';
             }
+        }
+
+        // 🛠️ Po vymazaní obrázku ho správne "deaktivujeme"
+        function clearImageSelection(e) {
+            e.stopPropagation();
+            document.getElementById('edit-image').value = ""; 
+            existingImageUrl = null; 
+            
+            const delBtn = document.getElementById('clear-upload-btn');
+            if(delBtn) delBtn.className = "submit-btn btn-tonal-disabled"; 
+            
+            updateImageUIState();
         }
 
         function handleDeleteFeed(id) {
@@ -1036,18 +1064,6 @@
                     closeMenu();
                 }, 1000);
             }
-        }
-
-        // 🛠️ Vymaže obrázok, prepne disabled štýl na Delete Image a vyčistí polia ak treba
-        function clearImageSelection(e) {
-            e.stopPropagation();
-            document.getElementById('edit-image').value = ""; 
-            existingImageUrl = null; 
-            
-            const delBtn = document.getElementById('clear-upload-btn');
-            if(editingPostId && delBtn) delBtn.className = "submit-btn btn-tonal-disabled"; // Disabled len v Edite
-            
-            updateImageUIState();
         }
 
         function handleDeleteAllClick() {
