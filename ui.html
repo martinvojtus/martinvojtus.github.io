@@ -65,7 +65,6 @@
             line-height: 1;
         }
 
-        /* 🛠️ Pridané pravidlo pre hardvérovú akceleráciu nového rozostrenia */
         header, .nav-overlay, .status-glass-bar, .status-glass-bar-bottom, .status-confirm-overlay, #delete-modal, .status-text-overlay {
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
@@ -195,20 +194,33 @@
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
 
         .form-input, .submit-btn { 
-            height: 3rem; border-radius: var(--border-radius); 
+            border-radius: var(--border-radius); 
             font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; display: flex; align-items: center; gap: var(--gap-item); 
             box-shadow: none; -webkit-appearance: none; appearance: none; margin: 0;
         }
 
         .form-input { 
+            height: 3rem;
             background-color: transparent; 
             color: var(--black);
             border: 1px solid var(--divider); 
         }
         .form-input::placeholder { color: var(--grey-50); } 
 
+        /* 🛠️ Špecifické nastavenie pre flexibilnú textareu */
+        textarea.form-input {
+            height: auto; /* Zruší fixných 3rem */
+            min-height: 3rem; /* Zabezpečí, že nebude menšia ako bežný input */
+            padding-top: 0.8rem;
+            padding-bottom: 0.8rem;
+            line-height: 1.5;
+            resize: none; /* Užívateľ nemôže manuálne naťahovať rohy, riadi to JS */
+            overflow: hidden; /* Skryje posuvník pri automatickom naťahovaní */
+        }
+
         .submit-btn { 
+            height: 3rem;
             background-color: var(--black); 
             color: var(--white);
             border: 1px solid var(--black); 
@@ -318,7 +330,7 @@
             z-index: -1;
         }
 
-        /* 🛠️ Nové rozostrené okno (Read Mode) s využitím Safari-safe::before */
+        /* 🛠️ Rozostrené okno (Read Mode) */
         .status-text-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 15;
@@ -339,17 +351,30 @@
         .status-text-overlay-content {
             font-size: var(--size-small); 
             color: var(--black);
-            text-align: justify; /* 🛠️ Zarovnanie do bloku */
-            padding: calc(var(--gap-item) * 2); /* Okraje od stien */
-            max-height: 100%; /* Obmedzenie aby sa zmestilo */
-            overflow-y: auto; /* Ak je text masívny, dá sa v ňom rolovať */
+            padding: calc(var(--gap-item) * 2); 
+            max-height: 100%; 
+            overflow-y: auto; 
             width: 100%;
             line-height: 1.6;
-            -ms-overflow-style: none;  /* Schová škaredý scrollbar pre IE */
-            scrollbar-width: none;  /* Schová scrollbar pre Firefox */
+            -ms-overflow-style: none;  
+            scrollbar-width: none;  
         }
         .status-text-overlay-content::-webkit-scrollbar {
-            display: none; /* Schová scrollbar pre Chrome/Safari */
+            display: none; 
+        }
+        
+        /* 🛠️ Nový CSS štýl pre Titulok a Odsadenie textu v Read Mode */
+        .status-text-overlay-title {
+            font-size: var(--size-large);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: var(--gap-item);
+            text-transform: uppercase;
+            word-wrap: break-word;
+        }
+        .status-text-overlay-body {
+            text-align: justify; /* Text zarovnaný do bloku */
+            white-space: pre-wrap; /* Automaticky zachováva riadky a Entery z textarey */
         }
 
         #delete-modal {
@@ -419,7 +444,8 @@
 
                     <div id="upload-details-zone" style="display: none; flex-direction: column; gap: var(--gap-item); width: 100%;">
                         
-                        <input type="text" id="edit-text" class="form-input" placeholder="Image description..." style="width: 100%;">
+                        <input type="text" id="edit-title" class="form-input" placeholder="Image title..." style="width: 100%;">
+                        <textarea id="edit-text" class="form-input" placeholder="Image description..." style="width: 100%;" oninput="autoResizeTextarea(this)"></textarea>
                         
                         <div id="upload-action-row" class="action-row" style="padding: 0;">
                             <button type="submit" id="publish-btn" class="submit-btn btn-tonal" style="flex-grow: 1;">UPLOAD</button>
@@ -485,6 +511,12 @@
                 passInput.classList.remove('input-error');
                 passInput.placeholder = 'Password...';
             });
+        }
+
+        // 🛠️ Funkcia na automatické prispôsobenie výšky textarei
+        function autoResizeTextarea(el) {
+            el.style.height = 'auto'; // Reset, aby sa zmenšilo ak zmažeš text
+            el.style.height = el.scrollHeight + 'px'; // Natiahne sa podľa obsahu
         }
 
         function toggleViewMode() {
@@ -736,7 +768,6 @@
             }
         }
 
-        // 🛠️ JS Logika pre otváranie "Read Mode"
         function toggleTextOverlay(e, id) {
             if (e) e.stopPropagation();
             
@@ -747,10 +778,10 @@
                 
                 if (overlay.style.display === 'none' || overlay.style.display === '') {
                     overlay.style.display = 'flex';
-                    bars.forEach(b => b.style.display = 'none'); // Skryje obláčiky pre čisté čítanie
+                    bars.forEach(b => b.style.display = 'none'); 
                 } else {
                     overlay.style.display = 'none';
-                    bars.forEach(b => b.style.display = 'flex'); // Vráti obláčiky
+                    bars.forEach(b => b.style.display = 'flex'); 
                 }
             }
         }
@@ -764,7 +795,11 @@
             editingPostId = post.id;
             existingImageUrl = post.image_url;
 
-            document.getElementById('edit-text').value = post.text || '';
+            // 🛠️ Počas editu načítame aj titulok a prispôsobíme výšku textarei
+            document.getElementById('edit-title').value = post.title || '';
+            const textInput = document.getElementById('edit-text');
+            textInput.value = post.text || '';
+            setTimeout(() => autoResizeTextarea(textInput), 0); // Vynúti prepočet po načítaní
             
             if (!navOverlay.classList.contains('active')) {
                 menuToggle.classList.add('active'); 
@@ -789,18 +824,25 @@
             let barHtmlBottom = '';
             let textOverlayHtml = '';
 
-            // 🛠️ Vytvorenie HTML pre textový Read Mode (Overlay)
-            if (s.text || secretKey) {
+            // 🛠️ Ak má fotka titulok alebo text, vytvoríme spodnú lištu a overlay pre Read Mode
+            if (s.title || s.text || secretKey) {
+                // Pre spodnú lištu použijeme title (ak neexistuje, použijeme záložné 'UNTITLED')
+                let displayTitle = s.title || 'UNTITLED';
+                
                 barHtmlBottom = `
                 <div class="status-glass-bar-bottom">
-                    <span class="status-text-content" onclick="toggleTextOverlay(event, ${s.id})">${s.text || ''}</span>
+                    <span class="status-text-content" onclick="toggleTextOverlay(event, ${s.id})">${displayTitle}</span>
+                    <span class="admin-bar-item admin-delete-link" onclick="toggleTextOverlay(event, ${s.id})" style="margin-left: var(--gap-item);">MORE</span>
                     ${secretKey ? `<span onclick="handleEditPost(event, ${s.id})" class="admin-bar-item admin-delete-link" style="margin-left: var(--gap-item);">EDIT</span>` : ''}
                 </div>`;
 
-                if (s.text) {
+                if (s.title || s.text) {
                     textOverlayHtml = `
                     <div id="text-overlay-${s.id}" class="status-text-overlay" onclick="toggleTextOverlay(event, ${s.id})">
-                        <div class="status-text-overlay-content">${s.text}</div>
+                        <div class="status-text-overlay-content">
+                            ${s.title ? `<div class="status-text-overlay-title">${s.title}</div>` : ''}
+                            ${s.text ? `<div class="status-text-overlay-body">${s.text}</div>` : ''}
+                        </div>
                     </div>`;
                 }
             }
@@ -839,7 +881,11 @@
             editingPostId = null;
             existingImageUrl = null;
             document.getElementById('edit-image').value = ""; 
-            document.getElementById('edit-text').value = "";
+            
+            document.getElementById('edit-title').value = ""; 
+            const textInput = document.getElementById('edit-text');
+            textInput.value = "";
+            textInput.style.height = 'auto'; // Resetuje výšku textarei po odoslaní
             
             document.getElementById('upload-action-row').style.display = 'flex';
             document.getElementById('upload-loading-row').style.display = 'none';
@@ -986,6 +1032,8 @@
             
             if (!imageFile && !existingImageUrl) { return; }
             
+            // 🛠️ Získame údaje z oboch polí (Titulok aj Popis)
+            const postTitle = document.getElementById('edit-title').value;
             const postText = document.getElementById('edit-text').value;
             
             document.getElementById('upload-action-row').style.display = 'none';
@@ -1007,7 +1055,8 @@
                     finalImageUrl = upData.image_url;
                 }
 
-                const payload = { title: "", text: postText, image_url: finalImageUrl, show_date: true, author: "" };
+                // 🛠️ Odosielame payload aj s Title
+                const payload = { title: postTitle, text: postText, image_url: finalImageUrl, show_date: true, author: "" };
                 
                 let res;
                 if (editingPostId) {
