@@ -143,27 +143,31 @@
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
-        .form-input, .submit-btn { 
-            height: 3rem; border: none; border-radius: var(--border-radius); 
-            background-color: var(--black); 
-            color: var(--white);
+        /* 🛠️ ÚPRAVA: Oddelené vstupné polia (form-input). Majú transparentné pozadie a plný rámček. */
+        .form-input { 
+            height: 3rem; border: 1px solid var(--black); border-radius: var(--border-radius); 
+            background-color: transparent; 
+            color: var(--black);
             font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; display: flex; align-items: center; gap: var(--gap-item); 
         }
 
-        .submit-btn { 
-            justify-content: center; text-transform: uppercase; cursor: pointer; white-space: nowrap;
-        }
-
-        /* 🛠️ OPRAVA: Placeholder a text sú čierne (resp. biele v tmavom režime), keďže pozadie je priehľadné */
         .form-input::placeholder { color: var(--black); opacity: 0.5; }
-        .form-input { color: var(--black); }
+
+        /* 🛠️ ÚPRAVA: Oddelené tlačidlá (submit-btn). Sú plne vyfarbené bez rámčeka. */
+        .submit-btn { 
+            height: 3rem; border: none; border-radius: var(--border-radius); 
+            background-color: var(--black); 
+            color: var(--white);
+            font-size: var(--size-small); padding: 0 var(--gap-item); 
+            outline: none; display: flex; align-items: center; justify-content: center; gap: var(--gap-item); 
+            text-transform: uppercase; cursor: pointer; white-space: nowrap;
+        }
         
         .input-error { border: 1px solid var(--danger) !important; }
         .input-error span { color: var(--danger) !important; }
         .input-error::placeholder { color: var(--danger) !important; opacity: 1; }
 
-        /* 🛠️ OPRAVA: Delete je celé červené a Deleted je celé zelené, obe majú čierny text */
         .danger-btn { 
             background-color: var(--danger) !important; 
             color: #000000 !important; 
@@ -177,7 +181,7 @@
 
         #upload-thumbnail { width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; cursor: pointer; background-color: var(--divider); }
 
-        /* 🛠️ OPRAVA: Checkbox je viditeľný na priehľadnom pozadí (čierny rámček a čierna fajočka) */
+        /* 🛠️ ÚPRAVA: Checkbox vrátený do pôvodných farieb (čierny okraj, priehľadné pozadie) */
         .custom-checkbox {
             appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black);
             border-radius: calc(var(--border-radius) / 3); cursor: pointer; display: grid; place-content: center;
@@ -240,10 +244,10 @@
             
             <div id="login-ui">
                 <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
-                    <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="width: 100%; background-color: transparent; border: 1px solid var(--divider);">
-                    <label class="form-input" style="cursor: pointer; justify-content: flex-start; user-select: none; width: 100%; background-color: transparent;">
+                    <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="width: 100%;">
+                    <label class="form-input" style="cursor: pointer; justify-content: flex-start; user-select: none; width: 100%;">
                         <input type="checkbox" id="remember-login" class="custom-checkbox">
-                        <span style="color: var(--black);">Remember me</span>
+                        <span>Remember me</span>
                     </label>
                     <button type="submit" id="login-btn" class="submit-btn" style="width: 100%;">LOGIN</button>
                 </form>
@@ -253,8 +257,8 @@
                 <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                     <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                     
-                    <div id="upload-empty-state" class="form-input" style="cursor: pointer; justify-content: center; width: 100%; background-color: transparent; border: 1px solid var(--divider);" onclick="document.getElementById('edit-image').click()">
-                        <span style="color: var(--black);">+ ADD IMAGE</span>
+                    <div id="upload-empty-state" class="form-input" style="cursor: pointer; justify-content: center; width: 100%;" onclick="document.getElementById('edit-image').click()">
+                        <span>+ ADD IMAGE</span>
                     </div>
 
                     <div id="upload-filled-state" style="display: none; gap: var(--gap-item); width: 100%;">
@@ -271,7 +275,7 @@
                 <button onclick="handleLogout()" class="submit-btn" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v5.9.7 • 2026</div>
+            <div class="footer-info">build v5.9.8 • 2026</div>
         </div>
     </nav>
 
