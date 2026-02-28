@@ -217,24 +217,29 @@
             border: none !important;
         }
 
+        /* 🛠️ Nové deštruktívne tlačidlo */
+        .btn-danger {
+            background-color: #ff3333 !important;
+            color: #000000 !important;
+            border: none !important;
+        }
+
         .btn-outline {
             background-color: transparent; 
             color: var(--black);
         }
 
-        /* 🛠️ OPRAVA: Procesné tlačidlá (10% pozadie, 50% opacity na text) */
         .btn-loading {
             background-color: var(--divider) !important;
-            color: var(--grey-50) !important; /* Polovičná priehľadnosť pre text počas procesu */
+            color: var(--grey-50) !important; 
             border: none !important;
             pointer-events: none !important;
-            opacity: 1 !important; /* Celé tlačidlo nesmie stratiť farbu, len text */
+            opacity: 1 !important; 
         }
 
-        /* 🛠️ OPRAVA: Hotové tlačidlá - Success/Done (10% pozadie, 100% opacity na text) */
         .btn-ghost {
             background-color: var(--divider) !important; 
-            color: var(--black) !important; /* Ostrá farba na znak úspešného dokončenia */
+            color: var(--black) !important; 
             border: none !important;
             pointer-events: none !important; 
             opacity: 1 !important; 
@@ -382,7 +387,7 @@
                         </div>
                     </div>
                     
-                    <button type="button" class="submit-btn" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
+                    <button type="button" class="submit-btn btn-danger" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
                 </form>
             </div>
 
@@ -390,7 +395,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.4.4 • 2026</div>
+            <div class="footer-info">build v6.4.5 • 2026</div>
         </div>
     </nav>
 
@@ -443,7 +448,9 @@
             refreshFeedUI();
         }
 
-        function openEditor() {
+        // 🛠️ OPRAVA: Zastavenie prebublávania eventu a bezpečné otvorenie editora
+        function openEditor(e) {
+            if (e) e.stopPropagation();
             if (!navOverlay.classList.contains('active')) {
                 toggleMenu();
             }
@@ -545,8 +552,9 @@
             if (globalPosts.length === 0) {
                 container.className = 'status-feed view-feed';
                 if (secretKey) {
+                    // 🛠️ Tu je upravený onclick s odovzdaním eventu
                     container.innerHTML = `
-                        <div class="image-preview-container" onclick="openEditor()" style="width: 100%;">
+                        <div class="image-preview-container" onclick="openEditor(event)" style="width: 100%;">
                             <span class="preview-add-text">+ ADD IMAGE</span>
                         </div>
                     `;
