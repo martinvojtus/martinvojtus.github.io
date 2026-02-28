@@ -200,11 +200,11 @@
         .input-error { border: 1px solid var(--black) !important; }
         .input-error span { color: var(--black) !important; }
 
-        /* 🛠️ OPRAVA: Zmazané aspect-ratio, pridané rozmery a rámček. Celý "contain" formát fotky. */
+        /* 🛠️ Návrat k veľkému 1:1 náhľadu s jemnými okrajmi z farby divider */
         .image-preview-container {
-            width: 3rem;
-            height: 3rem;
-            background-color: var(--divider);
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background-color: transparent;
             border: 1px solid var(--black);
             border-radius: var(--border-radius);
             display: flex;
@@ -212,11 +212,20 @@
             align-items: center;
             overflow: hidden;
             cursor: pointer;
+            position: relative;
         }
         .image-preview-img {
             width: 100%;
             height: 100%;
-            object-fit: cover; 
+            object-fit: contain; 
+            background-color: var(--divider); /* Vyplní prázdny priestor pri formátoch 16:9, 4:3 atď. */
+        }
+        
+        #preview-add-text {
+            font-size: var(--size-small);
+            color: var(--black);
+            text-transform: uppercase;
+            position: absolute;
         }
 
         .custom-checkbox {
@@ -294,15 +303,12 @@
                 <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                     <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                     
-                    <div id="upload-empty-state" class="submit-btn btn-outline" style="width: 100%;" onclick="document.getElementById('edit-image').click()">
-                        + ADD IMAGE
+                    <div class="image-preview-container" onclick="document.getElementById('edit-image').click()">
+                        <span id="preview-add-text">+ ADD IMAGE</span>
+                        <img id="upload-preview-img" class="image-preview-img" src="" alt="" style="display: none;">
                     </div>
 
-                    <div id="upload-filled-state" style="display: none; flex-direction: column; gap: var(--gap-item); width: 100%;">
-                        <div class="image-preview-container" onclick="document.getElementById('edit-image').click()">
-                            <span id="preview-add-text" style="display: none; font-size: var(--size-small); color: var(--black);">+ ADD IMAGE</span>
-                            <img id="upload-preview-img" class="image-preview-img" src="" alt="">
-                        </div>
+                    <div id="upload-details-zone" style="display: none; flex-direction: column; gap: var(--gap-item); width: 100%;">
                         
                         <input type="text" id="edit-text" class="form-input" placeholder="Image description..." style="width: 100%;">
                         
@@ -326,7 +332,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-outline" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.2.3 • 2026</div>
+            <div class="footer-info">build v6.2.4 • 2026</div>
         </div>
     </nav>
 
@@ -612,7 +618,6 @@
             document.getElementById('upload-loading-row').style.display = 'none';
             document.getElementById('upload-success-row').style.display = 'none';
             
-            // 🛠️ JS template pre resetovaný formulár. Rozloženie s miniatúrou.
             document.getElementById('upload-action-row').innerHTML = `
                 <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">UPLOAD</button>
                 <div id="clear-upload-btn" class="submit-btn btn-outline" onclick="clearImageSelection(event)">DELETE</div>
@@ -620,40 +625,45 @@
             updateImageUIState(); 
         }
 
+        // 🛠️ ÚPRAVA: Smart logika zobrazovania/skrývania zóny pre detaily postu
         function updateImageUIState() {
             const input = document.getElementById('edit-image');
-            const emptyState = document.getElementById('upload-empty-state');
-            const filledState = document.getElementById('upload-filled-state');
+            const detailsZone = document.getElementById('upload-details-zone');
             const thumbnail = document.getElementById('upload-preview-img');
             const previewAddText = document.getElementById('preview-add-text');
             const pubBtn = document.getElementById('publish-btn');
 
             const hasImage = (input && input.files && input.files.length > 0) || existingImageUrl;
 
+            // Spracovanie náhľadu vo štvorci
+            if (hasImage) {
+                if (input && input.files && input.files.length > 0) {
+                    if(thumbnail) thumbnail.src = URL.createObjectURL(input.files[0]);
+                } else {
+                    if(thumbnail) thumbnail.src = existingImageUrl;
+                }
+                if(thumbnail) thumbnail.style.display = 'block';
+                if(previewAddText) previewAddText.style.display = 'none';
+            } else {
+                if(thumbnail) {
+                    thumbnail.src = "";
+                    thumbnail.style.display = 'none';
+                }
+                if(previewAddText) previewAddText.style.display = 'block';
+            }
+
+            // Spracovanie spodných detailov a tlačidiel
             if (hasImage || editingPostId) {
-                emptyState.style.display = 'none';
-                filledState.style.display = 'flex';
+                if(detailsZone) detailsZone.style.display = 'flex';
                 
                 if (hasImage) {
-                    if (input && input.files && input.files.length > 0) {
-                        if(thumbnail) thumbnail.src = URL.createObjectURL(input.files[0]);
-                    } else {
-                        if(thumbnail) thumbnail.src = existingImageUrl;
-                    }
-                    if(thumbnail) thumbnail.style.display = 'block';
-                    if(previewAddText) previewAddText.style.display = 'none';
-                    
+                    // Máme fotku = môžeme odoslať
                     if(pubBtn) {
                         pubBtn.disabled = false;
                         pubBtn.style.opacity = '1';
                     }
                 } else {
-                    if(thumbnail) {
-                        thumbnail.src = "";
-                        thumbnail.style.display = 'none';
-                    }
-                    if(previewAddText) previewAddText.style.display = 'block';
-                    
+                    // Editujeme, ale zmazali sme fotku = nedá sa odoslať kým nedáme novú
                     if(pubBtn) {
                         pubBtn.disabled = true;
                         pubBtn.style.opacity = '0.5';
@@ -661,11 +671,9 @@
                 }
                 
                 if(pubBtn) pubBtn.innerText = editingPostId ? 'SAVE' : 'UPLOAD';
-                
             } else { 
-                if(thumbnail) thumbnail.src = "";
-                emptyState.style.display = 'flex';
-                filledState.style.display = 'none';
+                // Úplne nový post bez fotky = detaily sú schované
+                if(detailsZone) detailsZone.style.display = 'none';
             }
         }
 
