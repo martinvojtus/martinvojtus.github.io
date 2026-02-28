@@ -117,7 +117,6 @@
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
         #logout-ui { display: none; }
         
-        /* 🛠️ Editor teraz sedí priamo vo feede, skrytý je len keď nie si prihlásený */
         #admin-upload-zone { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; margin-bottom: var(--gap-item); }
 
         .status-feed { 
@@ -439,13 +438,17 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.5.9 • 2026</div>
+            <div class="footer-info">build v6.6.0 • 2026</div>
         </div>
     </nav>
 
     <main>
         <div id="admin-upload-zone">
-            <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
+            <div id="editor-collapsed-state" class="submit-btn btn-tonal" style="width: 100%; font-size: 1.5rem;" onclick="expandEditor()">
+                +
+            </div>
+
+            <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                 <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                 
                 <div id="upload-empty-state" class="submit-btn btn-tonal" style="width: 100%;" onclick="document.getElementById('edit-image').click()">
@@ -459,15 +462,14 @@
                     <div class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="clearImageSelection(event)">DELETE IMAGE</div>
                 </div>
 
-                <div id="upload-details-zone" style="display: none; flex-direction: column; gap: var(--gap-item); width: 100%;">
-                    
+                <div id="upload-details-zone" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;">
                     <input type="text" id="edit-title" class="form-input" placeholder="Image title..." style="width: 100%;" oninput="updateTextUIState()">
                     <textarea id="edit-text" class="form-input" placeholder="Image description..." style="width: 100%;" oninput="autoResizeTextarea(this); updateTextUIState();"></textarea>
                     
                     <div id="upload-action-row" class="action-row" style="padding: 0;">
                         <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
                         <div id="clear-text-btn" class="submit-btn btn-tonal-disabled" onclick="clearTextFields(event)">CLEAR</div>
-                        <div class="submit-btn btn-tonal" onclick="resetEditor()">CANCEL</div>
+                        <div class="submit-btn btn-tonal" onclick="collapseEditor()">CANCEL</div>
                     </div>
                     <div id="upload-loading-row" class="action-row" style="display: none; padding: 0;">
                         <div id="upload-loading-btn" class="submit-btn btn-loading" style="flex-grow: 1;">UPLOADING...</div>
@@ -553,6 +555,18 @@
             updateTextUIState(); 
         }
 
+        // 🛠️ Funkcie pre vysúvanie a schovávanie celého editora
+        function expandEditor() {
+            document.getElementById('editor-collapsed-state').style.display = 'none';
+            document.getElementById('editor-form').style.display = 'flex';
+        }
+
+        function collapseEditor() {
+            document.getElementById('editor-collapsed-state').style.display = 'flex';
+            document.getElementById('editor-form').style.display = 'none';
+            resetEditor(); // Pri zatvorení vyčistíme rozrobenú robotu
+        }
+
         function toggleViewMode() {
             const newMode = currentViewMode === 'feed' ? 'grid' : 'feed';
             currentViewMode = newMode;
@@ -564,8 +578,6 @@
             const isActive = menuToggle.classList.toggle('active'); 
             navOverlay.classList.toggle('active'); 
             menuToggle.innerText = isActive ? 'CLOSE' : 'MENU';
-            
-            // Reštart editora sme odstránili pri zatváraní menu, lebo editor už nie je v menu
         }
         function closeMenu() { 
             menuToggle.classList.remove('active'); 
@@ -577,8 +589,8 @@
             if (secretKey) {
                 document.body.classList.add('is-logged-in');
                 document.getElementById('login-ui').style.display = 'none';
-                document.getElementById('admin-upload-zone').style.display = 'flex'; // Zobrazí editor nad feedom
-                document.getElementById('logout-ui').style.display = 'flex';
+                document.getElementById('admin-upload-zone').style.display = 'flex';
+                document.getElementById('logout-ui').style.display = 'block';
             } else {
                 document.body.classList.remove('is-logged-in');
                 document.getElementById('login-ui').style.display = 'flex';
@@ -605,7 +617,7 @@
                     secretKey = tempKey; 
                     setTimeout(() => {
                         updateUIVisibility();
-                        closeMenu(); // Pri úspechu zavrie menu
+                        closeMenu(); 
                         refreshFeedUI(); 
                         passInput.value = ''; 
                         if (rememberMe) { localStorage.setItem('mv_admin_key', secretKey); } else { localStorage.removeItem('mv_admin_key'); }
@@ -645,7 +657,9 @@
             localStorage.removeItem('mv_admin_key');
             updateUIVisibility();
             closeMenu();
-            resetEditor(); // Pri odhlásení vyčistíme rozrobené zmeny
+            resetEditor();
+            document.getElementById('editor-collapsed-state').style.display = 'flex';
+            document.getElementById('editor-form').style.display = 'none';
             refreshFeedUI();
         }
 
@@ -665,14 +679,15 @@
             
             if (globalPosts.length === 0) {
                 container.className = 'status-feed view-feed';
-                if (!secretKey) {
+                if (secretKey) {
+                    // Ak je prihlásený, feed bude opticky prázdny, pretože na vrchu už tróni tlačidlo + (Editor)
+                    container.innerHTML = ``;
+                } else {
                     container.innerHTML = `
                         <div class="submit-btn btn-tonal-disabled" style="width: 100%; cursor: default;">
                             NOTHING HERE YET.
                         </div>
                     `;
-                } else {
-                    container.innerHTML = ''; // Editor je už zobrazený navrchu, feed je len prázdny
                 }
                 return;
             }
@@ -831,12 +846,14 @@
             document.getElementById('edit-title').value = post.title || '';
             const textInput = document.getElementById('edit-text');
             textInput.value = post.text || '';
+            
+            // 🛠️ Otvorí editor, vyplní údaje a preskroluje hore
+            expandEditor();
             setTimeout(() => {
                 autoResizeTextarea(textInput);
                 updateTextUIState(); 
             }, 0); 
             
-            // 🛠️ Scroll plynule hore k editoru (už neotvára menu)
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
             updateImageUIState();
@@ -923,7 +940,7 @@
             document.getElementById('upload-action-row').innerHTML = `
                 <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
                 <div id="clear-text-btn" class="submit-btn btn-tonal-disabled" onclick="clearTextFields(event)">CLEAR</div>
-                <div class="submit-btn btn-tonal" onclick="resetEditor()">CANCEL</div>
+                <div class="submit-btn btn-tonal" onclick="collapseEditor()">CANCEL</div>
             `;
             
             updateImageUIState(); 
@@ -936,7 +953,6 @@
             const filledState = document.getElementById('upload-filled-state');
             const thumbnail = document.getElementById('upload-preview-img');
             const pubBtn = document.getElementById('publish-btn');
-            const detailsZone = document.getElementById('upload-details-zone');
 
             const hasImage = (input && input.files && input.files.length > 0) || existingImageUrl;
 
@@ -956,24 +972,15 @@
                 if(filledState) filledState.style.display = 'none';
             }
 
-            if (hasImage || editingPostId) {
-                if(detailsZone) detailsZone.style.display = 'flex';
-                
+            if (pubBtn) {
                 if (hasImage) {
-                    if(pubBtn) {
-                        pubBtn.disabled = false;
-                        pubBtn.className = "submit-btn btn-tonal";
-                    }
+                    pubBtn.disabled = false;
+                    pubBtn.className = "submit-btn btn-tonal";
                 } else {
-                    if(pubBtn) {
-                        pubBtn.disabled = true;
-                        pubBtn.className = "submit-btn btn-tonal-disabled";
-                    }
+                    pubBtn.disabled = true;
+                    pubBtn.className = "submit-btn btn-tonal-disabled";
                 }
-                
-                if(pubBtn) pubBtn.innerText = editingPostId ? 'SAVE' : 'UPLOAD';
-            } else { 
-                if(detailsZone) detailsZone.style.display = 'none';
+                pubBtn.innerText = editingPostId ? 'SAVE' : 'UPLOAD';
             }
         }
 
@@ -1046,6 +1053,7 @@
                 setTimeout(() => {
                     fetchStatuses(true);
                     closeDeleteModal();
+                    collapseEditor(); // Po zmazaní všetkého zbalíme editor
                 }, 1000);
             }
         }
@@ -1102,7 +1110,9 @@
                     document.getElementById('upload-loading-row').style.display = 'none';
                     document.getElementById('upload-success-row').style.display = 'flex';
                     document.getElementById('upload-success-btn').innerText = editingPostId ? 'SAVED' : 'UPLOADED';
-                    setTimeout(() => { resetEditor(); }, 1000);
+                    setTimeout(() => { 
+                        collapseEditor(); // Po úspešnom odoslaní sa editor zavrie
+                    }, 1000);
                 } else { 
                     resetEditor(); 
                 }
