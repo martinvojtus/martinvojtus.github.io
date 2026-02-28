@@ -118,17 +118,14 @@
         #logout-ui { display: none; }
         #admin-upload-zone { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; }
 
-        /* 🛠️ FEED vs GRID LAYOUT CSS */
         .status-feed { 
             max-width: 600px; width: 100%; margin: 0 auto; 
         }
         
-        /* Klasický FEED */
         .status-feed.view-feed {
             display: flex; flex-direction: column; gap: var(--gap-item);
         }
 
-        /* 🛠️ CIK-CAK GRID (Masonry) */
         .status-feed.view-grid {
             display: block;
             column-count: 2;
@@ -139,12 +136,11 @@
             page-break-inside: avoid;
             break-inside: avoid;
             margin-bottom: var(--gap-item);
-            display: block; /* Override flex z defaultu */
+            display: block; 
         }
         .status-feed.view-grid .status-media-wrapper {
-            background-color: transparent; /* Zrušiť 10% pozadie pre čisté okraje fotiek */
+            background-color: transparent; 
         }
-        /* V Grid móde skryjeme všetky obláčiky s textom */
         .status-feed.view-grid .status-glass-bar,
         .status-feed.view-grid .status-glass-bar-bottom,
         .status-feed.view-grid .status-confirm-overlay {
@@ -365,16 +361,15 @@
                 <button onclick="handleLogout()" class="submit-btn btn-outline" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.3.0 • 2026</div>
+            <div class="footer-info">build v6.3.1 • 2026</div>
         </div>
     </nav>
 
     <main>
         <div id="section-feed">
             
-            <div style="max-width: 600px; width: 100%; margin: 0 auto var(--gap-item) auto; padding: 0;" class="action-row">
-                <button id="btn-view-grid" class="submit-btn btn-outline" style="flex-grow: 1;" onclick="setViewMode('grid')">GRID</button>
-                <button id="btn-view-feed" class="submit-btn" style="flex-grow: 1;" onclick="setViewMode('feed')">FEED</button>
+            <div style="max-width: 600px; width: 100%; margin: 0 auto calc(var(--gap-item) / 2) auto; display: flex; justify-content: flex-end; padding: 0 var(--gap-item);">
+                <span id="view-toggle-text" onclick="toggleViewMode()" style="font-size: var(--size-small); color: var(--grey-50); cursor: pointer; text-transform: uppercase; user-select: none;">GRID VIEW</span>
             </div>
 
             <div id="status-container" class="status-feed view-feed"></div>
@@ -404,7 +399,6 @@
         let editingPostId = null;
         let existingImageUrl = null;
         
-        // 🛠️ Pamäť pre View Mode
         let currentViewMode = localStorage.getItem('mv_view_mode') || 'feed';
 
         const passInput = document.getElementById('admin-pass');
@@ -418,29 +412,30 @@
             });
         }
 
-        // 🛠️ Funkcia na prepínanie GRID / FEED
+        // 🛠️ OPRAVA: Jednoduchá funkcia na prehodenie režimu jedným tlačidlom
+        function toggleViewMode() {
+            const newMode = currentViewMode === 'feed' ? 'grid' : 'feed';
+            setViewMode(newMode);
+        }
+
         function setViewMode(mode) {
             currentViewMode = mode;
             localStorage.setItem('mv_view_mode', mode);
             
-            const btnGrid = document.getElementById('btn-view-grid');
-            const btnFeed = document.getElementById('btn-view-feed');
+            const toggleText = document.getElementById('view-toggle-text');
             const container = document.getElementById('status-container');
             
             if (mode === 'grid') {
-                btnGrid.classList.remove('btn-outline');
-                btnFeed.classList.add('btn-outline');
+                if(toggleText) toggleText.innerText = 'FEED VIEW'; // Tlačidlo núka prechod do Feedu
                 container.classList.add('view-grid');
                 container.classList.remove('view-feed');
             } else {
-                btnFeed.classList.remove('btn-outline');
-                btnGrid.classList.add('btn-outline');
+                if(toggleText) toggleText.innerText = 'GRID VIEW'; // Tlačidlo núka prechod do Gridu
                 container.classList.add('view-feed');
                 container.classList.remove('view-grid');
             }
         }
 
-        // Aplikujeme mód pri načítaní
         setViewMode(currentViewMode);
 
         function toggleMenu() { 
@@ -590,7 +585,6 @@
         window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
 
         function toggleGlassBar(img) {
-            // 🛠️ Ak klikneš na fotku v GRID móde, prepne ťa to do FEED módu a zascrolluje na fotku
             if (currentViewMode === 'grid') {
                 setViewMode('feed');
                 setTimeout(() => {
