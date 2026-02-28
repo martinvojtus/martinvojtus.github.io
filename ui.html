@@ -147,8 +147,9 @@
             padding: 0 var(--gap-item);
         }
 
+        /* 🛠️ ÚPRAVA: Farba textu popisu zmenená na var(--grey-50) pre 0.5 opacity efekt */
         .status-text-content {
-            font-size: var(--size-small); color: var(--black);
+            font-size: var(--size-small); color: var(--grey-50);
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
             flex-grow: 1; text-align: left;
         }
@@ -324,7 +325,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-outline" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.2.0 • 2026</div>
+            <div class="footer-info">build v6.2.1 • 2026</div>
         </div>
     </nav>
 
@@ -337,8 +338,8 @@
 
     <div id="delete-modal">
         <div id="modal-action-zone" class="action-row">
-            <button class="submit-btn" onclick="executeModalDelete()">DELETE</button>
-            <button class="submit-btn btn-outline" onclick="closeDeleteModal()">CANCEL</button>
+            <button id="modal-del-btn" class="submit-btn" onclick="executeModalDelete()">DELETE</button>
+            <button id="modal-cancel-btn" class="submit-btn btn-outline" onclick="closeDeleteModal()">CANCEL</button>
         </div>
         <div id="modal-loading-zone" class="action-row" style="display: none;">
             <div class="submit-btn btn-outline btn-loading">DELETING...</div>
@@ -354,7 +355,6 @@
         let currentOffset = 0; const postsLimit = 10; let isLoading = false; let hasMorePosts = true;
         
         let deleteActionType = null;
-        // 🛠️ Globálne premenné pre EDIT režim
         let editingPostId = null;
         let existingImageUrl = null;
 
@@ -374,7 +374,6 @@
             navOverlay.classList.toggle('active'); 
             menuToggle.innerText = isActive ? 'CLOSE' : 'MENU';
             
-            // Reštart editora ak menu zatvoríme
             if (!isActive) resetEditor();
         }
         function closeMenu() { 
@@ -533,8 +532,10 @@
             }
         }
 
-        // 🛠️ ÚPRAVA: Načítanie existujúceho postu do formulára
-        function handleEditPost(id) {
+        // 🛠️ OPRAVA: Pridaný parameter "e" a e.stopPropagation() na zastavenie okamžitého zatvorenia
+        function handleEditPost(e, id) {
+            e.stopPropagation(); 
+            
             const post = globalPosts.find(p => p.id === id);
             if (!post) return;
 
@@ -543,7 +544,6 @@
 
             document.getElementById('edit-text').value = post.text || '';
             
-            // Otvorenie menu
             if (!navOverlay.classList.contains('active')) {
                 menuToggle.classList.add('active'); 
                 navOverlay.classList.add('active'); 
@@ -551,7 +551,6 @@
             }
             window.scrollTo(0,0);
             
-            // Refreš UI
             updateImageUIState();
         }
 
@@ -565,13 +564,13 @@
                 ${secretKey ? `<span onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>` : '<div></div>'}
             </div>`;
 
-            // 🛠️ ÚPRAVA: Tlačidlo EDIT pridané vpravo dole, ak je užívateľ admin
             let barHtmlBottom = '';
             if (s.text || secretKey) {
+                // 🛠️ OPRAVA: Tu odovzdávame event do funkcie
                 barHtmlBottom = `
                 <div class="status-glass-bar-bottom">
                     <span class="status-text-content">${s.text || ''}</span>
-                    ${secretKey ? `<span onclick="handleEditPost(${s.id})" class="admin-bar-item admin-delete-link" style="margin-left: var(--gap-item);">EDIT</span>` : ''}
+                    ${secretKey ? `<span onclick="handleEditPost(event, ${s.id})" class="admin-bar-item admin-delete-link" style="margin-left: var(--gap-item);">EDIT</span>` : ''}
                 </div>`;
             }
 
@@ -604,7 +603,6 @@
             return `<div class="status-card">${mediaHtml}</div>`;
         }
 
-        // 🛠️ ÚPRAVA: Reset zahŕňa aj EDIT parametre
         function resetEditor() {
             editingPostId = null;
             existingImageUrl = null;
@@ -615,7 +613,6 @@
             document.getElementById('upload-loading-row').style.display = 'none';
             document.getElementById('upload-success-row').style.display = 'none';
             
-            // Render čerstvých tlačidiel (zabraňuje Safari chybám)
             document.getElementById('upload-action-row').innerHTML = `
                 <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">UPLOAD</button>
                 <div id="clear-upload-btn" class="submit-btn btn-outline" onclick="clearImageSelection(event)">DELETE</div>
@@ -623,7 +620,6 @@
             updateImageUIState(); 
         }
 
-        // 🛠️ ÚPRAVA: Logika pre zobrazenie náhľadu, aj keď fotka pochádza z úpravy, nie z file inputu
         function updateImageUIState() {
             const input = document.getElementById('edit-image');
             const emptyState = document.getElementById('upload-empty-state');
@@ -638,7 +634,6 @@
                     if(thumbnail) thumbnail.src = existingImageUrl;
                 }
                 
-                // Ak sme v EDIT móde, tlačidlo ukazuje SAVE miesto UPLOAD
                 if(pubBtn && editingPostId) pubBtn.innerText = 'SAVE';
                 
                 emptyState.style.display = 'none';
@@ -717,7 +712,6 @@
             }
         }
 
-        // 🛠️ ÚPRAVA: Zmazanie fotky z editora. Vyžaduje nahratie novej pred odoslaním.
         function clearImageSelection(e) {
             e.stopPropagation();
             document.getElementById('edit-image').value = ""; 
@@ -729,12 +723,10 @@
             openDeleteModal('delete_all');
         }
 
-        // 🛠️ ÚPRAVA: Komplexná logika pre POST a PUT (Edit/Upload)
         async function handleMainSubmit(e) { 
             e.preventDefault(); 
             const imageFile = document.getElementById('edit-image').files[0];
             
-            // Post musí mať fotku
             if (!imageFile && !existingImageUrl) { return; }
             
             const postText = document.getElementById('edit-text').value;
@@ -748,7 +740,6 @@
             try {
                 let finalImageUrl = existingImageUrl;
                 
-                // Ak bola vybraná nová fotka, najprv ju nahráme
                 if (imageFile) {
                     const compressedFile = await compressImage(imageFile);
                     const formData = new FormData(); formData.append("file", compressedFile);
@@ -763,13 +754,11 @@
                 
                 let res;
                 if (editingPostId) {
-                    // Update existujúceho (PUT)
                     res = await fetch(`${API_URL}/posts/${editingPostId}`, {
                         method: "PUT", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
                         body: JSON.stringify(payload)
                     });
                 } else {
-                    // Vytvorenie nového (POST)
                     res = await fetch(`${API_URL}/posts`, {
                         method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
                         body: JSON.stringify(payload)
