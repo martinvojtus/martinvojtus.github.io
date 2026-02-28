@@ -271,7 +271,6 @@
         .input-error { border: 1px solid var(--black) !important; }
         .input-error span { color: var(--black) !important; }
 
-        /* 🛠️ Nový kontajner pre kompaktnú miniatúru fotky */
         .thumbnail-container {
             width: 3rem;
             height: 3rem;
@@ -287,7 +286,7 @@
         .thumbnail-img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Oreže sa do štvorca, aby vyplnila priestor */
+            object-fit: cover; 
         }
 
         .custom-checkbox {
@@ -420,7 +419,7 @@
                         <input type="checkbox" id="remember-login" class="custom-checkbox">
                         <span>Remember me</span>
                     </label>
-                    <button type="submit" id="login-btn" class="submit-btn" style="width: 100%;">LOGIN</button>
+                    <button type="submit" id="login-btn" class="submit-btn btn-tonal" style="width: 100%;">LOGIN</button>
                 </form>
             </div>
 
@@ -436,22 +435,23 @@
                         <div class="thumbnail-container" onclick="document.getElementById('edit-image').click()">
                             <img id="upload-preview-img" class="thumbnail-img" src="" alt="">
                         </div>
-                        <div class="submit-btn" style="flex-grow: 1;" onclick="clearImageSelection(event)">DELETE IMAGE</div>
+                        <div class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="clearImageSelection(event)">DELETE IMAGE</div>
                     </div>
 
                     <div id="upload-details-zone" style="display: none; flex-direction: column; gap: var(--gap-item); width: 100%;">
+                        
                         <input type="text" id="edit-title" class="form-input" placeholder="Image title..." style="width: 100%;" oninput="updateTextUIState()">
                         <textarea id="edit-text" class="form-input" placeholder="Image description..." style="width: 100%;" oninput="autoResizeTextarea(this); updateTextUIState();"></textarea>
                         
-                        <div id="upload-action-row" class="action-row">
+                        <div id="upload-action-row" class="action-row" style="padding: 0;">
                             <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
                             <div id="clear-text-btn" class="submit-btn btn-tonal-disabled" onclick="clearTextFields(event)">CLEAR</div>
                             <div class="submit-btn btn-tonal" onclick="closeMenu()">CANCEL</div>
                         </div>
-                        <div id="upload-loading-row" class="action-row" style="display: none;">
+                        <div id="upload-loading-row" class="action-row" style="display: none; padding: 0;">
                             <div id="upload-loading-btn" class="submit-btn btn-loading" style="flex-grow: 1;">UPLOADING...</div>
                         </div>
-                        <div id="upload-success-row" class="action-row" style="display: none;">
+                        <div id="upload-success-row" class="action-row" style="display: none; padding: 0;">
                             <div id="upload-success-btn" class="submit-btn btn-ghost" style="flex-grow: 1;">UPLOADED</div>
                         </div>
                     </div>
@@ -464,7 +464,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.5.4 • 2026</div>
+            <div class="footer-info">build v6.5.5 • 2026</div>
         </div>
     </nav>
 
@@ -481,10 +481,10 @@
             <button id="modal-cancel-btn" class="submit-btn btn-tonal" onclick="closeDeleteModal()">CANCEL</button>
         </div>
         <div id="modal-loading-zone" class="action-row" style="display: none;">
-            <div class="submit-btn btn-loading" style="width: 100%;">DELETING...</div>
+            <div class="submit-btn btn-loading">DELETING...</div>
         </div>
         <div id="modal-success-zone" class="action-row" style="display: none;">
-            <div class="submit-btn btn-ghost" style="width: 100%;">DELETED</div>
+            <div class="submit-btn btn-ghost">DELETED</div>
         </div>
     </div>
 
@@ -651,14 +651,12 @@
             if (globalPosts.length === 0) {
                 container.className = 'status-feed view-feed';
                 if (secretKey) {
-                    // 🛠️ Tlačidlo vo Feede je teraz klasické
                     container.innerHTML = `
                         <div class="submit-btn btn-tonal" onclick="openEditor(event)" style="width: 100%;">
                             + ADD IMAGE
                         </div>
                     `;
                 } else {
-                    // 🛠️ Tlačidlo vo Feede pre návštevníkov je klasické, ale disabled
                     container.innerHTML = `
                         <div class="submit-btn btn-tonal-disabled" style="width: 100%; cursor: default;">
                             NOTHING HERE YET.
@@ -919,7 +917,6 @@
             updateTextUIState(); 
         }
 
-        // 🛠️ Múdra funkcia pre prepínanie prázdneho a plného stavu pre Upload obrázka
         function updateImageUIState() {
             const input = document.getElementById('edit-image');
             const emptyState = document.getElementById('upload-empty-state');
@@ -937,13 +934,11 @@
                     if(thumbnail) thumbnail.src = existingImageUrl;
                 }
                 
-                // Schová + ADD IMAGE, ukáže Miniatúru a DELETE IMAGE
                 if(emptyState) emptyState.style.display = 'none';
                 if(filledState) filledState.style.display = 'flex';
             } else {
                 if(thumbnail) thumbnail.src = "";
                 
-                // Ukáže + ADD IMAGE, schová Miniatúru s Delete
                 if(emptyState) emptyState.style.display = 'flex';
                 if(filledState) filledState.style.display = 'none';
             }
@@ -969,7 +964,7 @@
             }
         }
 
-        // 🛠️ Zmaže obrázok z výberu a aktualizuje UI
+        // 🛠️ Úplne čistá funkcia na zmazanie fotky z editora (všetko ostatné riadi updateImageUIState)
         function clearImageSelection(e) {
             e.stopPropagation();
             document.getElementById('edit-image').value = ""; 
