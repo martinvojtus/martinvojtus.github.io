@@ -345,7 +345,6 @@
             z-index: -1;
         }
         
-        /* 🛠️ Padding zväčšený na 2rem pre lepší zážitok z čítania */
         .status-text-overlay-content {
             font-size: var(--size-small); 
             color: var(--black);
@@ -361,7 +360,6 @@
             display: none; 
         }
         
-        /* 🛠️ Odstránený text-transform: uppercase pre prirodzený titulok */
         .status-text-overlay-title {
             font-size: var(--size-large);
             font-weight: 400; 
@@ -439,13 +437,13 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.6.1 • 2026</div>
+            <div class="footer-info">build v6.6.2 • 2026</div>
         </div>
     </nav>
 
     <main>
         <div id="admin-upload-zone">
-            <div id="editor-collapsed-state" class="submit-btn btn-tonal" style="width: 100%; font-size: 1.5rem;" onclick="expandEditor()">
+            <div id="editor-collapsed-state" class="submit-btn btn-tonal" style="width: 100%;" onclick="expandEditor()">
                 +
             </div>
 
@@ -873,7 +871,6 @@
             if (s.title || s.text || secretKey) {
                 let displayTitle = s.title || 'UNTITLED';
                 
-                // 🛠️ Tlačidlo zmenené na READ MORE
                 barHtmlBottom = `
                 <div class="status-glass-bar-bottom">
                     <span class="status-text-content" onclick="toggleTextOverlay(event, ${s.id})">${displayTitle}</span>
