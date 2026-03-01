@@ -437,17 +437,16 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.6.4 • 2026</div>
+            <div class="footer-info">build v6.6.5 • 2026</div>
         </div>
     </nav>
 
     <main>
-        <div id="top-actions" class="action-row" style="margin-bottom: var(--gap-item); width: 100%; display: none;">
-            <div id="btn-expand-editor" class="submit-btn btn-tonal" style="display: none; flex: 1;" onclick="expandEditor()">+</div>
-            <button id="btn-toggle-view" class="submit-btn btn-tonal" style="display: none; flex: 1;" onclick="toggleViewMode()">GRID VIEW</button>
-        </div>
-
         <div id="admin-upload-zone">
+            <div id="editor-collapsed-state" class="submit-btn btn-tonal" style="width: 100%;" onclick="expandEditor()">
+                +
+            </div>
+
             <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                 <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                 
@@ -556,14 +555,14 @@
         }
 
         function expandEditor() {
-            document.getElementById('top-actions').style.display = 'none';
-            document.getElementById('admin-upload-zone').style.display = 'flex';
+            document.getElementById('editor-collapsed-state').style.display = 'none';
+            document.getElementById('editor-form').style.display = 'flex';
         }
 
         function collapseEditor() {
-            document.getElementById('admin-upload-zone').style.display = 'none';
+            document.getElementById('editor-collapsed-state').style.display = 'flex';
+            document.getElementById('editor-form').style.display = 'none';
             resetEditor(); 
-            refreshFeedUI(); 
         }
 
         function toggleViewMode() {
@@ -588,10 +587,12 @@
             if (secretKey) {
                 document.body.classList.add('is-logged-in');
                 document.getElementById('login-ui').style.display = 'none';
+                document.getElementById('admin-upload-zone').style.display = 'flex';
                 document.getElementById('logout-ui').style.display = 'flex';
             } else {
                 document.body.classList.remove('is-logged-in');
                 document.getElementById('login-ui').style.display = 'flex';
+                document.getElementById('admin-upload-zone').style.display = 'none';
                 document.getElementById('logout-ui').style.display = 'none';
                 collapseEditor(); 
             }
@@ -655,16 +656,16 @@
             localStorage.removeItem('mv_admin_key');
             updateUIVisibility();
             closeMenu();
+            resetEditor();
+            document.getElementById('editor-collapsed-state').style.display = 'flex';
+            document.getElementById('editor-form').style.display = 'none';
             refreshFeedUI();
         }
 
-        // 🛠️ Inteligentné preklápanie logiky Top lišty a Gridu
+        // 🛠️ Pôvodná logika pre generovanie prepínačov zobrazenia (GRID / FEED)
         function refreshFeedUI() { 
             const container = document.getElementById('status-container');
             const deleteAllBtn = document.getElementById('delete-all-btn');
-            const topActions = document.getElementById('top-actions');
-            const expandBtn = document.getElementById('btn-expand-editor');
-            const toggleBtn = document.getElementById('btn-toggle-view');
 
             if (deleteAllBtn) {
                 if (globalPosts.length === 0) {
@@ -680,11 +681,7 @@
                 container.className = 'status-feed view-feed';
                 if (secretKey) {
                     container.innerHTML = ``;
-                    topActions.style.display = 'flex';
-                    if(expandBtn) expandBtn.style.display = 'flex';
-                    if(toggleBtn) toggleBtn.style.display = 'none';
                 } else {
-                    topActions.style.display = 'none';
                     container.innerHTML = `
                         <div class="submit-btn btn-tonal-disabled" style="width: 100%; cursor: default;">
                             NOTHING HERE YET.
@@ -695,29 +692,21 @@
             }
 
             if (currentViewMode === 'feed') {
-                // 🛠️ Vo Feede je + a prepínač 50:50
-                topActions.style.display = 'flex';
-                if(expandBtn) expandBtn.style.display = secretKey ? 'flex' : 'none';
-                if(toggleBtn) {
-                    toggleBtn.style.display = 'flex';
-                    toggleBtn.innerText = 'GRID VIEW';
-                }
-
                 container.className = 'status-feed view-feed';
-                let html = '';
+                // 🛠️ GRID VIEW sa generuje ako prvý prvok vo Feede
+                let html = `
+                    <div class="feed-toggle-wrapper">
+                        <button class="submit-btn btn-tonal" style="width: 100%;" onclick="toggleViewMode()">GRID VIEW</button>
+                    </div>
+                `;
                 globalPosts.forEach(post => { html += renderSinglePost(post); });
                 container.innerHTML = html;
             } else {
-                // 🛠️ V Gride je horné + na 100% a FEED prepínač presunutý do mriežky doprava
-                if(expandBtn) expandBtn.style.display = secretKey ? 'flex' : 'none';
-                if(toggleBtn) toggleBtn.style.display = 'none'; 
-                
-                topActions.style.display = secretKey ? 'flex' : 'none';
-
                 container.className = 'status-feed view-grid';
                 let leftCol = '<div class="masonry-col col-left">';
                 let rightCol = '<div class="masonry-col col-right">';
 
+                // 🛠️ FEED VIEW sa generuje ako prvý prvok v pravej časti mriežky
                 rightCol += `
                     <div class="grid-toggle-wrapper">
                         <button class="submit-btn btn-tonal" style="width: 100%;" onclick="toggleViewMode()">FEED VIEW</button>
@@ -725,7 +714,6 @@
                 `;
 
                 globalPosts.forEach((post, index) => {
-                    // Mriežka spravodlivo rozdeľuje. Nultý ide doľava. 
                     if (index % 2 === 0) leftCol += renderSinglePost(post);
                     else rightCol += renderSinglePost(post);
                 });
