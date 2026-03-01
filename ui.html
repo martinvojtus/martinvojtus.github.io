@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sk">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -12,23 +12,23 @@
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=2">
     
     <title>martinvojtus.space</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
+            --size-large: 2.0rem;
+            --size-small: 1.0rem;
             --black: #000000;
             --white: #ffffff;
             --grey-50: rgba(0, 0, 0, 0.5);
             --divider: rgba(0, 0, 0, 0.1);
-            
             --glass-rgb: 255, 255, 255; 
             --content-width: 540px; 
             --border-radius: 1rem; 
             --gap-item: 1rem; 
             --letter-spacing: 0.05em;
-            --glass-opacity: 0.5; 
-            --glass-blur: 1rem;   
-            --size-large: 2.0rem;
-            --size-small: 1.0rem;
+            --glass-opacity: 0.6; 
+            --glass-blur: 25px;   
+            --danger: #ff4444;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -53,6 +53,8 @@
             animation: none !important;
         }
 
+        b, strong { font-weight: 700 !important; }
+
         body {
             margin: 0; padding: 0;
             background-color: var(--white); color: var(--black);
@@ -61,19 +63,16 @@
             min-height: 100vh;
         }
 
-        .submit-btn, .form-input, .admin-bar-item {
+        .menu-link, .status-date, .status-edited, .status-author, .footer-info, .submit-btn, .form-input, .logo-text, .status-title {
             line-height: 1;
         }
 
-        header, .nav-overlay, .status-glass-bar, .status-glass-bar-bottom, .status-confirm-overlay, #delete-modal, .status-text-overlay {
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
-        }
+        .divider { width: 100%; height: 1px; background-color: var(--divider); }
 
         header {
             position: fixed; top: 0; left: 0; width: 100%; 
             display: flex; justify-content: center; padding: var(--gap-item) 0; 
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
+            background: rgba(var(--glass-rgb), var(--glass-opacity));
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 2000;
         }
@@ -85,18 +84,18 @@
 
         .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
         .header-left svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
-        .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; pointer-events: none; }
+        .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; }
 
-        .menu-toggle { 
-            display: flex; justify-content: center; align-items: center; 
-            cursor: pointer; z-index: 2100; position: relative;
-            font-size: var(--size-small); font-weight: 400; user-select: none;
-            line-height: 1; text-transform: uppercase;
-        }
+        .menu-toggle { width: 1rem; height: 1rem; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 2100; position: relative; }
+        .line { width: 1rem; height: 1px; background-color: var(--black); position: absolute; border-radius: 1px; }
+        .line:nth-child(1) { transform: translateY(-0.25rem); }
+        .line:nth-child(2) { transform: translateY(0.25rem); }
+        .menu-toggle.active .line:nth-child(1) { transform: translateY(0) rotate(45deg) scaleX(1.4); }
+        .menu-toggle.active .line:nth-child(2) { transform: translateY(0) rotate(-45deg) scaleX(1.4); }
 
         .nav-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: auto;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
+            background: rgba(var(--glass-rgb), var(--glass-opacity));
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 1500; 
             padding: calc(3rem + var(--gap-item)) 0 var(--gap-item) 0; 
@@ -105,304 +104,111 @@
         .nav-overlay.active { display: flex; }
         
         .menu-items { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); }
+        .menu-link { text-decoration: none; color: var(--black); font-size: var(--size-small); cursor: pointer; display: inline-block; padding: 0; border: none; background: transparent; text-align: left; margin: 0; }
 
+        /* 🛠️ OPRAVA: Zmena na čisto blokový prvok, odstránenie rizika sčítavania flex medzier */
         main {
             padding: calc(3rem + var(--gap-item)) var(--gap-item) var(--gap-item); 
             width: 100%; max-width: var(--content-width); 
             flex-grow: 1; display: block; 
         }
 
-        #section-feed { display: block; width: 100%; }
+        #section-feed { display: block; }
         
+        /* 🛠️ OPRAVA: Skrytá zóna v predvolenom stave už nemá v CSS ŽIADNE okraje */
+        #feed-admin-zone { display: none; flex-direction: column; gap: var(--gap-item); }
+        
+        /* 🛠️ OPRAVA: Okraje sa naozaj vytvoria iba vtedy, ak je panel viditeľný */
+        body.is-logged-in #feed-admin-zone { 
+            display: flex; 
+            padding-bottom: var(--gap-item); 
+            margin-bottom: var(--gap-item); 
+            border-bottom: 1px solid var(--divider); 
+        }
+
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
         #logout-ui { display: none; }
+        body.is-logged-in #login-ui { display: none; }
+        body.is-logged-in #logout-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
+
+        .status-feed { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: var(--gap-item); }
+        .status-card { border-bottom: 1px solid var(--divider); padding-bottom: var(--gap-item); display: flex; flex-direction: column; gap: var(--gap-item); }
+        .status-card:last-child { border-bottom: none; padding-bottom: 0; }
+
+        .status-date, .status-edited, .status-author { 
+            font-size: var(--size-small); color: var(--grey-50); 
+            background-color: var(--divider); padding: 0 var(--gap-item); height: 3rem; 
+            border-radius: var(--border-radius); display: inline-flex; align-items: center; width: fit-content;
+        }
+        .status-date, .status-edited { text-transform: uppercase; }
+        .status-author { font-weight: 400; }
+
+        .admin-action-btn { 
+            background-color: var(--divider); border: none; border-radius: var(--border-radius); 
+            color: var(--black); cursor: pointer; 
+            width: 3rem; height: 3rem; 
+            display: inline-flex; justify-content: center; align-items: center; flex-shrink: 0;
+        }
+        .admin-action-btn svg, .icon-btn svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
+
+        .status-title { font-size: var(--size-large); margin: 0; color: var(--black); font-weight: 700 !important; }
+        .status-image { width: 100%; height: auto; border-radius: var(--border-radius); display: block; }
         
-        #admin-upload-zone { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; margin-bottom: var(--gap-item); }
+        .status-text { font-size: var(--size-small); color: var(--black); opacity: 0.8; white-space: pre-line; word-wrap: break-word; margin: 0; text-align: justify; -webkit-hyphens: auto; hyphens: auto; }
 
-        .status-feed { 
-            max-width: var(--content-width); width: 100%; margin: 0 auto; 
-        }
-
-        .status-feed.view-feed {
-            display: flex; flex-direction: column; gap: var(--gap-item);
-        }
-        .status-feed.view-grid {
-            display: flex; flex-direction: row; gap: var(--gap-item); align-items: flex-start;
-        }
-        .masonry-col {
-            display: flex; flex-direction: column; gap: var(--gap-item); flex: 1; min-width: 0;
-        }
-
-        .status-feed.view-grid .status-glass-bar,
-        .status-feed.view-grid .status-glass-bar-bottom,
-        .status-feed.view-grid .status-confirm-overlay,
-        .status-feed.view-grid .status-text-overlay {
-            display: none !important;
-        }
-        .status-feed.view-grid .status-media-wrapper {
-            background-color: transparent; 
-        }
-
-        .feed-toggle-wrapper {
-            display: flex; justify-content: center; width: 100%;
-        }
-        .grid-toggle-wrapper {
-            display: flex; justify-content: center; width: 100%; 
-        }
-
-        .status-card { display: flex; flex-direction: column; position: relative; }
-
-        .status-media-wrapper {
-            position: relative;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            transform: translateZ(0); 
-            min-height: 3rem;
-            background-color: var(--divider); 
-        }
-
-        .status-glass-bar {
-            height: 3rem; width: 100%;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
-            position: absolute; top: 0; left: 0; right: 0;
-            z-index: 10;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 var(--gap-item);
-        }
-
-        .status-glass-bar-bottom {
-            height: 3rem; width: 100%;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
-            position: absolute; bottom: 0; left: 0; right: 0;
-            z-index: 10;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 var(--gap-item);
-        }
-
-        .status-text-content {
-            font-size: var(--size-small); color: var(--grey-50);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            flex-grow: 1; text-align: left; cursor: pointer;
-        }
-
-        .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
-        .admin-delete-link { cursor: pointer; color: var(--black); text-decoration: none; }
-
-        .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); cursor: pointer; }
-        
-        .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
+        .loading-text { text-align: center; font-size: var(--size-small); color: var(--black); opacity: 0.5; padding: var(--gap-item) 0; }
 
         .form-input, .submit-btn { 
-            border-radius: var(--border-radius); 
-            font-size: var(--size-small); padding: 0 var(--gap-item); 
-            outline: none; display: flex; align-items: center; gap: var(--gap-item); 
-            box-shadow: none; -webkit-appearance: none; appearance: none; margin: 0;
+            height: 3rem; border: 1px solid var(--black); border-radius: var(--border-radius); 
+            background: transparent; font-size: var(--size-small); padding: 0 var(--gap-item); 
+            outline: none; color: var(--black); display: flex; align-items: center; gap: var(--gap-item); 
         }
 
-        .form-input { 
-            height: 3rem;
-            background-color: transparent; 
-            color: var(--black);
-            border: 1px solid var(--divider); 
-        }
-        .form-input::placeholder { color: var(--grey-50); } 
-
-        textarea.form-input {
-            height: auto; 
-            min-height: 3rem; 
-            padding-top: 0.8rem;
-            padding-bottom: 0.8rem;
-            line-height: 1.5;
-            resize: none; 
-            overflow: hidden; 
-        }
-
-        .submit-btn { 
-            height: 3rem;
-            background-color: var(--black); 
-            color: var(--white);
-            border: 1px solid var(--black); 
-            justify-content: center; text-transform: uppercase; cursor: pointer; white-space: nowrap;
-        }
-
-        .btn-tonal {
-            background-color: var(--divider) !important;
-            color: var(--black) !important;
-            border: none !important;
-        }
-
-        .btn-tonal-disabled {
-            background-color: var(--divider) !important;
-            color: var(--grey-50) !important;
-            border: none !important;
-            cursor: default !important;
-            pointer-events: none !important;
-        }
-
-        .btn-danger {
-            background-color: #ff3333 !important;
-            color: #000000 !important;
-            border: none !important;
-        }
-
-        .btn-outline {
-            background-color: transparent; 
-            color: var(--black);
-            border: 1px solid var(--black);
-        }
-
-        .btn-loading {
-            background-color: var(--divider) !important;
-            color: var(--grey-50) !important; 
-            border: none !important;
-            pointer-events: none !important;
-            opacity: 1 !important; 
-        }
-
-        .btn-ghost {
-            background-color: var(--divider) !important; 
-            color: var(--black) !important; 
-            border: none !important;
-            pointer-events: none !important; 
-            opacity: 1 !important; 
-        }
-
-        .input-error { border: 1px solid var(--black) !important; }
-        .input-error span { color: var(--black) !important; }
-
-        .thumbnail-container {
-            width: 3rem;
-            height: 3rem;
-            flex-shrink: 0;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            background-color: var(--divider);
-            cursor: pointer;
-            position: relative;
-            -webkit-mask-image: -webkit-radial-gradient(white, black);
-            mask-image: radial-gradient(white, black);
-        }
-        .thumbnail-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; 
-        }
+        .solid-input { background-color: var(--divider) !important; border: none !important; }
         
-        .preview-add-text {
-            font-size: var(--size-small);
-            color: var(--black);
-            text-transform: uppercase;
-            position: absolute;
+        #edit-author { display: none; margin-bottom: var(--gap-item); }
+        #editor-form.adv-open #edit-author { display: flex; }
+
+        .form-textarea {
+            width: 100%; border: 1px solid var(--black); border-radius: var(--border-radius); 
+            background: transparent; font-size: var(--size-small); padding: var(--gap-item); 
+            outline: none; color: var(--black); min-height: 5rem; resize: vertical;
+            text-align: justify; -webkit-hyphens: auto; hyphens: auto; display: block;
         }
+
+        .input-error { border-color: var(--danger) !important; }
+        .input-error::placeholder { color: var(--danger) !important; opacity: 1; }
+
+        .submit-btn { background: var(--black); color: var(--white); text-transform: uppercase; cursor: pointer; justify-content: center; white-space: nowrap; }
+        .icon-btn { width: 3rem; height: 3rem; flex-shrink: 0; padding: 0; }
+        .secondary-btn { background: transparent; color: var(--black); }
+        .danger-btn { background: var(--danger) !important; color: #000000 !important; border: none !important; }
+
+        #quick-buttons { display: flex; gap: var(--gap-item); width: calc(6rem + var(--gap-item)); margin-left: var(--gap-item); }
+        #editor-form.adv-open #quick-buttons { display: none; }
+        #advanced-section-wrapper { display: none; flex-direction: column; gap: var(--gap-item); padding-top: var(--gap-item); }
+        #editor-form.adv-open #advanced-section-wrapper { display: flex; }
+        
+        #upload-container { display: flex; cursor: pointer; flex-grow: 1; overflow: hidden; }
+        #file-name-display { color: var(--grey-50); text-align: right; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--size-small); }
+        
+        #upload-thumbnail { display: none; width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius); object-fit: cover; }
+
+        #upload-ui-wrapper.has-image #upload-action-label { display: none; }
+        #upload-ui-wrapper.has-image #file-name-display { color: var(--black); text-align: left; }
+        #upload-ui-wrapper.has-image #upload-thumbnail { display: block; }
+        #upload-ui-wrapper.has-image #clear-file-btn { display: flex; }
+        #clear-file-btn { display: none; }
 
         .custom-checkbox {
             appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black);
             border-radius: calc(var(--border-radius) / 3); cursor: pointer; display: grid; place-content: center;
         }
         .custom-checkbox::before { content: ""; width: 0.25rem; height: 0.5rem; border: solid var(--white); border-width: 0 1px 1px 0; transform: rotate(45deg); opacity: 0; margin-top: -0.125rem; }
-        .custom-checkbox:checked { background-color: var(--black); border-color: var(--black); } 
+        .custom-checkbox:checked { background-color: var(--black); }
         .custom-checkbox:checked::before { opacity: 1; }
 
-        .footer-info { 
-            font-size: var(--size-small); color: var(--grey-50); 
-            text-transform: uppercase; text-align: center; width: 100%; 
-        }
-
-        .status-confirm-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 20;
-            display: none; flex-direction: column; justify-content: center; align-items: center;
-            border-radius: var(--border-radius);
-            background: transparent;
-        }
-        .status-confirm-overlay::before {
-            content: "";
-            position: absolute; inset: 0;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); 
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border-radius: inherit;
-            z-index: -1;
-        }
-
-        .status-text-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 15;
-            display: none; flex-direction: column; justify-content: flex-start; align-items: flex-start;
-            border-radius: var(--border-radius);
-            background: transparent;
-            cursor: pointer;
-        }
-        .status-text-overlay::before {
-            content: "";
-            position: absolute; inset: 0;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); 
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border-radius: inherit;
-            z-index: -1;
-        }
-        
-        .status-text-overlay-content {
-            font-size: var(--size-small); 
-            color: var(--black);
-            padding: 2rem; 
-            max-height: 100%; 
-            overflow-y: auto; 
-            width: 100%;
-            line-height: 1.6;
-            -ms-overflow-style: none;  
-            scrollbar-width: none;  
-        }
-        .status-text-overlay-content::-webkit-scrollbar {
-            display: none; 
-        }
-        
-        .status-text-overlay-title {
-            font-size: var(--size-large);
-            font-weight: 400; 
-            line-height: 1.1;
-            margin-bottom: var(--gap-item);
-            word-wrap: break-word;
-        }
-        
-        .status-text-overlay-body {
-            text-align: justify;
-            white-space: pre-wrap; 
-            -webkit-hyphens: auto;
-            -ms-hyphens: auto;
-            hyphens: auto;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-        }
-
-        #delete-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 3000;
-            display: none; flex-direction: column; justify-content: center; align-items: center;
-            background: transparent;
-        }
-        #delete-modal::before {
-            content: "";
-            position: absolute; inset: 0;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); 
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            z-index: -1;
-        }
-
-        .modal-content {
-            width: 100%; max-width: var(--content-width);
-            display: flex; flex-direction: column; gap: var(--gap-item);
-            padding: 0 var(--gap-item);
-        }
-
-        .action-row {
-            display: flex; flex-direction: row; gap: var(--gap-item); justify-content: center;
-            width: 100%; padding: 0;
-        }
+        .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -413,312 +219,162 @@
                 <div class="header-left">
                     <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="72.35 270 935.31 810" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
                 </div>
+                <div class="logo-text"><span>martinvojtus</span> • space</div>
             </div>
-            <div class="logo-text"><span>martinvojtus</span> • space</div>
-            
-            <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">MENU</div>
+            <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()"><div class="line"></div><div class="line"></div></div>
         </div>
     </header>
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
+            <a class="menu-link" onclick="window.scrollTo(0,0); closeMenu();"><span>Feed</span></a>
+            <div class="divider"></div>
             <div id="login-ui">
                 <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
-                    <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="width: 100%;">
-                    <label class="form-input" style="cursor: pointer; justify-content: flex-start; user-select: none; width: 100%;">
+                    <div style="display: flex; width: 100%; gap: var(--gap-item);">
+                        <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="flex-grow: 1;">
+                        <button type="submit" id="login-btn" class="submit-btn icon-btn">
+                            <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>
+                        </button>
+                    </div>
+                    <label class="form-input solid-input" style="cursor: pointer; justify-content: flex-start; user-select: none;">
                         <input type="checkbox" id="remember-login" class="custom-checkbox">
                         <span>Remember me</span>
                     </label>
-                    <button type="submit" id="login-btn" class="submit-btn btn-tonal" style="width: 100%;">LOGIN</button>
                 </form>
             </div>
-
-            <div id="logout-ui" style="display: none;">
-                <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
+            <div id="logout-ui">
+                <button onclick="handleLogout()" class="submit-btn danger-btn" style="width: 100%;">LOGOUT</button>
             </div>
-            
-            <div class="footer-info">build v6.6.2 • 2026</div>
+            <div class="divider"></div>
+            <div class="footer-info">build v5.4.7 • 2026</div>
         </div>
     </nav>
 
     <main>
-        <div id="admin-upload-zone">
-            <div id="editor-collapsed-state" class="submit-btn btn-tonal" style="width: 100%;" onclick="expandEditor()">
-                +
-            </div>
-
-            <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
-                <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
-                
-                <div id="upload-empty-state" class="submit-btn btn-tonal" style="width: 100%;" onclick="document.getElementById('edit-image').click()">
-                    + ADD IMAGE
-                </div>
-
-                <div id="upload-filled-state" class="action-row" style="display: none;">
-                    <div class="thumbnail-container" onclick="document.getElementById('edit-image').click()">
-                        <img id="upload-preview-img" class="thumbnail-img" src="" alt="">
-                    </div>
-                    <div class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="clearImageSelection(event)">DELETE IMAGE</div>
-                </div>
-
-                <div id="upload-details-zone" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;">
-                    <input type="text" id="edit-title" class="form-input" placeholder="Image title..." style="width: 100%;" oninput="updateTextUIState()">
-                    <textarea id="edit-text" class="form-input" placeholder="Image description..." style="width: 100%;" oninput="autoResizeTextarea(this); updateTextUIState();"></textarea>
-                    
-                    <div id="upload-action-row" class="action-row" style="padding: 0;">
-                        <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
-                        <div id="clear-text-btn" class="submit-btn btn-tonal-disabled" onclick="clearTextFields(event)">CLEAR</div>
-                        <div class="submit-btn btn-tonal" onclick="collapseEditor()">CANCEL</div>
-                    </div>
-                    <div id="upload-loading-row" class="action-row" style="display: none; padding: 0;">
-                        <div id="upload-loading-btn" class="submit-btn btn-loading" style="flex-grow: 1;">UPLOADING...</div>
-                    </div>
-                    <div id="upload-success-row" class="action-row" style="display: none; padding: 0;">
-                        <div id="upload-success-btn" class="submit-btn btn-ghost" style="flex-grow: 1;">UPLOADED</div>
-                    </div>
-                </div>
-                
-                <button type="button" id="delete-all-btn" class="submit-btn btn-danger" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
-            </form>
-        </div>
-
         <div id="section-feed">
-            <div id="status-container" class="status-feed view-grid"></div>
-            <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
+            <div id="feed-admin-zone">
+                <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%;">
+                    
+                    <input type="text" id="edit-author" class="form-input" placeholder="Author (optional)">
+
+                    <div style="display: flex; width: 100%;">
+                        <input type="text" id="edit-title" class="form-input" placeholder="Quick thought..." style="flex-grow: 1; min-width: 0;">
+                        <div id="quick-buttons">
+                            <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(true)"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg></button>
+                            <button type="submit" id="quick-btn" class="submit-btn icon-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg></button>
+                        </div>
+                    </div>
+                    
+                    <div id="advanced-section-wrapper">
+                        
+                        <textarea id="edit-text" class="form-textarea" placeholder="Content"></textarea>
+                        
+                        <div id="upload-ui-wrapper" style="display: flex; gap: var(--gap-item); width: 100%;">
+                            <img id="upload-thumbnail" src="" alt="">
+                            <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
+                            
+                            <div id="upload-container" class="form-input solid-input" onclick="document.getElementById('edit-image').click()">
+                                <span id="upload-action-label" style="color: var(--black);">Upload image</span>
+                                <span id="file-name-display"></span>
+                            </div>
+                            <button type="button" id="clear-file-btn" data-confirm="false" class="submit-btn secondary-btn icon-btn solid-input" onclick="clearImageSelection(event)">
+                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20M19 5v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5M9 5V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                        
+                        <label class="form-input solid-input" style="cursor: pointer; justify-content: flex-start; user-select: none;">
+                            <input type="checkbox" id="edit-show-date" class="custom-checkbox" checked>
+                            <span>Show date & time post</span>
+                        </label>
+                        
+                        <div class="divider"></div>
+                        <div style="display: flex; gap: var(--gap-item);">
+                            <button type="submit" id="publish-btn" class="submit-btn" style="flex-grow: 1;">PUBLISH</button>
+                            <button type="button" class="submit-btn icon-btn" onclick="toggleAdvancedEditor(false)">
+                                <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="2" y2="22"></line><line x1="2" y1="2" x2="22" y2="22"></line></svg>
+                            </button>
+                        </div>
+                        <div class="divider"></div>
+                        <button type="button" id="delete-all-btn" data-state="0" class="submit-btn danger-btn" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
+                    </div>
+                </form>
+            </div>
+            <div id="status-container" class="status-feed"></div>
+            <div id="loading-indicator" class="loading-text">Loading...</div>
         </div>
     </main>
 
-    <div id="delete-modal">
-        <div id="modal-action-zone" class="action-row">
-            <button id="modal-del-btn" class="submit-btn" onclick="executeModalDelete()">DELETE</button>
-            <button id="modal-cancel-btn" class="submit-btn btn-tonal" onclick="closeDeleteModal()">CANCEL</button>
-        </div>
-        <div id="modal-loading-zone" class="action-row" style="display: none;">
-            <div class="submit-btn btn-loading">DELETING...</div>
-        </div>
-        <div id="modal-success-zone" class="action-row" style="display: none;">
-            <div class="submit-btn btn-ghost">DELETED</div>
-        </div>
-    </div>
-
     <script>
         const API_URL = "https://mv-backend-ak8l.onrender.com";
-        let secretKey = ""; let globalPosts = []; 
+        let secretKey = ""; let editingId = null; let globalPosts = []; let currentImageUrl = null; let removeImageFlag = false; 
         let currentOffset = 0; const postsLimit = 10; let isLoading = false; let hasMorePosts = true;
-        
-        let deleteActionType = null;
-        let editingPostId = null;
-        let existingImageUrl = null;
-        
-        let currentViewMode = localStorage.getItem('mv_view_mode') || 'grid';
+        let deleteTimer = null;
 
+        const titleInput = document.getElementById('edit-title');
+        const textInput = document.getElementById('edit-text');
         const passInput = document.getElementById('admin-pass');
+        const authorInput = document.getElementById('edit-author');
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
 
-        if(passInput) {
-            passInput.addEventListener('input', () => {
-                passInput.classList.remove('input-error');
-                passInput.placeholder = 'Password...';
+        [titleInput, textInput, passInput, authorInput].forEach(inp => {
+            if(inp) inp.addEventListener('input', () => {
+                inp.classList.remove('input-error');
+                if(inp.id === 'edit-title') inp.placeholder = document.getElementById('editor-form').classList.contains('adv-open') ? 'Title' : 'Quick thought...';
+                if(inp.id === 'edit-text') inp.placeholder = 'Content';
+                if(inp.id === 'admin-pass') inp.placeholder = 'Password...';
+                if(inp.id === 'edit-author') inp.placeholder = 'Author (optional)';
             });
-        }
+        });
 
-        function autoResizeTextarea(el) {
-            el.style.height = 'auto'; 
-            el.style.height = el.scrollHeight + 'px'; 
-        }
-
-        function updateTextUIState() {
-            const titleInput = document.getElementById('edit-title');
-            const textInput = document.getElementById('edit-text');
-            const clearBtn = document.getElementById('clear-text-btn');
-            
-            if (!clearBtn) return;
-
-            const hasText = (titleInput && titleInput.value.trim().length > 0) || 
-                            (textInput && textInput.value.trim().length > 0);
-                            
-            if (hasText) {
-                clearBtn.className = "submit-btn btn-tonal";
-            } else {
-                clearBtn.className = "submit-btn btn-tonal-disabled";
-            }
-        }
-
-        function clearTextFields(e) {
-            if(e) e.stopPropagation();
-            document.getElementById('edit-title').value = "";
-            const textInput = document.getElementById('edit-text');
-            textInput.value = "";
-            autoResizeTextarea(textInput);
-            updateTextUIState(); 
-        }
-
-        function expandEditor() {
-            document.getElementById('editor-collapsed-state').style.display = 'none';
-            document.getElementById('editor-form').style.display = 'flex';
-        }
-
-        function collapseEditor() {
-            document.getElementById('editor-collapsed-state').style.display = 'flex';
-            document.getElementById('editor-form').style.display = 'none';
-            resetEditor(); 
-        }
-
-        function toggleViewMode() {
-            const newMode = currentViewMode === 'feed' ? 'grid' : 'feed';
-            currentViewMode = newMode;
-            localStorage.setItem('mv_view_mode', newMode);
-            refreshFeedUI();
-        }
-
-        function toggleMenu() { 
-            const isActive = menuToggle.classList.toggle('active'); 
-            navOverlay.classList.toggle('active'); 
-            menuToggle.innerText = isActive ? 'CLOSE' : 'MENU';
-        }
-        function closeMenu() { 
-            menuToggle.classList.remove('active'); 
-            navOverlay.classList.remove('active'); 
-            menuToggle.innerText = 'MENU';
-        }
-
-        function updateUIVisibility() {
-            if (secretKey) {
-                document.body.classList.add('is-logged-in');
-                document.getElementById('login-ui').style.display = 'none';
-                document.getElementById('admin-upload-zone').style.display = 'flex';
-                document.getElementById('logout-ui').style.display = 'flex';
-            } else {
-                document.body.classList.remove('is-logged-in');
-                document.getElementById('login-ui').style.display = 'flex';
-                document.getElementById('admin-upload-zone').style.display = 'none';
-                document.getElementById('logout-ui').style.display = 'none';
-            }
-        }
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            const loginBtn = document.getElementById('login-btn');
-            loginBtn.innerText = 'LOGGING IN...';
-            loginBtn.classList.add('btn-loading'); 
-
-            const tempKey = passInput.value;
-            const rememberMe = document.getElementById('remember-login').checked;
-            try {
-                const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': tempKey } });
-                if (res.ok) { 
-                    loginBtn.classList.remove('btn-loading');
-                    loginBtn.classList.add('btn-ghost');
-                    loginBtn.innerText = 'SUCCESS';
-                    
-                    secretKey = tempKey; 
-                    setTimeout(() => {
-                        updateUIVisibility();
-                        closeMenu(); 
-                        refreshFeedUI(); 
-                        passInput.value = ''; 
-                        if (rememberMe) { localStorage.setItem('mv_admin_key', secretKey); } else { localStorage.removeItem('mv_admin_key'); }
-                        
-                        loginBtn.innerText = 'LOGIN';
-                        loginBtn.classList.remove('btn-ghost');
-                    }, 1000);
-                } else { 
-                    passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; 
-                    loginBtn.innerText = 'LOGIN'; loginBtn.classList.remove('btn-loading');
-                }
-            } catch (err) { 
-                passInput.classList.add('input-error'); 
-                loginBtn.innerText = 'LOGIN'; loginBtn.classList.remove('btn-loading');
-            }
-        }
+        function toggleMenu() { menuToggle.classList.toggle('active'); navOverlay.classList.toggle('active'); }
+        function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); }
 
         async function checkRememberedLogin() {
             const savedKey = localStorage.getItem('mv_admin_key');
             if (savedKey) {
                 try {
                     const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': savedKey } });
-                    if (res.ok) { 
-                        secretKey = savedKey; 
-                        updateUIVisibility();
-                        refreshFeedUI(); 
-                    } 
-                    else { localStorage.removeItem('mv_admin_key'); updateUIVisibility(); }
-                } catch (e) { updateUIVisibility(); }
-            } else {
-                updateUIVisibility();
+                    if (res.ok) { secretKey = savedKey; document.body.classList.add('is-logged-in'); refreshFeedUI(); } 
+                    else { localStorage.removeItem('mv_admin_key'); }
+                } catch (e) {}
             }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const tempKey = passInput.value;
+            const rememberMe = document.getElementById('remember-login').checked;
+            try {
+                const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': tempKey } });
+                if (res.ok) { 
+                    secretKey = tempKey; document.body.classList.add('is-logged-in'); closeMenu(); refreshFeedUI(); passInput.value = ''; 
+                    if (rememberMe) { localStorage.setItem('mv_admin_key', secretKey); } else { localStorage.removeItem('mv_admin_key'); }
+                } else { passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; }
+            } catch (err) { passInput.classList.add('input-error'); }
         }
 
         function handleLogout() {
-            secretKey = ""; passInput.value = ''; 
+            secretKey = ""; passInput.value = ''; toggleAdvancedEditor(false);
             localStorage.removeItem('mv_admin_key');
-            updateUIVisibility();
-            closeMenu();
-            resetEditor();
-            document.getElementById('editor-collapsed-state').style.display = 'flex';
-            document.getElementById('editor-form').style.display = 'none';
-            refreshFeedUI();
+            document.body.classList.remove('is-logged-in'); closeMenu();
+            resetDeleteAllBtn(); refreshFeedUI();
         }
 
         function refreshFeedUI() { 
-            const container = document.getElementById('status-container');
-            const deleteAllBtn = document.getElementById('delete-all-btn');
-
-            if (deleteAllBtn) {
-                if (globalPosts.length === 0) {
-                    deleteAllBtn.disabled = true;
-                    deleteAllBtn.className = "submit-btn btn-tonal-disabled";
-                } else {
-                    deleteAllBtn.disabled = false;
-                    deleteAllBtn.className = "submit-btn btn-danger";
-                }
-            }
-            
             if (globalPosts.length === 0) {
-                container.className = 'status-feed view-feed';
-                if (secretKey) {
-                    container.innerHTML = ``;
-                } else {
-                    container.innerHTML = `
-                        <div class="submit-btn btn-tonal-disabled" style="width: 100%; cursor: default;">
-                            NOTHING HERE YET.
-                        </div>
-                    `;
+                if (!isLoading) {
+                    document.getElementById('status-container').innerHTML = '<div class="loading-text">Nothing here yet.</div>';
                 }
-                return;
-            }
-
-            if (currentViewMode === 'feed') {
-                container.className = 'status-feed view-feed';
-                let html = `
-                    <div class="feed-toggle-wrapper">
-                        <button class="submit-btn btn-tonal" style="width: 100%;" onclick="toggleViewMode()">GRID VIEW</button>
-                    </div>
-                `;
-                globalPosts.forEach(post => { html += renderSinglePost(post); });
-                container.innerHTML = html;
             } else {
-                container.className = 'status-feed view-grid';
-                let leftCol = '<div class="masonry-col col-left">';
-                let rightCol = '<div class="masonry-col col-right">';
-
-                rightCol += `
-                    <div class="grid-toggle-wrapper">
-                        <button class="submit-btn btn-tonal" style="width: 100%;" onclick="toggleViewMode()">FEED VIEW</button>
-                    </div>
-                `;
-
-                globalPosts.forEach((post, index) => {
-                    if (index % 2 === 0) leftCol += renderSinglePost(post);
-                    else rightCol += renderSinglePost(post);
-                });
-
-                leftCol += '</div>';
-                rightCol += '</div>';
-
-                container.innerHTML = leftCol + rightCol;
+                document.getElementById('status-container').innerHTML = globalPosts.map(s => renderSinglePost(s)).join(''); 
             }
+        }
+        
+        function linkify(text) { 
+            if (text.includes('<a href=')) return text; 
+            return text.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" style="color: inherit; text-decoration: none; opacity: 0.6;">$1</a>'); 
         }
 
         function compressImage(file, maxWidth = 1200, quality = 0.8) {
@@ -753,26 +409,12 @@
                 if (newPosts.length < postsLimit) hasMorePosts = false;
                 currentOffset += newPosts.length; globalPosts = globalPosts.concat(newPosts);
                 
-                if (reset) {
-                    refreshFeedUI();
+                if (globalPosts.length === 0) {
+                    document.getElementById('status-container').innerHTML = '<div class="loading-text">Nothing here yet.</div>';
+                } else if (reset) {
+                    document.getElementById('status-container').innerHTML = globalPosts.map(s => renderSinglePost(s)).join('');
                 } else {
-                    if (currentViewMode === 'feed') {
-                        let html = '';
-                        newPosts.forEach(p => html += renderSinglePost(p));
-                        document.getElementById('status-container').insertAdjacentHTML('beforeend', html);
-                    } else {
-                        const leftCol = document.querySelector('.col-left');
-                        const rightCol = document.querySelector('.col-right');
-                        let currentCount = globalPosts.length - newPosts.length;
-                        newPosts.forEach((post, i) => {
-                            const postHtml = renderSinglePost(post);
-                            if ((currentCount + i) % 2 === 0) {
-                                if (leftCol) leftCol.insertAdjacentHTML('beforeend', postHtml);
-                            } else {
-                                if (rightCol) rightCol.insertAdjacentHTML('beforeend', postHtml);
-                            }
-                        });
-                    }
+                    document.getElementById('status-container').innerHTML += newPosts.map(s => renderSinglePost(s)).join('');
                 }
             } catch (error) {} finally { 
                 isLoading = false; 
@@ -782,340 +424,174 @@
 
         window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
 
-        function toggleGlassBar(imgElement, id) {
-            if (currentViewMode === 'grid') {
-                currentViewMode = 'feed';
-                localStorage.setItem('mv_view_mode', 'feed');
-                refreshFeedUI();
-                
-                setTimeout(() => {
-                    const targetImg = document.getElementById(`post-img-${id}`);
-                    if (targetImg) {
-                        targetImg.closest('.status-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                }, 100); 
-                return;
-            }
-
-            const bars = imgElement.parentElement.querySelectorAll('.status-glass-bar, .status-glass-bar-bottom');
-            if (bars.length > 0) {
-                const isHidden = bars[0].style.display === 'none';
-                if (isHidden) {
-                    bars.forEach(b => b.style.display = 'flex');
-                    clearTimeout(imgElement.glassTimer);
-                } else {
-                    bars.forEach(b => b.style.display = 'none');
-                    clearTimeout(imgElement.glassTimer); 
-                    imgElement.glassTimer = setTimeout(() => {
-                        bars.forEach(b => b.style.display = 'flex');
-                    }, 5000);
-                }
-            }
-        }
-
-        function toggleTextOverlay(e, id) {
-            if (e) e.stopPropagation();
-            
-            const overlay = document.getElementById(`text-overlay-${id}`);
-            if (overlay) {
-                const card = overlay.closest('.status-card');
-                const bars = card.querySelectorAll('.status-glass-bar, .status-glass-bar-bottom');
-                
-                if (overlay.style.display === 'none' || overlay.style.display === '') {
-                    overlay.style.display = 'flex';
-                    bars.forEach(b => b.style.display = 'none'); 
-                } else {
-                    overlay.style.display = 'none';
-                    bars.forEach(b => b.style.display = 'flex'); 
-                }
-            }
-        }
-
-        function handleEditPost(e, id) {
-            e.stopPropagation(); 
-            
-            const post = globalPosts.find(p => p.id === id);
-            if (!post) return;
-
-            editingPostId = post.id;
-            existingImageUrl = post.image_url;
-
-            document.getElementById('edit-title').value = post.title || '';
-            const textInput = document.getElementById('edit-text');
-            textInput.value = post.text || '';
-            
-            expandEditor();
-            setTimeout(() => {
-                autoResizeTextarea(textInput);
-                updateTextUIState(); 
-            }, 0); 
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            updateImageUIState();
-        }
-
         function renderSinglePost(s) {
-            const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
+            const showDate = s.show_date !== false;
+            let dateHtml = showDate ? `<span class="status-date">${new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}</span>` : '';
+            let idBadgeHtml = secretKey ? `<span class="status-date" style="margin-right: var(--gap-item);">#${s.id}</span>` : '';
             
-            let barHtmlTop = `
-            <div class="status-glass-bar">
-                ${secretKey ? `<span class="admin-bar-item" style="color: var(--grey-50);">#${s.id}</span>` : '<div></div>'}
-                <span class="admin-bar-item" style="position: absolute; left: 50%; transform: translateX(-50%); color: var(--grey-50);">${formattedDate}</span>
-                ${secretKey ? `<span onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>` : '<div></div>'}
-            </div>`;
-
-            let barHtmlBottom = '';
-            let textOverlayHtml = '';
-
-            if (s.title || s.text || secretKey) {
-                let displayTitle = s.title || 'UNTITLED';
-                
-                barHtmlBottom = `
-                <div class="status-glass-bar-bottom">
-                    <span class="status-text-content" onclick="toggleTextOverlay(event, ${s.id})">${displayTitle}</span>
-                    <span class="admin-bar-item admin-delete-link" onclick="toggleTextOverlay(event, ${s.id})" style="margin-left: var(--gap-item);">READ MORE</span>
-                    ${secretKey ? `<span onclick="handleEditPost(event, ${s.id})" class="admin-bar-item admin-delete-link" style="margin-left: var(--gap-item);">EDIT</span>` : ''}
-                </div>`;
-
-                if (s.title || s.text) {
-                    textOverlayHtml = `
-                    <div id="text-overlay-${s.id}" class="status-text-overlay" onclick="toggleTextOverlay(event, ${s.id})">
-                        <div class="status-text-overlay-content">
-                            ${s.title ? `<div class="status-text-overlay-title">${s.title}</div>` : ''}
-                            ${s.text ? `<div class="status-text-overlay-body">${s.text}</div>` : ''}
-                        </div>
-                    </div>`;
-                }
-            }
-
-            const imageHtml = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="status-image" alt="image" loading="lazy" onclick="toggleGlassBar(this, ${s.id})">` : '';
+            let editedHtml = (showDate && s.updated_at) ? `<div class="status-edited">EDITED: ${new Date(s.updated_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}</div>` : '';
+            let authorHtml = (s.author && s.author.trim() !== "") ? `<div class="status-author">${s.author.trim()}</div>` : '';
             
-            let mediaHtml = '';
-            if (imageHtml) {
-                mediaHtml = `
-                <div class="status-media-wrapper">
-                    ${barHtmlTop}
-                    ${imageHtml}
-                    ${barHtmlBottom}
-                    ${textOverlayHtml}
-                    ${secretKey ? `
-                    <div id="confirm-overlay-${s.id}" class="status-confirm-overlay">
-                        <div id="confirm-actions-${s.id}" class="action-row" style="padding: 0 var(--gap-item);">
-                            <button class="submit-btn" onclick="executeFeedDelete(${s.id})">DELETE</button>
-                            <button class="submit-btn btn-tonal" onclick="closeFeedDelete(${s.id})">CANCEL</button>
-                        </div>
-                        <div id="confirm-loading-${s.id}" class="action-row" style="display: none; padding: 0 var(--gap-item);">
-                            <div class="submit-btn btn-loading">DELETING...</div>
-                        </div>
-                        <div id="confirm-success-${s.id}" class="action-row" style="display: none; padding: 0 var(--gap-item);">
-                            <div class="submit-btn btn-ghost">DELETED</div>
-                        </div>
-                    </div>
-                    ` : ''}
+            let bottomInfoHtml = '';
+            if (editedHtml || authorHtml) {
+                bottomInfoHtml = `<div style="display: flex; justify-content: space-between; width: 100%; gap: var(--gap-item);">
+                    <div>${editedHtml}</div>
+                    <div style="margin-left: auto;">${authorHtml}</div>
                 </div>`;
             }
 
-            return `<div class="status-card">${mediaHtml}</div>`;
+            const titleHtml = s.title ? `<h3 class="status-title">${s.title}</h3>` : '';
+            const imageHtml = s.image_url ? `<img src="${s.image_url}" class="status-image" alt="image" loading="lazy">` : '';
+            
+            let textHtml = s.text ? `<div class="status-text">${linkify(s.text)}</div>` : '';
+            
+            let adminActionsHtml = secretKey ? `<div style="display: flex; gap: var(--gap-item);"><button onclick="startEdit(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button id="feed-del-btn-${s.id}" onclick="handleDeleteFeed(${s.id})" class="admin-action-btn"><svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20M19 5v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5M9 5V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg></button></div>` : '';
+
+            // 🛠️ OPRAVA: Iba ak vrchný riadok naozaj obsahuje nejaké dáta, inak sa vôbec nevykreslí (odstraňuje prázdnu medzeru)
+            let topRowHtml = '';
+            if (idBadgeHtml || dateHtml || adminActionsHtml) {
+                topRowHtml = `<div style="display: flex; justify-content: space-between; align-items: center;"><div>${idBadgeHtml}${dateHtml}</div>${adminActionsHtml}</div>`;
+            }
+            
+            return `<div class="status-card">${topRowHtml}${titleHtml}${imageHtml}${textHtml}${bottomInfoHtml}</div>`;
         }
 
-        function resetEditor() {
-            editingPostId = null;
-            existingImageUrl = null;
-            document.getElementById('edit-image').value = ""; 
-            
-            document.getElementById('edit-title').value = ""; 
-            const textInput = document.getElementById('edit-text');
-            textInput.value = "";
-            textInput.style.height = 'auto'; 
-            
-            document.getElementById('upload-action-row').style.display = 'flex';
-            document.getElementById('upload-loading-row').style.display = 'none';
-            document.getElementById('upload-success-row').style.display = 'none';
-            
-            document.getElementById('upload-action-row').innerHTML = `
-                <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
-                <div id="clear-text-btn" class="submit-btn btn-tonal-disabled" onclick="clearTextFields(event)">CLEAR</div>
-                <div class="submit-btn btn-tonal" onclick="collapseEditor()">CANCEL</div>
-            `;
-            
-            updateImageUIState(); 
-            updateTextUIState(); 
+        function toggleAdvancedEditor(show) {
+            const form = document.getElementById('editor-form');
+            titleInput.classList.remove('input-error'); textInput.classList.remove('input-error'); authorInput.classList.remove('input-error');
+            if (show) { form.classList.add('adv-open'); titleInput.placeholder = "Title"; } 
+            else { 
+                form.classList.remove('adv-open'); editingId = null; titleInput.value = ""; textInput.value = ""; authorInput.value = ""; document.getElementById('edit-image').value = ""; 
+                removeImageFlag = false; currentImageUrl = null; updateImageUIState(); titleInput.placeholder = "Quick thought..."; document.getElementById('publish-btn').innerText = "PUBLISH"; 
+            }
+        }
+
+        function startEdit(id) {
+            const post = globalPosts.find(p => p.id === id); if(!post) return;
+            editingId = id; currentImageUrl = post.image_url; removeImageFlag = false;
+            titleInput.value = post.title || ""; textInput.value = post.text || ""; authorInput.value = post.author || "";
+            document.getElementById('edit-show-date').checked = post.show_date !== false;
+            document.getElementById('publish-btn').innerText = "SAVE CHANGES";
+            updateImageUIState(); toggleAdvancedEditor(true); window.scrollTo(0,0);
         }
 
         function updateImageUIState() {
+            const wrapper = document.getElementById('upload-ui-wrapper');
             const input = document.getElementById('edit-image');
-            const emptyState = document.getElementById('upload-empty-state');
-            const filledState = document.getElementById('upload-filled-state');
-            const thumbnail = document.getElementById('upload-preview-img');
-            const pubBtn = document.getElementById('publish-btn');
-
-            const hasImage = (input && input.files && input.files.length > 0) || existingImageUrl;
-
-            if (hasImage) {
-                if (input && input.files && input.files.length > 0) {
-                    if(thumbnail) thumbnail.src = URL.createObjectURL(input.files[0]);
-                } else {
-                    if(thumbnail) thumbnail.src = existingImageUrl;
+            const thumbnail = document.getElementById('upload-thumbnail');
+            const hasNew = input.files.length > 0; const hasOld = currentImageUrl && !removeImageFlag;
+            
+            if (hasNew || hasOld) {
+                wrapper.classList.add('has-image');
+                thumbnail.src = hasNew ? URL.createObjectURL(input.files[0]) : currentImageUrl;
+                
+                let fileName = "image.jpg";
+                if (hasNew) {
+                    fileName = input.files[0].name;
+                } else if (hasOld && currentImageUrl) {
+                    fileName = currentImageUrl.split('/').pop().split('?')[0]; 
                 }
                 
-                if(emptyState) emptyState.style.display = 'none';
-                if(filledState) filledState.style.display = 'flex';
-            } else {
-                if(thumbnail) thumbnail.src = "";
-                
-                if(emptyState) emptyState.style.display = 'flex';
-                if(filledState) filledState.style.display = 'none';
-            }
-
-            if (pubBtn) {
-                if (hasImage) {
-                    pubBtn.disabled = false;
-                    pubBtn.className = "submit-btn btn-tonal";
-                } else {
-                    pubBtn.disabled = true;
-                    pubBtn.className = "submit-btn btn-tonal-disabled";
+                if (fileName.length > 22) {
+                    fileName = fileName.substring(0, 10) + "..." + fileName.substring(fileName.length - 9);
                 }
-                pubBtn.innerText = editingPostId ? 'SAVE' : 'UPLOAD';
+                
+                document.getElementById('file-name-display').innerText = fileName;
+                
+            } else { 
+                wrapper.classList.remove('has-image'); 
+                thumbnail.src = "";
+                document.getElementById('file-name-display').innerText = "";
             }
         }
 
         function clearImageSelection(e) {
-            e.stopPropagation();
-            document.getElementById('edit-image').value = ""; 
-            existingImageUrl = null; 
-            updateImageUIState();
-        }
-
-        function handleDeleteFeed(id) {
-            const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
-            const bars = card.querySelectorAll('.status-glass-bar, .status-glass-bar-bottom');
-            bars.forEach(b => b.style.display = 'none');
-            
-            document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
-            document.getElementById(`confirm-actions-${id}`).style.display = 'flex';
-            document.getElementById(`confirm-loading-${id}`).style.display = 'none';
-            document.getElementById(`confirm-success-${id}`).style.display = 'none';
-        }
-
-        function closeFeedDelete(id) {
-            document.getElementById(`confirm-overlay-${id}`).style.display = 'none';
-            const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
-            const bars = card.querySelectorAll('.status-glass-bar, .status-glass-bar-bottom');
-            bars.forEach(b => b.style.display = 'flex');
-        }
-
-        async function executeFeedDelete(id) {
-            document.getElementById(`confirm-actions-${id}`).style.display = 'none';
-            document.getElementById(`confirm-loading-${id}`).style.display = 'flex';
-            
-            await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
-            
-            document.getElementById(`confirm-loading-${id}`).style.display = 'none';
-            document.getElementById(`confirm-success-${id}`).style.display = 'flex';
-            
-            setTimeout(() => {
-                fetchStatuses(true);
-            }, 1000);
-        }
-
-        function openDeleteModal(type) {
-            deleteActionType = type;
-            document.getElementById('delete-modal').style.display = 'flex';
-            document.getElementById('modal-action-zone').style.display = 'flex';
-            document.getElementById('modal-loading-zone').style.display = 'none';
-            document.getElementById('modal-success-zone').style.display = 'none';
-        }
-
-        function closeDeleteModal() {
-            document.getElementById('delete-modal').style.display = 'none';
-            deleteActionType = null;
-        }
-
-        async function executeModalDelete() {
-            if (deleteActionType === 'delete_all') {
-                document.getElementById('modal-action-zone').style.display = 'none';
-                document.getElementById('modal-loading-zone').style.display = 'flex';
-
-                const res = await fetch(`${API_URL}/posts?skip=0&limit=100`);
-                const posts = await res.json();
-                for (const p of posts) { 
-                    await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); 
-                }
-                
-                document.getElementById('modal-loading-zone').style.display = 'none';
-                document.getElementById('modal-success-zone').style.display = 'flex';
-                
-                setTimeout(() => {
-                    fetchStatuses(true);
-                    closeDeleteModal();
-                    collapseEditor();
-                }, 1000);
-            }
-        }
-
-        function handleDeleteAllClick() {
-            openDeleteModal('delete_all');
+            const btn = e.currentTarget;
+            if (btn.dataset.confirm === "true") { document.getElementById('edit-image').value = ""; removeImageFlag = true; btn.classList.remove('danger-btn'); btn.dataset.confirm = "false"; updateImageUIState(); }
+            else { btn.classList.add('danger-btn'); btn.dataset.confirm = "true"; setTimeout(() => { btn.classList.remove('danger-btn'); btn.dataset.confirm = "false"; }, 3000); }
         }
 
         async function handleMainSubmit(e) { 
             e.preventDefault(); 
+            const isAdv = document.getElementById('editor-form').classList.contains('adv-open');
+            if (isAdv) await handlePublish(); else await handleQuickPost(); 
+        }
+
+        async function handlePublish() {
+            let textVal = textInput.value.trim();
+
+            const hasImg = document.getElementById('edit-image').files.length > 0 || (currentImageUrl && !removeImageFlag);
+            if (!textVal && !hasImg) { 
+                textInput.classList.add('input-error'); 
+                textInput.placeholder = 'Content required!'; 
+                return; 
+            }
+            
+            const publishBtn = document.getElementById('publish-btn'); publishBtn.disabled = true;
+            let finalImageUrl = currentImageUrl; if (removeImageFlag) finalImageUrl = null;
             const imageFile = document.getElementById('edit-image').files[0];
             
-            if (!imageFile && !existingImageUrl) { return; }
-            
-            const postTitle = document.getElementById('edit-title').value;
-            const postText = document.getElementById('edit-text').value;
-            
-            document.getElementById('upload-action-row').style.display = 'none';
-            document.getElementById('upload-loading-row').style.display = 'flex';
-            
-            const loadBtn = document.getElementById('upload-loading-btn');
-            loadBtn.innerText = editingPostId ? 'SAVING...' : 'UPLOADING...';
-            
-            try {
-                let finalImageUrl = existingImageUrl;
-                
-                if (imageFile) {
-                    const compressedFile = await compressImage(imageFile);
-                    const formData = new FormData(); formData.append("file", compressedFile);
-                    
-                    const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
-                    if (!upRes.ok) throw new Error("Upload failed");
-                    const upData = await upRes.json();
-                    finalImageUrl = upData.image_url;
-                }
-
-                const payload = { title: postTitle, text: postText, image_url: finalImageUrl, show_date: true, author: "" };
-                
-                let res;
-                if (editingPostId) {
-                    res = await fetch(`${API_URL}/posts/${editingPostId}`, {
-                        method: "PUT", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                        body: JSON.stringify(payload)
-                    });
-                } else {
-                    res = await fetch(`${API_URL}/posts`, {
-                        method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                        body: JSON.stringify(payload)
-                    });
-                }
-                
-                if (res.ok) { 
-                    fetchStatuses(true); 
-                    document.getElementById('upload-loading-row').style.display = 'none';
-                    document.getElementById('upload-success-row').style.display = 'flex';
-                    document.getElementById('upload-success-btn').innerText = editingPostId ? 'SAVED' : 'UPLOADED';
-                    setTimeout(() => { 
-                        collapseEditor(); 
-                    }, 1000);
-                } else { 
-                    resetEditor(); 
-                }
-            } catch (err) {
-                console.error(err);
-                resetEditor();
+            if (imageFile) {
+                publishBtn.innerText = "UPLOADING...";
+                const compressedFile = await compressImage(imageFile);
+                const formData = new FormData(); formData.append("file", compressedFile);
+                const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
+                const upData = await upRes.json(); finalImageUrl = upData.image_url;
             }
+            
+            publishBtn.innerText = "SAVING...";
+            const authorVal = authorInput.value.trim();
+            const res = await fetch(editingId ? `${API_URL}/posts/${editingId}` : `${API_URL}/posts`, {
+                method: editingId ? "PUT" : "POST",
+                headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
+                body: JSON.stringify({ title: titleInput.value, text: textVal, image_url: finalImageUrl, show_date: document.getElementById('edit-show-date').checked, author: authorVal })
+            });
+            if (res.ok) { fetchStatuses(true); toggleAdvancedEditor(false); }
+            publishBtn.disabled = false;
+        }
+
+        async function handleQuickPost() {
+            if (!titleInput.value.trim()) { titleInput.classList.add('input-error'); titleInput.placeholder = "Required!"; return; }
+            const btn = document.getElementById('quick-btn'); btn.disabled = true;
+            const res = await fetch(`${API_URL}/posts`, {
+                method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
+                body: JSON.stringify({ title: "", text: titleInput.value, image_url: null, show_date: true, author: null })
+            });
+            if (res.ok) { 
+                titleInput.value = ""; 
+                await fetchStatuses(true); 
+                btn.innerHTML = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 4 9 20 2 13"></polyline></svg>'; 
+                setTimeout(() => { btn.innerHTML = '<svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 22 17 12 7 2"></polyline></svg>'; }, 1000); 
+            }
+            btn.disabled = false;
+        }
+
+        async function handleDeleteFeed(id) {
+            const btn = document.getElementById(`feed-del-btn-${id}`);
+            if (btn.dataset.confirm === "true") { await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); fetchStatuses(true); }
+            else { btn.classList.add('danger-btn'); btn.dataset.confirm = "true"; setTimeout(() => { btn.classList.remove('danger-btn'); btn.dataset.confirm = "false"; }, 3000); }
+        }
+
+        function handleDeleteAllClick() {
+            const btn = document.getElementById('delete-all-btn');
+            if (btn.dataset.state === "0") { btn.dataset.state = "1"; btn.innerText = "CLICK TO CONFIRM"; setTimeout(() => { if(btn.dataset.state === "1") resetDeleteAllBtn(); }, 3000); }
+            else if (btn.dataset.state === "1") { btn.dataset.state = "2"; startDeleteCountdown(5); }
+            else if (btn.dataset.state === "2") { stopDeleteCountdown(); }
+        }
+
+        function startDeleteCountdown(seconds) {
+            const btn = document.getElementById('delete-all-btn'); let left = seconds; btn.innerText = `CANCEL IN ${left}S`;
+            deleteTimer = setInterval(() => { left--; if (left <= 0) { clearInterval(deleteTimer); btn.innerText = "DELETING..."; btn.disabled = true; executeDeleteAll(); } else { btn.innerText = `CANCEL IN ${left}S`; } }, 1000);
+        }
+
+        function stopDeleteCountdown() { clearInterval(deleteTimer); resetDeleteAllBtn(); }
+        function resetDeleteAllBtn() { const btn = document.getElementById('delete-all-btn'); btn.dataset.state = "0"; btn.innerText = "DELETE ALL POSTS"; btn.disabled = false; }
+
+        async function executeDeleteAll() {
+            const res = await fetch(`${API_URL}/posts?skip=0&limit=100`);
+            const posts = await res.json();
+            for (const p of posts) { await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); }
+            fetchStatuses(true); resetDeleteAllBtn(); closeMenu();
         }
 
         checkRememberedLogin();
