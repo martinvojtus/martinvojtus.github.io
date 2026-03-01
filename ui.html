@@ -109,7 +109,7 @@
         main {
             padding: calc(3rem + var(--gap-item)) var(--gap-item) var(--gap-item); 
             width: 100%; max-width: var(--content-width); 
-            flex-grow: 1; display: block; 
+            flex-grow: 1; display: flex; flex-direction: column; align-items: center; 
         }
 
         #section-feed { display: block; width: 100%; }
@@ -141,13 +141,6 @@
         }
         .status-feed.view-grid .status-media-wrapper {
             background-color: transparent; 
-        }
-
-        .feed-toggle-wrapper {
-            display: flex; justify-content: center; width: 100%;
-        }
-        .grid-toggle-wrapper {
-            display: flex; justify-content: center; width: 100%; 
         }
 
         .status-card { display: flex; flex-direction: column; position: relative; }
@@ -348,7 +341,7 @@
         .status-text-overlay-content {
             font-size: var(--size-small); 
             color: var(--black);
-            padding: 2rem; 
+            padding: 1rem; 
             max-height: 100%; 
             overflow-y: auto; 
             width: 100%;
@@ -437,17 +430,18 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.6.2 • 2026</div>
+            <div class="footer-info">build v6.6.3 • 2026</div>
         </div>
     </nav>
 
     <main>
-        <div id="admin-upload-zone">
-            <div id="editor-collapsed-state" class="submit-btn btn-tonal" style="width: 100%;" onclick="expandEditor()">
-                +
-            </div>
+        <div id="top-actions" class="action-row" style="margin-bottom: var(--gap-item); width: 100%; display: none;">
+            <div id="btn-expand-editor" class="submit-btn btn-tonal" style="display: none; flex: 1;" onclick="expandEditor()">+</div>
+            <button id="btn-toggle-view" class="submit-btn btn-tonal" style="display: none; flex: 1;" onclick="toggleViewMode()">GRID VIEW</button>
+        </div>
 
-            <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
+        <div id="admin-upload-zone">
+            <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                 <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
                 
                 <div id="upload-empty-state" class="submit-btn btn-tonal" style="width: 100%;" onclick="document.getElementById('edit-image').click()">
@@ -555,13 +549,15 @@
         }
 
         function expandEditor() {
-            document.getElementById('editor-collapsed-state').style.display = 'none';
-            document.getElementById('editor-form').style.display = 'flex';
+            document.getElementById('top-actions').style.display = 'none';
+            document.getElementById('admin-upload-zone').style.display = 'flex';
         }
 
         function collapseEditor() {
-            document.getElementById('editor-collapsed-state').style.display = 'flex';
-            document.getElementById('editor-form').style.display = 'none';
+            if (secretKey || globalPosts.length > 0) {
+                document.getElementById('top-actions').style.display = 'flex';
+            }
+            document.getElementById('admin-upload-zone').style.display = 'none';
             resetEditor(); 
         }
 
@@ -584,16 +580,21 @@
         }
 
         function updateUIVisibility() {
+            const expandBtn = document.getElementById('btn-expand-editor');
+            const topActions = document.getElementById('top-actions');
+            
             if (secretKey) {
                 document.body.classList.add('is-logged-in');
                 document.getElementById('login-ui').style.display = 'none';
-                document.getElementById('admin-upload-zone').style.display = 'flex';
                 document.getElementById('logout-ui').style.display = 'flex';
+                if (expandBtn) expandBtn.style.display = 'flex';
+                topActions.style.display = 'flex';
             } else {
                 document.body.classList.remove('is-logged-in');
                 document.getElementById('login-ui').style.display = 'flex';
-                document.getElementById('admin-upload-zone').style.display = 'none';
                 document.getElementById('logout-ui').style.display = 'none';
+                if (expandBtn) expandBtn.style.display = 'none';
+                collapseEditor();
             }
         }
 
@@ -655,15 +656,14 @@
             localStorage.removeItem('mv_admin_key');
             updateUIVisibility();
             closeMenu();
-            resetEditor();
-            document.getElementById('editor-collapsed-state').style.display = 'flex';
-            document.getElementById('editor-form').style.display = 'none';
             refreshFeedUI();
         }
 
         function refreshFeedUI() { 
             const container = document.getElementById('status-container');
             const deleteAllBtn = document.getElementById('delete-all-btn');
+            const topActions = document.getElementById('top-actions');
+            const toggleBtn = document.getElementById('btn-toggle-view');
 
             if (deleteAllBtn) {
                 if (globalPosts.length === 0) {
@@ -676,10 +676,13 @@
             }
             
             if (globalPosts.length === 0) {
+                if (toggleBtn) toggleBtn.style.display = 'none';
                 container.className = 'status-feed view-feed';
+                
                 if (secretKey) {
                     container.innerHTML = ``;
                 } else {
+                    topActions.style.display = 'none';
                     container.innerHTML = `
                         <div class="submit-btn btn-tonal-disabled" style="width: 100%; cursor: default;">
                             NOTHING HERE YET.
@@ -689,25 +692,21 @@
                 return;
             }
 
+            topActions.style.display = 'flex';
+            if (toggleBtn) {
+                toggleBtn.style.display = 'flex';
+                toggleBtn.innerText = currentViewMode === 'feed' ? 'GRID VIEW' : 'FEED VIEW';
+            }
+
             if (currentViewMode === 'feed') {
                 container.className = 'status-feed view-feed';
-                let html = `
-                    <div class="feed-toggle-wrapper">
-                        <button class="submit-btn btn-tonal" style="width: 100%;" onclick="toggleViewMode()">GRID VIEW</button>
-                    </div>
-                `;
+                let html = '';
                 globalPosts.forEach(post => { html += renderSinglePost(post); });
                 container.innerHTML = html;
             } else {
                 container.className = 'status-feed view-grid';
                 let leftCol = '<div class="masonry-col col-left">';
                 let rightCol = '<div class="masonry-col col-right">';
-
-                rightCol += `
-                    <div class="grid-toggle-wrapper">
-                        <button class="submit-btn btn-tonal" style="width: 100%;" onclick="toggleViewMode()">FEED VIEW</button>
-                    </div>
-                `;
 
                 globalPosts.forEach((post, index) => {
                     if (index % 2 === 0) leftCol += renderSinglePost(post);
