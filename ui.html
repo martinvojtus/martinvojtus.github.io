@@ -193,10 +193,10 @@
             background: rgba(var(--glass-rgb), var(--glass-opacity)); 
             backdrop-filter: blur(var(--glass-blur)); 
             -webkit-backdrop-filter: blur(var(--glass-blur));
-            /* 🛠️ Upravené pre väčší text: 1rem zaoblenie, mierne širší padding */
-            padding: 0.5rem 0.75rem; 
+            /* 🛠️ OPRAVA: Vrátený kompaktný stlačený padding presne na 0.5rem */
+            padding: 0.5rem; 
             border-radius: 1rem; 
-            font-size: var(--size-small); /* 🛠️ Písmo zmenené na 1rem */
+            font-size: var(--size-small); 
             color: var(--black);
             text-transform: uppercase;
             line-height: 1;
@@ -384,7 +384,7 @@
         .status-text-overlay-content {
             font-size: var(--size-small); 
             color: var(--black);
-            padding: 2rem; 
+            padding: 1rem; 
             max-height: 100%; 
             overflow-y: auto; 
             width: 100%;
@@ -473,7 +473,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.6.7 • 2026</div>
+            <div class="footer-info">build v6.6.8 • 2026</div>
         </div>
     </nav>
 
@@ -494,6 +494,7 @@
                     <div class="thumbnail-container" onclick="document.getElementById('edit-image').click()">
                         <img id="upload-preview-img" class="thumbnail-img" src="" alt="">
                     </div>
+                    <div id="edit-post-id-display" class="submit-btn btn-tonal-disabled" style="display: none; flex-grow: 1;"></div>
                     <div class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="clearImageSelection(event)">DELETE IMAGE</div>
                 </div>
 
@@ -993,6 +994,7 @@
             const filledState = document.getElementById('upload-filled-state');
             const thumbnail = document.getElementById('upload-preview-img');
             const pubBtn = document.getElementById('publish-btn');
+            const idDisplay = document.getElementById('edit-post-id-display');
 
             const hasImage = (input && input.files && input.files.length > 0) || existingImageUrl;
 
@@ -1010,6 +1012,19 @@
                 
                 if(emptyState) emptyState.style.display = 'flex';
                 if(filledState) filledState.style.display = 'none';
+            }
+
+            // 🛠️ Logika pre zobrazenie ID príspevku pri editovaní
+            if (editingPostId) {
+                if (idDisplay) {
+                    idDisplay.style.display = 'flex';
+                    idDisplay.innerText = '#' + editingPostId;
+                }
+            } else {
+                if (idDisplay) {
+                    idDisplay.style.display = 'none';
+                    idDisplay.innerText = '';
+                }
             }
 
             if (pubBtn) {
