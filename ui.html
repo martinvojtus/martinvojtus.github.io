@@ -61,11 +61,10 @@
             min-height: 100vh;
         }
 
-        .submit-btn, .form-input {
+        .submit-btn, .form-input, .admin-bar-item {
             line-height: 1;
         }
 
-        /* 🛠️ Hardvérová akcelerácia presunutá na nové triedy piluliek */
         header, .nav-overlay, .status-glass-pill, .status-confirm-overlay, #delete-modal, .status-text-overlay {
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
@@ -134,7 +133,6 @@
             display: flex; flex-direction: column; gap: var(--gap-item); flex: 1; min-width: 0;
         }
 
-        /* 🛠️ Skrytie nových piluliek a overlayov v Grid móde */
         .status-feed.view-grid .status-pills-top,
         .status-feed.view-grid .status-pills-bottom,
         .status-feed.view-grid .status-confirm-overlay,
@@ -167,22 +165,21 @@
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
 
-        /* 🛠️ Nové rozloženie "Piluliek" nad obrázkom */
         .status-pills-top {
             position: absolute;
-            top: 0.5rem; /* Odsadenie od horného okraja fotky */
-            left: 0.5rem; /* Odsadenie od ľavého okraja fotky */
-            right: 0.5rem; /* Odsadenie od pravého okraja fotky */
+            top: 0.5rem; 
+            left: 0.5rem; 
+            right: 0.5rem; 
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             z-index: 10;
-            pointer-events: none; /* Umožní kliknúť cez voľný priestor na fotku */
+            pointer-events: none; 
         }
 
         .status-pills-bottom {
             position: absolute;
-            bottom: 0.5rem; /* Odsadenie od spodného okraja fotky */
+            bottom: 0.5rem; 
             left: 0.5rem;
             right: 0.5rem;
             display: flex;
@@ -196,13 +193,14 @@
             background: rgba(var(--glass-rgb), var(--glass-opacity)); 
             backdrop-filter: blur(var(--glass-blur)); 
             -webkit-backdrop-filter: blur(var(--glass-blur));
-            padding: 0.5rem; /* Vnútorný okraj pilulky */
-            border-radius: 0.5rem; /* Zaoblenie pilulky */
-            font-size: 0.5rem; /* Extrémne minimalistický text (cca 8px) */
+            /* 🛠️ Upravené pre väčší text: 1rem zaoblenie, mierne širší padding */
+            padding: 0.5rem 0.75rem; 
+            border-radius: 1rem; 
+            font-size: var(--size-small); /* 🛠️ Písmo zmenené na 1rem */
             color: var(--black);
             text-transform: uppercase;
             line-height: 1;
-            pointer-events: auto; /* Samotná pilulka je klikateľná */
+            pointer-events: auto; 
             display: flex;
             align-items: center;
             justify-content: center;
@@ -210,23 +208,22 @@
             cursor: default;
         }
 
-        /* Modifikátory pre pilulky */
-        .pill-btn { cursor: pointer; } /* Kurzór pre klikateľné tlačidlá */
+        .pill-btn { cursor: pointer; } 
         
         .pill-center {
             position: absolute;
             left: 50%;
-            transform: translateX(-50%) translateZ(0); /* Vycentrovanie + hardvérová akcelerácia */
+            transform: translateX(-50%) translateZ(0); 
         }
 
         .pill-group {
             display: flex;
-            gap: 0.5rem; /* Medzera medzi Read More a Edit */
-            pointer-events: none; /* Nechá prebublať kliky medzi tlačidlami */
+            gap: 0.5rem; 
+            pointer-events: none; 
         }
 
         .pill-title {
-            max-width: 50%; /* Zabráni, aby dlhý titulok roztlačil Edit tlačidlá */
+            max-width: 50%; 
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -387,7 +384,7 @@
         .status-text-overlay-content {
             font-size: var(--size-small); 
             color: var(--black);
-            padding: 1rem; 
+            padding: 2rem; 
             max-height: 100%; 
             overflow-y: auto; 
             width: 100%;
@@ -476,7 +473,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.6.6 • 2026</div>
+            <div class="footer-info">build v6.6.7 • 2026</div>
         </div>
     </nav>
 
@@ -903,7 +900,6 @@
         function renderSinglePost(s) {
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
-            // 🛠️ Nové rozloženie hornej lišty pomocou "Pill" elementov
             let barHtmlTop = `
             <div class="status-pills-top">
                 ${secretKey ? `<div class="status-glass-pill">#${s.id}</div>` : '<div></div>'}
@@ -917,7 +913,6 @@
             if (s.title || s.text || secretKey) {
                 let displayTitle = s.title || 'UNTITLED';
                 
-                // 🛠️ Nové rozloženie dolnej lišty pomocou "Pill" elementov
                 barHtmlBottom = `
                 <div class="status-pills-bottom">
                     <div class="status-glass-pill pill-btn pill-title" onclick="toggleTextOverlay(event, ${s.id})">${displayTitle}</div>
