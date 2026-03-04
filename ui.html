@@ -161,6 +161,35 @@
             background-color: var(--divider); 
         }
 
+        .status-glass-bar {
+            height: 3rem; width: 100%;
+            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
+            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+            position: absolute; top: 0; left: 0; right: 0;
+            z-index: 10;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 var(--gap-item);
+        }
+
+        .status-glass-bar-bottom {
+            height: 3rem; width: 100%;
+            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
+            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+            position: absolute; bottom: 0; left: 0; right: 0;
+            z-index: 10;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 var(--gap-item);
+        }
+
+        .status-text-content {
+            font-size: var(--size-small); color: var(--grey-50);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            flex-grow: 1; text-align: left; cursor: pointer;
+        }
+
+        .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
+        .admin-delete-link { cursor: pointer; color: var(--black); text-decoration: none; }
+
         .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); cursor: pointer; }
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
@@ -193,9 +222,9 @@
             background: rgba(var(--glass-rgb), var(--glass-opacity)); 
             backdrop-filter: blur(var(--glass-blur)); 
             -webkit-backdrop-filter: blur(var(--glass-blur));
-            /* 🛠️ OPRAVA: Vrátený kompaktný stlačený padding presne na 0.5rem */
             padding: 0.5rem; 
-            border-radius: 1rem; 
+            /* 🛠️ OPRAVA: Zaoblenie vrátené na 0.5rem pre hranatejší "pill" vzhľad */
+            border-radius: 0.5rem; 
             font-size: var(--size-small); 
             color: var(--black);
             text-transform: uppercase;
@@ -473,7 +502,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.6.8 • 2026</div>
+            <div class="footer-info">build v6.6.9 • 2026</div>
         </div>
     </nav>
 
@@ -1014,7 +1043,6 @@
                 if(filledState) filledState.style.display = 'none';
             }
 
-            // 🛠️ Logika pre zobrazenie ID príspevku pri editovaní
             if (editingPostId) {
                 if (idDisplay) {
                     idDisplay.style.display = 'flex';
