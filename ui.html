@@ -61,11 +61,12 @@
             min-height: 100vh;
         }
 
-        .submit-btn, .form-input, .admin-bar-item {
+        .submit-btn, .form-input {
             line-height: 1;
         }
 
-        header, .nav-overlay, .status-glass-bar, .status-glass-bar-bottom, .status-confirm-overlay, #delete-modal, .status-text-overlay {
+        /* 🛠️ Hardvérová akcelerácia presunutá na nové triedy piluliek */
+        header, .nav-overlay, .status-glass-pill, .status-confirm-overlay, #delete-modal, .status-text-overlay {
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
         }
@@ -133,8 +134,9 @@
             display: flex; flex-direction: column; gap: var(--gap-item); flex: 1; min-width: 0;
         }
 
-        .status-feed.view-grid .status-glass-bar,
-        .status-feed.view-grid .status-glass-bar-bottom,
+        /* 🛠️ Skrytie nových piluliek a overlayov v Grid móde */
+        .status-feed.view-grid .status-pills-top,
+        .status-feed.view-grid .status-pills-bottom,
         .status-feed.view-grid .status-confirm-overlay,
         .status-feed.view-grid .status-text-overlay {
             display: none !important;
@@ -161,38 +163,75 @@
             background-color: var(--divider); 
         }
 
-        .status-glass-bar {
-            height: 3rem; width: 100%;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
-            position: absolute; top: 0; left: 0; right: 0;
-            z-index: 10;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 var(--gap-item);
-        }
-
-        .status-glass-bar-bottom {
-            height: 3rem; width: 100%;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
-            position: absolute; bottom: 0; left: 0; right: 0;
-            z-index: 10;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 var(--gap-item);
-        }
-
-        .status-text-content {
-            font-size: var(--size-small); color: var(--grey-50);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            flex-grow: 1; text-align: left; cursor: pointer;
-        }
-
-        .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
-        .admin-delete-link { cursor: pointer; color: var(--black); text-decoration: none; }
-
         .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); cursor: pointer; }
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
+
+        /* 🛠️ Nové rozloženie "Piluliek" nad obrázkom */
+        .status-pills-top {
+            position: absolute;
+            top: 0.5rem; /* Odsadenie od horného okraja fotky */
+            left: 0.5rem; /* Odsadenie od ľavého okraja fotky */
+            right: 0.5rem; /* Odsadenie od pravého okraja fotky */
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 10;
+            pointer-events: none; /* Umožní kliknúť cez voľný priestor na fotku */
+        }
+
+        .status-pills-bottom {
+            position: absolute;
+            bottom: 0.5rem; /* Odsadenie od spodného okraja fotky */
+            left: 0.5rem;
+            right: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .status-glass-pill {
+            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
+            backdrop-filter: blur(var(--glass-blur)); 
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            padding: 0.5rem; /* Vnútorný okraj pilulky */
+            border-radius: 0.5rem; /* Zaoblenie pilulky */
+            font-size: 0.5rem; /* Extrémne minimalistický text (cca 8px) */
+            color: var(--black);
+            text-transform: uppercase;
+            line-height: 1;
+            pointer-events: auto; /* Samotná pilulka je klikateľná */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            cursor: default;
+        }
+
+        /* Modifikátory pre pilulky */
+        .pill-btn { cursor: pointer; } /* Kurzór pre klikateľné tlačidlá */
+        
+        .pill-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%) translateZ(0); /* Vycentrovanie + hardvérová akcelerácia */
+        }
+
+        .pill-group {
+            display: flex;
+            gap: 0.5rem; /* Medzera medzi Read More a Edit */
+            pointer-events: none; /* Nechá prebublať kliky medzi tlačidlami */
+        }
+
+        .pill-title {
+            max-width: 50%; /* Zabráni, aby dlhý titulok roztlačil Edit tlačidlá */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
 
         .form-input, .submit-btn { 
             border-radius: var(--border-radius); 
@@ -783,7 +822,6 @@
 
         window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
 
-        // 🛠️ OPRAVA SCROLLOVANIA: Smart Anchor technika pre elimináciu posunu pri asynchrónnom načítaní
         function toggleGlassBar(imgElement, id) {
             if (currentViewMode === 'grid') {
                 currentViewMode = 'feed';
@@ -797,7 +835,6 @@
                     }
                 };
 
-                // Poistkové iterácie centrovania kým sa načítavajú ostatné fotky zhora
                 setTimeout(() => scrollIt('auto'), 50);
                 setTimeout(() => scrollIt('auto'), 300);
                 setTimeout(() => scrollIt('smooth'), 600);
@@ -805,7 +842,7 @@
                 return;
             }
 
-            const bars = imgElement.parentElement.querySelectorAll('.status-glass-bar, .status-glass-bar-bottom');
+            const bars = imgElement.parentElement.querySelectorAll('.status-pills-top, .status-pills-bottom');
             if (bars.length > 0) {
                 const isHidden = bars[0].style.display === 'none';
                 if (isHidden) {
@@ -827,7 +864,7 @@
             const overlay = document.getElementById(`text-overlay-${id}`);
             if (overlay) {
                 const card = overlay.closest('.status-card');
-                const bars = card.querySelectorAll('.status-glass-bar, .status-glass-bar-bottom');
+                const bars = card.querySelectorAll('.status-pills-top, .status-pills-bottom');
                 
                 if (overlay.style.display === 'none' || overlay.style.display === '') {
                     overlay.style.display = 'flex';
@@ -866,11 +903,12 @@
         function renderSinglePost(s) {
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
+            // 🛠️ Nové rozloženie hornej lišty pomocou "Pill" elementov
             let barHtmlTop = `
-            <div class="status-glass-bar">
-                ${secretKey ? `<span class="admin-bar-item" style="color: var(--grey-50);">#${s.id}</span>` : '<div></div>'}
-                <span class="admin-bar-item" style="position: absolute; left: 50%; transform: translateX(-50%); color: var(--grey-50);">${formattedDate}</span>
-                ${secretKey ? `<span onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>` : '<div></div>'}
+            <div class="status-pills-top">
+                ${secretKey ? `<div class="status-glass-pill">#${s.id}</div>` : '<div></div>'}
+                <div class="status-glass-pill pill-center">${formattedDate}</div>
+                ${secretKey ? `<div class="status-glass-pill pill-btn" onclick="handleDeleteFeed(${s.id})">DELETE</div>` : '<div></div>'}
             </div>`;
 
             let barHtmlBottom = '';
@@ -879,11 +917,14 @@
             if (s.title || s.text || secretKey) {
                 let displayTitle = s.title || 'UNTITLED';
                 
+                // 🛠️ Nové rozloženie dolnej lišty pomocou "Pill" elementov
                 barHtmlBottom = `
-                <div class="status-glass-bar-bottom">
-                    <span class="status-text-content" onclick="toggleTextOverlay(event, ${s.id})">${displayTitle}</span>
-                    <span class="admin-bar-item admin-delete-link" onclick="toggleTextOverlay(event, ${s.id})" style="margin-left: var(--gap-item);">READ MORE</span>
-                    ${secretKey ? `<span onclick="handleEditPost(event, ${s.id})" class="admin-bar-item admin-delete-link" style="margin-left: var(--gap-item);">EDIT</span>` : ''}
+                <div class="status-pills-bottom">
+                    <div class="status-glass-pill pill-btn pill-title" onclick="toggleTextOverlay(event, ${s.id})">${displayTitle}</div>
+                    <div class="pill-group">
+                        <div class="status-glass-pill pill-btn" onclick="toggleTextOverlay(event, ${s.id})">READ MORE</div>
+                        ${secretKey ? `<div class="status-glass-pill pill-btn" onclick="handleEditPost(event, ${s.id})">EDIT</div>` : ''}
+                    </div>
                 </div>`;
 
                 if (s.title || s.text) {
@@ -997,7 +1038,7 @@
 
         function handleDeleteFeed(id) {
             const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
-            const bars = card.querySelectorAll('.status-glass-bar, .status-glass-bar-bottom');
+            const bars = card.querySelectorAll('.status-pills-top, .status-pills-bottom');
             bars.forEach(b => b.style.display = 'none');
             
             document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
@@ -1009,7 +1050,7 @@
         function closeFeedDelete(id) {
             document.getElementById(`confirm-overlay-${id}`).style.display = 'none';
             const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
-            const bars = card.querySelectorAll('.status-glass-bar, .status-glass-bar-bottom');
+            const bars = card.querySelectorAll('.status-pills-top, .status-pills-bottom');
             bars.forEach(b => b.style.display = 'flex');
         }
 
