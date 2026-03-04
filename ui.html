@@ -437,7 +437,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.6.5 • 2026</div>
+            <div class="footer-info">build v6.6.6 • 2026</div>
         </div>
     </nav>
 
@@ -662,7 +662,6 @@
             refreshFeedUI();
         }
 
-        // 🛠️ Pôvodná logika pre generovanie prepínačov zobrazenia (GRID / FEED)
         function refreshFeedUI() { 
             const container = document.getElementById('status-container');
             const deleteAllBtn = document.getElementById('delete-all-btn');
@@ -693,7 +692,6 @@
 
             if (currentViewMode === 'feed') {
                 container.className = 'status-feed view-feed';
-                // 🛠️ GRID VIEW sa generuje ako prvý prvok vo Feede
                 let html = `
                     <div class="feed-toggle-wrapper">
                         <button class="submit-btn btn-tonal" style="width: 100%;" onclick="toggleViewMode()">GRID VIEW</button>
@@ -706,7 +704,6 @@
                 let leftCol = '<div class="masonry-col col-left">';
                 let rightCol = '<div class="masonry-col col-right">';
 
-                // 🛠️ FEED VIEW sa generuje ako prvý prvok v pravej časti mriežky
                 rightCol += `
                     <div class="grid-toggle-wrapper">
                         <button class="submit-btn btn-tonal" style="width: 100%;" onclick="toggleViewMode()">FEED VIEW</button>
@@ -786,18 +783,25 @@
 
         window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
 
+        // 🛠️ OPRAVA SCROLLOVANIA: Smart Anchor technika pre elimináciu posunu pri asynchrónnom načítaní
         function toggleGlassBar(imgElement, id) {
             if (currentViewMode === 'grid') {
                 currentViewMode = 'feed';
                 localStorage.setItem('mv_view_mode', 'feed');
                 refreshFeedUI();
                 
-                setTimeout(() => {
+                const scrollIt = (behavior) => {
                     const targetImg = document.getElementById(`post-img-${id}`);
                     if (targetImg) {
-                        targetImg.closest('.status-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        targetImg.closest('.status-card').scrollIntoView({ behavior: behavior, block: 'center' });
                     }
-                }, 100); 
+                };
+
+                // Poistkové iterácie centrovania kým sa načítavajú ostatné fotky zhora
+                setTimeout(() => scrollIt('auto'), 50);
+                setTimeout(() => scrollIt('auto'), 300);
+                setTimeout(() => scrollIt('smooth'), 600);
+                
                 return;
             }
 
