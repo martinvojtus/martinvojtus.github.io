@@ -65,7 +65,7 @@
             line-height: 1;
         }
 
-        header, .nav-overlay, .status-glass-pill, .status-confirm-overlay, #delete-modal {
+        header, .nav-overlay, .status-glass-bar, .status-confirm-overlay, #delete-modal {
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
         }
@@ -133,7 +133,7 @@
             display: flex; flex-direction: column; gap: var(--gap-item); flex: 1; min-width: 0;
         }
 
-        .status-feed.view-grid .status-pills-top,
+        .status-feed.view-grid .status-glass-bar,
         .status-feed.view-grid .status-confirm-overlay {
             display: none !important;
         }
@@ -159,47 +159,23 @@
             background-color: var(--divider); 
         }
 
+        /* 🛠️ Návrat k jednoliatej sklenenej lište */
+        .status-glass-bar {
+            height: 3rem; width: 100%;
+            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
+            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+            position: absolute; top: 0; left: 0; right: 0;
+            z-index: 10;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 var(--gap-item);
+        }
+
+        .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
+        .admin-delete-link { cursor: pointer; color: var(--black); text-decoration: none; }
+
         .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); cursor: pointer; }
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
-
-        .status-pills-top {
-            position: absolute;
-            top: 0.5rem; 
-            left: 0.5rem; 
-            right: 0.5rem; 
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            z-index: 10;
-            pointer-events: none; 
-        }
-
-        .status-glass-pill {
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); 
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            padding: 0.5rem; 
-            border-radius: 0.5rem; 
-            font-size: var(--size-small); 
-            color: var(--black);
-            text-transform: uppercase;
-            line-height: 1;
-            pointer-events: auto; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            white-space: nowrap;
-            cursor: default;
-        }
-
-        .pill-btn { cursor: pointer; } 
-        
-        .pill-center {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%) translateZ(0); 
-        }
 
         .form-input, .submit-btn { 
             border-radius: var(--border-radius); 
@@ -285,13 +261,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover; 
-        }
-        
-        .preview-add-text {
-            font-size: var(--size-small);
-            color: var(--black);
-            text-transform: uppercase;
-            position: absolute;
         }
 
         .custom-checkbox {
@@ -383,7 +352,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.7.0 • 2026</div>
+            <div class="footer-info">build v6.7.1 • 2026</div>
         </div>
     </nav>
 
@@ -447,7 +416,6 @@
         const API_URL = "https://mv-backend-ak8l.onrender.com";
         let secretKey = ""; let globalPosts = []; 
         let currentOffset = 0; const postsLimit = 10; let isLoading = false; let hasMorePosts = true;
-        
         let deleteActionType = null;
         
         let currentViewMode = localStorage.getItem('mv_view_mode') || 'grid';
@@ -712,7 +680,7 @@
                 return;
             }
 
-            const bars = imgElement.parentElement.querySelectorAll('.status-pills-top');
+            const bars = imgElement.parentElement.querySelectorAll('.status-glass-bar');
             if (bars.length > 0) {
                 const isHidden = bars[0].style.display === 'none';
                 if (isHidden) {
@@ -731,11 +699,12 @@
         function renderSinglePost(s) {
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
+            // 🛠️ Vrátená klasická "sklenená lišta"
             let barHtmlTop = `
-            <div class="status-pills-top">
-                ${secretKey ? `<div class="status-glass-pill">#${s.id}</div>` : '<div></div>'}
-                <div class="status-glass-pill pill-center">${formattedDate}</div>
-                ${secretKey ? `<div class="status-glass-pill pill-btn" onclick="handleDeleteFeed(${s.id})">DELETE</div>` : '<div></div>'}
+            <div class="status-glass-bar">
+                ${secretKey ? `<span class="admin-bar-item" style="color: var(--grey-50);">#${s.id}</span>` : '<div></div>'}
+                <span class="admin-bar-item" style="position: absolute; left: 50%; transform: translateX(-50%); color: var(--grey-50);">${formattedDate}</span>
+                ${secretKey ? `<span onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>` : '<div></div>'}
             </div>`;
 
             const imageHtml = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="status-image" alt="image" loading="lazy" onclick="toggleGlassBar(this, ${s.id})">` : '';
@@ -824,7 +793,7 @@
 
         function handleDeleteFeed(id) {
             const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
-            const bars = card.querySelectorAll('.status-pills-top');
+            const bars = card.querySelectorAll('.status-glass-bar');
             bars.forEach(b => b.style.display = 'none');
             
             document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
@@ -836,7 +805,7 @@
         function closeFeedDelete(id) {
             document.getElementById(`confirm-overlay-${id}`).style.display = 'none';
             const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
-            const bars = card.querySelectorAll('.status-pills-top');
+            const bars = card.querySelectorAll('.status-glass-bar');
             bars.forEach(b => b.style.display = 'flex');
         }
 
@@ -911,7 +880,6 @@
                 const upData = await upRes.json();
                 const finalImageUrl = upData.image_url;
 
-                // 🛠️ Odosielame payload s prázdnym textom a titulkom pre kompatibilitu backendu
                 const payload = { title: "", text: "", image_url: finalImageUrl, show_date: true, author: "" };
                 
                 const res = await fetch(`${API_URL}/posts`, {
