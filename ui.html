@@ -65,7 +65,7 @@
             line-height: 1;
         }
 
-        header, .nav-overlay, .status-glass-pill, .status-confirm-overlay, #delete-modal, .status-text-overlay {
+        header, .nav-overlay, .status-glass-pill, .status-confirm-overlay, #delete-modal {
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
         }
@@ -134,9 +134,7 @@
         }
 
         .status-feed.view-grid .status-pills-top,
-        .status-feed.view-grid .status-pills-bottom,
-        .status-feed.view-grid .status-confirm-overlay,
-        .status-feed.view-grid .status-text-overlay {
+        .status-feed.view-grid .status-confirm-overlay {
             display: none !important;
         }
         .status-feed.view-grid .status-media-wrapper {
@@ -161,35 +159,6 @@
             background-color: var(--divider); 
         }
 
-        .status-glass-bar {
-            height: 3rem; width: 100%;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
-            position: absolute; top: 0; left: 0; right: 0;
-            z-index: 10;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 var(--gap-item);
-        }
-
-        .status-glass-bar-bottom {
-            height: 3rem; width: 100%;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
-            position: absolute; bottom: 0; left: 0; right: 0;
-            z-index: 10;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 var(--gap-item);
-        }
-
-        .status-text-content {
-            font-size: var(--size-small); color: var(--grey-50);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            flex-grow: 1; text-align: left; cursor: pointer;
-        }
-
-        .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
-        .admin-delete-link { cursor: pointer; color: var(--black); text-decoration: none; }
-
         .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); cursor: pointer; }
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
@@ -206,24 +175,11 @@
             pointer-events: none; 
         }
 
-        .status-pills-bottom {
-            position: absolute;
-            bottom: 0.5rem; 
-            left: 0.5rem;
-            right: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            z-index: 10;
-            pointer-events: none;
-        }
-
         .status-glass-pill {
             background: rgba(var(--glass-rgb), var(--glass-opacity)); 
             backdrop-filter: blur(var(--glass-blur)); 
             -webkit-backdrop-filter: blur(var(--glass-blur));
             padding: 0.5rem; 
-            /* 🛠️ OPRAVA: Zaoblenie vrátené na 0.5rem pre hranatejší "pill" vzhľad */
             border-radius: 0.5rem; 
             font-size: var(--size-small); 
             color: var(--black);
@@ -245,20 +201,6 @@
             transform: translateX(-50%) translateZ(0); 
         }
 
-        .pill-group {
-            display: flex;
-            gap: 0.5rem; 
-            pointer-events: none; 
-        }
-
-        .pill-title {
-            max-width: 50%; 
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            display: block;
-        }
-
         .form-input, .submit-btn { 
             border-radius: var(--border-radius); 
             font-size: var(--size-small); padding: 0 var(--gap-item); 
@@ -273,16 +215,6 @@
             border: 1px solid var(--divider); 
         }
         .form-input::placeholder { color: var(--grey-50); } 
-
-        textarea.form-input {
-            height: auto; 
-            min-height: 3rem; 
-            padding-top: 0.8rem;
-            padding-bottom: 0.8rem;
-            line-height: 1.5;
-            resize: none; 
-            overflow: hidden; 
-        }
 
         .submit-btn { 
             height: 3rem;
@@ -392,57 +324,6 @@
             z-index: -1;
         }
 
-        .status-text-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 15;
-            display: none; flex-direction: column; justify-content: flex-start; align-items: flex-start;
-            border-radius: var(--border-radius);
-            background: transparent;
-            cursor: pointer;
-        }
-        .status-text-overlay::before {
-            content: "";
-            position: absolute; inset: 0;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); 
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border-radius: inherit;
-            z-index: -1;
-        }
-        
-        .status-text-overlay-content {
-            font-size: var(--size-small); 
-            color: var(--black);
-            padding: 1rem; 
-            max-height: 100%; 
-            overflow-y: auto; 
-            width: 100%;
-            line-height: 1.6;
-            -ms-overflow-style: none;  
-            scrollbar-width: none;  
-        }
-        .status-text-overlay-content::-webkit-scrollbar {
-            display: none; 
-        }
-        
-        .status-text-overlay-title {
-            font-size: var(--size-large);
-            font-weight: 400; 
-            line-height: 1.1;
-            margin-bottom: var(--gap-item);
-            word-wrap: break-word;
-        }
-        
-        .status-text-overlay-body {
-            text-align: justify;
-            white-space: pre-wrap; 
-            -webkit-hyphens: auto;
-            -ms-hyphens: auto;
-            hyphens: auto;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-        }
-
         #delete-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 3000;
@@ -502,7 +383,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.6.9 • 2026</div>
+            <div class="footer-info">build v6.7.0 • 2026</div>
         </div>
     </nav>
 
@@ -523,17 +404,12 @@
                     <div class="thumbnail-container" onclick="document.getElementById('edit-image').click()">
                         <img id="upload-preview-img" class="thumbnail-img" src="" alt="">
                     </div>
-                    <div id="edit-post-id-display" class="submit-btn btn-tonal-disabled" style="display: none; flex-grow: 1;"></div>
                     <div class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="clearImageSelection(event)">DELETE IMAGE</div>
                 </div>
 
                 <div id="upload-details-zone" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;">
-                    <input type="text" id="edit-title" class="form-input" placeholder="Image title..." style="width: 100%;" oninput="updateTextUIState()">
-                    <textarea id="edit-text" class="form-input" placeholder="Image description..." style="width: 100%;" oninput="autoResizeTextarea(this); updateTextUIState();"></textarea>
-                    
                     <div id="upload-action-row" class="action-row" style="padding: 0;">
                         <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
-                        <div id="clear-text-btn" class="submit-btn btn-tonal-disabled" onclick="clearTextFields(event)">CLEAR</div>
                         <div class="submit-btn btn-tonal" onclick="collapseEditor()">CANCEL</div>
                     </div>
                     <div id="upload-loading-row" class="action-row" style="display: none; padding: 0;">
@@ -573,8 +449,6 @@
         let currentOffset = 0; const postsLimit = 10; let isLoading = false; let hasMorePosts = true;
         
         let deleteActionType = null;
-        let editingPostId = null;
-        let existingImageUrl = null;
         
         let currentViewMode = localStorage.getItem('mv_view_mode') || 'grid';
 
@@ -587,37 +461,6 @@
                 passInput.classList.remove('input-error');
                 passInput.placeholder = 'Password...';
             });
-        }
-
-        function autoResizeTextarea(el) {
-            el.style.height = 'auto'; 
-            el.style.height = el.scrollHeight + 'px'; 
-        }
-
-        function updateTextUIState() {
-            const titleInput = document.getElementById('edit-title');
-            const textInput = document.getElementById('edit-text');
-            const clearBtn = document.getElementById('clear-text-btn');
-            
-            if (!clearBtn) return;
-
-            const hasText = (titleInput && titleInput.value.trim().length > 0) || 
-                            (textInput && textInput.value.trim().length > 0);
-                            
-            if (hasText) {
-                clearBtn.className = "submit-btn btn-tonal";
-            } else {
-                clearBtn.className = "submit-btn btn-tonal-disabled";
-            }
-        }
-
-        function clearTextFields(e) {
-            if(e) e.stopPropagation();
-            document.getElementById('edit-title').value = "";
-            const textInput = document.getElementById('edit-text');
-            textInput.value = "";
-            autoResizeTextarea(textInput);
-            updateTextUIState(); 
         }
 
         function expandEditor() {
@@ -869,7 +712,7 @@
                 return;
             }
 
-            const bars = imgElement.parentElement.querySelectorAll('.status-pills-top, .status-pills-bottom');
+            const bars = imgElement.parentElement.querySelectorAll('.status-pills-top');
             if (bars.length > 0) {
                 const isHidden = bars[0].style.display === 'none';
                 if (isHidden) {
@@ -885,48 +728,6 @@
             }
         }
 
-        function toggleTextOverlay(e, id) {
-            if (e) e.stopPropagation();
-            
-            const overlay = document.getElementById(`text-overlay-${id}`);
-            if (overlay) {
-                const card = overlay.closest('.status-card');
-                const bars = card.querySelectorAll('.status-pills-top, .status-pills-bottom');
-                
-                if (overlay.style.display === 'none' || overlay.style.display === '') {
-                    overlay.style.display = 'flex';
-                    bars.forEach(b => b.style.display = 'none'); 
-                } else {
-                    overlay.style.display = 'none';
-                    bars.forEach(b => b.style.display = 'flex'); 
-                }
-            }
-        }
-
-        function handleEditPost(e, id) {
-            e.stopPropagation(); 
-            
-            const post = globalPosts.find(p => p.id === id);
-            if (!post) return;
-
-            editingPostId = post.id;
-            existingImageUrl = post.image_url;
-
-            document.getElementById('edit-title').value = post.title || '';
-            const textInput = document.getElementById('edit-text');
-            textInput.value = post.text || '';
-            
-            expandEditor();
-            setTimeout(() => {
-                autoResizeTextarea(textInput);
-                updateTextUIState(); 
-            }, 0); 
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            updateImageUIState();
-        }
-
         function renderSinglePost(s) {
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
@@ -937,32 +738,6 @@
                 ${secretKey ? `<div class="status-glass-pill pill-btn" onclick="handleDeleteFeed(${s.id})">DELETE</div>` : '<div></div>'}
             </div>`;
 
-            let barHtmlBottom = '';
-            let textOverlayHtml = '';
-
-            if (s.title || s.text || secretKey) {
-                let displayTitle = s.title || 'UNTITLED';
-                
-                barHtmlBottom = `
-                <div class="status-pills-bottom">
-                    <div class="status-glass-pill pill-btn pill-title" onclick="toggleTextOverlay(event, ${s.id})">${displayTitle}</div>
-                    <div class="pill-group">
-                        <div class="status-glass-pill pill-btn" onclick="toggleTextOverlay(event, ${s.id})">READ MORE</div>
-                        ${secretKey ? `<div class="status-glass-pill pill-btn" onclick="handleEditPost(event, ${s.id})">EDIT</div>` : ''}
-                    </div>
-                </div>`;
-
-                if (s.title || s.text) {
-                    textOverlayHtml = `
-                    <div id="text-overlay-${s.id}" class="status-text-overlay" onclick="toggleTextOverlay(event, ${s.id})">
-                        <div class="status-text-overlay-content">
-                            ${s.title ? `<div class="status-text-overlay-title">${s.title}</div>` : ''}
-                            ${s.text ? `<div class="status-text-overlay-body">${s.text}</div>` : ''}
-                        </div>
-                    </div>`;
-                }
-            }
-
             const imageHtml = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="status-image" alt="image" loading="lazy" onclick="toggleGlassBar(this, ${s.id})">` : '';
             
             let mediaHtml = '';
@@ -971,8 +746,6 @@
                 <div class="status-media-wrapper">
                     ${barHtmlTop}
                     ${imageHtml}
-                    ${barHtmlBottom}
-                    ${textOverlayHtml}
                     ${secretKey ? `
                     <div id="confirm-overlay-${s.id}" class="status-confirm-overlay">
                         <div id="confirm-actions-${s.id}" class="action-row" style="padding: 0 var(--gap-item);">
@@ -994,14 +767,7 @@
         }
 
         function resetEditor() {
-            editingPostId = null;
-            existingImageUrl = null;
             document.getElementById('edit-image').value = ""; 
-            
-            document.getElementById('edit-title').value = ""; 
-            const textInput = document.getElementById('edit-text');
-            textInput.value = "";
-            textInput.style.height = 'auto'; 
             
             document.getElementById('upload-action-row').style.display = 'flex';
             document.getElementById('upload-loading-row').style.display = 'none';
@@ -1009,12 +775,10 @@
             
             document.getElementById('upload-action-row').innerHTML = `
                 <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
-                <div id="clear-text-btn" class="submit-btn btn-tonal-disabled" onclick="clearTextFields(event)">CLEAR</div>
                 <div class="submit-btn btn-tonal" onclick="collapseEditor()">CANCEL</div>
             `;
             
             updateImageUIState(); 
-            updateTextUIState(); 
         }
 
         function updateImageUIState() {
@@ -1023,36 +787,22 @@
             const filledState = document.getElementById('upload-filled-state');
             const thumbnail = document.getElementById('upload-preview-img');
             const pubBtn = document.getElementById('publish-btn');
-            const idDisplay = document.getElementById('edit-post-id-display');
+            const detailsZone = document.getElementById('upload-details-zone');
 
-            const hasImage = (input && input.files && input.files.length > 0) || existingImageUrl;
+            const hasImage = (input && input.files && input.files.length > 0);
 
             if (hasImage) {
-                if (input && input.files && input.files.length > 0) {
-                    if(thumbnail) thumbnail.src = URL.createObjectURL(input.files[0]);
-                } else {
-                    if(thumbnail) thumbnail.src = existingImageUrl;
-                }
+                if(thumbnail) thumbnail.src = URL.createObjectURL(input.files[0]);
                 
                 if(emptyState) emptyState.style.display = 'none';
                 if(filledState) filledState.style.display = 'flex';
+                if(detailsZone) detailsZone.style.display = 'flex';
             } else {
                 if(thumbnail) thumbnail.src = "";
                 
                 if(emptyState) emptyState.style.display = 'flex';
                 if(filledState) filledState.style.display = 'none';
-            }
-
-            if (editingPostId) {
-                if (idDisplay) {
-                    idDisplay.style.display = 'flex';
-                    idDisplay.innerText = '#' + editingPostId;
-                }
-            } else {
-                if (idDisplay) {
-                    idDisplay.style.display = 'none';
-                    idDisplay.innerText = '';
-                }
+                if(detailsZone) detailsZone.style.display = 'none';
             }
 
             if (pubBtn) {
@@ -1063,20 +813,18 @@
                     pubBtn.disabled = true;
                     pubBtn.className = "submit-btn btn-tonal-disabled";
                 }
-                pubBtn.innerText = editingPostId ? 'SAVE' : 'UPLOAD';
             }
         }
 
         function clearImageSelection(e) {
             e.stopPropagation();
             document.getElementById('edit-image').value = ""; 
-            existingImageUrl = null; 
             updateImageUIState();
         }
 
         function handleDeleteFeed(id) {
             const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
-            const bars = card.querySelectorAll('.status-pills-top, .status-pills-bottom');
+            const bars = card.querySelectorAll('.status-pills-top');
             bars.forEach(b => b.style.display = 'none');
             
             document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
@@ -1088,7 +836,7 @@
         function closeFeedDelete(id) {
             document.getElementById(`confirm-overlay-${id}`).style.display = 'none';
             const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
-            const bars = card.querySelectorAll('.status-pills-top, .status-pills-bottom');
+            const bars = card.querySelectorAll('.status-pills-top');
             bars.forEach(b => b.style.display = 'flex');
         }
 
@@ -1149,50 +897,32 @@
             e.preventDefault(); 
             const imageFile = document.getElementById('edit-image').files[0];
             
-            if (!imageFile && !existingImageUrl) { return; }
-            
-            const postTitle = document.getElementById('edit-title').value;
-            const postText = document.getElementById('edit-text').value;
+            if (!imageFile) { return; }
             
             document.getElementById('upload-action-row').style.display = 'none';
             document.getElementById('upload-loading-row').style.display = 'flex';
             
-            const loadBtn = document.getElementById('upload-loading-btn');
-            loadBtn.innerText = editingPostId ? 'SAVING...' : 'UPLOADING...';
-            
             try {
-                let finalImageUrl = existingImageUrl;
+                const compressedFile = await compressImage(imageFile);
+                const formData = new FormData(); formData.append("file", compressedFile);
                 
-                if (imageFile) {
-                    const compressedFile = await compressImage(imageFile);
-                    const formData = new FormData(); formData.append("file", compressedFile);
-                    
-                    const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
-                    if (!upRes.ok) throw new Error("Upload failed");
-                    const upData = await upRes.json();
-                    finalImageUrl = upData.image_url;
-                }
+                const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
+                if (!upRes.ok) throw new Error("Upload failed");
+                const upData = await upRes.json();
+                const finalImageUrl = upData.image_url;
 
-                const payload = { title: postTitle, text: postText, image_url: finalImageUrl, show_date: true, author: "" };
+                // 🛠️ Odosielame payload s prázdnym textom a titulkom pre kompatibilitu backendu
+                const payload = { title: "", text: "", image_url: finalImageUrl, show_date: true, author: "" };
                 
-                let res;
-                if (editingPostId) {
-                    res = await fetch(`${API_URL}/posts/${editingPostId}`, {
-                        method: "PUT", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                        body: JSON.stringify(payload)
-                    });
-                } else {
-                    res = await fetch(`${API_URL}/posts`, {
-                        method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                        body: JSON.stringify(payload)
-                    });
-                }
+                const res = await fetch(`${API_URL}/posts`, {
+                    method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
+                    body: JSON.stringify(payload)
+                });
                 
                 if (res.ok) { 
                     fetchStatuses(true); 
                     document.getElementById('upload-loading-row').style.display = 'none';
                     document.getElementById('upload-success-row').style.display = 'flex';
-                    document.getElementById('upload-success-btn').innerText = editingPostId ? 'SAVED' : 'UPLOADED';
                     setTimeout(() => { 
                         collapseEditor(); 
                     }, 1000);
