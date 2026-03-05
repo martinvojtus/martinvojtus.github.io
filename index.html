@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — Final Clean Transition</title>
+    <title>Martin Vojtuš — v5.0.5</title>
     <style>
         :root {
             --bg-start: #ffffff;
             --bg-end: #000000;
             --iphone-gray: #e0e0e0;
             --text-white: #ffffff;
-            --radius-pill: 100px;
-            --f-big: 1.85rem;
-            --f-small: 0.65rem;
-            --gap: 8px;
-            --radius-cookie-box: 24px; 
+            /* 📏 Univerzálne nastavenia podľa zadania */
+            --unit: 1rem; 
+            --f-btn: 2rem;
+            --radius-cookie-box: 1.5rem; /* Zachované pre vizuálnu rovnováhu boxu */
         }
 
         /* 🛠️ Core Reset */
@@ -27,21 +26,19 @@
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
+            font-size: var(--unit); /* Základný text 1rem */
             animation: bodyDarken 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
         }
 
         @keyframes bodyDarken { to { background-color: var(--bg-end); } }
 
-        /* --- ⚪ BIELA PREKRÝVACIA VRSTVA --- */
         #white-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #ffffff; opacity: 0; 
-            z-index: 100;
-            pointer-events: none;
-            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #ffffff; opacity: 0; z-index: 100;
+            pointer-events: none; transition: opacity 0.5s ease;
         }
 
-        /* --- 📱 IPHONE RÁM --- */
+        /* 📱 IPHONE RÁM */
         #frame {
             position: absolute; background-color: var(--iphone-gray); z-index: 10;
             width: 50vw; aspect-ratio: 1170 / 2532; border-radius: 8vw;
@@ -50,25 +47,18 @@
                 expandToBlack 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards;
         }
 
-        @media (orientation: landscape) {
-            #frame { width: auto; height: 50vh; aspect-ratio: 2532 / 1170; border-radius: 4vh; }
-        }
-
         @keyframes flyIn {
             0% { transform: translateY(110vh) scale(0.9); opacity: 0; }
             100% { transform: translateY(0) scale(1); opacity: 1; }
         }
 
-        @keyframes expandToBlack {
-            to { transform: scale(30); background-color: var(--bg-end); }
-        }
+        @keyframes expandToBlack { to { transform: scale(30); background-color: var(--bg-end); } }
 
-        /* --- 🎨 LOGO (60px) --- */
+        /* 🎨 LOGO */
         .logo-svg {
             position: absolute; top: 50%; left: 50%; width: 60px; height: 60px;
             fill: #000; z-index: 40; opacity: 0;
             transform: translate(-50%, -50%) scale(0.8);
-            transition: opacity 0.4s ease;
             animation: 
                 fadeInCenter 0.6s ease forwards 1.4s,
                 moveLogo 1.2s cubic-bezier(0.65, 0, 0.35, 1) 2.2s forwards,
@@ -77,33 +67,31 @@
 
         @keyframes fadeInCenter { to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
         @keyframes logoToWhite { to { fill: var(--text-white); } }
-        @keyframes moveLogo { to { transform: translate(-50%, calc(-50% - 98px)) scale(1); } }
+        /* Logo sa posunie nad text s medzerou 1rem */
+        @keyframes moveLogo { to { transform: translate(-50%, calc(-50% - 110px)) scale(1); } }
 
-        /* --- 🏁 UI ELEMENTY --- */
-        .ui-element {
-            position: absolute; left: 50%; z-index: 35; opacity: 0;
-            transition: opacity 0.4s ease;
-        }
+        /* 🏁 UI ELEMENTY */
+        .ui-element { position: absolute; left: 50%; z-index: 35; opacity: 0; transform: translateX(-50%); }
 
         @keyframes flyFromBottom {
-            0% { transform: translate(-50%, 80px); opacity: 0; }
+            0% { transform: translate(-50%, 40px); opacity: 0; }
             100% { transform: translate(-50%, 0); opacity: 1; }
         }
 
+        /* Usporiadanie s 1rem medzerami */
         .logo-text {
-            bottom: calc(50% + 40px + var(--gap));
-            font-size: var(--f-small); text-transform: uppercase; letter-spacing: 0.4em; white-space: nowrap;
+            bottom: calc(50% + 40px + var(--unit)); /* Nad buttonom */
+            font-size: var(--unit); text-transform: uppercase; letter-spacing: 0.3em;
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
         .pill {
-            top: 50%; width: 340px; height: 80px; border-radius: var(--radius-pill);
+            top: 50%; width: 320px; padding: var(--unit); border-radius: var(--unit);
             display: flex; align-items: center; justify-content: center;
             background: var(--text-white); color: #000; border: none; cursor: pointer;
             overflow: hidden; position: absolute; left: 50%; transform: translate(-50%, -50%);
             z-index: 110; 
             animation: flyFromBottomCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards;
-            transition: background-color 0.5s ease;
         }
         
         @keyframes flyFromBottomCenter {
@@ -111,36 +99,31 @@
             100% { transform: translate(-50%, -50%); opacity: 1; }
         }
 
-        .pill h1 { font-size: var(--f-big); margin: 0; letter-spacing: -0.02em; transition: opacity 0.3s ease; z-index: 2; }
+        .pill h1 { font-size: var(--f-btn); margin: 0; letter-spacing: -0.02em; z-index: 2; transition: opacity 0.3s; }
 
-        .loading-fill {
-            position: absolute; top: 0; left: 0; width: 0%; height: 100%;
-            background: #000; z-index: 1;
-        }
-
+        .loading-fill { position: absolute; top: 0; left: 0; width: 0%; height: 100%; background: #000; z-index: 1; }
         .loading-active .loading-fill { width: 100%; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
 
         footer {
-            top: calc(50% + 40px + var(--gap));
-            font-size: var(--f-small); text-transform: uppercase; letter-spacing: 0.18em;
-            color: #ffffff; white-space: nowrap;
+            top: calc(50% + 40px + var(--unit)); /* Pod buttonom */
+            font-size: var(--unit); text-transform: uppercase; letter-spacing: 0.1em;
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
         }
 
-        /* --- 🍪 COOKIE BOX --- */
+        /* 🍪 COOKIE BOX */
         #cookie-banner {
-            position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 250px);
-            width: calc(100% - 40px); max-width: 360px;
-            background: #ffffff; color: #000000; padding: var(--gap); 
-            border-radius: var(--radius-cookie-box); z-index: 60; text-align: center;
-            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            position: fixed; bottom: var(--unit); left: 50%; transform: translate(-50%, 250px);
+            width: calc(100% - 2rem); max-width: 380px;
+            background: #ffffff; color: #000000; padding: var(--unit); 
+            border-radius: var(--unit); z-index: 60; text-align: center;
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
 
         #cookie-banner.show { transform: translate(-50%, 0); }
-        .cookie-text { font-size: var(--f-small); margin: 4px 0 10px 0; text-transform: uppercase; letter-spacing: 0.05em; color: #000; }
-        .cookie-btns { display: flex; gap: var(--gap); }
-        .c-btn { flex: 1; height: 32px; border-radius: var(--radius-pill); border: none; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer; white-space: nowrap; }
+        .cookie-text { font-size: var(--unit); margin-bottom: var(--unit); text-transform: uppercase; }
+        .cookie-btns { display: flex; gap: var(--unit); }
+        .c-btn { flex: 1; padding: 0.8rem; border-radius: var(--unit); border: none; font-size: 0.8rem; text-transform: uppercase; cursor: pointer; }
         .c-btn-accept { background: #000000; color: #ffffff; }
         .c-btn-decline { background: #e0e0e0; color: #000000; }
 
@@ -150,9 +133,9 @@
 <body>
 
     <div id="white-screen"></div>
-    <div id="frame" class="iphone-frame"></div>
+    <div id="frame"></div>
 
-    <svg id="logo-main" class="logo-svg" viewBox="-234 -135 468 405" preserveAspectRatio="xMidYMid meet">
+    <svg id="logo-main" class="logo-svg" viewBox="-234 -135 468 405">
         <path d="M 0,0 L 233.827, -135 L 233.827, 135 L 0, 270 L -233.827, 135 L -233.827, -135 Z" />
     </svg>
 
@@ -166,10 +149,10 @@
     <footer id="footer-main" class="ui-element">Martin Vojtuš • 2026</footer>
 
     <div id="cookie-banner">
-        <div class="cookie-text">Súhlasíte s použitím cookies?</div>
+        <div class="cookie-text">Cookies? 🍪</div>
         <div class="cookie-btns">
-            <button class="c-btn c-btn-decline" onclick="hideCookies()">Nesúhlasím</button>
-            <button class="c-btn c-btn-accept" onclick="hideCookies()">Súhlasím</button>
+            <button class="c-btn c-btn-decline" onclick="hideCookies()">Nie</button>
+            <button class="c-btn c-btn-accept" onclick="hideCookies()">Áno</button>
         </div>
     </div>
 
@@ -179,43 +162,25 @@
         }, 4000);
 
         function hideCookies() {
-            // ⚡ Pattern vibrovania pre lepšiu kompatibilitu (krátky impulz)
-            if ("vibrate" in navigator) {
-                navigator.vibrate([15]);
-            }
+            if ("vibrate" in navigator) navigator.vibrate(15);
             document.getElementById('cookie-banner').classList.remove('show');
         }
 
         function handleFinalTransition() {
             const btn = document.getElementById('cosmos-btn');
-            const whiteScreen = document.getElementById('white-screen');
-            const logo = document.getElementById('logo-main');
-            const text = document.getElementById('text-main');
-            const foot = document.getElementById('footer-main');
-            const cookie = document.getElementById('cookie-banner');
+            const elements = ['logo-main', 'text-main', 'footer-main', 'cookie-banner'];
+            
+            if ("vibrate" in navigator) navigator.vibrate([30, 10, 30]);
 
-            // ⚡ Dvojitý pattern vibrácie pre dôležitý klik (vibrácia 30ms, pauza 10ms, vibrácia 30ms)
-            if ("vibrate" in navigator) {
-                navigator.vibrate([30, 10, 30]);
-            }
-
-            logo.classList.add('hidden');
-            text.classList.add('hidden');
-            foot.classList.add('hidden');
-            cookie.classList.add('hidden');
+            elements.forEach(id => document.getElementById(id).classList.add('hidden'));
             btn.querySelector('h1').style.opacity = '0';
 
-            whiteScreen.style.opacity = "1";
+            document.getElementById('white-screen').style.opacity = "1";
             btn.style.backgroundColor = "#e0e0e0";
             btn.style.pointerEvents = "none";
 
-            setTimeout(() => {
-                btn.classList.add('loading-active');
-            }, 600);
-
-            setTimeout(() => {
-                window.location.replace("https://www.cosmos.so/martinvojtus");
-            }, 2300);
+            setTimeout(() => btn.classList.add('loading-active'), 600);
+            setTimeout(() => window.location.replace("https://www.cosmos.so/martinvojtus"), 2300);
         }
     </script>
 </body>
