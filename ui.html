@@ -569,7 +569,6 @@
                     container.innerHTML = ``;
                 } else {
                     container.innerHTML = `
-                        <div class="divider-line"></div>
                         <div class="submit-btn btn-tonal-disabled" style="width: 100%; cursor: default;">
                             NOTHING HERE YET.
                         </div>
@@ -580,10 +579,10 @@
 
             if (currentViewMode === 'feed') {
                 container.className = 'status-feed view-feed';
-                // 🛠️ Odstránený divider pod tlačidlom GRID VIEW
+                // 🛠️ Divider renderovaný len pre prihlásených
                 let html = `
                     <div class="feed-toggle-wrapper">
-                        <div class="divider-line"></div>
+                        ${secretKey ? '<div class="divider-line"></div>' : ''}
                         <button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">GRID VIEW</button>
                     </div>
                 `;
@@ -591,7 +590,8 @@
                 container.innerHTML = html;
             } else {
                 container.className = 'status-feed view-grid';
-                let html = '<div class="divider-line"></div>';
+                // 🛠️ Divider renderovaný len pre prihlásených
+                let html = secretKey ? '<div class="divider-line"></div>' : '';
                 
                 let leftCol = '<div class="masonry-col col-left">';
                 let rightCol = '<div class="masonry-col col-right">';
@@ -776,13 +776,11 @@
                 
                 if(emptyState) emptyState.style.display = 'none';
                 if(filledState) filledState.style.display = 'flex';
-                if(detailsZone) detailsZone.style.display = 'flex';
             } else {
                 if(thumbnail) thumbnail.src = "";
                 
                 if(emptyState) emptyState.style.display = 'flex';
                 if(filledState) filledState.style.display = 'none';
-                if(detailsZone) detailsZone.style.display = 'flex'; 
             }
 
             if (pubBtn) {
