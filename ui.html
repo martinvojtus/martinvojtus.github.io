@@ -126,9 +126,17 @@
         .status-feed.view-feed {
             display: flex; flex-direction: column; gap: var(--gap-item);
         }
+        
+        /* 🛠️ Nová štruktúra pre GRID: Pôvodný container je teraz column a obsahuje divider */
         .status-feed.view-grid {
-            display: flex; flex-direction: row; gap: var(--gap-item); align-items: flex-start;
+            display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;
         }
+        
+        /* 🛠️ Obal pre samotné stĺpce, ktorý je vložený pod čiaru */
+        .grid-columns-wrapper {
+            display: flex; flex-direction: row; gap: var(--gap-item); align-items: flex-start; width: 100%;
+        }
+
         .masonry-col {
             display: flex; flex-direction: column; gap: var(--gap-item); flex: 1; min-width: 0;
         }
@@ -139,6 +147,10 @@
         }
         .status-feed.view-grid .status-media-wrapper {
             background-color: transparent; 
+        }
+
+        .feed-toggle-wrapper {
+            display: flex; flex-direction: column; align-items: center; width: 100%; gap: var(--gap-item);
         }
 
         .divider-line {
@@ -571,21 +583,24 @@
             if (currentViewMode === 'feed') {
                 container.className = 'status-feed view-feed';
                 let html = `
-                    <div class="divider-line"></div>
-                    <button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">GRID VIEW</button>
-                    <div class="divider-line"></div>
+                    <div class="feed-toggle-wrapper">
+                        <div class="divider-line"></div>
+                        <button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">GRID VIEW</button>
+                        <div class="divider-line"></div>
+                    </div>
                 `;
                 globalPosts.forEach(post => { html += renderSinglePost(post); });
                 container.innerHTML = html;
             } else {
                 container.className = 'status-feed view-grid';
+                // 🛠️ Pre GRID: Najprv vygenerujeme jednu spoločnú, 100% širokú čiaru
+                let html = '<div class="divider-line"></div>';
+                
+                // 🛠️ Potom nasleduje wrapper pre samotné stĺpce
                 let leftCol = '<div class="masonry-col col-left">';
                 let rightCol = '<div class="masonry-col col-right">';
 
-                // 🛠️ OPRAVA: Oddeľovače (dividers) do oboch stĺpcov pre dokonalé výškové zarovnanie
-                leftCol += '<div class="divider-line"></div>';
-                
-                rightCol += '<div class="divider-line"></div>';
+                // 🛠️ Tlačidlo FEED VIEW je ako prvá dlaždica vpravo
                 rightCol += `<button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">FEED VIEW</button>`;
 
                 globalPosts.forEach((post, index) => {
@@ -596,7 +611,8 @@
                 leftCol += '</div>';
                 rightCol += '</div>';
 
-                container.innerHTML = leftCol + rightCol;
+                html += `<div class="grid-columns-wrapper">${leftCol}${rightCol}</div>`;
+                container.innerHTML = html;
             }
         }
 
@@ -771,7 +787,7 @@
                 
                 if(emptyState) emptyState.style.display = 'flex';
                 if(filledState) filledState.style.display = 'none';
-                if(detailsZone) detailsZone.style.display = 'flex'; // Zabezpečené, aby tlačidlá UPLOAD a CANCEL zostali viditeľné aj bez obrázka
+                if(detailsZone) detailsZone.style.display = 'flex'; 
             }
 
             if (pubBtn) {
