@@ -76,6 +76,8 @@
             background: rgba(var(--glass-rgb), var(--glass-opacity)); 
             backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
             z-index: 2000;
+            /* 🛠️ Pridaný 1px oddeľovací rámik na spodok hlavičky */
+            border-bottom: 1px solid var(--divider);
         }
 
         .header-content {
@@ -362,7 +364,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v6.7.7 • 2026</div>
+            <div class="footer-info">build v6.7.8 • 2026</div>
         </div>
     </nav>
 
@@ -569,6 +571,7 @@
                     container.innerHTML = ``;
                 } else {
                     container.innerHTML = `
+                        <div class="divider-line"></div>
                         <div class="submit-btn btn-tonal-disabled" style="width: 100%; cursor: default;">
                             NOTHING HERE YET.
                         </div>
@@ -579,7 +582,6 @@
 
             if (currentViewMode === 'feed') {
                 container.className = 'status-feed view-feed';
-                // 🛠️ Divider renderovaný len pre prihlásených
                 let html = `
                     <div class="feed-toggle-wrapper">
                         ${secretKey ? '<div class="divider-line"></div>' : ''}
@@ -590,7 +592,6 @@
                 container.innerHTML = html;
             } else {
                 container.className = 'status-feed view-grid';
-                // 🛠️ Divider renderovaný len pre prihlásených
                 let html = secretKey ? '<div class="divider-line"></div>' : '';
                 
                 let leftCol = '<div class="masonry-col col-left">';
