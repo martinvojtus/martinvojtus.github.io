@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>Martin Vojtuš — v5.0.6</title>
+    <title>martinvojtus — v5.0.7</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
@@ -18,10 +18,11 @@
             --f-btn: 2rem;
         }
 
-        /* 🛠️ Core Reset */
+        /* 🛠️ Core Reset - hrúbka fontu a spacing nastavené na normal */
         * { 
             box-sizing: border-box; 
             font-weight: 400 !important; 
+            letter-spacing: normal !important; 
             -webkit-tap-highlight-color: transparent; 
         }
 
@@ -44,7 +45,6 @@
             pointer-events: none; transition: opacity 0.5s ease;
         }
 
-        /* 📱 IPHONE RÁM */
         #frame {
             position: absolute; background-color: var(--iphone-gray); z-index: 10;
             width: 50vw; aspect-ratio: 1170 / 2532; border-radius: 8vw;
@@ -60,7 +60,6 @@
 
         @keyframes expandToBlack { to { transform: scale(30); background-color: var(--bg-end); } }
 
-        /* 🎨 LOGO */
         .logo-svg {
             position: absolute; top: 50%; left: 50%; width: 60px; height: 60px;
             fill: #000; z-index: 40; opacity: 0;
@@ -75,7 +74,6 @@
         @keyframes logoToWhite { to { fill: var(--text-white); } }
         @keyframes moveLogo { to { transform: translate(-50%, calc(-50% - 110px)) scale(1); } }
 
-        /* 🏁 UI ELEMENTY */
         .ui-element { position: absolute; left: 50%; z-index: 35; opacity: 0; transform: translateX(-50%); }
 
         @keyframes flyFromBottom {
@@ -83,10 +81,9 @@
             100% { transform: translate(-50%, 0); opacity: 1; }
         }
 
-        /* 🔡 Text - všetko malé písmo */
         .logo-text {
             bottom: calc(50% + 40px + var(--unit));
-            font-size: var(--unit); text-transform: lowercase; letter-spacing: 0.1em;
+            font-size: var(--unit); text-transform: lowercase;
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
@@ -104,18 +101,17 @@
             100% { transform: translate(-50%, -50%); opacity: 1; }
         }
 
-        .pill h1 { font-size: var(--f-btn); margin: 0; letter-spacing: -0.04em; z-index: 2; transition: opacity 0.3s; text-transform: lowercase; }
+        .pill h1 { font-size: var(--f-btn); margin: 0; z-index: 2; transition: opacity 0.3s; text-transform: lowercase; }
 
         .loading-fill { position: absolute; top: 0; left: 0; width: 0%; height: 100%; background: #000; z-index: 1; }
         .loading-active .loading-fill { width: 100%; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
 
         footer {
             top: calc(50% + 40px + var(--unit));
-            font-size: var(--unit); text-transform: lowercase; letter-spacing: 0.05em;
+            font-size: var(--unit); text-transform: lowercase;
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
         }
 
-        /* 🍪 COOKIE BOX */
         #cookie-banner {
             position: fixed; bottom: var(--unit); left: 50%; transform: translate(-50%, 250px);
             width: calc(100% - 2rem); max-width: 380px;
@@ -144,20 +140,20 @@
         <path d="M 0,0 L 233.827, -135 L 233.827, 135 L 0, 270 L -233.827, 135 L -233.827, -135 Z" />
     </svg>
 
-    <div id="text-main" class="ui-element logo-text">martin vojtuš • space</div>
+    <div id="text-main" class="ui-element logo-text">martinvojtus • space</div>
     
     <button id="cosmos-btn" class="ui-element pill" onclick="handleFinalTransition()">
         <div class="loading-fill" id="fill"></div>
         <h1>enter</h1>
     </button>
 
-    <footer id="footer-main" class="ui-element">martin vojtuš • 2026</footer>
+    <footer id="footer-main" class="ui-element">martinvojtus • 2026</footer>
 
     <div id="cookie-banner">
         <div class="cookie-text">cookies? 🍪</div>
         <div class="cookie-btns">
             <button class="c-btn c-btn-decline" onclick="hideCookies()">nie</button>
-            <button class="c-btn c-btn-accept" onclick="hideCookies()">áno</button>
+            <button class="c-btn c-btn-accept" onclick="hideCookies()">ano</button>
         </div>
     </div>
 
