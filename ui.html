@@ -141,11 +141,20 @@
             background-color: transparent; 
         }
 
+        /* 🛠️ Úprava wrapperov aby podporovali medzeru s 1px čiarou */
         .feed-toggle-wrapper {
-            display: flex; justify-content: center; width: 100%;
+            display: flex; flex-direction: column; align-items: center; width: 100%; gap: var(--gap-item);
         }
         .grid-toggle-wrapper {
-            display: flex; justify-content: center; width: 100%; 
+            display: flex; flex-direction: column; align-items: center; width: 100%; gap: var(--gap-item); 
+        }
+
+        /* 🛠️ Nová trieda pre čistú 1px oddeľovaciu čiaru (10% opacita) */
+        .divider-line {
+            width: 100%;
+            height: 1px;
+            background-color: var(--divider);
+            flex-shrink: 0;
         }
 
         .status-card { display: flex; flex-direction: column; position: relative; }
@@ -351,7 +360,8 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.7.4 • 2026</div>
+            <div class="divider-line"></div>
+            <div class="footer-info">build v6.7.5 • 2026</div>
         </div>
     </nav>
 
@@ -568,8 +578,10 @@
 
             if (currentViewMode === 'feed') {
                 container.className = 'status-feed view-feed';
+                // 🛠️ Pridaný jemný oddeľovač (Divider) nad tlačidlo
                 let html = `
                     <div class="feed-toggle-wrapper">
+                        <div class="divider-line"></div>
                         <button class="submit-btn btn-tonal" style="width: 100%;" onclick="toggleViewMode()">GRID VIEW</button>
                     </div>
                 `;
@@ -580,8 +592,10 @@
                 let leftCol = '<div class="masonry-col col-left">';
                 let rightCol = '<div class="masonry-col col-right">';
 
+                // 🛠️ Pridaný jemný oddeľovač (Divider) nad tlačidlo
                 rightCol += `
                     <div class="grid-toggle-wrapper">
+                        <div class="divider-line"></div>
                         <button class="submit-btn btn-tonal" style="width: 100%;" onclick="toggleViewMode()">FEED VIEW</button>
                     </div>
                 `;
@@ -754,6 +768,7 @@
             const filledState = document.getElementById('upload-filled-state');
             const thumbnail = document.getElementById('upload-preview-img');
             const pubBtn = document.getElementById('publish-btn');
+            const detailsZone = document.getElementById('upload-details-zone');
 
             const hasImage = (input && input.files && input.files.length > 0);
 
