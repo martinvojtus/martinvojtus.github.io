@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>martinvojtus — v6.8.0</title>
+    <title>martinvojtus — v6.8.1</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
@@ -15,8 +15,7 @@
             --iphone-gray: #e0e0e0;
             --text-white: #ffffff;
             --unit: 1rem; 
-            --f-btn: 2rem;
-            --btn-height: 80px;
+            --f-btn: 1rem; /* 👈 Text v buttone je teraz 1rem */
         }
 
         /* 🛠️ Core Reset */
@@ -74,7 +73,8 @@
 
         @keyframes fadeInCenter { to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
         @keyframes logoToWhite { to { fill: var(--text-white); } }
-        @keyframes moveLogo { to { transform: translate(-50%, calc(-50% - 40px - var(--unit) - var(--unit) - var(--unit) - 30px)) scale(1); } }
+        /* 📏 Prepočítaná medzera podľa nového 3rem buttonu (1.5rem je jeho polovica) */
+        @keyframes moveLogo { to { transform: translate(-50%, calc(-50% - 1.5rem - var(--unit) - var(--unit) - var(--unit) - 30px)) scale(1); } }
 
         .ui-element { position: absolute; left: 50%; z-index: 35; opacity: 0; transform: translateX(-50%); }
 
@@ -85,14 +85,16 @@
 
         /* 🏷️ Horný text */
         .logo-text {
-            bottom: calc(50% + 40px + var(--unit));
+            bottom: calc(50% + 1.5rem + var(--unit));
             font-size: var(--unit); text-transform: lowercase;
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
         }
 
-        /* 🔘 ENTER PILL */
+        /* 🔘 ENTER PILL s dynamickou výškou a 1rem paddingom */
         .pill {
-            top: 50%; width: 320px; height: var(--btn-height); border-radius: var(--unit);
+            top: 50%; width: 320px; 
+            padding: var(--unit); /* 👈 Padding 1rem */
+            border-radius: var(--unit);
             display: flex; align-items: center; justify-content: center;
             background: var(--text-white); color: #000; border: none; cursor: pointer;
             overflow: hidden; position: absolute; left: 50%; transform: translate(-50%, -50%);
@@ -110,11 +112,11 @@
         .loading-fill { position: absolute; top: 0; left: 0; width: 0%; height: 100%; background: #000; z-index: 1; }
         .loading-active .loading-fill { width: 100%; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        /* 🏁 Footer - opravená viditeľnosť */
+        /* 🏁 Footer */
         footer {
-            top: calc(50% + 40px + var(--unit));
+            top: calc(50% + 1.5rem + var(--unit));
             font-size: var(--unit); text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.5); /* 👻 Nahrádza fixnú opacity pre zachovanie animácie */
+            color: rgba(255, 255, 255, 0.5); 
             animation: flyFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.1s forwards;
         }
 
@@ -153,7 +155,7 @@
         <h1>ENTER</h1>
     </button>
 
-    <footer id="footer-main" class="ui-element">BUILD V6.8.0 • 2026</footer>
+    <footer id="footer-main" class="ui-element">BUILD V6.8.1 • 2026</footer>
 
     <div id="cookie-banner">
         <div class="cookie-text">cookies? 🍪</div>
