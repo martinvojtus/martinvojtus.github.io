@@ -127,12 +127,10 @@
             display: flex; flex-direction: column; gap: var(--gap-item);
         }
         
-        /* 🛠️ Nová štruktúra pre GRID: Pôvodný container je teraz column a obsahuje divider */
         .status-feed.view-grid {
             display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;
         }
         
-        /* 🛠️ Obal pre samotné stĺpce, ktorý je vložený pod čiaru */
         .grid-columns-wrapper {
             display: flex; flex-direction: row; gap: var(--gap-item); align-items: flex-start; width: 100%;
         }
@@ -364,7 +362,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v6.7.6 • 2026</div>
+            <div class="footer-info">build v6.7.7 • 2026</div>
         </div>
     </nav>
 
@@ -582,25 +580,22 @@
 
             if (currentViewMode === 'feed') {
                 container.className = 'status-feed view-feed';
+                // 🛠️ Odstránený divider pod tlačidlom GRID VIEW
                 let html = `
                     <div class="feed-toggle-wrapper">
                         <div class="divider-line"></div>
                         <button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">GRID VIEW</button>
-                        <div class="divider-line"></div>
                     </div>
                 `;
                 globalPosts.forEach(post => { html += renderSinglePost(post); });
                 container.innerHTML = html;
             } else {
                 container.className = 'status-feed view-grid';
-                // 🛠️ Pre GRID: Najprv vygenerujeme jednu spoločnú, 100% širokú čiaru
                 let html = '<div class="divider-line"></div>';
                 
-                // 🛠️ Potom nasleduje wrapper pre samotné stĺpce
                 let leftCol = '<div class="masonry-col col-left">';
                 let rightCol = '<div class="masonry-col col-right">';
 
-                // 🛠️ Tlačidlo FEED VIEW je ako prvá dlaždica vpravo
                 rightCol += `<button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">FEED VIEW</button>`;
 
                 globalPosts.forEach((post, index) => {
