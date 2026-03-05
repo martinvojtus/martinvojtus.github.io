@@ -159,7 +159,6 @@
             background-color: var(--divider); 
         }
 
-        /* 🛠️ Návrat k jednoliatej sklenenej lište */
         .status-glass-bar {
             height: 3rem; width: 100%;
             background: rgba(var(--glass-rgb), var(--glass-opacity)); 
@@ -352,7 +351,7 @@
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
             
-            <div class="footer-info">build v6.7.1 • 2026</div>
+            <div class="footer-info">build v6.7.2 • 2026</div>
         </div>
     </nav>
 
@@ -699,7 +698,6 @@
         function renderSinglePost(s) {
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
-            // 🛠️ Vrátená klasická "sklenená lišta"
             let barHtmlTop = `
             <div class="status-glass-bar">
                 ${secretKey ? `<span class="admin-bar-item" style="color: var(--grey-50);">#${s.id}</span>` : '<div></div>'}
@@ -756,7 +754,8 @@
             const filledState = document.getElementById('upload-filled-state');
             const thumbnail = document.getElementById('upload-preview-img');
             const pubBtn = document.getElementById('publish-btn');
-            const detailsZone = document.getElementById('upload-details-zone');
+            
+            // 🛠️ Odstránená logika pre zobrazenie/skrytie detailsZone (upload zóny), lebo musí byť stále viditeľná pre UPLOAD a CANCEL
 
             const hasImage = (input && input.files && input.files.length > 0);
 
@@ -765,13 +764,11 @@
                 
                 if(emptyState) emptyState.style.display = 'none';
                 if(filledState) filledState.style.display = 'flex';
-                if(detailsZone) detailsZone.style.display = 'flex';
             } else {
                 if(thumbnail) thumbnail.src = "";
                 
                 if(emptyState) emptyState.style.display = 'flex';
                 if(filledState) filledState.style.display = 'none';
-                if(detailsZone) detailsZone.style.display = 'none';
             }
 
             if (pubBtn) {
