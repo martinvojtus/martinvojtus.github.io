@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>martinvojtus — v5.0.7</title>
+    <title>martinvojtus — v5.0.8</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
             --f-btn: 2rem;
         }
 
-        /* 🛠️ Core Reset - hrúbka fontu a spacing nastavené na normal */
+        /* 🛠️ Core Reset */
         * { 
             box-sizing: border-box; 
             font-weight: 400 !important; 
@@ -101,7 +101,8 @@
             100% { transform: translate(-50%, -50%); opacity: 1; }
         }
 
-        .pill h1 { font-size: var(--f-btn); margin: 0; z-index: 2; transition: opacity 0.3s; text-transform: lowercase; }
+        /* 🔘 ENTER ako jediný text veľkými písmenami */
+        .pill h1 { font-size: var(--f-btn); margin: 0; z-index: 2; transition: opacity 0.3s; text-transform: uppercase; }
 
         .loading-fill { position: absolute; top: 0; left: 0; width: 0%; height: 100%; background: #000; z-index: 1; }
         .loading-active .loading-fill { width: 100%; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -144,7 +145,7 @@
     
     <button id="cosmos-btn" class="ui-element pill" onclick="handleFinalTransition()">
         <div class="loading-fill" id="fill"></div>
-        <h1>enter</h1>
+        <h1>ENTER</h1>
     </button>
 
     <footer id="footer-main" class="ui-element">martinvojtus • 2026</footer>
@@ -180,8 +181,14 @@
             btn.style.backgroundColor = "#e0e0e0";
             btn.style.pointerEvents = "none";
 
-            setTimeout(() => btn.classList.add('loading-active'), 600);
-            setTimeout(() => window.location.replace("https://www.cosmos.so/martinvojtus"), 2300);
+            setTimeout(() => {
+                btn.classList.add('loading-active');
+            }, 600);
+
+            // 🔗 Presmerovanie na tvoj GitHub po animácii
+            setTimeout(() => {
+                window.location.replace("https://martinvojtus.github.io/ui.html");
+            }, 2300);
         }
     </script>
 </body>
