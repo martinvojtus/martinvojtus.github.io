@@ -106,6 +106,16 @@
         
         .menu-items { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); }
 
+        /* 🛠️ Nová trieda pre čistý odkaz v menu */
+        .menu-nav-link {
+            font-size: var(--size-small);
+            color: var(--black);
+            text-transform: uppercase;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+        }
+
         main {
             padding: calc(3rem + var(--gap-item)) var(--gap-item) var(--gap-item); 
             width: 100%; max-width: var(--content-width); 
@@ -346,6 +356,10 @@
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
+            <div class="menu-nav-link" onclick="closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' });">FEED</div>
+            
+            <div class="divider-line"></div>
+
             <div id="login-ui">
                 <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                     <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="width: 100%;">
@@ -362,7 +376,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v6.8.2 • 2026</div>
+            <div class="footer-info">build v6.8.3 • 2026</div>
         </div>
     </nav>
 
