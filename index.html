@@ -106,14 +106,14 @@
         
         .menu-items { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); }
 
-        /* 🛠️ Nová trieda pre čistý odkaz v menu */
+        /* 🛠️ Trieda pre čistý odkaz v menu - odstránené uppercase */
         .menu-nav-link {
             font-size: var(--size-small);
             color: var(--black);
-            text-transform: uppercase;
             cursor: pointer;
             width: 100%;
             text-align: left;
+            display: block;
         }
 
         main {
@@ -356,7 +356,7 @@
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
-            <div class="menu-nav-link" onclick="closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' });">FEED</div>
+            <div class="menu-nav-link" onclick="closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' });">Feed</div>
             
             <div class="divider-line"></div>
 
@@ -376,7 +376,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v6.8.3 • 2026</div>
+            <div class="footer-info">build v6.8.4 • 2026</div>
         </div>
     </nav>
 
