@@ -373,7 +373,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v6.9.4 • 2026</div>
+            <div class="footer-info">build v6.9.5 • 2026</div>
         </div>
     </nav>
 
@@ -399,7 +399,7 @@
 
                 <div id="upload-details-zone" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;">
                     <div id="upload-action-row" class="action-row" style="padding: 0;">
-                        <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
+                        <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>UPLOAD</button>
                         <div class="submit-btn btn-tonal" onclick="collapseEditor()">CANCEL</div>
                     </div>
                     <div id="upload-loading-row" class="action-row" style="display: none; padding: 0;">
@@ -424,9 +424,8 @@
             </div>
 
             <form id="editor-form-about" onsubmit="handleAboutSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
-                <input type="text" id="edit-title-about" class="form-input" placeholder="Title..." style="width: 100%;">
-                
-                <textarea id="edit-text-about" class="form-input" placeholder="Content..." style="width: 100%; min-height: 6rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this)"></textarea>
+                <input type="text" id="edit-title-about" class="form-input" placeholder="Title..." style="width: 100%;" oninput="updateAboutUIState()">
+                <textarea id="edit-text-about" class="form-input" placeholder="Content..." style="width: 100%; min-height: 6rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateAboutUIState();"></textarea>
 
                 <input type="file" id="edit-image-about" accept="image/*" style="display: none;" onchange="updateAboutImageUIState()">
                 
@@ -443,8 +442,8 @@
 
                 <div id="upload-details-zone-about" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;">
                     <div id="upload-action-row-about" class="action-row" style="padding: 0;">
-                        <button type="submit" id="publish-btn-about" class="submit-btn btn-tonal" style="flex-grow: 1;">UPLOAD</button>
-                        <div class="submit-btn btn-tonal" onclick="clearAboutTextFields(event)" style="flex-grow: 0;">CLEAR</div>
+                        <button type="submit" id="publish-btn-about" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>UPLOAD</button>
+                        <div id="clear-btn-about" class="submit-btn btn-tonal-disabled" onclick="clearAboutTextFields(event)" style="flex-grow: 0;" disabled>CLEAR</div>
                         <div class="submit-btn btn-tonal" onclick="collapseAboutEditor()" style="flex-grow: 0;">CANCEL</div>
                     </div>
                     <div id="upload-loading-row-about" class="action-row" style="display: none; padding: 0;">
@@ -498,7 +497,6 @@
             });
         }
 
-        // 🛠️ Vylepšený autoResize, ktorý pri vymazaní textu vráti pole do predvoleného stavu
         function autoResizeTextarea(el) {
             el.style.height = 'auto';
             if(el.value.trim() === '') {
@@ -912,19 +910,45 @@
             updateImageUIState();
         }
 
-        // 🛠️ Bezpečný CLEAR, ktorý resetuje výšku poľa na predvolenú hodnotu
+        // 🛠️ Funkcia, ktorá kontroluje obsah všetkých 3 polí a zapína/vypína tlačidlá
+        function updateAboutUIState() {
+            const titleVal = document.getElementById('edit-title-about').value.trim();
+            const textVal = document.getElementById('edit-text-about').value.trim();
+            const input = document.getElementById('edit-image-about');
+            const hasImage = (input && input.files && input.files.length > 0) || existingAboutImageUrl;
+
+            const hasContent = titleVal.length > 0 || textVal.length > 0 || hasImage;
+
+            const pubBtn = document.getElementById('publish-btn-about');
+            const clearBtn = document.getElementById('clear-btn-about');
+
+            if (hasContent) {
+                if (pubBtn) { pubBtn.disabled = false; pubBtn.className = "submit-btn btn-tonal"; }
+                if (clearBtn) { clearBtn.disabled = false; clearBtn.className = "submit-btn btn-tonal"; }
+            } else {
+                if (pubBtn) { pubBtn.disabled = true; pubBtn.className = "submit-btn btn-tonal-disabled"; }
+                if (clearBtn) { clearBtn.disabled = true; clearBtn.className = "submit-btn btn-tonal-disabled"; }
+            }
+        }
+
         function clearAboutTextFields(e) {
             if(e) e.stopPropagation();
             document.getElementById('edit-title-about').value = "";
             const textEl = document.getElementById('edit-text-about');
             textEl.value = "";
             textEl.style.height = ''; 
+            updateAboutUIState();
         }
 
         function resetAboutEditor() {
             editingAboutPostId = null;
             existingAboutImageUrl = null;
-            clearAboutTextFields(null);
+            
+            document.getElementById('edit-title-about').value = "";
+            const textEl = document.getElementById('edit-text-about');
+            textEl.value = "";
+            textEl.style.height = '';
+
             document.getElementById('edit-image-about').value = "";
             
             document.getElementById('upload-action-row-about').style.display = 'flex';
@@ -956,6 +980,8 @@
                 emptyState.style.display = 'flex';
                 filledState.style.display = 'none';
             }
+
+            updateAboutUIState();
         }
 
         function clearAboutImageSelection(e) {
