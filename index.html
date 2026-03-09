@@ -148,9 +148,11 @@
             display: flex; flex-direction: column; gap: var(--gap-item); flex: 1; min-width: 0;
         }
 
+        /* 🛠️ Pridaný .feed-divider pre skrytie oddeľovača v Grid View */
         .status-feed.view-grid .feed-top-row,
         .status-feed.view-grid .status-confirm-overlay,
-        .status-feed.view-grid .feed-admin-actions {
+        .status-feed.view-grid .feed-admin-actions,
+        .status-feed.view-grid .feed-divider {
             display: none !important;
         }
         .status-feed.view-grid .status-media-wrapper {
@@ -182,16 +184,18 @@
         .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
         .admin-delete-link { cursor: pointer; color: var(--black); text-decoration: none; }
 
-        /* 🛠️ Pridaný cursor: pointer pre indikáciu klikateľnosti fotky */
         .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); cursor: pointer; }
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
 
-        .form-input { 
+        .form-input, .submit-btn { 
             border-radius: var(--border-radius); 
             font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; display: flex; align-items: center; gap: var(--gap-item); 
             box-shadow: none; -webkit-appearance: none; appearance: none; margin: 0;
+        }
+
+        .form-input { 
             height: 3rem;
             background-color: transparent; 
             color: var(--black);
@@ -200,10 +204,6 @@
         .form-input::placeholder { color: var(--grey-50); } 
 
         .submit-btn { 
-            border-radius: var(--border-radius); 
-            font-size: var(--size-small); padding: 0 var(--gap-item); 
-            outline: none; display: flex; align-items: center; gap: var(--gap-item); 
-            box-shadow: none; -webkit-appearance: none; appearance: none; margin: 0;
             height: 3rem;
             background-color: var(--black); 
             color: var(--white);
@@ -376,7 +376,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.3 • 2026</div>
+            <div class="footer-info">build v7.0.4 • 2026</div>
         </div>
     </nav>
 
@@ -971,7 +971,6 @@
             }
         });
 
-        // 🛠️ Funkcia na presun fotky z Grid do Feed pri kliknutí na ňu
         function handleImageClick(id) {
             if (currentViewMode === 'grid') {
                 currentViewMode = 'feed';
@@ -991,6 +990,7 @@
             }
         }
 
+        // 🛠️ Pridaný divider na koniec feed príspevku
         function renderSinglePost(s) {
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
@@ -1004,7 +1004,6 @@
             </div>
             `;
 
-            // 🛠️ Obrázok je znova klikateľný vo Feede a volá handleImageClick
             const imageHtml = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="status-image" alt="image" loading="lazy" onclick="handleImageClick(${s.id})">` : '';
             
             let mediaHtml = '';
@@ -1029,7 +1028,12 @@
                 </div>`;
             }
 
-            return `<div class="status-card" style="gap: var(--gap-item);">${topRow}${mediaHtml}</div>`;
+            return `
+            <div class="status-card" style="gap: var(--gap-item);">
+                ${topRow}
+                ${mediaHtml}
+                <div class="divider-line feed-divider"></div>
+            </div>`;
         }
 
         function resetEditor() {
