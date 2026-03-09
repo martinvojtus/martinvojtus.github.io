@@ -375,7 +375,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.1 • 2026</div>
+            <div class="footer-info">build v7.0.2 • 2026</div>
         </div>
     </nav>
 
@@ -580,6 +580,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // 🛠️ Bezpečná kontrola limitov bez volania reset(), čím sa odstránila nekonečná slučka
         function checkPostLimits() {
             const aboutCount = globalPosts.filter(p => p.author === 'about').length;
             const btnAbout = document.getElementById('editor-collapsed-state-about');
@@ -587,7 +588,9 @@
                 if (aboutCount >= 1) {
                     btnAbout.className = 'submit-btn btn-tonal-disabled';
                     btnAbout.onclick = null;
-                    collapseAboutEditor();
+                    if (document.getElementById('editor-form-about').style.display === 'flex') {
+                        collapseAboutEditor();
+                    }
                 } else {
                     btnAbout.className = 'submit-btn btn-tonal';
                     btnAbout.onclick = expandAboutEditor;
@@ -600,7 +603,9 @@
                 if (contactCount >= 1) {
                     btnContact.className = 'submit-btn btn-tonal-disabled';
                     btnContact.onclick = null;
-                    collapseContactEditor();
+                    if (document.getElementById('editor-form-contact').style.display === 'flex') {
+                        collapseContactEditor();
+                    }
                 } else {
                     btnContact.className = 'submit-btn btn-tonal';
                     btnContact.onclick = expandContactEditor;
@@ -1086,6 +1091,7 @@
             updateAboutUIState();
         }
 
+        // 🛠️ Bezpečný reset formulárov BEZ volania checkPostLimits(), čím sme zabili slučku
         function resetAboutEditor() {
             editingAboutPostId = null;
             existingAboutImageUrl = null;
@@ -1103,7 +1109,6 @@
             document.getElementById('publish-btn-about').innerText = "UPLOAD";
             
             updateAboutImageUIState();
-            checkPostLimits();
         }
 
         function updateAboutImageUIState() {
@@ -1203,7 +1208,6 @@
             document.getElementById('publish-btn-contact').innerText = "UPLOAD";
             
             updateContactImageUIState();
-            checkPostLimits();
         }
 
         function updateContactImageUIState() {
