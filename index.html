@@ -12,7 +12,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=2">
     
     <title>martinvojtus.space</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
             --black: #000000;
@@ -47,7 +47,8 @@
             -webkit-tap-highlight-color: transparent; 
             box-sizing: border-box; 
             font-weight: 400; 
-            font-family: 'Inter', sans-serif; 
+            /* 🛠️ Aplikovanie nového fontu */
+            font-family: 'Plus Jakarta Sans', sans-serif; 
             letter-spacing: var(--letter-spacing); 
             transition: none !important; 
             animation: none !important;
@@ -61,7 +62,8 @@
             min-height: 100vh;
         }
 
-        .submit-btn, .form-input, .admin-bar-item {
+        /* 🛠️ Odstránené fixné riadkovanie pre tlačidlá, aby sa text prirodzene vycentroval */
+        .form-input, .admin-bar-item {
             line-height: 1;
         }
 
@@ -186,14 +188,11 @@
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
 
-        .form-input, .submit-btn { 
+        .form-input { 
             border-radius: var(--border-radius); 
             font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; display: flex; align-items: center; gap: var(--gap-item); 
             box-shadow: none; -webkit-appearance: none; appearance: none; margin: 0;
-        }
-
-        .form-input { 
             height: 3rem;
             background-color: transparent; 
             color: var(--black);
@@ -202,11 +201,17 @@
         .form-input::placeholder { color: var(--grey-50); } 
 
         .submit-btn { 
+            border-radius: var(--border-radius); 
+            font-size: var(--size-small); padding: 0 var(--gap-item); 
+            outline: none; display: flex; align-items: center; gap: var(--gap-item); 
+            box-shadow: none; -webkit-appearance: none; appearance: none; margin: 0;
             height: 3rem;
             background-color: var(--black); 
             color: var(--white);
             border: 1px solid var(--black); 
             justify-content: center; text-transform: uppercase; cursor: pointer; white-space: nowrap;
+            /* 🛠️ Explicitne nastavený line-height na normal pre dokonalé vycentrovanie v kombinácii s novým fontom */
+            line-height: normal;
         }
 
         .btn-tonal {
@@ -372,7 +377,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v6.9.8 • 2026</div>
+            <div class="footer-info">build v6.9.9 • 2026</div>
         </div>
     </nav>
 
