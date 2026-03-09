@@ -126,7 +126,7 @@
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
         #logout-ui { display: none; }
         
-        #admin-upload-zone { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; margin-bottom: var(--gap-item); }
+        #admin-upload-zone, #admin-upload-zone-about { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; margin-bottom: var(--gap-item); }
 
         .status-feed { 
             max-width: var(--content-width); width: 100%; margin: 0 auto; 
@@ -389,7 +389,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v6.8.7 • 2026</div>
+            <div class="footer-info">build v6.8.8 • 2026</div>
         </div>
     </nav>
 
@@ -432,7 +432,40 @@
 
         <div id="section-feed">
             <div id="status-container" class="status-feed view-grid"></div>
-            <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
+        </div>
+
+        <div id="admin-upload-zone-about">
+            <div id="editor-collapsed-state-about" class="submit-btn btn-tonal" style="width: 100%;" onclick="expandAboutEditor()">
+                + ADD ABOUT POST
+            </div>
+
+            <form id="editor-form-about" onsubmit="handleAboutSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
+                <input type="text" id="edit-title-about" class="form-input" placeholder="Title..." style="width: 100%;">
+                <textarea id="edit-text-about" class="form-input" placeholder="Content..." style="width: 100%; min-height: 3rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this)"></textarea>
+
+                <input type="file" id="edit-image-about" accept="image/*" style="display: none;" onchange="updateAboutImageUIState()">
+                
+                <div id="upload-empty-state-about" class="submit-btn btn-tonal" style="width: 100%;" onclick="document.getElementById('edit-image-about').click()">
+                    + ADD IMAGE
+                </div>
+
+                <div id="upload-filled-state-about" class="action-row" style="display: none;">
+                    <div class="thumbnail-container" onclick="document.getElementById('edit-image-about').click()">
+                        <img id="upload-preview-img-about" class="thumbnail-img" src="" alt="">
+                    </div>
+                    <div class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="clearAboutImageSelection(event)">DELETE IMAGE</div>
+                </div>
+
+                <div id="upload-details-zone-about" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;">
+                    <div id="upload-action-row-about" class="action-row" style="padding: 0;">
+                        <button type="submit" id="publish-btn-about" class="submit-btn btn-tonal" style="flex-grow: 1;">UPLOAD</button>
+                        <div class="submit-btn btn-tonal" onclick="collapseAboutEditor()">CANCEL</div>
+                    </div>
+                    <div id="upload-loading-row-about" class="action-row" style="display: none; padding: 0;">
+                        <div class="submit-btn btn-loading" style="flex-grow: 1;">UPLOADING...</div>
+                    </div>
+                </div>
+            </form>
         </div>
 
         <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
@@ -446,10 +479,14 @@
                 I leave tedious setups to the machines. My architecture relies on modern, maintenance-free cloud solutions like Supabase and Render. This serverless approach frees me from technical clutter, allowing me to focus entirely on seamless performance.
             </div>
             
-            <div class="about-text">
+            <div class="about-text" style="margin-bottom: 1rem;">
                 Ultimately, technology is just a tool. My true goal is visual clarity, minimalism, and an artistic experience. I treat web development as a digital canvas where every pixel and calculated gap holds meaning. I don't just write functional code—I strive to craft aesthetically refined experiences that bring joy to the user.
             </div>
+
+            <div id="about-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
         </div>
+        
+        <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
     </main>
 
     <div id="delete-modal">
@@ -468,9 +505,13 @@
     <script>
         const API_URL = "https://mv-backend-ak8l.onrender.com";
         let secretKey = ""; let globalPosts = []; 
-        let currentOffset = 0; const postsLimit = 10; let isLoading = false; let hasMorePosts = true;
+        let currentOffset = 0; const postsLimit = 20; // 🛠️ Zvýšený limit pre načítavanie (na spoľahlivejšie načítanie About postov)
+        let isLoading = false; let hasMorePosts = true;
         let deleteActionType = null;
         
+        let editingAboutPostId = null;
+        let existingAboutImageUrl = null;
+
         let currentViewMode = localStorage.getItem('mv_view_mode') || 'grid';
         let currentSection = 'feed'; 
 
@@ -485,6 +526,11 @@
             });
         }
 
+        function autoResizeTextarea(el) {
+            el.style.height = 'auto';
+            el.style.height = el.scrollHeight + 'px';
+        }
+
         function showFeed() {
             currentSection = 'feed';
             document.getElementById('section-about').style.display = 'none';
@@ -497,8 +543,8 @@
         function showAbout() {
             currentSection = 'about';
             document.getElementById('section-feed').style.display = 'none';
-            document.getElementById('admin-upload-zone').style.display = 'none';
             document.getElementById('section-about').style.display = 'flex';
+            updateUIVisibility();
             closeMenu();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -514,11 +560,22 @@
             resetEditor(); 
         }
 
+        function expandAboutEditor() {
+            document.getElementById('editor-collapsed-state-about').style.display = 'none';
+            document.getElementById('editor-form-about').style.display = 'flex';
+        }
+
+        function collapseAboutEditor() {
+            document.getElementById('editor-collapsed-state-about').style.display = 'flex';
+            document.getElementById('editor-form-about').style.display = 'none';
+            resetAboutEditor(); 
+        }
+
         function toggleViewMode() {
             const newMode = currentViewMode === 'feed' ? 'grid' : 'feed';
             currentViewMode = newMode;
             localStorage.setItem('mv_view_mode', newMode);
-            refreshFeedUI();
+            refreshFeedUI(globalPosts.filter(p => p.author !== 'about'));
         }
 
         function toggleMenu() { 
@@ -539,15 +596,19 @@
                 document.getElementById('logout-ui').style.display = 'flex';
                 if (currentSection === 'feed') {
                     document.getElementById('admin-upload-zone').style.display = 'flex';
+                    document.getElementById('admin-upload-zone-about').style.display = 'none';
                 } else {
                     document.getElementById('admin-upload-zone').style.display = 'none';
+                    document.getElementById('admin-upload-zone-about').style.display = 'flex';
                 }
             } else {
                 document.body.classList.remove('is-logged-in');
                 document.getElementById('login-ui').style.display = 'flex';
                 document.getElementById('admin-upload-zone').style.display = 'none';
+                document.getElementById('admin-upload-zone-about').style.display = 'none';
                 document.getElementById('logout-ui').style.display = 'none';
                 collapseEditor(); 
+                collapseAboutEditor();
             }
         }
 
@@ -570,7 +631,7 @@
                     setTimeout(() => {
                         updateUIVisibility();
                         closeMenu(); 
-                        refreshFeedUI(); 
+                        fetchStatuses(true); 
                         passInput.value = ''; 
                         if (rememberMe) { localStorage.setItem('mv_admin_key', secretKey); } else { localStorage.removeItem('mv_admin_key'); }
                         
@@ -595,7 +656,7 @@
                     if (res.ok) { 
                         secretKey = savedKey; 
                         updateUIVisibility();
-                        refreshFeedUI(); 
+                        fetchStatuses(true); 
                     } 
                     else { localStorage.removeItem('mv_admin_key'); updateUIVisibility(); }
                 } catch (e) { updateUIVisibility(); }
@@ -610,12 +671,15 @@
             updateUIVisibility();
             closeMenu();
             resetEditor();
+            resetAboutEditor();
             document.getElementById('editor-collapsed-state').style.display = 'flex';
             document.getElementById('editor-form').style.display = 'none';
-            refreshFeedUI();
+            document.getElementById('editor-collapsed-state-about').style.display = 'flex';
+            document.getElementById('editor-form-about').style.display = 'none';
+            fetchStatuses(true);
         }
 
-        function refreshFeedUI() { 
+        function refreshFeedUI(feedPosts) { 
             const container = document.getElementById('status-container');
             const deleteAllBtn = document.getElementById('delete-all-btn');
 
@@ -629,7 +693,7 @@
                 }
             }
             
-            if (globalPosts.length === 0) {
+            if (feedPosts.length === 0) {
                 container.className = 'status-feed view-feed';
                 if (secretKey) {
                     container.innerHTML = ``;
@@ -652,7 +716,7 @@
                         <button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">GRID VIEW</button>
                     </div>
                 `;
-                globalPosts.forEach(post => { html += renderSinglePost(post); });
+                feedPosts.forEach(post => { html += renderSinglePost(post); });
                 container.innerHTML = html;
             } else {
                 container.className = 'status-feed view-grid';
@@ -663,7 +727,7 @@
 
                 rightCol += `<button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">FEED VIEW</button>`;
 
-                globalPosts.forEach((post, index) => {
+                feedPosts.forEach((post, index) => {
                     if (index % 2 === 0) leftCol += renderSinglePost(post);
                     else rightCol += renderSinglePost(post);
                 });
@@ -674,6 +738,30 @@
                 html += `<div class="grid-columns-wrapper">${leftCol}${rightCol}</div>`;
                 container.innerHTML = html;
             }
+        }
+
+        // 🛠️ Vykreslenie dynamických príspevkov v sekcii About (čistý dizajn)
+        function getAboutPostHtml(p) {
+            return `
+            <div class="status-card" style="gap: var(--gap-item); margin-top: 1rem;">
+                ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
+                ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
+                ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
+                ${secretKey ? `
+                <div class="action-row" style="margin-top: 0.5rem;">
+                    <button class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="editAboutPost(${p.id})">EDIT</button>
+                    <button class="submit-btn btn-danger" style="flex-grow: 1;" onclick="openDeleteAboutModal(${p.id})">DELETE</button>
+                </div>
+                ` : ''}
+            </div>
+            `;
+        }
+
+        function renderAboutPosts(posts) {
+            const container = document.getElementById('about-posts-container');
+            let html = '';
+            posts.forEach(p => html += getAboutPostHtml(p));
+            container.innerHTML = html;
         }
 
         function compressImage(file, maxWidth = 1200, quality = 0.8) {
@@ -708,25 +796,38 @@
                 if (newPosts.length < postsLimit) hasMorePosts = false;
                 currentOffset += newPosts.length; globalPosts = globalPosts.concat(newPosts);
                 
+                const feedPosts = globalPosts.filter(p => p.author !== 'about');
+                const aboutPosts = globalPosts.filter(p => p.author === 'about');
+
                 if (reset) {
-                    refreshFeedUI();
+                    refreshFeedUI(feedPosts);
+                    renderAboutPosts(aboutPosts);
                 } else {
+                    const newFeedPosts = newPosts.filter(p => p.author !== 'about');
+                    const newAboutPosts = newPosts.filter(p => p.author === 'about');
+
                     if (currentViewMode === 'feed') {
                         let html = '';
-                        newPosts.forEach(p => html += renderSinglePost(p));
+                        newFeedPosts.forEach(p => html += renderSinglePost(p));
                         document.getElementById('status-container').insertAdjacentHTML('beforeend', html);
                     } else {
                         const leftCol = document.querySelector('.col-left');
                         const rightCol = document.querySelector('.col-right');
-                        let currentCount = globalPosts.length - newPosts.length;
-                        newPosts.forEach((post, i) => {
+                        let currentFeedCount = feedPosts.length - newFeedPosts.length;
+                        newFeedPosts.forEach((post, i) => {
                             const postHtml = renderSinglePost(post);
-                            if ((currentCount + i) % 2 === 0) {
+                            if ((currentFeedCount + i) % 2 === 0) {
                                 if (leftCol) leftCol.insertAdjacentHTML('beforeend', postHtml);
                             } else {
                                 if (rightCol) rightCol.insertAdjacentHTML('beforeend', postHtml);
                             }
                         });
+                    }
+
+                    if (newAboutPosts.length > 0) {
+                        let html = '';
+                        newAboutPosts.forEach(p => html += getAboutPostHtml(p));
+                        document.getElementById('about-posts-container').insertAdjacentHTML('beforeend', html);
                     }
                 }
             } catch (error) {} finally { 
@@ -745,7 +846,7 @@
             if (currentViewMode === 'grid') {
                 currentViewMode = 'feed';
                 localStorage.setItem('mv_view_mode', 'feed');
-                refreshFeedUI();
+                refreshFeedUI(globalPosts.filter(p => p.author !== 'about'));
                 
                 const scrollIt = (behavior) => {
                     const targetImg = document.getElementById(`post-img-${id}`);
@@ -836,20 +937,17 @@
             const filledState = document.getElementById('upload-filled-state');
             const thumbnail = document.getElementById('upload-preview-img');
             const pubBtn = document.getElementById('publish-btn');
-            const detailsZone = document.getElementById('upload-details-zone');
 
             const hasImage = (input && input.files && input.files.length > 0);
 
             if (hasImage) {
                 if(thumbnail) thumbnail.src = URL.createObjectURL(input.files[0]);
-                
-                if(emptyState) emptyState.style.display = 'none';
-                if(filledState) filledState.style.display = 'flex';
+                emptyState.style.display = 'none';
+                filledState.style.display = 'flex';
             } else {
                 if(thumbnail) thumbnail.src = "";
-                
-                if(emptyState) emptyState.style.display = 'flex';
-                if(filledState) filledState.style.display = 'none';
+                emptyState.style.display = 'flex';
+                filledState.style.display = 'none';
             }
 
             if (pubBtn) {
@@ -867,6 +965,73 @@
             e.stopPropagation();
             document.getElementById('edit-image').value = ""; 
             updateImageUIState();
+        }
+
+        // 🛠️ Nové funkcie pre prácu s About editorom
+        function resetAboutEditor() {
+            editingAboutPostId = null;
+            existingAboutImageUrl = null;
+            document.getElementById('edit-title-about').value = "";
+            const textEl = document.getElementById('edit-text-about');
+            textEl.value = "";
+            textEl.style.height = 'auto';
+            document.getElementById('edit-image-about').value = "";
+            
+            document.getElementById('upload-action-row-about').style.display = 'flex';
+            document.getElementById('upload-loading-row-about').style.display = 'none';
+            
+            document.getElementById('publish-btn-about').innerText = "UPLOAD";
+            
+            updateAboutImageUIState();
+        }
+
+        function updateAboutImageUIState() {
+            const input = document.getElementById('edit-image-about');
+            const emptyState = document.getElementById('upload-empty-state-about');
+            const filledState = document.getElementById('upload-filled-state-about');
+            const thumbnail = document.getElementById('upload-preview-img-about');
+            
+            const hasImage = (input && input.files && input.files.length > 0) || existingAboutImageUrl;
+
+            if (hasImage) {
+                if(input && input.files && input.files.length > 0) {
+                    thumbnail.src = URL.createObjectURL(input.files[0]);
+                } else {
+                    thumbnail.src = existingAboutImageUrl;
+                }
+                emptyState.style.display = 'none';
+                filledState.style.display = 'flex';
+            } else {
+                thumbnail.src = "";
+                emptyState.style.display = 'flex';
+                filledState.style.display = 'none';
+            }
+        }
+
+        function clearAboutImageSelection(e) {
+            e.stopPropagation();
+            document.getElementById('edit-image-about').value = "";
+            existingAboutImageUrl = null; 
+            updateAboutImageUIState();
+        }
+
+        function editAboutPost(id) {
+            const post = globalPosts.find(p => p.id === id);
+            if (!post) return;
+            
+            editingAboutPostId = post.id;
+            existingAboutImageUrl = post.image_url;
+            
+            document.getElementById('edit-title-about').value = post.title || "";
+            const textEl = document.getElementById('edit-text-about');
+            textEl.value = post.text || "";
+            
+            expandAboutEditor();
+            setTimeout(() => { autoResizeTextarea(textEl); }, 0);
+            updateAboutImageUIState();
+            
+            document.getElementById('publish-btn-about').innerText = "SAVE";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function handleDeleteFeed(id) {
@@ -909,31 +1074,38 @@
             document.getElementById('modal-success-zone').style.display = 'none';
         }
 
+        function openDeleteAboutModal(id) {
+            openDeleteModal('about_' + id);
+        }
+
         function closeDeleteModal() {
             document.getElementById('delete-modal').style.display = 'none';
             deleteActionType = null;
         }
 
         async function executeModalDelete() {
-            if (deleteActionType === 'delete_all') {
-                document.getElementById('modal-action-zone').style.display = 'none';
-                document.getElementById('modal-loading-zone').style.display = 'flex';
+            document.getElementById('modal-action-zone').style.display = 'none';
+            document.getElementById('modal-loading-zone').style.display = 'flex';
 
+            if (deleteActionType === 'delete_all') {
                 const res = await fetch(`${API_URL}/posts?skip=0&limit=100`);
                 const posts = await res.json();
                 for (const p of posts) { 
                     await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); 
                 }
-                
-                document.getElementById('modal-loading-zone').style.display = 'none';
-                document.getElementById('modal-success-zone').style.display = 'flex';
-                
-                setTimeout(() => {
-                    fetchStatuses(true);
-                    closeDeleteModal();
-                    collapseEditor();
-                }, 1000);
+            } else if (deleteActionType && deleteActionType.startsWith('about_')) {
+                const id = deleteActionType.split('_')[1];
+                await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); 
             }
+            
+            document.getElementById('modal-loading-zone').style.display = 'none';
+            document.getElementById('modal-success-zone').style.display = 'flex';
+            
+            setTimeout(() => {
+                fetchStatuses(true);
+                closeDeleteModal();
+                if(deleteActionType === 'delete_all') { collapseEditor(); }
+            }, 1000);
         }
 
         function handleDeleteAllClick() {
@@ -978,6 +1150,57 @@
             } catch (err) {
                 console.error(err);
                 resetEditor();
+            }
+        }
+
+        async function handleAboutSubmit(e) { 
+            e.preventDefault(); 
+            const title = document.getElementById('edit-title-about').value;
+            const text = document.getElementById('edit-text-about').value;
+            const imageFile = document.getElementById('edit-image-about').files[0];
+            
+            if (!title && !text && !imageFile && !existingAboutImageUrl) return;
+            
+            document.getElementById('upload-action-row-about').style.display = 'none';
+            document.getElementById('upload-loading-row-about').style.display = 'flex';
+            
+            try {
+                let finalImageUrl = existingAboutImageUrl;
+                
+                if (imageFile) {
+                    const compressedFile = await compressImage(imageFile);
+                    const formData = new FormData(); formData.append("file", compressedFile);
+                    const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
+                    if (!upRes.ok) throw new Error("Upload failed");
+                    const upData = await upRes.json();
+                    finalImageUrl = upData.image_url;
+                }
+
+                // Označenie author: "about" zaručí, že sa post zobrazí v sekcii About
+                const payload = { title: title, text: text, image_url: finalImageUrl || "", show_date: false, author: "about" };
+                
+                let res;
+                if (editingAboutPostId) {
+                    res = await fetch(`${API_URL}/posts/${editingAboutPostId}`, {
+                        method: "PUT", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
+                        body: JSON.stringify(payload)
+                    });
+                } else {
+                    res = await fetch(`${API_URL}/posts`, {
+                        method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
+                        body: JSON.stringify(payload)
+                    });
+                }
+                
+                if (res.ok) { 
+                    fetchStatuses(true); 
+                    collapseAboutEditor();
+                } else { 
+                    resetAboutEditor(); 
+                }
+            } catch (err) {
+                console.error(err);
+                resetAboutEditor();
             }
         }
 
