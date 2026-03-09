@@ -389,7 +389,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v6.8.8 • 2026</div>
+            <div class="footer-info">build v6.8.9 • 2026</div>
         </div>
     </nav>
 
@@ -469,20 +469,6 @@
         </div>
 
         <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
-            <div style="font-size: var(--size-large); width: 100%; text-align: left; margin-bottom: var(--gap-item);">My vision</div>
-            
-            <div class="about-text">
-                I believe the best programmers are inherently a bit lazy—they seek efficiency over complexity. Coding is no longer about writing thousands of lines from scratch. I leverage AI and advanced LLMs as creative partners to automate routines and bring ideas to life at lightning speed.
-            </div>
-            
-            <div class="about-text">
-                I leave tedious setups to the machines. My architecture relies on modern, maintenance-free cloud solutions like Supabase and Render. This serverless approach frees me from technical clutter, allowing me to focus entirely on seamless performance.
-            </div>
-            
-            <div class="about-text" style="margin-bottom: 1rem;">
-                Ultimately, technology is just a tool. My true goal is visual clarity, minimalism, and an artistic experience. I treat web development as a digital canvas where every pixel and calculated gap holds meaning. I don't just write functional code—I strive to craft aesthetically refined experiences that bring joy to the user.
-            </div>
-
             <div id="about-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
         </div>
         
@@ -505,7 +491,7 @@
     <script>
         const API_URL = "https://mv-backend-ak8l.onrender.com";
         let secretKey = ""; let globalPosts = []; 
-        let currentOffset = 0; const postsLimit = 20; // 🛠️ Zvýšený limit pre načítavanie (na spoľahlivejšie načítanie About postov)
+        let currentOffset = 0; const postsLimit = 20; 
         let isLoading = false; let hasMorePosts = true;
         let deleteActionType = null;
         
@@ -740,19 +726,19 @@
             }
         }
 
-        // 🛠️ Vykreslenie dynamických príspevkov v sekcii About (čistý dizajn)
+        // 🛠️ Tlačidlá EDIT a DELETE presunuté nad príspevok
         function getAboutPostHtml(p) {
             return `
             <div class="status-card" style="gap: var(--gap-item); margin-top: 1rem;">
-                ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
-                ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
-                ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
                 ${secretKey ? `
-                <div class="action-row" style="margin-top: 0.5rem;">
+                <div class="action-row" style="margin-bottom: 0.5rem;">
                     <button class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="editAboutPost(${p.id})">EDIT</button>
                     <button class="submit-btn btn-danger" style="flex-grow: 1;" onclick="openDeleteAboutModal(${p.id})">DELETE</button>
                 </div>
                 ` : ''}
+                ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
+                ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
+                ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
             </div>
             `;
         }
@@ -967,7 +953,6 @@
             updateImageUIState();
         }
 
-        // 🛠️ Nové funkcie pre prácu s About editorom
         function resetAboutEditor() {
             editingAboutPostId = null;
             existingAboutImageUrl = null;
@@ -1176,7 +1161,6 @@
                     finalImageUrl = upData.image_url;
                 }
 
-                // Označenie author: "about" zaručí, že sa post zobrazí v sekcii About
                 const payload = { title: title, text: text, image_url: finalImageUrl || "", show_date: false, author: "about" };
                 
                 let res;
