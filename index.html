@@ -85,8 +85,6 @@
 
         .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
         .header-left svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
-        
-        /* 🛠️ Opravený pointer-events, aby bolo možné kliknúť aj na text */
         .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; pointer-events: auto; cursor: pointer; }
 
         .menu-toggle { 
@@ -128,7 +126,6 @@
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
         #logout-ui { display: none; }
         
-        /* 🛠️ Pridané skrytie pre contact upload zónu */
         #admin-upload-zone, #admin-upload-zone-about, #admin-upload-zone-contact { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; margin-bottom: var(--gap-item); }
 
         .status-feed { 
@@ -378,7 +375,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.0 • 2026</div>
+            <div class="footer-info">build v7.0.1 • 2026</div>
         </div>
     </nav>
 
@@ -553,7 +550,6 @@
             }
         }
 
-        // 🛠️ SPA NAVIGÁCIA
         function showFeed() {
             currentSection = 'feed';
             document.getElementById('section-about').style.display = 'none';
@@ -584,7 +580,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 🛠️ KONTROLA LIMITOV PRÍSPEVKOV
         function checkPostLimits() {
             const aboutCount = globalPosts.filter(p => p.author === 'about').length;
             const btnAbout = document.getElementById('editor-collapsed-state-about');
@@ -613,7 +608,6 @@
             }
         }
 
-        // 🛠️ EDITORY EXPAND/COLLAPSE
         function expandEditor() {
             document.getElementById('editor-collapsed-state').style.display = 'none';
             document.getElementById('editor-form').style.display = 'flex';
@@ -1063,8 +1057,6 @@
             updateImageUIState();
         }
 
-        // ------------------ ABOUT EDITOR LOGIC ------------------
-
         function updateAboutUIState() {
             const titleVal = document.getElementById('edit-title-about').value.trim();
             const textVal = document.getElementById('edit-text-about').value.trim();
@@ -1164,8 +1156,6 @@
             document.getElementById('publish-btn-about').innerText = "SAVE";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
-        // ------------------ CONTACT EDITOR LOGIC ------------------
 
         function updateContactUIState() {
             const titleVal = document.getElementById('edit-title-contact').value.trim();
@@ -1268,8 +1258,6 @@
         }
 
 
-        // ------------------ DELETE LOGIC ------------------
-
         function handleDeleteFeed(id) {
             document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
             document.getElementById(`confirm-actions-${id}`).style.display = 'flex';
@@ -1344,8 +1332,6 @@
         function handleDeleteAllClick() {
             openDeleteModal('delete_all');
         }
-
-        // ------------------ SUBMIT LOGIC ------------------
 
         async function handleMainSubmit(e) { 
             e.preventDefault(); 
@@ -1461,7 +1447,6 @@
                     finalImageUrl = upData.image_url;
                 }
 
-                // 🛠️ Contact príspevky dostanú author: "contact"
                 const payload = { title: title, text: text, image_url: finalImageUrl || "", show_date: false, author: "contact" };
                 
                 let res;
