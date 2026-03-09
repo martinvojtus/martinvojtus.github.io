@@ -148,10 +148,13 @@
             display: flex; flex-direction: column; gap: var(--gap-item); flex: 1; min-width: 0;
         }
 
+        /* 🛠️ Nové CSS pravidlo pre skrytie administrátorských tlačidiel v Grid móde */
         .status-feed.view-grid .status-glass-bar,
-        .status-feed.view-grid .status-confirm-overlay {
+        .status-feed.view-grid .status-confirm-overlay,
+        .status-feed.view-grid .feed-admin-actions {
             display: none !important;
         }
+        
         .status-feed.view-grid .status-media-wrapper {
             background-color: transparent; 
         }
@@ -389,7 +392,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v6.9.1 • 2026</div>
+            <div class="footer-info">build v6.9.2 • 2026</div>
         </div>
     </nav>
 
@@ -874,7 +877,7 @@
             <div class="status-glass-bar">
                 ${secretKey ? `<span class="admin-bar-item" style="color: var(--grey-50);">#${s.id}</span>` : '<div></div>'}
                 <span class="admin-bar-item" style="position: absolute; left: 50%; transform: translateX(-50%); color: var(--grey-50);">${formattedDate}</span>
-                ${secretKey ? `<span onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>` : '<div></div>'}
+                <div></div>
             </div>`;
 
             const imageHtml = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="status-image" alt="image" loading="lazy" onclick="toggleGlassBar(this, ${s.id})">` : '';
@@ -902,7 +905,14 @@
                 </div>`;
             }
 
-            return `<div class="status-card">${mediaHtml}</div>`;
+            // 🛠️ Nové externé DELETE tlačidlo vložené nad fotkou vo Feede
+            let adminActions = secretKey ? `
+            <div class="action-row feed-admin-actions" style="justify-content: flex-end; padding: 0; margin-bottom: 0.5rem;">
+                <button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="handleDeleteFeed(${s.id})">DELETE</button>
+            </div>
+            ` : '';
+
+            return `<div class="status-card">${adminActions}${mediaHtml}</div>`;
         }
 
         function resetEditor() {
@@ -1032,6 +1042,10 @@
             const bars = card.querySelectorAll('.status-glass-bar');
             bars.forEach(b => b.style.display = 'none');
             
+            // Dočasne skryť aj externé tlačidlo pri potvrdzovaní
+            const adminActions = card.querySelector('.feed-admin-actions');
+            if(adminActions) adminActions.style.display = 'none';
+            
             document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
             document.getElementById(`confirm-actions-${id}`).style.display = 'flex';
             document.getElementById(`confirm-loading-${id}`).style.display = 'none';
@@ -1043,6 +1057,9 @@
             const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
             const bars = card.querySelectorAll('.status-glass-bar');
             bars.forEach(b => b.style.display = 'flex');
+            
+            const adminActions = card.querySelector('.feed-admin-actions');
+            if(adminActions) adminActions.style.display = 'flex';
         }
 
         async function executeFeedDelete(id) {
