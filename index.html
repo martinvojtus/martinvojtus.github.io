@@ -47,7 +47,6 @@
             -webkit-tap-highlight-color: transparent; 
             box-sizing: border-box; 
             font-weight: 400; 
-            /* 🛠️ Aplikovanie nového fontu */
             font-family: 'Plus Jakarta Sans', sans-serif; 
             letter-spacing: var(--letter-spacing); 
             transition: none !important; 
@@ -62,7 +61,6 @@
             min-height: 100vh;
         }
 
-        /* 🛠️ Odstránené fixné riadkovanie pre tlačidlá, aby sa text prirodzene vycentroval */
         .form-input, .admin-bar-item {
             line-height: 1;
         }
@@ -87,7 +85,9 @@
 
         .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
         .header-left svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
-        .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; pointer-events: none; }
+        
+        /* 🛠️ Opravený pointer-events, aby bolo možné kliknúť aj na text */
+        .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; pointer-events: auto; cursor: pointer; }
 
         .menu-toggle { 
             display: flex; justify-content: center; align-items: center; 
@@ -128,7 +128,8 @@
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
         #logout-ui { display: none; }
         
-        #admin-upload-zone, #admin-upload-zone-about { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; margin-bottom: var(--gap-item); }
+        /* 🛠️ Pridané skrytie pre contact upload zónu */
+        #admin-upload-zone, #admin-upload-zone-about, #admin-upload-zone-contact { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; margin-bottom: var(--gap-item); }
 
         .status-feed { 
             max-width: var(--content-width); width: 100%; margin: 0 auto; 
@@ -210,7 +211,6 @@
             color: var(--white);
             border: 1px solid var(--black); 
             justify-content: center; text-transform: uppercase; cursor: pointer; white-space: nowrap;
-            /* 🛠️ Explicitne nastavený line-height na normal pre dokonalé vycentrovanie v kombinácii s novým fontom */
             line-height: normal;
         }
 
@@ -348,7 +348,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="72.35 270 935.31 810" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
                 </div>
             </div>
-            <div class="logo-text"><span>martinvojtus</span> • space</div>
+            <div class="logo-text" onclick="showFeed()"><span>martinvojtus</span> • space</div>
             
             <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">MENU</div>
         </div>
@@ -358,6 +358,7 @@
         <div class="menu-items">
             <div class="menu-nav-link" onclick="showFeed()">Feed</div>
             <div class="menu-nav-link" onclick="showAbout()">About</div>
+            <div class="menu-nav-link" onclick="showContact()">Contact</div>
             
             <div class="divider-line"></div>
 
@@ -377,7 +378,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v6.9.9 • 2026</div>
+            <div class="footer-info">build v7.0.0 • 2026</div>
         </div>
     </nav>
 
@@ -460,6 +461,45 @@
         <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="about-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
         </div>
+
+        <div id="admin-upload-zone-contact">
+            <div id="editor-collapsed-state-contact" class="submit-btn btn-tonal" style="width: 100%;" onclick="expandContactEditor()">
+                + ADD CONTACT POST
+            </div>
+
+            <form id="editor-form-contact" onsubmit="handleContactSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
+                <input type="text" id="edit-title-contact" class="form-input" placeholder="Title..." style="width: 100%;" oninput="updateContactUIState()">
+                <textarea id="edit-text-contact" class="form-input" placeholder="Content..." style="width: 100%; min-height: 6rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateContactUIState();"></textarea>
+
+                <input type="file" id="edit-image-contact" accept="image/*" style="display: none;" onchange="updateContactImageUIState()">
+                
+                <div id="upload-empty-state-contact" class="submit-btn btn-tonal" style="width: 100%;" onclick="document.getElementById('edit-image-contact').click()">
+                    + ADD IMAGE
+                </div>
+
+                <div id="upload-filled-state-contact" class="action-row" style="display: none;">
+                    <div class="thumbnail-container" onclick="document.getElementById('edit-image-contact').click()">
+                        <img id="upload-preview-img-contact" class="thumbnail-img" src="" alt="">
+                    </div>
+                    <div class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="clearContactImageSelection(event)">DELETE IMAGE</div>
+                </div>
+
+                <div id="upload-details-zone-contact" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;">
+                    <div id="upload-action-row-contact" class="action-row" style="padding: 0;">
+                        <button type="submit" id="publish-btn-contact" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>UPLOAD</button>
+                        <div id="clear-btn-contact" class="submit-btn btn-tonal-disabled" onclick="clearContactTextFields(event)" style="flex-grow: 0;" disabled>CLEAR</div>
+                        <div class="submit-btn btn-tonal" onclick="collapseContactEditor()" style="flex-grow: 0;">CANCEL</div>
+                    </div>
+                    <div id="upload-loading-row-contact" class="action-row" style="display: none; padding: 0;">
+                        <div class="submit-btn btn-loading" style="flex-grow: 1;">UPLOADING...</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div id="section-contact" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
+            <div id="contact-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
+        </div>
         
         <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
     </main>
@@ -486,6 +526,9 @@
         
         let editingAboutPostId = null;
         let existingAboutImageUrl = null;
+        
+        let editingContactPostId = null;
+        let existingContactImageUrl = null;
 
         let currentViewMode = localStorage.getItem('mv_view_mode') || 'grid';
         let currentSection = 'feed'; 
@@ -510,9 +553,11 @@
             }
         }
 
+        // 🛠️ SPA NAVIGÁCIA
         function showFeed() {
             currentSection = 'feed';
             document.getElementById('section-about').style.display = 'none';
+            document.getElementById('section-contact').style.display = 'none';
             document.getElementById('section-feed').style.display = 'block';
             updateUIVisibility();
             closeMenu();
@@ -522,17 +567,57 @@
         function showAbout() {
             currentSection = 'about';
             document.getElementById('section-feed').style.display = 'none';
+            document.getElementById('section-contact').style.display = 'none';
             document.getElementById('section-about').style.display = 'flex';
             updateUIVisibility();
             closeMenu();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function showContact() {
+            currentSection = 'contact';
+            document.getElementById('section-feed').style.display = 'none';
+            document.getElementById('section-about').style.display = 'none';
+            document.getElementById('section-contact').style.display = 'flex';
+            updateUIVisibility();
+            closeMenu();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 🛠️ KONTROLA LIMITOV PRÍSPEVKOV
+        function checkPostLimits() {
+            const aboutCount = globalPosts.filter(p => p.author === 'about').length;
+            const btnAbout = document.getElementById('editor-collapsed-state-about');
+            if (btnAbout) {
+                if (aboutCount >= 1) {
+                    btnAbout.className = 'submit-btn btn-tonal-disabled';
+                    btnAbout.onclick = null;
+                    collapseAboutEditor();
+                } else {
+                    btnAbout.className = 'submit-btn btn-tonal';
+                    btnAbout.onclick = expandAboutEditor;
+                }
+            }
+
+            const contactCount = globalPosts.filter(p => p.author === 'contact').length;
+            const btnContact = document.getElementById('editor-collapsed-state-contact');
+            if (btnContact) {
+                if (contactCount >= 1) {
+                    btnContact.className = 'submit-btn btn-tonal-disabled';
+                    btnContact.onclick = null;
+                    collapseContactEditor();
+                } else {
+                    btnContact.className = 'submit-btn btn-tonal';
+                    btnContact.onclick = expandContactEditor;
+                }
+            }
+        }
+
+        // 🛠️ EDITORY EXPAND/COLLAPSE
         function expandEditor() {
             document.getElementById('editor-collapsed-state').style.display = 'none';
             document.getElementById('editor-form').style.display = 'flex';
         }
-
         function collapseEditor() {
             document.getElementById('editor-collapsed-state').style.display = 'flex';
             document.getElementById('editor-form').style.display = 'none';
@@ -543,18 +628,27 @@
             document.getElementById('editor-collapsed-state-about').style.display = 'none';
             document.getElementById('editor-form-about').style.display = 'flex';
         }
-
         function collapseAboutEditor() {
             document.getElementById('editor-collapsed-state-about').style.display = 'flex';
             document.getElementById('editor-form-about').style.display = 'none';
             resetAboutEditor(); 
         }
 
+        function expandContactEditor() {
+            document.getElementById('editor-collapsed-state-contact').style.display = 'none';
+            document.getElementById('editor-form-contact').style.display = 'flex';
+        }
+        function collapseContactEditor() {
+            document.getElementById('editor-collapsed-state-contact').style.display = 'flex';
+            document.getElementById('editor-form-contact').style.display = 'none';
+            resetContactEditor(); 
+        }
+
         function toggleViewMode() {
             const newMode = currentViewMode === 'feed' ? 'grid' : 'feed';
             currentViewMode = newMode;
             localStorage.setItem('mv_view_mode', newMode);
-            refreshFeedUI(globalPosts.filter(p => p.author !== 'about'));
+            refreshFeedUI(globalPosts.filter(p => p.author !== 'about' && p.author !== 'contact'));
         }
 
         function toggleMenu() { 
@@ -573,22 +667,30 @@
                 document.body.classList.add('is-logged-in');
                 document.getElementById('login-ui').style.display = 'none';
                 document.getElementById('logout-ui').style.display = 'flex';
+                
+                document.getElementById('admin-upload-zone').style.display = 'none';
+                document.getElementById('admin-upload-zone-about').style.display = 'none';
+                document.getElementById('admin-upload-zone-contact').style.display = 'none';
+
                 if (currentSection === 'feed') {
                     document.getElementById('admin-upload-zone').style.display = 'flex';
-                    document.getElementById('admin-upload-zone-about').style.display = 'none';
-                } else {
-                    document.getElementById('admin-upload-zone').style.display = 'none';
+                } else if (currentSection === 'about') {
                     document.getElementById('admin-upload-zone-about').style.display = 'flex';
+                } else if (currentSection === 'contact') {
+                    document.getElementById('admin-upload-zone-contact').style.display = 'flex';
                 }
             } else {
                 document.body.classList.remove('is-logged-in');
                 document.getElementById('login-ui').style.display = 'flex';
                 document.getElementById('admin-upload-zone').style.display = 'none';
                 document.getElementById('admin-upload-zone-about').style.display = 'none';
+                document.getElementById('admin-upload-zone-contact').style.display = 'none';
                 document.getElementById('logout-ui').style.display = 'none';
                 collapseEditor(); 
                 collapseAboutEditor();
+                collapseContactEditor();
             }
+            checkPostLimits();
         }
 
         async function handleLogin(e) {
@@ -651,10 +753,13 @@
             closeMenu();
             resetEditor();
             resetAboutEditor();
+            resetContactEditor();
             document.getElementById('editor-collapsed-state').style.display = 'flex';
             document.getElementById('editor-form').style.display = 'none';
             document.getElementById('editor-collapsed-state-about').style.display = 'flex';
             document.getElementById('editor-form-about').style.display = 'none';
+            document.getElementById('editor-collapsed-state-contact').style.display = 'flex';
+            document.getElementById('editor-form-contact').style.display = 'none';
             fetchStatuses(true);
         }
 
@@ -741,10 +846,39 @@
             `;
         }
 
+        function getContactPostHtml(p, index = 0) {
+            const showDivider = (index === 0 && !secretKey) ? false : true;
+            const dividerHtml = showDivider ? `<div class="divider-line"></div>` : '';
+
+            return `
+            <div style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item);">
+                ${dividerHtml}
+                <div class="status-card" style="gap: var(--gap-item);">
+                    ${secretKey ? `
+                    <div class="action-row" style="justify-content: flex-end; padding: 0;">
+                        <button class="submit-btn btn-tonal" style="flex-grow: 0;" onclick="editContactPost(${p.id})">EDIT</button>
+                        <button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="openDeleteContactModal(${p.id})">DELETE</button>
+                    </div>
+                    ` : ''}
+                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
+                    ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
+                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
+                </div>
+            </div>
+            `;
+        }
+
         function renderAboutPosts(posts) {
             const container = document.getElementById('about-posts-container');
             let html = '';
             posts.forEach((p, index) => html += getAboutPostHtml(p, index));
+            container.innerHTML = html;
+        }
+
+        function renderContactPosts(posts) {
+            const container = document.getElementById('contact-posts-container');
+            let html = '';
+            posts.forEach((p, index) => html += getContactPostHtml(p, index));
             container.innerHTML = html;
         }
 
@@ -780,15 +914,18 @@
                 if (newPosts.length < postsLimit) hasMorePosts = false;
                 currentOffset += newPosts.length; globalPosts = globalPosts.concat(newPosts);
                 
-                const feedPosts = globalPosts.filter(p => p.author !== 'about');
+                const feedPosts = globalPosts.filter(p => p.author !== 'about' && p.author !== 'contact');
                 const aboutPosts = globalPosts.filter(p => p.author === 'about');
+                const contactPosts = globalPosts.filter(p => p.author === 'contact');
 
                 if (reset) {
                     refreshFeedUI(feedPosts);
                     renderAboutPosts(aboutPosts);
+                    renderContactPosts(contactPosts);
                 } else {
-                    const newFeedPosts = newPosts.filter(p => p.author !== 'about');
+                    const newFeedPosts = newPosts.filter(p => p.author !== 'about' && p.author !== 'contact');
                     const newAboutPosts = newPosts.filter(p => p.author === 'about');
+                    const newContactPosts = newPosts.filter(p => p.author === 'contact');
 
                     if (currentViewMode === 'feed') {
                         let html = '';
@@ -814,10 +951,18 @@
                         newAboutPosts.forEach((p, i) => html += getAboutPostHtml(p, currentAboutCount + i));
                         document.getElementById('about-posts-container').insertAdjacentHTML('beforeend', html);
                     }
+
+                    if (newContactPosts.length > 0) {
+                        let html = '';
+                        let currentContactCount = contactPosts.length - newContactPosts.length;
+                        newContactPosts.forEach((p, i) => html += getContactPostHtml(p, currentContactCount + i));
+                        document.getElementById('contact-posts-container').insertAdjacentHTML('beforeend', html);
+                    }
                 }
             } catch (error) {} finally { 
                 isLoading = false; 
                 document.getElementById('loading-indicator').style.display = (hasMorePosts && globalPosts.length > 0) ? 'block' : 'none'; 
+                checkPostLimits();
             }
         }
 
@@ -918,6 +1063,8 @@
             updateImageUIState();
         }
 
+        // ------------------ ABOUT EDITOR LOGIC ------------------
+
         function updateAboutUIState() {
             const titleVal = document.getElementById('edit-title-about').value.trim();
             const textVal = document.getElementById('edit-text-about').value.trim();
@@ -964,6 +1111,7 @@
             document.getElementById('publish-btn-about').innerText = "UPLOAD";
             
             updateAboutImageUIState();
+            checkPostLimits();
         }
 
         function updateAboutImageUIState() {
@@ -1017,6 +1165,111 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // ------------------ CONTACT EDITOR LOGIC ------------------
+
+        function updateContactUIState() {
+            const titleVal = document.getElementById('edit-title-contact').value.trim();
+            const textVal = document.getElementById('edit-text-contact').value.trim();
+            const input = document.getElementById('edit-image-contact');
+            const hasImage = (input && input.files && input.files.length > 0) || existingContactImageUrl;
+
+            const hasContent = titleVal.length > 0 || textVal.length > 0 || hasImage;
+
+            const pubBtn = document.getElementById('publish-btn-contact');
+            const clearBtn = document.getElementById('clear-btn-contact');
+
+            if (hasContent) {
+                if (pubBtn) { pubBtn.disabled = false; pubBtn.className = "submit-btn btn-tonal"; }
+                if (clearBtn) { clearBtn.disabled = false; clearBtn.className = "submit-btn btn-tonal"; }
+            } else {
+                if (pubBtn) { pubBtn.disabled = true; pubBtn.className = "submit-btn btn-tonal-disabled"; }
+                if (clearBtn) { clearBtn.disabled = true; clearBtn.className = "submit-btn btn-tonal-disabled"; }
+            }
+        }
+
+        function clearContactTextFields(e) {
+            if(e) e.stopPropagation();
+            document.getElementById('edit-title-contact').value = "";
+            const textEl = document.getElementById('edit-text-contact');
+            textEl.value = "";
+            textEl.style.height = ''; 
+            updateContactUIState();
+        }
+
+        function resetContactEditor() {
+            editingContactPostId = null;
+            existingContactImageUrl = null;
+            
+            document.getElementById('edit-title-contact').value = "";
+            const textEl = document.getElementById('edit-text-contact');
+            textEl.value = "";
+            textEl.style.height = '';
+
+            document.getElementById('edit-image-contact').value = "";
+            
+            document.getElementById('upload-action-row-contact').style.display = 'flex';
+            document.getElementById('upload-loading-row-contact').style.display = 'none';
+            
+            document.getElementById('publish-btn-contact').innerText = "UPLOAD";
+            
+            updateContactImageUIState();
+            checkPostLimits();
+        }
+
+        function updateContactImageUIState() {
+            const input = document.getElementById('edit-image-contact');
+            const emptyState = document.getElementById('upload-empty-state-contact');
+            const filledState = document.getElementById('upload-filled-state-contact');
+            const thumbnail = document.getElementById('upload-preview-img-contact');
+            
+            const hasImage = (input && input.files && input.files.length > 0) || existingContactImageUrl;
+
+            if (hasImage) {
+                if(input && input.files && input.files.length > 0) {
+                    thumbnail.src = URL.createObjectURL(input.files[0]);
+                } else {
+                    thumbnail.src = existingContactImageUrl;
+                }
+                emptyState.style.display = 'none';
+                filledState.style.display = 'flex';
+            } else {
+                thumbnail.src = "";
+                emptyState.style.display = 'flex';
+                filledState.style.display = 'none';
+            }
+
+            updateContactUIState();
+        }
+
+        function clearContactImageSelection(e) {
+            e.stopPropagation();
+            document.getElementById('edit-image-contact').value = "";
+            existingContactImageUrl = null; 
+            updateContactImageUIState();
+        }
+
+        function editContactPost(id) {
+            const post = globalPosts.find(p => p.id === id);
+            if (!post) return;
+            
+            editingContactPostId = post.id;
+            existingContactImageUrl = post.image_url;
+            
+            document.getElementById('edit-title-contact').value = post.title || "";
+            const textEl = document.getElementById('edit-text-contact');
+            textEl.value = post.text || "";
+            
+            expandContactEditor();
+            setTimeout(() => { autoResizeTextarea(textEl); }, 0);
+            updateContactImageUIState();
+            
+            document.getElementById('publish-btn-contact').innerText = "SAVE";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+
+        // ------------------ DELETE LOGIC ------------------
+
         function handleDeleteFeed(id) {
             document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
             document.getElementById(`confirm-actions-${id}`).style.display = 'flex';
@@ -1053,6 +1306,10 @@
         function openDeleteAboutModal(id) {
             openDeleteModal('about_' + id);
         }
+        
+        function openDeleteContactModal(id) {
+            openDeleteModal('contact_' + id);
+        }
 
         function closeDeleteModal() {
             document.getElementById('delete-modal').style.display = 'none';
@@ -1069,7 +1326,7 @@
                 for (const p of posts) { 
                     await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); 
                 }
-            } else if (deleteActionType && deleteActionType.startsWith('about_')) {
+            } else if (deleteActionType && (deleteActionType.startsWith('about_') || deleteActionType.startsWith('contact_'))) {
                 const id = deleteActionType.split('_')[1];
                 await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); 
             }
@@ -1087,6 +1344,8 @@
         function handleDeleteAllClick() {
             openDeleteModal('delete_all');
         }
+
+        // ------------------ SUBMIT LOGIC ------------------
 
         async function handleMainSubmit(e) { 
             e.preventDefault(); 
@@ -1176,6 +1435,57 @@
             } catch (err) {
                 console.error(err);
                 resetAboutEditor();
+            }
+        }
+
+        async function handleContactSubmit(e) { 
+            e.preventDefault(); 
+            const title = document.getElementById('edit-title-contact').value;
+            const text = document.getElementById('edit-text-contact').value;
+            const imageFile = document.getElementById('edit-image-contact').files[0];
+            
+            if (!title && !text && !imageFile && !existingContactImageUrl) return;
+            
+            document.getElementById('upload-action-row-contact').style.display = 'none';
+            document.getElementById('upload-loading-row-contact').style.display = 'flex';
+            
+            try {
+                let finalImageUrl = existingContactImageUrl;
+                
+                if (imageFile) {
+                    const compressedFile = await compressImage(imageFile);
+                    const formData = new FormData(); formData.append("file", compressedFile);
+                    const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
+                    if (!upRes.ok) throw new Error("Upload failed");
+                    const upData = await upRes.json();
+                    finalImageUrl = upData.image_url;
+                }
+
+                // 🛠️ Contact príspevky dostanú author: "contact"
+                const payload = { title: title, text: text, image_url: finalImageUrl || "", show_date: false, author: "contact" };
+                
+                let res;
+                if (editingContactPostId) {
+                    res = await fetch(`${API_URL}/posts/${editingContactPostId}`, {
+                        method: "PUT", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
+                        body: JSON.stringify(payload)
+                    });
+                } else {
+                    res = await fetch(`${API_URL}/posts`, {
+                        method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
+                        body: JSON.stringify(payload)
+                    });
+                }
+                
+                if (res.ok) { 
+                    fetchStatuses(true); 
+                    collapseContactEditor();
+                } else { 
+                    resetContactEditor(); 
+                }
+            } catch (err) {
+                console.error(err);
+                resetContactEditor();
             }
         }
 
