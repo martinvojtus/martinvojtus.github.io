@@ -65,7 +65,7 @@
             line-height: 1;
         }
 
-        header, .nav-overlay, .status-glass-bar, .status-confirm-overlay, #delete-modal {
+        header, .nav-overlay, .status-confirm-overlay, #delete-modal {
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
         }
@@ -148,13 +148,11 @@
             display: flex; flex-direction: column; gap: var(--gap-item); flex: 1; min-width: 0;
         }
 
-        /* 🛠️ Nové CSS pravidlo pre skrytie administrátorských tlačidiel v Grid móde */
-        .status-feed.view-grid .status-glass-bar,
-        .status-feed.view-grid .status-confirm-overlay,
-        .status-feed.view-grid .feed-admin-actions {
+        /* 🛠️ Skrytie lišty s tlačidlami a overlayu pri GRID zobrazení */
+        .status-feed.view-grid .feed-top-row,
+        .status-feed.view-grid .status-confirm-overlay {
             display: none !important;
         }
-        
         .status-feed.view-grid .status-media-wrapper {
             background-color: transparent; 
         }
@@ -181,20 +179,10 @@
             background-color: var(--divider); 
         }
 
-        .status-glass-bar {
-            height: 3rem; width: 100%;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
-            position: absolute; top: 0; left: 0; right: 0;
-            z-index: 10;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 var(--gap-item);
-        }
-
         .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
         .admin-delete-link { cursor: pointer; color: var(--black); text-decoration: none; }
 
-        .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); cursor: pointer; }
+        .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); }
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
 
@@ -297,21 +285,15 @@
             text-transform: uppercase; text-align: center; width: 100%; 
         }
 
+        /* 🛠️ Opravený overlay pre priame rozostrenie pozadia (bez pseudo-elementov) */
         .status-confirm-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 20;
             display: none; flex-direction: column; justify-content: center; align-items: center;
             border-radius: var(--border-radius);
-            background: transparent;
-        }
-        .status-confirm-overlay::before {
-            content: "";
-            position: absolute; inset: 0;
             background: rgba(var(--glass-rgb), var(--glass-opacity)); 
             backdrop-filter: blur(var(--glass-blur)); 
             -webkit-backdrop-filter: blur(var(--glass-blur));
-            border-radius: inherit;
-            z-index: -1;
         }
 
         #delete-modal {
@@ -392,7 +374,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v6.9.2 • 2026</div>
+            <div class="footer-info">build v6.9.3 • 2026</div>
         </div>
     </nav>
 
@@ -834,59 +816,26 @@
             }
         });
 
-        function toggleGlassBar(imgElement, id) {
-            if (currentViewMode === 'grid') {
-                currentViewMode = 'feed';
-                localStorage.setItem('mv_view_mode', 'feed');
-                refreshFeedUI(globalPosts.filter(p => p.author !== 'about'));
-                
-                const scrollIt = (behavior) => {
-                    const targetImg = document.getElementById(`post-img-${id}`);
-                    if (targetImg) {
-                        targetImg.closest('.status-card').scrollIntoView({ behavior: behavior, block: 'center' });
-                    }
-                };
-
-                setTimeout(() => scrollIt('auto'), 50);
-                setTimeout(() => scrollIt('auto'), 300);
-                setTimeout(() => scrollIt('smooth'), 600);
-                
-                return;
-            }
-
-            const bars = imgElement.parentElement.querySelectorAll('.status-glass-bar');
-            if (bars.length > 0) {
-                const isHidden = bars[0].style.display === 'none';
-                if (isHidden) {
-                    bars.forEach(b => b.style.display = 'flex');
-                    clearTimeout(imgElement.glassTimer);
-                } else {
-                    bars.forEach(b => b.style.display = 'none');
-                    clearTimeout(imgElement.glassTimer); 
-                    imgElement.glassTimer = setTimeout(() => {
-                        bars.forEach(b => b.style.display = 'flex');
-                    }, 5000);
-                }
-            }
-        }
-
+        // 🛠️ Vytvorenie štruktúry horných tlačidiel v zobrazení Feed príspevku a bez vnútorného skla
         function renderSinglePost(s) {
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
-            let barHtmlTop = `
-            <div class="status-glass-bar">
-                ${secretKey ? `<span class="admin-bar-item" style="color: var(--grey-50);">#${s.id}</span>` : '<div></div>'}
-                <span class="admin-bar-item" style="position: absolute; left: 50%; transform: translateX(-50%); color: var(--grey-50);">${formattedDate}</span>
-                <div></div>
-            </div>`;
+            let topRow = `
+            <div class="action-row feed-top-row" style="justify-content: space-between; padding: 0;">
+                <div style="display: flex; gap: var(--gap-item);">
+                    ${secretKey ? `<div class="submit-btn btn-tonal-disabled" style="flex-grow: 0; padding: 0 1rem; cursor: default;">#${s.id}</div>` : ''}
+                    <div class="submit-btn btn-tonal-disabled" style="flex-grow: 0; padding: 0 1rem; cursor: default;">${formattedDate}</div>
+                </div>
+                ${secretKey ? `<button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="handleDeleteFeed(${s.id})">DELETE</button>` : ''}
+            </div>
+            `;
 
-            const imageHtml = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="status-image" alt="image" loading="lazy" onclick="toggleGlassBar(this, ${s.id})">` : '';
+            const imageHtml = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="status-image" alt="image" loading="lazy">` : '';
             
             let mediaHtml = '';
             if (imageHtml) {
                 mediaHtml = `
                 <div class="status-media-wrapper">
-                    ${barHtmlTop}
                     ${imageHtml}
                     ${secretKey ? `
                     <div id="confirm-overlay-${s.id}" class="status-confirm-overlay">
@@ -905,14 +854,7 @@
                 </div>`;
             }
 
-            // 🛠️ Nové externé DELETE tlačidlo vložené nad fotkou vo Feede
-            let adminActions = secretKey ? `
-            <div class="action-row feed-admin-actions" style="justify-content: flex-end; padding: 0; margin-bottom: 0.5rem;">
-                <button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="handleDeleteFeed(${s.id})">DELETE</button>
-            </div>
-            ` : '';
-
-            return `<div class="status-card">${adminActions}${mediaHtml}</div>`;
+            return `<div class="status-card" style="gap: var(--gap-item);">${topRow}${mediaHtml}</div>`;
         }
 
         function resetEditor() {
@@ -1037,15 +979,8 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // 🛠️ Zjednodušená funkcia Delete, ktorá iba prekryje obrázok rozostreným oknom
         function handleDeleteFeed(id) {
-            const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
-            const bars = card.querySelectorAll('.status-glass-bar');
-            bars.forEach(b => b.style.display = 'none');
-            
-            // Dočasne skryť aj externé tlačidlo pri potvrdzovaní
-            const adminActions = card.querySelector('.feed-admin-actions');
-            if(adminActions) adminActions.style.display = 'none';
-            
             document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
             document.getElementById(`confirm-actions-${id}`).style.display = 'flex';
             document.getElementById(`confirm-loading-${id}`).style.display = 'none';
@@ -1054,12 +989,6 @@
 
         function closeFeedDelete(id) {
             document.getElementById(`confirm-overlay-${id}`).style.display = 'none';
-            const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
-            const bars = card.querySelectorAll('.status-glass-bar');
-            bars.forEach(b => b.style.display = 'flex');
-            
-            const adminActions = card.querySelector('.feed-admin-actions');
-            if(adminActions) adminActions.style.display = 'flex';
         }
 
         async function executeFeedDelete(id) {
