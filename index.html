@@ -352,9 +352,8 @@
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
             <div class="menu-nav-link" onclick="showFeed()">Feed</div>
-            <div class="divider-line"></div>
-            
             <div class="menu-nav-link" onclick="showAbout()">About</div>
+            
             <div class="divider-line"></div>
 
             <div id="login-ui">
@@ -373,7 +372,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v6.9.6 • 2026</div>
+            <div class="footer-info">build v6.9.7 • 2026</div>
         </div>
     </nav>
 
@@ -715,9 +714,7 @@
             }
         }
 
-        // 🛠️ Inteligentné renderovanie oddeľovača v About sekcii
         function getAboutPostHtml(p, index = 0) {
-            // Oddeľovač sa zobrazí vždy, OKREM prípadu, keď je to úplne prvý príspevok (index 0) a návštevník nie je prihlásený
             const showDivider = (index === 0 && !secretKey) ? false : true;
             const dividerHtml = showDivider ? `<div class="divider-line"></div>` : '';
 
