@@ -182,7 +182,8 @@
         .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
         .admin-delete-link { cursor: pointer; color: var(--black); text-decoration: none; }
 
-        .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); }
+        /* 🛠️ Pridaný cursor: pointer pre indikáciu klikateľnosti fotky */
+        .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); cursor: pointer; }
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
 
@@ -375,7 +376,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.2 • 2026</div>
+            <div class="footer-info">build v7.0.3 • 2026</div>
         </div>
     </nav>
 
@@ -580,7 +581,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 🛠️ Bezpečná kontrola limitov bez volania reset(), čím sa odstránila nekonečná slučka
         function checkPostLimits() {
             const aboutCount = globalPosts.filter(p => p.author === 'about').length;
             const btnAbout = document.getElementById('editor-collapsed-state-about');
@@ -971,6 +971,26 @@
             }
         });
 
+        // 🛠️ Funkcia na presun fotky z Grid do Feed pri kliknutí na ňu
+        function handleImageClick(id) {
+            if (currentViewMode === 'grid') {
+                currentViewMode = 'feed';
+                localStorage.setItem('mv_view_mode', 'feed');
+                refreshFeedUI(globalPosts.filter(p => p.author !== 'about' && p.author !== 'contact'));
+                
+                const scrollIt = (behavior) => {
+                    const targetImg = document.getElementById(`post-img-${id}`);
+                    if (targetImg) {
+                        targetImg.closest('.status-card').scrollIntoView({ behavior: behavior, block: 'center' });
+                    }
+                };
+
+                setTimeout(() => scrollIt('auto'), 50);
+                setTimeout(() => scrollIt('auto'), 300);
+                setTimeout(() => scrollIt('smooth'), 600);
+            }
+        }
+
         function renderSinglePost(s) {
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
@@ -984,7 +1004,8 @@
             </div>
             `;
 
-            const imageHtml = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="status-image" alt="image" loading="lazy">` : '';
+            // 🛠️ Obrázok je znova klikateľný vo Feede a volá handleImageClick
+            const imageHtml = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="status-image" alt="image" loading="lazy" onclick="handleImageClick(${s.id})">` : '';
             
             let mediaHtml = '';
             if (imageHtml) {
@@ -1091,7 +1112,6 @@
             updateAboutUIState();
         }
 
-        // 🛠️ Bezpečný reset formulárov BEZ volania checkPostLimits(), čím sme zabili slučku
         function resetAboutEditor() {
             editingAboutPostId = null;
             existingAboutImageUrl = null;
