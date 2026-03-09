@@ -148,9 +148,9 @@
             display: flex; flex-direction: column; gap: var(--gap-item); flex: 1; min-width: 0;
         }
 
-        /* 🛠️ Skrytie lišty s tlačidlami a overlayu pri GRID zobrazení */
         .status-feed.view-grid .feed-top-row,
-        .status-feed.view-grid .status-confirm-overlay {
+        .status-feed.view-grid .status-confirm-overlay,
+        .status-feed.view-grid .feed-admin-actions {
             display: none !important;
         }
         .status-feed.view-grid .status-media-wrapper {
@@ -285,7 +285,6 @@
             text-transform: uppercase; text-align: center; width: 100%; 
         }
 
-        /* 🛠️ Opravený overlay pre priame rozostrenie pozadia (bez pseudo-elementov) */
         .status-confirm-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 20;
@@ -374,7 +373,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v6.9.3 • 2026</div>
+            <div class="footer-info">build v6.9.4 • 2026</div>
         </div>
     </nav>
 
@@ -426,7 +425,8 @@
 
             <form id="editor-form-about" onsubmit="handleAboutSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                 <input type="text" id="edit-title-about" class="form-input" placeholder="Title..." style="width: 100%;">
-                <textarea id="edit-text-about" class="form-input" placeholder="Content..." style="width: 100%; min-height: 3rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this)"></textarea>
+                
+                <textarea id="edit-text-about" class="form-input" placeholder="Content..." style="width: 100%; min-height: 6rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this)"></textarea>
 
                 <input type="file" id="edit-image-about" accept="image/*" style="display: none;" onchange="updateAboutImageUIState()">
                 
@@ -498,9 +498,14 @@
             });
         }
 
+        // 🛠️ Vylepšený autoResize, ktorý pri vymazaní textu vráti pole do predvoleného stavu
         function autoResizeTextarea(el) {
             el.style.height = 'auto';
-            el.style.height = el.scrollHeight + 'px';
+            if(el.value.trim() === '') {
+                el.style.height = ''; 
+            } else {
+                el.style.height = el.scrollHeight + 'px';
+            }
         }
 
         function showFeed() {
@@ -816,7 +821,6 @@
             }
         });
 
-        // 🛠️ Vytvorenie štruktúry horných tlačidiel v zobrazení Feed príspevku a bez vnútorného skla
         function renderSinglePost(s) {
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
@@ -908,12 +912,13 @@
             updateImageUIState();
         }
 
+        // 🛠️ Bezpečný CLEAR, ktorý resetuje výšku poľa na predvolenú hodnotu
         function clearAboutTextFields(e) {
             if(e) e.stopPropagation();
             document.getElementById('edit-title-about').value = "";
             const textEl = document.getElementById('edit-text-about');
             textEl.value = "";
-            autoResizeTextarea(textEl);
+            textEl.style.height = ''; 
         }
 
         function resetAboutEditor() {
@@ -979,7 +984,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 🛠️ Zjednodušená funkcia Delete, ktorá iba prekryje obrázok rozostreným oknom
         function handleDeleteFeed(id) {
             document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
             document.getElementById(`confirm-actions-${id}`).style.display = 'flex';
