@@ -389,7 +389,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v6.8.9 • 2026</div>
+            <div class="footer-info">build v6.9.0 • 2026</div>
         </div>
     </nav>
 
@@ -459,7 +459,8 @@
                 <div id="upload-details-zone-about" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;">
                     <div id="upload-action-row-about" class="action-row" style="padding: 0;">
                         <button type="submit" id="publish-btn-about" class="submit-btn btn-tonal" style="flex-grow: 1;">UPLOAD</button>
-                        <div class="submit-btn btn-tonal" onclick="collapseAboutEditor()">CANCEL</div>
+                        <div class="submit-btn btn-tonal" onclick="clearAboutTextFields(event)" style="flex-grow: 1;">CLEAR</div>
+                        <div class="submit-btn btn-tonal" onclick="collapseAboutEditor()" style="flex-grow: 1;">CANCEL</div>
                     </div>
                     <div id="upload-loading-row-about" class="action-row" style="display: none; padding: 0;">
                         <div class="submit-btn btn-loading" style="flex-grow: 1;">UPLOADING...</div>
@@ -726,19 +727,22 @@
             }
         }
 
-        // 🛠️ Tlačidlá EDIT a DELETE presunuté nad príspevok
+        // 🛠️ Tlačidlá EDIT a DELETE vpravo nad príspevkom s pridaným dividerom nad každým postom
         function getAboutPostHtml(p) {
             return `
-            <div class="status-card" style="gap: var(--gap-item); margin-top: 1rem;">
-                ${secretKey ? `
-                <div class="action-row" style="margin-bottom: 0.5rem;">
-                    <button class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="editAboutPost(${p.id})">EDIT</button>
-                    <button class="submit-btn btn-danger" style="flex-grow: 1;" onclick="openDeleteAboutModal(${p.id})">DELETE</button>
+            <div style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item);">
+                <div class="divider-line"></div>
+                <div class="status-card" style="gap: var(--gap-item);">
+                    ${secretKey ? `
+                    <div class="action-row" style="justify-content: flex-end; padding: 0;">
+                        <button class="submit-btn btn-tonal" style="flex-grow: 0;" onclick="editAboutPost(${p.id})">EDIT</button>
+                        <button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="openDeleteAboutModal(${p.id})">DELETE</button>
+                    </div>
+                    ` : ''}
+                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
+                    ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
+                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
                 </div>
-                ` : ''}
-                ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
-                ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
-                ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
             </div>
             `;
         }
@@ -953,13 +957,19 @@
             updateImageUIState();
         }
 
-        function resetAboutEditor() {
-            editingAboutPostId = null;
-            existingAboutImageUrl = null;
+        // 🛠️ Nová funkcia pre rýchle zmazanie textov
+        function clearAboutTextFields(e) {
+            if(e) e.stopPropagation();
             document.getElementById('edit-title-about').value = "";
             const textEl = document.getElementById('edit-text-about');
             textEl.value = "";
-            textEl.style.height = 'auto';
+            autoResizeTextarea(textEl);
+        }
+
+        function resetAboutEditor() {
+            editingAboutPostId = null;
+            existingAboutImageUrl = null;
+            clearAboutTextFields(null);
             document.getElementById('edit-image-about').value = "";
             
             document.getElementById('upload-action-row-about').style.display = 'flex';
