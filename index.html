@@ -373,7 +373,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v6.9.5 • 2026</div>
+            <div class="footer-info">build v6.9.6 • 2026</div>
         </div>
     </nav>
 
@@ -715,10 +715,15 @@
             }
         }
 
-        function getAboutPostHtml(p) {
+        // 🛠️ Inteligentné renderovanie oddeľovača v About sekcii
+        function getAboutPostHtml(p, index = 0) {
+            // Oddeľovač sa zobrazí vždy, OKREM prípadu, keď je to úplne prvý príspevok (index 0) a návštevník nie je prihlásený
+            const showDivider = (index === 0 && !secretKey) ? false : true;
+            const dividerHtml = showDivider ? `<div class="divider-line"></div>` : '';
+
             return `
             <div style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item);">
-                <div class="divider-line"></div>
+                ${dividerHtml}
                 <div class="status-card" style="gap: var(--gap-item);">
                     ${secretKey ? `
                     <div class="action-row" style="justify-content: flex-end; padding: 0;">
@@ -737,7 +742,7 @@
         function renderAboutPosts(posts) {
             const container = document.getElementById('about-posts-container');
             let html = '';
-            posts.forEach(p => html += getAboutPostHtml(p));
+            posts.forEach((p, index) => html += getAboutPostHtml(p, index));
             container.innerHTML = html;
         }
 
@@ -803,7 +808,8 @@
 
                     if (newAboutPosts.length > 0) {
                         let html = '';
-                        newAboutPosts.forEach(p => html += getAboutPostHtml(p));
+                        let currentAboutCount = aboutPosts.length - newAboutPosts.length;
+                        newAboutPosts.forEach((p, i) => html += getAboutPostHtml(p, currentAboutCount + i));
                         document.getElementById('about-posts-container').insertAdjacentHTML('beforeend', html);
                     }
                 }
@@ -910,7 +916,6 @@
             updateImageUIState();
         }
 
-        // 🛠️ Funkcia, ktorá kontroluje obsah všetkých 3 polí a zapína/vypína tlačidlá
         function updateAboutUIState() {
             const titleVal = document.getElementById('edit-title-about').value.trim();
             const textVal = document.getElementById('edit-text-about').value.trim();
