@@ -106,7 +106,6 @@
         
         .menu-items { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); }
 
-        /* 🛠️ Trieda pre čistý odkaz v menu - odstránené uppercase */
         .menu-nav-link {
             font-size: var(--size-small);
             color: var(--black);
@@ -343,7 +342,7 @@
 
     <header>
         <div class="header-content">
-            <div class="logo-link" onclick="window.scrollTo(0,0)">
+            <div class="logo-link" onclick="showFeed()">
                 <div class="header-left">
                     <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="72.35 270 935.31 810" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
                 </div>
@@ -356,8 +355,11 @@
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
-            <div class="menu-nav-link" onclick="closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' });">Feed</div>
             
+            <div class="menu-nav-link" onclick="showFeed()">Feed</div>
+            <div class="divider-line"></div>
+            
+            <div class="menu-nav-link" onclick="showAbout()">About</div>
             <div class="divider-line"></div>
 
             <div id="login-ui">
@@ -376,7 +378,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v6.8.4 • 2026</div>
+            <div class="footer-info">build v6.8.5 • 2026</div>
         </div>
     </nav>
 
@@ -421,6 +423,10 @@
             <div id="status-container" class="status-feed view-grid"></div>
             <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
         </div>
+
+        <div id="section-about" style="display: none; width: 100%;">
+            <div style="font-size: 2rem; width: 100%; text-align: left;">My vision</div>
+        </div>
     </main>
 
     <div id="delete-modal">
@@ -443,6 +449,7 @@
         let deleteActionType = null;
         
         let currentViewMode = localStorage.getItem('mv_view_mode') || 'grid';
+        let currentSection = 'feed'; // 🛠️ Stavová premenná pre SPA navigáciu
 
         const passInput = document.getElementById('admin-pass');
         const menuToggle = document.getElementById('menuToggle');
@@ -453,6 +460,25 @@
                 passInput.classList.remove('input-error');
                 passInput.placeholder = 'Password...';
             });
+        }
+
+        // 🛠️ SPA Navigačné funkcie
+        function showFeed() {
+            currentSection = 'feed';
+            document.getElementById('section-about').style.display = 'none';
+            document.getElementById('section-feed').style.display = 'block';
+            updateUIVisibility();
+            closeMenu();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showAbout() {
+            currentSection = 'about';
+            document.getElementById('section-feed').style.display = 'none';
+            document.getElementById('admin-upload-zone').style.display = 'none';
+            document.getElementById('section-about').style.display = 'block';
+            closeMenu();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function expandEditor() {
@@ -488,8 +514,13 @@
             if (secretKey) {
                 document.body.classList.add('is-logged-in');
                 document.getElementById('login-ui').style.display = 'none';
-                document.getElementById('admin-upload-zone').style.display = 'flex';
                 document.getElementById('logout-ui').style.display = 'flex';
+                // Ukážeme editor iba ak sme vo Feede
+                if (currentSection === 'feed') {
+                    document.getElementById('admin-upload-zone').style.display = 'flex';
+                } else {
+                    document.getElementById('admin-upload-zone').style.display = 'none';
+                }
             } else {
                 document.body.classList.remove('is-logged-in');
                 document.getElementById('login-ui').style.display = 'flex';
@@ -683,7 +714,12 @@
             }
         }
 
-        window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
+        window.addEventListener('scroll', () => { 
+            // 🛠️ Infinite scroll funguje iba ak sme v sekcii Feed
+            if (currentSection === 'feed' && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+                fetchStatuses(); 
+            }
+        });
 
         function toggleGlassBar(imgElement, id) {
             if (currentViewMode === 'grid') {
