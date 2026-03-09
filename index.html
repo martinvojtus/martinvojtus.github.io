@@ -389,7 +389,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v6.9.0 • 2026</div>
+            <div class="footer-info">build v6.9.1 • 2026</div>
         </div>
     </nav>
 
@@ -459,8 +459,8 @@
                 <div id="upload-details-zone-about" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;">
                     <div id="upload-action-row-about" class="action-row" style="padding: 0;">
                         <button type="submit" id="publish-btn-about" class="submit-btn btn-tonal" style="flex-grow: 1;">UPLOAD</button>
-                        <div class="submit-btn btn-tonal" onclick="clearAboutTextFields(event)" style="flex-grow: 1;">CLEAR</div>
-                        <div class="submit-btn btn-tonal" onclick="collapseAboutEditor()" style="flex-grow: 1;">CANCEL</div>
+                        <div class="submit-btn btn-tonal" onclick="clearAboutTextFields(event)" style="flex-grow: 0;">CLEAR</div>
+                        <div class="submit-btn btn-tonal" onclick="collapseAboutEditor()" style="flex-grow: 0;">CANCEL</div>
                     </div>
                     <div id="upload-loading-row-about" class="action-row" style="display: none; padding: 0;">
                         <div class="submit-btn btn-loading" style="flex-grow: 1;">UPLOADING...</div>
@@ -727,7 +727,6 @@
             }
         }
 
-        // 🛠️ Tlačidlá EDIT a DELETE vpravo nad príspevkom s pridaným dividerom nad každým postom
         function getAboutPostHtml(p) {
             return `
             <div style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item);">
@@ -957,7 +956,6 @@
             updateImageUIState();
         }
 
-        // 🛠️ Nová funkcia pre rýchle zmazanie textov
         function clearAboutTextFields(e) {
             if(e) e.stopPropagation();
             document.getElementById('edit-title-about').value = "";
