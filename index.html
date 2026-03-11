@@ -154,6 +154,12 @@
         .status-feed.view-grid .feed-divider {
             display: none !important;
         }
+
+        /* 🛠️ Nové pravidlo na skrytie duplicitného oddeľovača na konci feedu */
+        .status-feed.view-feed .status-card:last-child .feed-divider {
+            display: none !important;
+        }
+
         .status-feed.view-grid .status-media-wrapper {
             background-color: transparent; 
         }
@@ -375,7 +381,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.2 • 2026</div>
+            <div class="footer-info">build v7.1.3 • 2026</div>
         </div>
     </nav>
 
@@ -419,7 +425,7 @@
         <div id="section-feed">
             <div id="status-container" class="status-feed view-grid"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.2 • 2026</div>
+            <div class="footer-info">build v7.1.3 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-about">
@@ -460,7 +466,7 @@
         <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="about-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.2 • 2026</div>
+            <div class="footer-info">build v7.1.3 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-contact">
@@ -501,7 +507,7 @@
         <div id="section-contact" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="contact-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.2 • 2026</div>
+            <div class="footer-info">build v7.1.3 • 2026</div>
         </div>
         
         <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
