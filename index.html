@@ -15,7 +15,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* 🎨 Zjemnená čierna pre mäkší kontrast */
             --black: #1a1a1a;
             --white: #ffffff;
             --grey-50: rgba(0, 0, 0, 0.5);
@@ -24,19 +23,16 @@
             --glass-rgb: 255, 255, 255; 
             --content-width: 720px; 
             --border-radius: 1rem; 
-            /* 🔲 Vzdušnejšie medzery */
             --gap-item: 1.25rem; 
             --letter-spacing: 0.05em;
             --glass-opacity: 0.5; 
             --glass-blur: 1rem;   
             --size-large: 2.0rem;
-            /* 📏 Väčší základný text (18px) */
             --size-small: 1.125rem;
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                /* 🎨 Zjemnená biela a čierna aj pre dark mode */
                 --black: #f5f5f5;       
                 --white: #121212;       
                 --grey-50: rgba(255, 255, 255, 0.5); 
@@ -199,7 +195,7 @@
         }
 
         .form-input { 
-            height: 3.5rem; /* Zväčšená výška formulárových prvkov pre vzdušnosť */
+            height: 3.5rem;
             background-color: transparent; 
             color: var(--black);
             border: 1px solid var(--divider); 
@@ -207,7 +203,7 @@
         .form-input::placeholder { color: var(--grey-50); } 
 
         .submit-btn { 
-            height: 3.5rem; /* Zväčšená výška tlačidiel */
+            height: 3.5rem;
             background-color: var(--black); 
             color: var(--white);
             border: 1px solid var(--black); 
@@ -338,44 +334,6 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
-
-        .two-col-layout {
-            display: flex;
-            flex-direction: row;
-            gap: var(--gap-item);
-            width: 100%;
-            align-items: flex-start;
-        }
-
-        .two-col-layout .col-text {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            gap: var(--gap-item);
-            background-color: var(--divider);
-            border-radius: var(--border-radius);
-            /* 🔲 Vzdušnejší luxusný padding vo vnútri boxov */
-            padding: 1.5rem;
-        }
-
-        .two-col-layout .col-image {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .two-col-layout .col-image img {
-            width: 100%;
-            height: auto;
-            display: block;
-            border-radius: var(--border-radius);
-        }
-
-        @media (max-width: 600px) {
-            .two-col-layout {
-                flex-direction: column;
-            }
-        }
     </style>
 </head>
 <body>
@@ -417,7 +375,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.0 • 2026</div>
+            <div class="footer-info">build v7.1.1 • 2026</div>
         </div>
     </nav>
 
@@ -461,7 +419,7 @@
         <div id="section-feed">
             <div id="status-container" class="status-feed view-grid"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.0 • 2026</div>
+            <div class="footer-info">build v7.1.1 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-about">
@@ -502,7 +460,7 @@
         <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="about-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.0 • 2026</div>
+            <div class="footer-info">build v7.1.1 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-contact">
@@ -543,7 +501,7 @@
         <div id="section-contact" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="contact-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.0 • 2026</div>
+            <div class="footer-info">build v7.1.1 • 2026</div>
         </div>
         
         <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
@@ -902,32 +860,10 @@
             }
         }
 
+        // 🛠️ Nový Editorial layout pre About
         function getAboutPostHtml(p, index = 0) {
             const showDivider = (index === 0 && !secretKey) ? false : true;
             const dividerHtml = showDivider ? `<div class="divider-line"></div>` : '';
-
-            const hasText = p.title || p.text;
-            const hasImage = p.image_url;
-
-            let contentHtml = '';
-            if (hasText && hasImage) {
-                contentHtml = `
-                <div class="two-col-layout">
-                    <div class="col-text">
-                        ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
-                        ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
-                    </div>
-                    <div class="col-image">
-                        <img src="${p.image_url}" loading="lazy" alt="">
-                    </div>
-                </div>`;
-            } else {
-                contentHtml = `
-                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
-                    ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
-                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
-                `;
-            }
 
             return `
             <div style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item);">
@@ -939,38 +875,18 @@
                         <button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="openDeleteAboutModal(${p.id})">DELETE</button>
                     </div>
                     ` : ''}
-                    ${contentHtml}
+                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
+                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
+                    ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
                 </div>
             </div>
             `;
         }
 
+        // 🛠️ Nový Editorial layout pre Contact
         function getContactPostHtml(p, index = 0) {
             const showDivider = (index === 0 && !secretKey) ? false : true;
             const dividerHtml = showDivider ? `<div class="divider-line"></div>` : '';
-
-            const hasText = p.title || p.text;
-            const hasImage = p.image_url;
-
-            let contentHtml = '';
-            if (hasText && hasImage) {
-                contentHtml = `
-                <div class="two-col-layout">
-                    <div class="col-text">
-                        ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
-                        ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
-                    </div>
-                    <div class="col-image">
-                        <img src="${p.image_url}" loading="lazy" alt="">
-                    </div>
-                </div>`;
-            } else {
-                contentHtml = `
-                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
-                    ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
-                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
-                `;
-            }
 
             return `
             <div style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item);">
@@ -982,7 +898,9 @@
                         <button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="openDeleteContactModal(${p.id})">DELETE</button>
                     </div>
                     ` : ''}
-                    ${contentHtml}
+                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
+                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
+                    ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
                 </div>
             </div>
             `;
