@@ -19,7 +19,6 @@
             --white: #ffffff;
             --grey-50: rgba(0, 0, 0, 0.5);
             --divider: rgba(0, 0, 0, 0.1);
-            
             --glass-rgb: 255, 255, 255; 
             --content-width: 720px; 
             --border-radius: 1rem; 
@@ -105,12 +104,8 @@
         .menu-items { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); }
 
         .menu-nav-link {
-            font-size: var(--size-small);
-            color: var(--black);
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-            display: block;
+            font-size: var(--size-small); color: var(--black);
+            cursor: pointer; width: 100%; text-align: left; display: block;
         }
 
         main {
@@ -124,26 +119,20 @@
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
         #logout-ui { display: none; }
         
-        #admin-upload-zone, #admin-upload-zone-about, #admin-upload-zone-contact { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; margin-bottom: var(--gap-item); }
+        #admin-upload-zone, #admin-upload-zone-about, #admin-upload-zone-contact {
+            display: none; flex-direction: column; gap: var(--gap-item); width: 100%; margin-bottom: var(--gap-item);
+        }
 
         .status-feed { max-width: var(--content-width); width: 100%; margin: 0 auto; }
-
         .status-feed.view-feed { display: flex; flex-direction: column; gap: var(--gap-item); }
-        
         .status-feed.view-grid { display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; }
         
         .grid-columns-wrapper {
-            display: flex;
-            flex-direction: row;
-            gap: var(--gap-item);
-            align-items: flex-start;
-            width: 100%;
+            display: flex; flex-direction: row; gap: var(--gap-item); align-items: flex-start; width: 100%;
         }
 
         @media (max-width: 480px) {
-            .grid-columns-wrapper {
-                flex-direction: column;
-            }
+            .grid-columns-wrapper { flex-direction: column; }
         }
 
         .masonry-col {
@@ -153,115 +142,51 @@
         .status-feed.view-grid .feed-top-row,
         .status-feed.view-grid .status-confirm-overlay,
         .status-feed.view-grid .feed-admin-actions,
-        .status-feed.view-grid .feed-divider {
-            display: none !important;
-        }
+        .status-feed.view-grid .feed-divider { display: none !important; }
         .status-feed.view-grid .status-media-wrapper { background-color: transparent; }
 
-        .feed-toggle-wrapper {
-            display: flex; flex-direction: column; align-items: center; width: 100%; gap: var(--gap-item);
-        }
-
         .divider-line {
-            width: 100%;
-            height: 1px;
-            background-color: var(--divider);
-            flex-shrink: 0;
+            width: 100%; height: 1px; background-color: var(--divider); flex-shrink: 0;
         }
 
         .status-card { display: flex; flex-direction: column; position: relative; }
 
         .status-media-wrapper {
-            position: relative;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            transform: translateZ(0); 
-            min-height: 3rem;
-            background-color: var(--divider); 
+            position: relative; border-radius: var(--border-radius); overflow: hidden;
+            transform: translateZ(0); min-height: 3rem; background-color: var(--divider); 
         }
 
         .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
-        .admin-delete-link { cursor: pointer; color: var(--black); text-decoration: none; }
-
         .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); cursor: pointer; }
-        
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
 
         .form-input, .submit-btn { 
-            border-radius: var(--border-radius); 
-            font-size: var(--size-small); padding: 0 var(--gap-item); 
+            border-radius: var(--border-radius); font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; display: flex; align-items: center; gap: var(--gap-item); 
             box-shadow: none; -webkit-appearance: none; appearance: none; margin: 0;
         }
-
         .form-input { 
-            height: 3rem;
-            background-color: transparent; 
-            color: var(--black);
-            border: 1px solid var(--divider); 
+            height: 3rem; background-color: transparent; color: var(--black); border: 1px solid var(--divider); 
         }
         .form-input::placeholder { color: var(--grey-50); } 
-
         .submit-btn { 
-            height: 3rem;
-            background-color: var(--black); 
-            color: var(--white);
-            border: 1px solid var(--black); 
-            justify-content: center; text-transform: uppercase; cursor: pointer; white-space: nowrap;
-            line-height: normal;
+            height: 3rem; background-color: var(--black); color: var(--white); border: 1px solid var(--black); 
+            justify-content: center; text-transform: uppercase; cursor: pointer; white-space: nowrap; line-height: normal;
         }
-
-        .btn-tonal {
-            background-color: var(--divider) !important;
-            color: var(--black) !important;
-            border: none !important;
-        }
-
-        .btn-tonal-disabled {
-            background-color: var(--divider) !important;
-            color: var(--grey-50) !important;
-            border: none !important;
-            cursor: default !important;
-            pointer-events: none !important;
-        }
-
-        .btn-danger {
-            background-color: #ff3333 !important;
-            color: #000000 !important;
-            border: none !important;
-        }
-
-        .btn-outline {
-            background-color: transparent; 
-            color: var(--black);
-            border: 1px solid var(--black);
-        }
-
-        .btn-loading {
-            background-color: var(--divider) !important;
-            color: var(--grey-50) !important; 
-            border: none !important;
-            pointer-events: none !important;
-            opacity: 1 !important; 
-        }
-
-        .btn-ghost {
-            background-color: var(--divider) !important; 
-            color: var(--black) !important; 
-            border: none !important;
-            pointer-events: none !important; 
-            opacity: 1 !important; 
-        }
+        .btn-tonal { background-color: var(--divider) !important; color: var(--black) !important; border: none !important; }
+        .btn-tonal-disabled { background-color: var(--divider) !important; color: var(--grey-50) !important; border: none !important; cursor: default !important; pointer-events: none !important; }
+        .btn-danger { background-color: #ff3333 !important; color: #000000 !important; border: none !important; }
+        .btn-outline { background-color: transparent; color: var(--black); border: 1px solid var(--black); }
+        .btn-loading { background-color: var(--divider) !important; color: var(--grey-50) !important; border: none !important; pointer-events: none !important; opacity: 1 !important; }
+        .btn-ghost { background-color: var(--divider) !important; color: var(--black) !important; border: none !important; pointer-events: none !important; opacity: 1 !important; }
 
         .input-error { border: 1px solid var(--black) !important; }
         .input-error span { color: var(--black) !important; }
 
         .thumbnail-container {
-            width: 3rem; height: 3rem; flex-shrink: 0;
-            border-radius: var(--border-radius); overflow: hidden;
-            background-color: var(--divider); cursor: pointer; position: relative;
-            -webkit-mask-image: -webkit-radial-gradient(white, black);
-            mask-image: radial-gradient(white, black);
+            width: 3rem; height: 3rem; flex-shrink: 0; border-radius: var(--border-radius);
+            overflow: hidden; background-color: var(--divider); cursor: pointer; position: relative;
+            -webkit-mask-image: -webkit-radial-gradient(white, black); mask-image: radial-gradient(white, black);
         }
         .thumbnail-img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -279,83 +204,43 @@
         }
 
         .status-confirm-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 20;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20;
             display: none; flex-direction: column; justify-content: center; align-items: center;
             border-radius: var(--border-radius);
             background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); 
-            -webkit-backdrop-filter: blur(var(--glass-blur));
+            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
         }
 
         #delete-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 3000;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3000;
             display: none; flex-direction: column; justify-content: center; align-items: center;
             background: transparent;
         }
         #delete-modal::before {
-            content: "";
-            position: absolute; inset: 0;
+            content: ""; position: absolute; inset: 0;
             background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); 
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            z-index: -1;
-        }
-
-        .modal-content {
-            width: 100%; max-width: var(--content-width);
-            display: flex; flex-direction: column; gap: var(--gap-item);
-            padding: 0 var(--gap-item);
+            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); z-index: -1;
         }
 
         .action-row {
-            display: flex; flex-direction: row; gap: var(--gap-item); justify-content: center;
-            width: 100%; padding: 0;
+            display: flex; flex-direction: row; gap: var(--gap-item); justify-content: center; width: 100%; padding: 0;
         }
 
         .about-text {
-            font-size: var(--size-small);
-            color: var(--black);
-            text-align: justify;
-            line-height: 1.6;
-            -webkit-hyphens: auto;
-            -ms-hyphens: auto;
-            hyphens: auto;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
+            font-size: var(--size-small); color: var(--black); text-align: justify; line-height: 1.6;
+            -webkit-hyphens: auto; -ms-hyphens: auto; hyphens: auto;
+            word-wrap: break-word; overflow-wrap: break-word;
         }
 
         .two-col-layout {
-            display: flex;
-            flex-direction: row;
-            gap: var(--gap-item);
-            width: 100%;
-            align-items: flex-start;
+            display: flex; flex-direction: row; gap: var(--gap-item); width: 100%; align-items: flex-start;
         }
-
         .two-col-layout .col-text {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            gap: var(--gap-item);
-            background-color: var(--divider);
-            border-radius: var(--border-radius);
-            padding: var(--gap-item);
+            flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--gap-item);
+            background-color: var(--divider); border-radius: var(--border-radius); padding: var(--gap-item);
         }
-
-        .two-col-layout .col-image {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .two-col-layout .col-image img {
-            width: 100%;
-            height: auto;
-            display: block;
-            border-radius: var(--border-radius);
-        }
+        .two-col-layout .col-image { flex: 1; min-width: 0; }
+        .two-col-layout .col-image img { width: 100%; height: auto; display: block; border-radius: var(--border-radius); }
 
         @media (max-width: 600px) {
             .two-col-layout { flex-direction: column; }
@@ -381,9 +266,7 @@
             <div class="menu-nav-link" onclick="showFeed()">Feed</div>
             <div class="menu-nav-link" onclick="showAbout()">About</div>
             <div class="menu-nav-link" onclick="showContact()">Contact</div>
-            
             <div class="divider-line"></div>
-
             <div id="login-ui">
                 <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                     <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="width: 100%;">
@@ -394,32 +277,26 @@
                     <button type="submit" id="login-btn" class="submit-btn btn-tonal" style="width: 100%;">LOGIN</button>
                 </form>
             </div>
-
             <div id="logout-ui" style="display: none;">
                 <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
             </div>
-            
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.8 • 2026</div>
+            <div class="footer-info">build v7.0.9 • 2026</div>
         </div>
     </nav>
 
     <main>
         <div id="admin-upload-zone">
             <div id="editor-collapsed-state" class="submit-btn btn-tonal" style="width: 100%;" onclick="expandEditor()">+</div>
-
             <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                 <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
-                
                 <div id="upload-empty-state" class="submit-btn btn-tonal" style="width: 100%;" onclick="document.getElementById('edit-image').click()">+ ADD IMAGE</div>
-
                 <div id="upload-filled-state" class="action-row" style="display: none;">
                     <div class="thumbnail-container" onclick="document.getElementById('edit-image').click()">
                         <img id="upload-preview-img" class="thumbnail-img" src="" alt="">
                     </div>
                     <div class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="clearImageSelection(event)">DELETE IMAGE</div>
                 </div>
-
                 <div id="upload-details-zone" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;">
                     <div id="upload-action-row" class="action-row" style="padding: 0;">
                         <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>UPLOAD</button>
@@ -432,20 +309,20 @@
                         <div id="upload-success-btn" class="submit-btn btn-ghost" style="flex-grow: 1;">UPLOADED</div>
                     </div>
                 </div>
-                
                 <button type="button" id="delete-all-btn" class="submit-btn btn-danger" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
             </form>
         </div>
 
         <div id="section-feed">
+            <!-- Trvalé toggle tlačidlo vždy viditeľné -->
+            <button id="view-toggle-btn" class="submit-btn btn-tonal" style="width: 100%;" onclick="toggleViewMode()">FEED VIEW</button>
             <div id="status-container" class="status-feed view-grid"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.8 • 2026</div>
+            <div class="footer-info">build v7.0.9 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-about">
             <div id="editor-collapsed-state-about" class="submit-btn btn-tonal" style="width: 100%;" onclick="expandAboutEditor()">+ ADD POST</div>
-
             <form id="editor-form-about" onsubmit="handleAboutSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                 <input type="text" id="edit-title-about" class="form-input" placeholder="Title..." style="width: 100%;" oninput="updateAboutUIState()">
                 <textarea id="edit-text-about" class="form-input" placeholder="Content..." style="width: 100%; min-height: 6rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateAboutUIState();"></textarea>
@@ -473,12 +350,11 @@
         <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="about-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.8 • 2026</div>
+            <div class="footer-info">build v7.0.9 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-contact">
             <div id="editor-collapsed-state-contact" class="submit-btn btn-tonal" style="width: 100%;" onclick="expandContactEditor()">+ ADD POST</div>
-
             <form id="editor-form-contact" onsubmit="handleContactSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                 <input type="text" id="edit-title-contact" class="form-input" placeholder="Title..." style="width: 100%;" oninput="updateContactUIState()">
                 <textarea id="edit-text-contact" class="form-input" placeholder="Content..." style="width: 100%; min-height: 6rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateContactUIState();"></textarea>
@@ -506,7 +382,7 @@
         <div id="section-contact" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="contact-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.8 • 2026</div>
+            <div class="footer-info">build v7.0.9 • 2026</div>
         </div>
         
         <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
@@ -531,13 +407,8 @@
         let currentOffset = 0; const postsLimit = 20; 
         let isLoading = false; let hasMorePosts = true;
         let deleteActionType = null;
-        
-        let editingAboutPostId = null;
-        let existingAboutImageUrl = null;
-        
-        let editingContactPostId = null;
-        let existingContactImageUrl = null;
-
+        let editingAboutPostId = null; let existingAboutImageUrl = null;
+        let editingContactPostId = null; let existingContactImageUrl = null;
         let currentViewMode = localStorage.getItem('mv_view_mode') || 'grid';
         let currentSection = 'feed'; 
 
@@ -550,6 +421,12 @@
                 passInput.classList.remove('input-error');
                 passInput.placeholder = 'Password...';
             });
+        }
+
+        function updateToggleBtn() {
+            const btn = document.getElementById('view-toggle-btn');
+            if (!btn) return;
+            btn.innerText = currentViewMode === 'grid' ? 'FEED VIEW' : 'GRID VIEW';
         }
 
         function autoResizeTextarea(el) {
@@ -590,60 +467,31 @@
             const btnAbout = document.getElementById('editor-collapsed-state-about');
             if (btnAbout) {
                 if (aboutCount >= 1) {
-                    btnAbout.className = 'submit-btn btn-tonal-disabled';
-                    btnAbout.onclick = null;
+                    btnAbout.className = 'submit-btn btn-tonal-disabled'; btnAbout.onclick = null;
                     if (document.getElementById('editor-form-about').style.display === 'flex') collapseAboutEditor();
-                } else {
-                    btnAbout.className = 'submit-btn btn-tonal';
-                    btnAbout.onclick = expandAboutEditor;
-                }
+                } else { btnAbout.className = 'submit-btn btn-tonal'; btnAbout.onclick = expandAboutEditor; }
             }
             const contactCount = globalPosts.filter(p => p.author === 'contact').length;
             const btnContact = document.getElementById('editor-collapsed-state-contact');
             if (btnContact) {
                 if (contactCount >= 1) {
-                    btnContact.className = 'submit-btn btn-tonal-disabled';
-                    btnContact.onclick = null;
+                    btnContact.className = 'submit-btn btn-tonal-disabled'; btnContact.onclick = null;
                     if (document.getElementById('editor-form-contact').style.display === 'flex') collapseContactEditor();
-                } else {
-                    btnContact.className = 'submit-btn btn-tonal';
-                    btnContact.onclick = expandContactEditor;
-                }
+                } else { btnContact.className = 'submit-btn btn-tonal'; btnContact.onclick = expandContactEditor; }
             }
         }
 
-        function expandEditor() {
-            document.getElementById('editor-collapsed-state').style.display = 'none';
-            document.getElementById('editor-form').style.display = 'flex';
-        }
-        function collapseEditor() {
-            document.getElementById('editor-collapsed-state').style.display = 'flex';
-            document.getElementById('editor-form').style.display = 'none';
-            resetEditor();
-        }
-        function expandAboutEditor() {
-            document.getElementById('editor-collapsed-state-about').style.display = 'none';
-            document.getElementById('editor-form-about').style.display = 'flex';
-        }
-        function collapseAboutEditor() {
-            document.getElementById('editor-collapsed-state-about').style.display = 'flex';
-            document.getElementById('editor-form-about').style.display = 'none';
-            resetAboutEditor();
-        }
-        function expandContactEditor() {
-            document.getElementById('editor-collapsed-state-contact').style.display = 'none';
-            document.getElementById('editor-form-contact').style.display = 'flex';
-        }
-        function collapseContactEditor() {
-            document.getElementById('editor-collapsed-state-contact').style.display = 'flex';
-            document.getElementById('editor-form-contact').style.display = 'none';
-            resetContactEditor();
-        }
+        function expandEditor() { document.getElementById('editor-collapsed-state').style.display = 'none'; document.getElementById('editor-form').style.display = 'flex'; }
+        function collapseEditor() { document.getElementById('editor-collapsed-state').style.display = 'flex'; document.getElementById('editor-form').style.display = 'none'; resetEditor(); }
+        function expandAboutEditor() { document.getElementById('editor-collapsed-state-about').style.display = 'none'; document.getElementById('editor-form-about').style.display = 'flex'; }
+        function collapseAboutEditor() { document.getElementById('editor-collapsed-state-about').style.display = 'flex'; document.getElementById('editor-form-about').style.display = 'none'; resetAboutEditor(); }
+        function expandContactEditor() { document.getElementById('editor-collapsed-state-contact').style.display = 'none'; document.getElementById('editor-form-contact').style.display = 'flex'; }
+        function collapseContactEditor() { document.getElementById('editor-collapsed-state-contact').style.display = 'flex'; document.getElementById('editor-form-contact').style.display = 'none'; resetContactEditor(); }
 
         function toggleViewMode() {
-            const newMode = currentViewMode === 'feed' ? 'grid' : 'feed';
-            currentViewMode = newMode;
-            localStorage.setItem('mv_view_mode', newMode);
+            currentViewMode = currentViewMode === 'feed' ? 'grid' : 'feed';
+            localStorage.setItem('mv_view_mode', currentViewMode);
+            updateToggleBtn();
             refreshFeedUI(globalPosts.filter(p => p.author !== 'about' && p.author !== 'contact'));
         }
 
@@ -653,9 +501,7 @@
             menuToggle.innerText = isActive ? 'CLOSE' : 'MENU';
         }
         function closeMenu() { 
-            menuToggle.classList.remove('active'); 
-            navOverlay.classList.remove('active'); 
-            menuToggle.innerText = 'MENU';
+            menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); menuToggle.innerText = 'MENU';
         }
 
         function updateUIVisibility() {
@@ -684,16 +530,13 @@
         async function handleLogin(e) {
             e.preventDefault();
             const loginBtn = document.getElementById('login-btn');
-            loginBtn.innerText = 'LOGGING IN...';
-            loginBtn.classList.add('btn-loading'); 
+            loginBtn.innerText = 'LOGGING IN...'; loginBtn.classList.add('btn-loading'); 
             const tempKey = passInput.value;
             const rememberMe = document.getElementById('remember-login').checked;
             try {
                 const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': tempKey } });
                 if (res.ok) { 
-                    loginBtn.classList.remove('btn-loading');
-                    loginBtn.classList.add('btn-ghost');
-                    loginBtn.innerText = 'SUCCESS';
+                    loginBtn.classList.remove('btn-loading'); loginBtn.classList.add('btn-ghost'); loginBtn.innerText = 'SUCCESS';
                     secretKey = tempKey; 
                     setTimeout(() => {
                         updateUIVisibility(); closeMenu(); fetchStatuses(true); passInput.value = ''; 
@@ -705,8 +548,7 @@
                     loginBtn.innerText = 'LOGIN'; loginBtn.classList.remove('btn-loading');
                 }
             } catch (err) { 
-                passInput.classList.add('input-error'); 
-                loginBtn.innerText = 'LOGIN'; loginBtn.classList.remove('btn-loading');
+                passInput.classList.add('input-error'); loginBtn.innerText = 'LOGIN'; loginBtn.classList.remove('btn-loading');
             }
         }
 
@@ -722,8 +564,7 @@
         }
 
         function handleLogout() {
-            secretKey = ""; passInput.value = ''; 
-            localStorage.removeItem('mv_admin_key');
+            secretKey = ""; passInput.value = ''; localStorage.removeItem('mv_admin_key');
             updateUIVisibility(); closeMenu();
             resetEditor(); resetAboutEditor(); resetContactEditor();
             document.getElementById('editor-collapsed-state').style.display = 'flex';
@@ -738,93 +579,62 @@
         function refreshFeedUI(feedPosts) { 
             const container = document.getElementById('status-container');
             const deleteAllBtn = document.getElementById('delete-all-btn');
-
             if (deleteAllBtn) {
-                if (globalPosts.length === 0) {
-                    deleteAllBtn.disabled = true;
-                    deleteAllBtn.className = "submit-btn btn-tonal-disabled";
-                } else {
-                    deleteAllBtn.disabled = false;
-                    deleteAllBtn.className = "submit-btn btn-danger";
-                }
+                deleteAllBtn.disabled = globalPosts.length === 0;
+                deleteAllBtn.className = globalPosts.length === 0 ? "submit-btn btn-tonal-disabled" : "submit-btn btn-danger";
             }
             
             if (feedPosts.length === 0) {
                 container.className = 'status-feed view-feed';
-                if (secretKey) {
-                    container.innerHTML = ``;
-                } else {
-                    container.innerHTML = `
-                        <div class="divider-line"></div>
-                        <div class="submit-btn btn-tonal-disabled" style="width: 100%; cursor: default;">NOTHING HERE YET.</div>
-                    `;
-                }
+                container.innerHTML = secretKey ? `` : `
+                    <div class="divider-line"></div>
+                    <div class="submit-btn btn-tonal-disabled" style="width: 100%; cursor: default;">NOTHING HERE YET.</div>
+                `;
                 return;
             }
 
             if (currentViewMode === 'feed') {
                 container.className = 'status-feed view-feed';
-                let html = `
-                    <div class="feed-toggle-wrapper">
-                        ${secretKey ? '<div class="divider-line"></div>' : ''}
-                        <button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">GRID VIEW</button>
-                    </div>
-                `;
+                let html = '';
                 feedPosts.forEach(post => { html += renderSinglePost(post); });
                 container.innerHTML = html;
             } else {
                 container.className = 'status-feed view-grid';
                 let html = secretKey ? '<div class="divider-line"></div>' : '';
-                
                 let leftCol   = '<div class="masonry-col col-left">';
                 let centerCol = '<div class="masonry-col col-center">';
                 let rightCol  = '<div class="masonry-col col-right">';
-
-                centerCol += `<button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">FEED VIEW</button>`;
-
                 feedPosts.forEach((post, index) => {
                     if (index % 3 === 0)      leftCol   += renderSinglePost(post);
                     else if (index % 3 === 1) centerCol += renderSinglePost(post);
                     else                      rightCol  += renderSinglePost(post);
                 });
-
-                leftCol   += '</div>';
-                centerCol += '</div>';
-                rightCol  += '</div>';
-
+                leftCol += '</div>'; centerCol += '</div>'; rightCol += '</div>';
                 html += `<div class="grid-columns-wrapper">${leftCol}${centerCol}${rightCol}</div>`;
                 container.innerHTML = html;
             }
         }
 
         function getAboutPostHtml(p, index = 0) {
-            const showDivider = (index === 0 && !secretKey) ? false : true;
-            const dividerHtml = showDivider ? `<div class="divider-line"></div>` : '';
+            const dividerHtml = (index === 0 && !secretKey) ? '' : `<div class="divider-line"></div>`;
             const hasText = p.title || p.text;
             const hasImage = p.image_url;
-            let contentHtml = '';
-            if (hasText && hasImage) {
-                contentHtml = `
+            let contentHtml = hasText && hasImage ? `
                 <div class="two-col-layout">
                     <div class="col-text">
                         ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
                         ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
                     </div>
                     <div class="col-image"><img src="${p.image_url}" loading="lazy" alt=""></div>
-                </div>`;
-            } else {
-                contentHtml = `
+                </div>` : `
                     ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
                     ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
-                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
-                `;
-            }
+                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}`;
             return `
             <div style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item);">
                 ${dividerHtml}
                 <div class="status-card" style="gap: var(--gap-item);">
-                    ${secretKey ? `
-                    <div class="action-row" style="justify-content: flex-end; padding: 0;">
+                    ${secretKey ? `<div class="action-row" style="justify-content: flex-end; padding: 0;">
                         <button class="submit-btn btn-tonal" style="flex-grow: 0;" onclick="editAboutPost(${p.id})">EDIT</button>
                         <button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="openDeleteAboutModal(${p.id})">DELETE</button>
                     </div>` : ''}
@@ -834,33 +644,25 @@
         }
 
         function getContactPostHtml(p, index = 0) {
-            const showDivider = (index === 0 && !secretKey) ? false : true;
-            const dividerHtml = showDivider ? `<div class="divider-line"></div>` : '';
+            const dividerHtml = (index === 0 && !secretKey) ? '' : `<div class="divider-line"></div>`;
             const hasText = p.title || p.text;
             const hasImage = p.image_url;
-            let contentHtml = '';
-            if (hasText && hasImage) {
-                contentHtml = `
+            let contentHtml = hasText && hasImage ? `
                 <div class="two-col-layout">
                     <div class="col-text">
                         ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
                         ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
                     </div>
                     <div class="col-image"><img src="${p.image_url}" loading="lazy" alt=""></div>
-                </div>`;
-            } else {
-                contentHtml = `
+                </div>` : `
                     ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
                     ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
-                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
-                `;
-            }
+                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}`;
             return `
             <div style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item);">
                 ${dividerHtml}
                 <div class="status-card" style="gap: var(--gap-item);">
-                    ${secretKey ? `
-                    <div class="action-row" style="justify-content: flex-end; padding: 0;">
+                    ${secretKey ? `<div class="action-row" style="justify-content: flex-end; padding: 0;">
                         <button class="submit-btn btn-tonal" style="flex-grow: 0;" onclick="editContactPost(${p.id})">EDIT</button>
                         <button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="openDeleteContactModal(${p.id})">DELETE</button>
                     </div>` : ''}
@@ -871,25 +673,18 @@
 
         function renderAboutPosts(posts) {
             const container = document.getElementById('about-posts-container');
-            let html = '';
-            posts.forEach((p, index) => html += getAboutPostHtml(p, index));
-            container.innerHTML = html;
+            let html = ''; posts.forEach((p, i) => html += getAboutPostHtml(p, i)); container.innerHTML = html;
         }
-
         function renderContactPosts(posts) {
             const container = document.getElementById('contact-posts-container');
-            let html = '';
-            posts.forEach((p, index) => html += getContactPostHtml(p, index));
-            container.innerHTML = html;
+            let html = ''; posts.forEach((p, i) => html += getContactPostHtml(p, i)); container.innerHTML = html;
         }
 
         function compressImage(file, maxWidth = 1200, quality = 0.8) {
             return new Promise((resolve) => {
-                const reader = new FileReader(); 
-                reader.readAsDataURL(file);
+                const reader = new FileReader(); reader.readAsDataURL(file);
                 reader.onload = event => {
-                    const img = new Image(); 
-                    img.src = event.target.result;
+                    const img = new Image(); img.src = event.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         let w = img.width, h = img.height;
@@ -897,9 +692,7 @@
                         canvas.width = w; canvas.height = h;
                         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                         const newName = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
-                        canvas.toBlob(blob => { 
-                            resolve(new File([blob], newName, { type: 'image/jpeg', lastModified: Date.now() })); 
-                        }, 'image/jpeg', quality);
+                        canvas.toBlob(blob => { resolve(new File([blob], newName, { type: 'image/jpeg', lastModified: Date.now() })); }, 'image/jpeg', quality);
                     };
                 };
             });
@@ -914,23 +707,17 @@
                 const newPosts = await response.json();
                 if (newPosts.length < postsLimit) hasMorePosts = false;
                 currentOffset += newPosts.length; globalPosts = globalPosts.concat(newPosts);
-                
                 const feedPosts    = globalPosts.filter(p => p.author !== 'about' && p.author !== 'contact');
                 const aboutPosts   = globalPosts.filter(p => p.author === 'about');
                 const contactPosts = globalPosts.filter(p => p.author === 'contact');
-
                 if (reset) {
-                    refreshFeedUI(feedPosts);
-                    renderAboutPosts(aboutPosts);
-                    renderContactPosts(contactPosts);
+                    refreshFeedUI(feedPosts); renderAboutPosts(aboutPosts); renderContactPosts(contactPosts);
                 } else {
                     const newFeedPosts    = newPosts.filter(p => p.author !== 'about' && p.author !== 'contact');
                     const newAboutPosts   = newPosts.filter(p => p.author === 'about');
                     const newContactPosts = newPosts.filter(p => p.author === 'contact');
-
                     if (currentViewMode === 'feed') {
-                        let html = '';
-                        newFeedPosts.forEach(p => html += renderSinglePost(p));
+                        let html = ''; newFeedPosts.forEach(p => html += renderSinglePost(p));
                         document.getElementById('status-container').insertAdjacentHTML('beforeend', html);
                     } else {
                         const leftCol   = document.querySelector('.col-left');
@@ -945,17 +732,14 @@
                             else                     { if (rightCol)  rightCol.insertAdjacentHTML('beforeend', postHtml); }
                         });
                     }
-
                     if (newAboutPosts.length > 0) {
-                        let html = '';
-                        let currentAboutCount = aboutPosts.length - newAboutPosts.length;
-                        newAboutPosts.forEach((p, i) => html += getAboutPostHtml(p, currentAboutCount + i));
+                        let html = ''; let c = aboutPosts.length - newAboutPosts.length;
+                        newAboutPosts.forEach((p, i) => html += getAboutPostHtml(p, c + i));
                         document.getElementById('about-posts-container').insertAdjacentHTML('beforeend', html);
                     }
                     if (newContactPosts.length > 0) {
-                        let html = '';
-                        let currentContactCount = contactPosts.length - newContactPosts.length;
-                        newContactPosts.forEach((p, i) => html += getContactPostHtml(p, currentContactCount + i));
+                        let html = ''; let c = contactPosts.length - newContactPosts.length;
+                        newContactPosts.forEach((p, i) => html += getContactPostHtml(p, c + i));
                         document.getElementById('contact-posts-container').insertAdjacentHTML('beforeend', html);
                     }
                 }
@@ -967,19 +751,18 @@
         }
 
         window.addEventListener('scroll', () => { 
-            if (currentSection === 'feed' && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
-                fetchStatuses(); 
-            }
+            if (currentSection === 'feed' && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); 
         });
 
         function handleImageClick(id) {
             if (currentViewMode === 'grid') {
                 currentViewMode = 'feed';
                 localStorage.setItem('mv_view_mode', 'feed');
+                updateToggleBtn();
                 refreshFeedUI(globalPosts.filter(p => p.author !== 'about' && p.author !== 'contact'));
                 const scrollIt = (behavior) => {
                     const targetImg = document.getElementById(`post-img-${id}`);
-                    if (targetImg) targetImg.closest('.status-card').scrollIntoView({ behavior: behavior, block: 'center' });
+                    if (targetImg) targetImg.closest('.status-card').scrollIntoView({ behavior, block: 'center' });
                 };
                 setTimeout(() => scrollIt('auto'), 50);
                 setTimeout(() => scrollIt('auto'), 300);
@@ -1033,67 +816,51 @@
             document.getElementById('upload-success-row').style.display = 'none';
             document.getElementById('upload-action-row').innerHTML = `
                 <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
-                <div class="submit-btn btn-tonal" onclick="collapseEditor()">CANCEL</div>
-            `;
+                <div class="submit-btn btn-tonal" onclick="collapseEditor()">CANCEL</div>`;
             updateImageUIState(); 
         }
 
         function updateImageUIState() {
             const input = document.getElementById('edit-image');
-            const emptyState = document.getElementById('upload-empty-state');
-            const filledState = document.getElementById('upload-filled-state');
-            const thumbnail = document.getElementById('upload-preview-img');
-            const pubBtn = document.getElementById('publish-btn');
             const hasImage = (input && input.files && input.files.length > 0);
+            const thumbnail = document.getElementById('upload-preview-img');
             if (hasImage) {
                 if(thumbnail) thumbnail.src = URL.createObjectURL(input.files[0]);
-                emptyState.style.display = 'none'; filledState.style.display = 'flex';
+                document.getElementById('upload-empty-state').style.display = 'none';
+                document.getElementById('upload-filled-state').style.display = 'flex';
             } else {
                 if(thumbnail) thumbnail.src = "";
-                emptyState.style.display = 'flex'; filledState.style.display = 'none';
+                document.getElementById('upload-empty-state').style.display = 'flex';
+                document.getElementById('upload-filled-state').style.display = 'none';
             }
-            if (pubBtn) {
-                pubBtn.disabled = !hasImage;
-                pubBtn.className = hasImage ? "submit-btn btn-tonal" : "submit-btn btn-tonal-disabled";
-            }
+            const pubBtn = document.getElementById('publish-btn');
+            if (pubBtn) { pubBtn.disabled = !hasImage; pubBtn.className = hasImage ? "submit-btn btn-tonal" : "submit-btn btn-tonal-disabled"; }
         }
 
-        function clearImageSelection(e) {
-            e.stopPropagation();
-            document.getElementById('edit-image').value = ""; 
-            updateImageUIState();
-        }
+        function clearImageSelection(e) { e.stopPropagation(); document.getElementById('edit-image').value = ""; updateImageUIState(); }
 
         function updateAboutUIState() {
-            const titleVal = document.getElementById('edit-title-about').value.trim();
-            const textVal  = document.getElementById('edit-text-about').value.trim();
-            const input    = document.getElementById('edit-image-about');
-            const hasImage = (input && input.files && input.files.length > 0) || existingAboutImageUrl;
-            const hasContent = titleVal.length > 0 || textVal.length > 0 || hasImage;
-            const pubBtn  = document.getElementById('publish-btn-about');
+            const hasContent = document.getElementById('edit-title-about').value.trim().length > 0
+                || document.getElementById('edit-text-about').value.trim().length > 0
+                || (document.getElementById('edit-image-about').files && document.getElementById('edit-image-about').files.length > 0)
+                || existingAboutImageUrl;
+            const pubBtn = document.getElementById('publish-btn-about');
             const clearBtn = document.getElementById('clear-btn-about');
-            if (hasContent) {
-                if (pubBtn)  { pubBtn.disabled  = false; pubBtn.className  = "submit-btn btn-tonal"; }
-                if (clearBtn){ clearBtn.disabled = false; clearBtn.className = "submit-btn btn-tonal"; }
-            } else {
-                if (pubBtn)  { pubBtn.disabled  = true;  pubBtn.className  = "submit-btn btn-tonal-disabled"; }
-                if (clearBtn){ clearBtn.disabled = true;  clearBtn.className = "submit-btn btn-tonal-disabled"; }
-            }
+            if (pubBtn)  { pubBtn.disabled  = !hasContent; pubBtn.className  = hasContent ? "submit-btn btn-tonal" : "submit-btn btn-tonal-disabled"; }
+            if (clearBtn){ clearBtn.disabled = !hasContent; clearBtn.className = hasContent ? "submit-btn btn-tonal" : "submit-btn btn-tonal-disabled"; }
         }
 
         function clearAboutTextFields(e) {
             if(e) e.stopPropagation();
             document.getElementById('edit-title-about').value = "";
-            const textEl = document.getElementById('edit-text-about');
-            textEl.value = ""; textEl.style.height = ''; 
+            const textEl = document.getElementById('edit-text-about'); textEl.value = ""; textEl.style.height = ''; 
             updateAboutUIState();
         }
 
         function resetAboutEditor() {
             editingAboutPostId = null; existingAboutImageUrl = null;
             document.getElementById('edit-title-about').value = "";
-            const textEl = document.getElementById('edit-text-about');
-            textEl.value = ""; textEl.style.height = '';
+            const textEl = document.getElementById('edit-text-about'); textEl.value = ""; textEl.style.height = '';
             document.getElementById('edit-image-about').value = "";
             document.getElementById('upload-action-row-about').style.display = 'flex';
             document.getElementById('upload-loading-row-about').style.display = 'none';
@@ -1102,70 +869,55 @@
         }
 
         function updateAboutImageUIState() {
-            const input     = document.getElementById('edit-image-about');
-            const emptyState  = document.getElementById('upload-empty-state-about');
-            const filledState = document.getElementById('upload-filled-state-about');
-            const thumbnail   = document.getElementById('upload-preview-img-about');
-            const hasImage  = (input && input.files && input.files.length > 0) || existingAboutImageUrl;
+            const input = document.getElementById('edit-image-about');
+            const hasImage = (input && input.files && input.files.length > 0) || existingAboutImageUrl;
+            const thumbnail = document.getElementById('upload-preview-img-about');
             if (hasImage) {
                 thumbnail.src = (input && input.files && input.files.length > 0) ? URL.createObjectURL(input.files[0]) : existingAboutImageUrl;
-                emptyState.style.display = 'none'; filledState.style.display = 'flex';
+                document.getElementById('upload-empty-state-about').style.display = 'none';
+                document.getElementById('upload-filled-state-about').style.display = 'flex';
             } else {
-                thumbnail.src = ""; emptyState.style.display = 'flex'; filledState.style.display = 'none';
+                thumbnail.src = "";
+                document.getElementById('upload-empty-state-about').style.display = 'flex';
+                document.getElementById('upload-filled-state-about').style.display = 'none';
             }
             updateAboutUIState();
         }
 
-        function clearAboutImageSelection(e) {
-            e.stopPropagation();
-            document.getElementById('edit-image-about').value = "";
-            existingAboutImageUrl = null; updateAboutImageUIState();
-        }
+        function clearAboutImageSelection(e) { e.stopPropagation(); document.getElementById('edit-image-about').value = ""; existingAboutImageUrl = null; updateAboutImageUIState(); }
 
         function editAboutPost(id) {
-            const post = globalPosts.find(p => p.id === id);
-            if (!post) return;
+            const post = globalPosts.find(p => p.id === id); if (!post) return;
             editingAboutPostId = post.id; existingAboutImageUrl = post.image_url;
             document.getElementById('edit-title-about').value = post.title || "";
-            const textEl = document.getElementById('edit-text-about');
-            textEl.value = post.text || "";
-            expandAboutEditor();
-            setTimeout(() => { autoResizeTextarea(textEl); }, 0);
-            updateAboutImageUIState();
-            document.getElementById('publish-btn-about').innerText = "SAVE";
+            const textEl = document.getElementById('edit-text-about'); textEl.value = post.text || "";
+            expandAboutEditor(); setTimeout(() => { autoResizeTextarea(textEl); }, 0);
+            updateAboutImageUIState(); document.getElementById('publish-btn-about').innerText = "SAVE";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function updateContactUIState() {
-            const titleVal = document.getElementById('edit-title-contact').value.trim();
-            const textVal  = document.getElementById('edit-text-contact').value.trim();
-            const input    = document.getElementById('edit-image-contact');
-            const hasImage = (input && input.files && input.files.length > 0) || existingContactImageUrl;
-            const hasContent = titleVal.length > 0 || textVal.length > 0 || hasImage;
-            const pubBtn  = document.getElementById('publish-btn-contact');
+            const hasContent = document.getElementById('edit-title-contact').value.trim().length > 0
+                || document.getElementById('edit-text-contact').value.trim().length > 0
+                || (document.getElementById('edit-image-contact').files && document.getElementById('edit-image-contact').files.length > 0)
+                || existingContactImageUrl;
+            const pubBtn = document.getElementById('publish-btn-contact');
             const clearBtn = document.getElementById('clear-btn-contact');
-            if (hasContent) {
-                if (pubBtn)  { pubBtn.disabled  = false; pubBtn.className  = "submit-btn btn-tonal"; }
-                if (clearBtn){ clearBtn.disabled = false; clearBtn.className = "submit-btn btn-tonal"; }
-            } else {
-                if (pubBtn)  { pubBtn.disabled  = true;  pubBtn.className  = "submit-btn btn-tonal-disabled"; }
-                if (clearBtn){ clearBtn.disabled = true;  clearBtn.className = "submit-btn btn-tonal-disabled"; }
-            }
+            if (pubBtn)  { pubBtn.disabled  = !hasContent; pubBtn.className  = hasContent ? "submit-btn btn-tonal" : "submit-btn btn-tonal-disabled"; }
+            if (clearBtn){ clearBtn.disabled = !hasContent; clearBtn.className = hasContent ? "submit-btn btn-tonal" : "submit-btn btn-tonal-disabled"; }
         }
 
         function clearContactTextFields(e) {
             if(e) e.stopPropagation();
             document.getElementById('edit-title-contact').value = "";
-            const textEl = document.getElementById('edit-text-contact');
-            textEl.value = ""; textEl.style.height = ''; 
+            const textEl = document.getElementById('edit-text-contact'); textEl.value = ""; textEl.style.height = ''; 
             updateContactUIState();
         }
 
         function resetContactEditor() {
             editingContactPostId = null; existingContactImageUrl = null;
             document.getElementById('edit-title-contact').value = "";
-            const textEl = document.getElementById('edit-text-contact');
-            textEl.value = ""; textEl.style.height = '';
+            const textEl = document.getElementById('edit-text-contact'); textEl.value = ""; textEl.style.height = '';
             document.getElementById('edit-image-contact').value = "";
             document.getElementById('upload-action-row-contact').style.display = 'flex';
             document.getElementById('upload-loading-row-contact').style.display = 'none';
@@ -1174,37 +926,30 @@
         }
 
         function updateContactImageUIState() {
-            const input     = document.getElementById('edit-image-contact');
-            const emptyState  = document.getElementById('upload-empty-state-contact');
-            const filledState = document.getElementById('upload-filled-state-contact');
-            const thumbnail   = document.getElementById('upload-preview-img-contact');
-            const hasImage  = (input && input.files && input.files.length > 0) || existingContactImageUrl;
+            const input = document.getElementById('edit-image-contact');
+            const hasImage = (input && input.files && input.files.length > 0) || existingContactImageUrl;
+            const thumbnail = document.getElementById('upload-preview-img-contact');
             if (hasImage) {
                 thumbnail.src = (input && input.files && input.files.length > 0) ? URL.createObjectURL(input.files[0]) : existingContactImageUrl;
-                emptyState.style.display = 'none'; filledState.style.display = 'flex';
+                document.getElementById('upload-empty-state-contact').style.display = 'none';
+                document.getElementById('upload-filled-state-contact').style.display = 'flex';
             } else {
-                thumbnail.src = ""; emptyState.style.display = 'flex'; filledState.style.display = 'none';
+                thumbnail.src = "";
+                document.getElementById('upload-empty-state-contact').style.display = 'flex';
+                document.getElementById('upload-filled-state-contact').style.display = 'none';
             }
             updateContactUIState();
         }
 
-        function clearContactImageSelection(e) {
-            e.stopPropagation();
-            document.getElementById('edit-image-contact').value = "";
-            existingContactImageUrl = null; updateContactImageUIState();
-        }
+        function clearContactImageSelection(e) { e.stopPropagation(); document.getElementById('edit-image-contact').value = ""; existingContactImageUrl = null; updateContactImageUIState(); }
 
         function editContactPost(id) {
-            const post = globalPosts.find(p => p.id === id);
-            if (!post) return;
+            const post = globalPosts.find(p => p.id === id); if (!post) return;
             editingContactPostId = post.id; existingContactImageUrl = post.image_url;
             document.getElementById('edit-title-contact').value = post.title || "";
-            const textEl = document.getElementById('edit-text-contact');
-            textEl.value = post.text || "";
-            expandContactEditor();
-            setTimeout(() => { autoResizeTextarea(textEl); }, 0);
-            updateContactImageUIState();
-            document.getElementById('publish-btn-contact').innerText = "SAVE";
+            const textEl = document.getElementById('edit-text-contact'); textEl.value = post.text || "";
+            expandContactEditor(); setTimeout(() => { autoResizeTextarea(textEl); }, 0);
+            updateContactImageUIState(); document.getElementById('publish-btn-contact').innerText = "SAVE";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1214,9 +959,7 @@
             document.getElementById(`confirm-loading-${id}`).style.display = 'none';
             document.getElementById(`confirm-success-${id}`).style.display = 'none';
         }
-        function closeFeedDelete(id) {
-            document.getElementById(`confirm-overlay-${id}`).style.display = 'none';
-        }
+        function closeFeedDelete(id) { document.getElementById(`confirm-overlay-${id}`).style.display = 'none'; }
         async function executeFeedDelete(id) {
             document.getElementById(`confirm-actions-${id}`).style.display = 'none';
             document.getElementById(`confirm-loading-${id}`).style.display = 'flex';
@@ -1235,10 +978,7 @@
         }
         function openDeleteAboutModal(id)   { openDeleteModal('about_'   + id); }
         function openDeleteContactModal(id) { openDeleteModal('contact_' + id); }
-        function closeDeleteModal() {
-            document.getElementById('delete-modal').style.display = 'none';
-            deleteActionType = null;
-        }
+        function closeDeleteModal() { document.getElementById('delete-modal').style.display = 'none'; deleteActionType = null; }
 
         async function executeModalDelete() {
             document.getElementById('modal-action-zone').style.display = 'none';
@@ -1246,19 +986,14 @@
             if (deleteActionType === 'delete_all') {
                 const res = await fetch(`${API_URL}/posts?skip=0&limit=100`);
                 const posts = await res.json();
-                for (const p of posts) { 
-                    await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); 
-                }
+                for (const p of posts) { await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); }
             } else if (deleteActionType && (deleteActionType.startsWith('about_') || deleteActionType.startsWith('contact_'))) {
                 const id = deleteActionType.split('_')[1];
                 await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); 
             }
             document.getElementById('modal-loading-zone').style.display = 'none';
             document.getElementById('modal-success-zone').style.display = 'flex';
-            setTimeout(() => {
-                fetchStatuses(true); closeDeleteModal();
-                if(deleteActionType === 'delete_all') { collapseEditor(); }
-            }, 1000);
+            setTimeout(() => { fetchStatuses(true); closeDeleteModal(); if(deleteActionType === 'delete_all') { collapseEditor(); } }, 1000);
         }
 
         function handleDeleteAllClick() { openDeleteModal('delete_all'); }
@@ -1274,12 +1009,8 @@
                 const formData = new FormData(); formData.append("file", compressedFile);
                 const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
                 if (!upRes.ok) throw new Error("Upload failed");
-                const upData = await upRes.json();
-                const payload = { title: "", text: "", image_url: upData.image_url, show_date: true, author: "" };
-                const res = await fetch(`${API_URL}/posts`, {
-                    method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                    body: JSON.stringify(payload)
-                });
+                const payload = { title: "", text: "", image_url: (await upRes.json()).image_url, show_date: true, author: "" };
+                const res = await fetch(`${API_URL}/posts`, { method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify(payload) });
                 if (res.ok) { 
                     fetchStatuses(true); 
                     document.getElementById('upload-loading-row').style.display = 'none';
@@ -1291,8 +1022,8 @@
 
         async function handleAboutSubmit(e) { 
             e.preventDefault(); 
-            const title     = document.getElementById('edit-title-about').value;
-            const text      = document.getElementById('edit-text-about').value;
+            const title = document.getElementById('edit-title-about').value;
+            const text  = document.getElementById('edit-text-about').value;
             const imageFile = document.getElementById('edit-image-about').files[0];
             if (!title && !text && !imageFile && !existingAboutImageUrl) return;
             document.getElementById('upload-action-row-about').style.display = 'none';
@@ -1307,20 +1038,17 @@
                     finalImageUrl = (await upRes.json()).image_url;
                 }
                 const payload = { title, text, image_url: finalImageUrl || "", show_date: false, author: "about" };
-                let res;
-                if (editingAboutPostId) {
-                    res = await fetch(`${API_URL}/posts/${editingAboutPostId}`, { method: "PUT", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify(payload) });
-                } else {
-                    res = await fetch(`${API_URL}/posts`, { method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify(payload) });
-                }
+                const res = editingAboutPostId
+                    ? await fetch(`${API_URL}/posts/${editingAboutPostId}`, { method: "PUT", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify(payload) })
+                    : await fetch(`${API_URL}/posts`, { method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify(payload) });
                 if (res.ok) { fetchStatuses(true); collapseAboutEditor(); } else { resetAboutEditor(); }
             } catch (err) { console.error(err); resetAboutEditor(); }
         }
 
         async function handleContactSubmit(e) { 
             e.preventDefault(); 
-            const title     = document.getElementById('edit-title-contact').value;
-            const text      = document.getElementById('edit-text-contact').value;
+            const title = document.getElementById('edit-title-contact').value;
+            const text  = document.getElementById('edit-text-contact').value;
             const imageFile = document.getElementById('edit-image-contact').files[0];
             if (!title && !text && !imageFile && !existingContactImageUrl) return;
             document.getElementById('upload-action-row-contact').style.display = 'none';
@@ -1335,16 +1063,14 @@
                     finalImageUrl = (await upRes.json()).image_url;
                 }
                 const payload = { title, text, image_url: finalImageUrl || "", show_date: false, author: "contact" };
-                let res;
-                if (editingContactPostId) {
-                    res = await fetch(`${API_URL}/posts/${editingContactPostId}`, { method: "PUT", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify(payload) });
-                } else {
-                    res = await fetch(`${API_URL}/posts`, { method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify(payload) });
-                }
+                const res = editingContactPostId
+                    ? await fetch(`${API_URL}/posts/${editingContactPostId}`, { method: "PUT", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify(payload) })
+                    : await fetch(`${API_URL}/posts`, { method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify(payload) });
                 if (res.ok) { fetchStatuses(true); collapseContactEditor(); } else { resetContactEditor(); }
             } catch (err) { console.error(err); resetContactEditor(); }
         }
 
+        updateToggleBtn();
         checkRememberedLogin();
         fetchStatuses(true);
         document.addEventListener('click', (e) => { if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); });
