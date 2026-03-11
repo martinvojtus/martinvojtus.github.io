@@ -21,7 +21,7 @@
             --divider: rgba(0, 0, 0, 0.1);
             
             --glass-rgb: 255, 255, 255; 
-            --content-width: 540px; 
+            --content-width: 720px; 
             --border-radius: 1rem; 
             --gap-item: 1rem; 
             --letter-spacing: 0.05em;
@@ -334,6 +334,40 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
+
+        .two-col-layout {
+            display: flex;
+            flex-direction: row;
+            gap: var(--gap-item);
+            width: 100%;
+            align-items: flex-start;
+        }
+
+        .two-col-layout .col-text {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: var(--gap-item);
+        }
+
+        .two-col-layout .col-image {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .two-col-layout .col-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: var(--border-radius);
+        }
+
+        @media (max-width: 600px) {
+            .two-col-layout {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
@@ -375,7 +409,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.5 • 2026</div>
+            <div class="footer-info">build v7.0.6 • 2026</div>
         </div>
     </nav>
 
@@ -419,7 +453,7 @@
         <div id="section-feed">
             <div id="status-container" class="status-feed view-grid"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.5 • 2026</div>
+            <div class="footer-info">build v7.0.6 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-about">
@@ -460,7 +494,7 @@
         <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="about-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.5 • 2026</div>
+            <div class="footer-info">build v7.0.6 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-contact">
@@ -501,7 +535,7 @@
         <div id="section-contact" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="contact-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.5 • 2026</div>
+            <div class="footer-info">build v7.0.6 • 2026</div>
         </div>
         
         <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
@@ -832,6 +866,29 @@
             const showDivider = (index === 0 && !secretKey) ? false : true;
             const dividerHtml = showDivider ? `<div class="divider-line"></div>` : '';
 
+            const hasText = p.title || p.text;
+            const hasImage = p.image_url;
+
+            let contentHtml = '';
+            if (hasText && hasImage) {
+                contentHtml = `
+                <div class="two-col-layout">
+                    <div class="col-text">
+                        ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
+                        ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
+                    </div>
+                    <div class="col-image">
+                        <img src="${p.image_url}" loading="lazy" alt="">
+                    </div>
+                </div>`;
+            } else {
+                contentHtml = `
+                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
+                    ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
+                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
+                `;
+            }
+
             return `
             <div style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item);">
                 ${dividerHtml}
@@ -842,9 +899,7 @@
                         <button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="openDeleteAboutModal(${p.id})">DELETE</button>
                     </div>
                     ` : ''}
-                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
-                    ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
-                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
+                    ${contentHtml}
                 </div>
             </div>
             `;
@@ -853,6 +908,29 @@
         function getContactPostHtml(p, index = 0) {
             const showDivider = (index === 0 && !secretKey) ? false : true;
             const dividerHtml = showDivider ? `<div class="divider-line"></div>` : '';
+
+            const hasText = p.title || p.text;
+            const hasImage = p.image_url;
+
+            let contentHtml = '';
+            if (hasText && hasImage) {
+                contentHtml = `
+                <div class="two-col-layout">
+                    <div class="col-text">
+                        ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
+                        ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
+                    </div>
+                    <div class="col-image">
+                        <img src="${p.image_url}" loading="lazy" alt="">
+                    </div>
+                </div>`;
+            } else {
+                contentHtml = `
+                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
+                    ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
+                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
+                `;
+            }
 
             return `
             <div style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item);">
@@ -864,9 +942,7 @@
                         <button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="openDeleteContactModal(${p.id})">DELETE</button>
                     </div>
                     ` : ''}
-                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
-                    ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
-                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
+                    ${contentHtml}
                 </div>
             </div>
             `;
@@ -915,599 +991,3 @@
             try {
                 const response = await fetch(`${API_URL}/posts?skip=${currentOffset}&limit=${postsLimit}`);
                 const newPosts = await response.json();
-                if (newPosts.length < postsLimit) hasMorePosts = false;
-                currentOffset += newPosts.length; globalPosts = globalPosts.concat(newPosts);
-                
-                const feedPosts = globalPosts.filter(p => p.author !== 'about' && p.author !== 'contact');
-                const aboutPosts = globalPosts.filter(p => p.author === 'about');
-                const contactPosts = globalPosts.filter(p => p.author === 'contact');
-
-                if (reset) {
-                    refreshFeedUI(feedPosts);
-                    renderAboutPosts(aboutPosts);
-                    renderContactPosts(contactPosts);
-                } else {
-                    const newFeedPosts = newPosts.filter(p => p.author !== 'about' && p.author !== 'contact');
-                    const newAboutPosts = newPosts.filter(p => p.author === 'about');
-                    const newContactPosts = newPosts.filter(p => p.author === 'contact');
-
-                    if (currentViewMode === 'feed') {
-                        let html = '';
-                        newFeedPosts.forEach(p => html += renderSinglePost(p));
-                        document.getElementById('status-container').insertAdjacentHTML('beforeend', html);
-                    } else {
-                        const leftCol = document.querySelector('.col-left');
-                        const rightCol = document.querySelector('.col-right');
-                        let currentFeedCount = feedPosts.length - newFeedPosts.length;
-                        newFeedPosts.forEach((post, i) => {
-                            const postHtml = renderSinglePost(post);
-                            if ((currentFeedCount + i) % 2 === 0) {
-                                if (leftCol) leftCol.insertAdjacentHTML('beforeend', postHtml);
-                            } else {
-                                if (rightCol) rightCol.insertAdjacentHTML('beforeend', postHtml);
-                            }
-                        });
-                    }
-
-                    if (newAboutPosts.length > 0) {
-                        let html = '';
-                        let currentAboutCount = aboutPosts.length - newAboutPosts.length;
-                        newAboutPosts.forEach((p, i) => html += getAboutPostHtml(p, currentAboutCount + i));
-                        document.getElementById('about-posts-container').insertAdjacentHTML('beforeend', html);
-                    }
-
-                    if (newContactPosts.length > 0) {
-                        let html = '';
-                        let currentContactCount = contactPosts.length - newContactPosts.length;
-                        newContactPosts.forEach((p, i) => html += getContactPostHtml(p, currentContactCount + i));
-                        document.getElementById('contact-posts-container').insertAdjacentHTML('beforeend', html);
-                    }
-                }
-            } catch (error) {} finally { 
-                isLoading = false; 
-                document.getElementById('loading-indicator').style.display = (hasMorePosts && globalPosts.length > 0) ? 'block' : 'none'; 
-                checkPostLimits();
-            }
-        }
-
-        window.addEventListener('scroll', () => { 
-            if (currentSection === 'feed' && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
-                fetchStatuses(); 
-            }
-        });
-
-        function handleImageClick(id) {
-            if (currentViewMode === 'grid') {
-                currentViewMode = 'feed';
-                localStorage.setItem('mv_view_mode', 'feed');
-                refreshFeedUI(globalPosts.filter(p => p.author !== 'about' && p.author !== 'contact'));
-                
-                const scrollIt = (behavior) => {
-                    const targetImg = document.getElementById(`post-img-${id}`);
-                    if (targetImg) {
-                        targetImg.closest('.status-card').scrollIntoView({ behavior: behavior, block: 'center' });
-                    }
-                };
-
-                setTimeout(() => scrollIt('auto'), 50);
-                setTimeout(() => scrollIt('auto'), 300);
-                setTimeout(() => scrollIt('smooth'), 600);
-            }
-        }
-
-        function renderSinglePost(s) {
-            const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
-            
-            let topRow = `
-            <div class="action-row feed-top-row" style="justify-content: space-between; padding: 0;">
-                <div style="display: flex; gap: var(--gap-item);">
-                    ${secretKey ? `<div class="submit-btn btn-tonal-disabled" style="flex-grow: 0; padding: 0 1rem; cursor: default;">#${s.id}</div>` : ''}
-                    <div class="submit-btn btn-tonal-disabled" style="flex-grow: 0; padding: 0 1rem; cursor: default;">${formattedDate}</div>
-                </div>
-                ${secretKey ? `<button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="handleDeleteFeed(${s.id})">DELETE</button>` : ''}
-            </div>
-            `;
-
-            const imageHtml = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="status-image" alt="image" loading="lazy" onclick="handleImageClick(${s.id})">` : '';
-            
-            let mediaHtml = '';
-            if (imageHtml) {
-                mediaHtml = `
-                <div class="status-media-wrapper">
-                    ${imageHtml}
-                    ${secretKey ? `
-                    <div id="confirm-overlay-${s.id}" class="status-confirm-overlay">
-                        <div id="confirm-actions-${s.id}" class="action-row" style="padding: 0 var(--gap-item);">
-                            <button class="submit-btn" onclick="executeFeedDelete(${s.id})">DELETE</button>
-                            <button class="submit-btn btn-tonal" onclick="closeFeedDelete(${s.id})">CANCEL</button>
-                        </div>
-                        <div id="confirm-loading-${s.id}" class="action-row" style="display: none; padding: 0 var(--gap-item);">
-                            <div class="submit-btn btn-loading">DELETING...</div>
-                        </div>
-                        <div id="confirm-success-${s.id}" class="action-row" style="display: none; padding: 0 var(--gap-item);">
-                            <div class="submit-btn btn-ghost">DELETED</div>
-                        </div>
-                    </div>
-                    ` : ''}
-                </div>`;
-            }
-
-            return `
-            <div class="status-card" style="gap: var(--gap-item);">
-                ${topRow}
-                ${mediaHtml}
-                <div class="divider-line feed-divider"></div>
-            </div>`;
-        }
-
-        function resetEditor() {
-            document.getElementById('edit-image').value = ""; 
-            
-            document.getElementById('upload-action-row').style.display = 'flex';
-            document.getElementById('upload-loading-row').style.display = 'none';
-            document.getElementById('upload-success-row').style.display = 'none';
-            
-            document.getElementById('upload-action-row').innerHTML = `
-                <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
-                <div class="submit-btn btn-tonal" onclick="collapseEditor()">CANCEL</div>
-            `;
-            
-            updateImageUIState(); 
-        }
-
-        function updateImageUIState() {
-            const input = document.getElementById('edit-image');
-            const emptyState = document.getElementById('upload-empty-state');
-            const filledState = document.getElementById('upload-filled-state');
-            const thumbnail = document.getElementById('upload-preview-img');
-            const pubBtn = document.getElementById('publish-btn');
-
-            const hasImage = (input && input.files && input.files.length > 0);
-
-            if (hasImage) {
-                if(thumbnail) thumbnail.src = URL.createObjectURL(input.files[0]);
-                emptyState.style.display = 'none';
-                filledState.style.display = 'flex';
-            } else {
-                if(thumbnail) thumbnail.src = "";
-                emptyState.style.display = 'flex';
-                filledState.style.display = 'none';
-            }
-
-            if (pubBtn) {
-                if (hasImage) {
-                    pubBtn.disabled = false;
-                    pubBtn.className = "submit-btn btn-tonal";
-                } else {
-                    pubBtn.disabled = true;
-                    pubBtn.className = "submit-btn btn-tonal-disabled";
-                }
-            }
-        }
-
-        function clearImageSelection(e) {
-            e.stopPropagation();
-            document.getElementById('edit-image').value = ""; 
-            updateImageUIState();
-        }
-
-        function updateAboutUIState() {
-            const titleVal = document.getElementById('edit-title-about').value.trim();
-            const textVal = document.getElementById('edit-text-about').value.trim();
-            const input = document.getElementById('edit-image-about');
-            const hasImage = (input && input.files && input.files.length > 0) || existingAboutImageUrl;
-
-            const hasContent = titleVal.length > 0 || textVal.length > 0 || hasImage;
-
-            const pubBtn = document.getElementById('publish-btn-about');
-            const clearBtn = document.getElementById('clear-btn-about');
-
-            if (hasContent) {
-                if (pubBtn) { pubBtn.disabled = false; pubBtn.className = "submit-btn btn-tonal"; }
-                if (clearBtn) { clearBtn.disabled = false; clearBtn.className = "submit-btn btn-tonal"; }
-            } else {
-                if (pubBtn) { pubBtn.disabled = true; pubBtn.className = "submit-btn btn-tonal-disabled"; }
-                if (clearBtn) { clearBtn.disabled = true; clearBtn.className = "submit-btn btn-tonal-disabled"; }
-            }
-        }
-
-        function clearAboutTextFields(e) {
-            if(e) e.stopPropagation();
-            document.getElementById('edit-title-about').value = "";
-            const textEl = document.getElementById('edit-text-about');
-            textEl.value = "";
-            textEl.style.height = ''; 
-            updateAboutUIState();
-        }
-
-        function resetAboutEditor() {
-            editingAboutPostId = null;
-            existingAboutImageUrl = null;
-            
-            document.getElementById('edit-title-about').value = "";
-            const textEl = document.getElementById('edit-text-about');
-            textEl.value = "";
-            textEl.style.height = '';
-
-            document.getElementById('edit-image-about').value = "";
-            
-            document.getElementById('upload-action-row-about').style.display = 'flex';
-            document.getElementById('upload-loading-row-about').style.display = 'none';
-            
-            document.getElementById('publish-btn-about').innerText = "UPLOAD";
-            
-            updateAboutImageUIState();
-        }
-
-        function updateAboutImageUIState() {
-            const input = document.getElementById('edit-image-about');
-            const emptyState = document.getElementById('upload-empty-state-about');
-            const filledState = document.getElementById('upload-filled-state-about');
-            const thumbnail = document.getElementById('upload-preview-img-about');
-            
-            const hasImage = (input && input.files && input.files.length > 0) || existingAboutImageUrl;
-
-            if (hasImage) {
-                if(input && input.files && input.files.length > 0) {
-                    thumbnail.src = URL.createObjectURL(input.files[0]);
-                } else {
-                    thumbnail.src = existingAboutImageUrl;
-                }
-                emptyState.style.display = 'none';
-                filledState.style.display = 'flex';
-            } else {
-                thumbnail.src = "";
-                emptyState.style.display = 'flex';
-                filledState.style.display = 'none';
-            }
-
-            updateAboutUIState();
-        }
-
-        function clearAboutImageSelection(e) {
-            e.stopPropagation();
-            document.getElementById('edit-image-about').value = "";
-            existingAboutImageUrl = null; 
-            updateAboutImageUIState();
-        }
-
-        function editAboutPost(id) {
-            const post = globalPosts.find(p => p.id === id);
-            if (!post) return;
-            
-            editingAboutPostId = post.id;
-            existingAboutImageUrl = post.image_url;
-            
-            document.getElementById('edit-title-about').value = post.title || "";
-            const textEl = document.getElementById('edit-text-about');
-            textEl.value = post.text || "";
-            
-            expandAboutEditor();
-            setTimeout(() => { autoResizeTextarea(textEl); }, 0);
-            updateAboutImageUIState();
-            
-            document.getElementById('publish-btn-about').innerText = "SAVE";
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function updateContactUIState() {
-            const titleVal = document.getElementById('edit-title-contact').value.trim();
-            const textVal = document.getElementById('edit-text-contact').value.trim();
-            const input = document.getElementById('edit-image-contact');
-            const hasImage = (input && input.files && input.files.length > 0) || existingContactImageUrl;
-
-            const hasContent = titleVal.length > 0 || textVal.length > 0 || hasImage;
-
-            const pubBtn = document.getElementById('publish-btn-contact');
-            const clearBtn = document.getElementById('clear-btn-contact');
-
-            if (hasContent) {
-                if (pubBtn) { pubBtn.disabled = false; pubBtn.className = "submit-btn btn-tonal"; }
-                if (clearBtn) { clearBtn.disabled = false; clearBtn.className = "submit-btn btn-tonal"; }
-            } else {
-                if (pubBtn) { pubBtn.disabled = true; pubBtn.className = "submit-btn btn-tonal-disabled"; }
-                if (clearBtn) { clearBtn.disabled = true; clearBtn.className = "submit-btn btn-tonal-disabled"; }
-            }
-        }
-
-        function clearContactTextFields(e) {
-            if(e) e.stopPropagation();
-            document.getElementById('edit-title-contact').value = "";
-            const textEl = document.getElementById('edit-text-contact');
-            textEl.value = "";
-            textEl.style.height = ''; 
-            updateContactUIState();
-        }
-
-        function resetContactEditor() {
-            editingContactPostId = null;
-            existingContactImageUrl = null;
-            
-            document.getElementById('edit-title-contact').value = "";
-            const textEl = document.getElementById('edit-text-contact');
-            textEl.value = "";
-            textEl.style.height = '';
-
-            document.getElementById('edit-image-contact').value = "";
-            
-            document.getElementById('upload-action-row-contact').style.display = 'flex';
-            document.getElementById('upload-loading-row-contact').style.display = 'none';
-            
-            document.getElementById('publish-btn-contact').innerText = "UPLOAD";
-            
-            updateContactImageUIState();
-        }
-
-        function updateContactImageUIState() {
-            const input = document.getElementById('edit-image-contact');
-            const emptyState = document.getElementById('upload-empty-state-contact');
-            const filledState = document.getElementById('upload-filled-state-contact');
-            const thumbnail = document.getElementById('upload-preview-img-contact');
-            
-            const hasImage = (input && input.files && input.files.length > 0) || existingContactImageUrl;
-
-            if (hasImage) {
-                if(input && input.files && input.files.length > 0) {
-                    thumbnail.src = URL.createObjectURL(input.files[0]);
-                } else {
-                    thumbnail.src = existingContactImageUrl;
-                }
-                emptyState.style.display = 'none';
-                filledState.style.display = 'flex';
-            } else {
-                thumbnail.src = "";
-                emptyState.style.display = 'flex';
-                filledState.style.display = 'none';
-            }
-
-            updateContactUIState();
-        }
-
-        function clearContactImageSelection(e) {
-            e.stopPropagation();
-            document.getElementById('edit-image-contact').value = "";
-            existingContactImageUrl = null; 
-            updateContactImageUIState();
-        }
-
-        function editContactPost(id) {
-            const post = globalPosts.find(p => p.id === id);
-            if (!post) return;
-            
-            editingContactPostId = post.id;
-            existingContactImageUrl = post.image_url;
-            
-            document.getElementById('edit-title-contact').value = post.title || "";
-            const textEl = document.getElementById('edit-text-contact');
-            textEl.value = post.text || "";
-            
-            expandContactEditor();
-            setTimeout(() => { autoResizeTextarea(textEl); }, 0);
-            updateContactImageUIState();
-            
-            document.getElementById('publish-btn-contact').innerText = "SAVE";
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function handleDeleteFeed(id) {
-            document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
-            document.getElementById(`confirm-actions-${id}`).style.display = 'flex';
-            document.getElementById(`confirm-loading-${id}`).style.display = 'none';
-            document.getElementById(`confirm-success-${id}`).style.display = 'none';
-        }
-
-        function closeFeedDelete(id) {
-            document.getElementById(`confirm-overlay-${id}`).style.display = 'none';
-        }
-
-        async function executeFeedDelete(id) {
-            document.getElementById(`confirm-actions-${id}`).style.display = 'none';
-            document.getElementById(`confirm-loading-${id}`).style.display = 'flex';
-            
-            await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
-            
-            document.getElementById(`confirm-loading-${id}`).style.display = 'none';
-            document.getElementById(`confirm-success-${id}`).style.display = 'flex';
-            
-            setTimeout(() => {
-                fetchStatuses(true);
-            }, 1000);
-        }
-
-        function openDeleteModal(type) {
-            deleteActionType = type;
-            document.getElementById('delete-modal').style.display = 'flex';
-            document.getElementById('modal-action-zone').style.display = 'flex';
-            document.getElementById('modal-loading-zone').style.display = 'none';
-            document.getElementById('modal-success-zone').style.display = 'none';
-        }
-
-        function openDeleteAboutModal(id) {
-            openDeleteModal('about_' + id);
-        }
-        
-        function openDeleteContactModal(id) {
-            openDeleteModal('contact_' + id);
-        }
-
-        function closeDeleteModal() {
-            document.getElementById('delete-modal').style.display = 'none';
-            deleteActionType = null;
-        }
-
-        async function executeModalDelete() {
-            document.getElementById('modal-action-zone').style.display = 'none';
-            document.getElementById('modal-loading-zone').style.display = 'flex';
-
-            if (deleteActionType === 'delete_all') {
-                const res = await fetch(`${API_URL}/posts?skip=0&limit=100`);
-                const posts = await res.json();
-                for (const p of posts) { 
-                    await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); 
-                }
-            } else if (deleteActionType && (deleteActionType.startsWith('about_') || deleteActionType.startsWith('contact_'))) {
-                const id = deleteActionType.split('_')[1];
-                await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); 
-            }
-            
-            document.getElementById('modal-loading-zone').style.display = 'none';
-            document.getElementById('modal-success-zone').style.display = 'flex';
-            
-            setTimeout(() => {
-                fetchStatuses(true);
-                closeDeleteModal();
-                if(deleteActionType === 'delete_all') { collapseEditor(); }
-            }, 1000);
-        }
-
-        function handleDeleteAllClick() {
-            openDeleteModal('delete_all');
-        }
-
-        async function handleMainSubmit(e) { 
-            e.preventDefault(); 
-            const imageFile = document.getElementById('edit-image').files[0];
-            
-            if (!imageFile) { return; }
-            
-            document.getElementById('upload-action-row').style.display = 'none';
-            document.getElementById('upload-loading-row').style.display = 'flex';
-            
-            try {
-                const compressedFile = await compressImage(imageFile);
-                const formData = new FormData(); formData.append("file", compressedFile);
-                
-                const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
-                if (!upRes.ok) throw new Error("Upload failed");
-                const upData = await upRes.json();
-                const finalImageUrl = upData.image_url;
-
-                const payload = { title: "", text: "", image_url: finalImageUrl, show_date: true, author: "" };
-                
-                const res = await fetch(`${API_URL}/posts`, {
-                    method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                    body: JSON.stringify(payload)
-                });
-                
-                if (res.ok) { 
-                    fetchStatuses(true); 
-                    document.getElementById('upload-loading-row').style.display = 'none';
-                    document.getElementById('upload-success-row').style.display = 'flex';
-                    setTimeout(() => { 
-                        collapseEditor(); 
-                    }, 1000);
-                } else { 
-                    resetEditor(); 
-                }
-            } catch (err) {
-                console.error(err);
-                resetEditor();
-            }
-        }
-
-        async function handleAboutSubmit(e) { 
-            e.preventDefault(); 
-            const title = document.getElementById('edit-title-about').value;
-            const text = document.getElementById('edit-text-about').value;
-            const imageFile = document.getElementById('edit-image-about').files[0];
-            
-            if (!title && !text && !imageFile && !existingAboutImageUrl) return;
-            
-            document.getElementById('upload-action-row-about').style.display = 'none';
-            document.getElementById('upload-loading-row-about').style.display = 'flex';
-            
-            try {
-                let finalImageUrl = existingAboutImageUrl;
-                
-                if (imageFile) {
-                    const compressedFile = await compressImage(imageFile);
-                    const formData = new FormData(); formData.append("file", compressedFile);
-                    const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
-                    if (!upRes.ok) throw new Error("Upload failed");
-                    const upData = await upRes.json();
-                    finalImageUrl = upData.image_url;
-                }
-
-                const payload = { title: title, text: text, image_url: finalImageUrl || "", show_date: false, author: "about" };
-                
-                let res;
-                if (editingAboutPostId) {
-                    res = await fetch(`${API_URL}/posts/${editingAboutPostId}`, {
-                        method: "PUT", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                        body: JSON.stringify(payload)
-                    });
-                } else {
-                    res = await fetch(`${API_URL}/posts`, {
-                        method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                        body: JSON.stringify(payload)
-                    });
-                }
-                
-                if (res.ok) { 
-                    fetchStatuses(true); 
-                    collapseAboutEditor();
-                } else { 
-                    resetAboutEditor(); 
-                }
-            } catch (err) {
-                console.error(err);
-                resetAboutEditor();
-            }
-        }
-
-        async function handleContactSubmit(e) { 
-            e.preventDefault(); 
-            const title = document.getElementById('edit-title-contact').value;
-            const text = document.getElementById('edit-text-contact').value;
-            const imageFile = document.getElementById('edit-image-contact').files[0];
-            
-            if (!title && !text && !imageFile && !existingContactImageUrl) return;
-            
-            document.getElementById('upload-action-row-contact').style.display = 'none';
-            document.getElementById('upload-loading-row-contact').style.display = 'flex';
-            
-            try {
-                let finalImageUrl = existingContactImageUrl;
-                
-                if (imageFile) {
-                    const compressedFile = await compressImage(imageFile);
-                    const formData = new FormData(); formData.append("file", compressedFile);
-                    const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
-                    if (!upRes.ok) throw new Error("Upload failed");
-                    const upData = await upRes.json();
-                    finalImageUrl = upData.image_url;
-                }
-
-                const payload = { title: title, text: text, image_url: finalImageUrl || "", show_date: false, author: "contact" };
-                
-                let res;
-                if (editingContactPostId) {
-                    res = await fetch(`${API_URL}/posts/${editingContactPostId}`, {
-                        method: "PUT", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                        body: JSON.stringify(payload)
-                    });
-                } else {
-                    res = await fetch(`${API_URL}/posts`, {
-                        method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                        body: JSON.stringify(payload)
-                    });
-                }
-                
-                if (res.ok) { 
-                    fetchStatuses(true); 
-                    collapseContactEditor();
-                } else { 
-                    resetContactEditor(); 
-                }
-            } catch (err) {
-                console.error(err);
-                resetContactEditor();
-            }
-        }
-
-        checkRememberedLogin();
-        fetchStatuses(true);
-        document.addEventListener('click', (e) => { if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); });
-    </script>
-</body>
-</html>
