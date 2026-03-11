@@ -187,14 +187,11 @@
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
 
-        .form-input, .submit-btn { 
+        .form-input { 
             border-radius: var(--border-radius); 
             font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; display: flex; align-items: center; gap: var(--gap-item); 
             box-shadow: none; -webkit-appearance: none; appearance: none; margin: 0;
-        }
-
-        .form-input { 
             height: 3rem;
             background-color: transparent; 
             color: var(--black);
@@ -203,6 +200,10 @@
         .form-input::placeholder { color: var(--grey-50); } 
 
         .submit-btn { 
+            border-radius: var(--border-radius); 
+            font-size: var(--size-small); padding: 0 var(--gap-item); 
+            outline: none; display: flex; align-items: center; gap: var(--gap-item); 
+            box-shadow: none; -webkit-appearance: none; appearance: none; margin: 0;
             height: 3rem;
             background-color: var(--black); 
             color: var(--white);
@@ -326,7 +327,8 @@
         .about-text {
             font-size: var(--size-small);
             color: var(--black);
-            text-align: justify;
+            /* 🛠️ Zmena z justify na left */
+            text-align: left;
             line-height: 1.6;
             -webkit-hyphens: auto;
             -ms-hyphens: auto;
@@ -412,7 +414,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.8 • 2026</div>
+            <div class="footer-info">build v7.0.9 • 2026</div>
         </div>
     </nav>
 
@@ -456,7 +458,7 @@
         <div id="section-feed">
             <div id="status-container" class="status-feed view-grid"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.8 • 2026</div>
+            <div class="footer-info">build v7.0.9 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-about">
@@ -497,7 +499,7 @@
         <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="about-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.8 • 2026</div>
+            <div class="footer-info">build v7.0.9 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-contact">
@@ -538,7 +540,7 @@
         <div id="section-contact" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="contact-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.8 • 2026</div>
+            <div class="footer-info">build v7.0.9 • 2026</div>
         </div>
         
         <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
@@ -818,7 +820,6 @@
             fetchStatuses(true);
         }
 
-        // 🛠️ Mriežka dynamicky reaguje na aktuálny počet stĺpcov
         function refreshFeedUI(feedPosts) { 
             const container = document.getElementById('status-container');
             const deleteAllBtn = document.getElementById('delete-all-btn');
@@ -1022,7 +1023,6 @@
             });
         }
 
-        // 🛠️ Pridávanie nových príspevkov do príslušných stĺpcov podľa currentGridCols
         async function fetchStatuses(reset = false) {
             if (reset) { currentOffset = 0; hasMorePosts = true; globalPosts = []; document.getElementById('status-container').innerHTML = ''; }
             if (isLoading || !hasMorePosts) return;
