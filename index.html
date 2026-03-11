@@ -423,7 +423,7 @@
 
         <div id="admin-upload-zone-about">
             <div id="editor-collapsed-state-about" class="submit-btn btn-tonal" style="width: 100%;" onclick="expandAboutEditor()">
-                + ADD ABOUT POST
+                + ADD POST
             </div>
 
             <form id="editor-form-about" onsubmit="handleAboutSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
@@ -462,7 +462,7 @@
 
         <div id="admin-upload-zone-contact">
             <div id="editor-collapsed-state-contact" class="submit-btn btn-tonal" style="width: 100%;" onclick="expandContactEditor()">
-                + ADD CONTACT POST
+                + ADD POST
             </div>
 
             <form id="editor-form-contact" onsubmit="handleContactSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
@@ -1284,7 +1284,6 @@
             document.getElementById('publish-btn-contact').innerText = "SAVE";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
 
         function handleDeleteFeed(id) {
             document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
