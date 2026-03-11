@@ -412,7 +412,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.7 • 2026</div>
+            <div class="footer-info">build v7.0.8 • 2026</div>
         </div>
     </nav>
 
@@ -456,7 +456,7 @@
         <div id="section-feed">
             <div id="status-container" class="status-feed view-grid"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.7 • 2026</div>
+            <div class="footer-info">build v7.0.8 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-about">
@@ -497,7 +497,7 @@
         <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="about-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.7 • 2026</div>
+            <div class="footer-info">build v7.0.8 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-contact">
@@ -538,7 +538,7 @@
         <div id="section-contact" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="contact-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.7 • 2026</div>
+            <div class="footer-info">build v7.0.8 • 2026</div>
         </div>
         
         <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
@@ -573,6 +573,9 @@
         let currentViewMode = localStorage.getItem('mv_view_mode') || 'grid';
         let currentSection = 'feed'; 
 
+        // 🛠️ Globálna premenná pre počet stĺpcov podľa šírky obrazovky
+        let currentGridCols = window.innerWidth > 600 ? 3 : 2;
+
         const passInput = document.getElementById('admin-pass');
         const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
@@ -583,6 +586,17 @@
                 passInput.placeholder = 'Password...';
             });
         }
+
+        // 🛠️ Sledovanie zmeny veľkosti okna na prekreslenie mriežky
+        window.addEventListener('resize', () => {
+            const newCols = window.innerWidth > 600 ? 3 : 2;
+            if (newCols !== currentGridCols) {
+                currentGridCols = newCols;
+                if (currentSection === 'feed' && currentViewMode === 'grid') {
+                    refreshFeedUI(globalPosts.filter(p => p.author !== 'about' && p.author !== 'contact'));
+                }
+            }
+        });
 
         function autoResizeTextarea(el) {
             el.style.height = 'auto';
@@ -804,6 +818,7 @@
             fetchStatuses(true);
         }
 
+        // 🛠️ Mriežka dynamicky reaguje na aktuálny počet stĺpcov
         function refreshFeedUI(feedPosts) { 
             const container = document.getElementById('status-container');
             const deleteAllBtn = document.getElementById('delete-all-btn');
@@ -847,20 +862,40 @@
                 container.className = 'status-feed view-grid';
                 let html = secretKey ? '<div class="divider-line"></div>' : '';
                 
-                let leftCol = '<div class="masonry-col col-left">';
-                let rightCol = '<div class="masonry-col col-right">';
+                if (currentGridCols === 3) {
+                    let leftCol = '<div class="masonry-col col-left">';
+                    let midCol = '<div class="masonry-col col-mid">';
+                    let rightCol = '<div class="masonry-col col-right">';
 
-                rightCol += `<button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">FEED VIEW</button>`;
+                    midCol += `<button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">FEED VIEW</button>`;
 
-                feedPosts.forEach((post, index) => {
-                    if (index % 2 === 0) leftCol += renderSinglePost(post);
-                    else rightCol += renderSinglePost(post);
-                });
+                    feedPosts.forEach((post, index) => {
+                        if (index % 3 === 0) leftCol += renderSinglePost(post);
+                        else if (index % 3 === 1) midCol += renderSinglePost(post);
+                        else rightCol += renderSinglePost(post);
+                    });
 
-                leftCol += '</div>';
-                rightCol += '</div>';
+                    leftCol += '</div>';
+                    midCol += '</div>';
+                    rightCol += '</div>';
 
-                html += `<div class="grid-columns-wrapper">${leftCol}${rightCol}</div>`;
+                    html += `<div class="grid-columns-wrapper">${leftCol}${midCol}${rightCol}</div>`;
+                } else {
+                    let leftCol = '<div class="masonry-col col-left">';
+                    let rightCol = '<div class="masonry-col col-right">';
+
+                    rightCol += `<button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">FEED VIEW</button>`;
+
+                    feedPosts.forEach((post, index) => {
+                        if (index % 2 === 0) leftCol += renderSinglePost(post);
+                        else rightCol += renderSinglePost(post);
+                    });
+
+                    leftCol += '</div>';
+                    rightCol += '</div>';
+
+                    html += `<div class="grid-columns-wrapper">${leftCol}${rightCol}</div>`;
+                }
                 container.innerHTML = html;
             }
         }
@@ -987,6 +1022,7 @@
             });
         }
 
+        // 🛠️ Pridávanie nových príspevkov do príslušných stĺpcov podľa currentGridCols
         async function fetchStatuses(reset = false) {
             if (reset) { currentOffset = 0; hasMorePosts = true; globalPosts = []; document.getElementById('status-container').innerHTML = ''; }
             if (isLoading || !hasMorePosts) return;
@@ -1015,17 +1051,31 @@
                         newFeedPosts.forEach(p => html += renderSinglePost(p));
                         document.getElementById('status-container').insertAdjacentHTML('beforeend', html);
                     } else {
-                        const leftCol = document.querySelector('.col-left');
-                        const rightCol = document.querySelector('.col-right');
-                        let currentFeedCount = feedPosts.length - newFeedPosts.length;
-                        newFeedPosts.forEach((post, i) => {
-                            const postHtml = renderSinglePost(post);
-                            if ((currentFeedCount + i) % 2 === 0) {
-                                if (leftCol) leftCol.insertAdjacentHTML('beforeend', postHtml);
-                            } else {
-                                if (rightCol) rightCol.insertAdjacentHTML('beforeend', postHtml);
-                            }
-                        });
+                        if (currentGridCols === 3) {
+                            const leftCol = document.querySelector('.col-left');
+                            const midCol = document.querySelector('.col-mid');
+                            const rightCol = document.querySelector('.col-right');
+                            let currentFeedCount = feedPosts.length - newFeedPosts.length;
+                            newFeedPosts.forEach((post, i) => {
+                                const postHtml = renderSinglePost(post);
+                                const colIndex = (currentFeedCount + i) % 3;
+                                if (colIndex === 0 && leftCol) leftCol.insertAdjacentHTML('beforeend', postHtml);
+                                else if (colIndex === 1 && midCol) midCol.insertAdjacentHTML('beforeend', postHtml);
+                                else if (rightCol) rightCol.insertAdjacentHTML('beforeend', postHtml);
+                            });
+                        } else {
+                            const leftCol = document.querySelector('.col-left');
+                            const rightCol = document.querySelector('.col-right');
+                            let currentFeedCount = feedPosts.length - newFeedPosts.length;
+                            newFeedPosts.forEach((post, i) => {
+                                const postHtml = renderSinglePost(post);
+                                if ((currentFeedCount + i) % 2 === 0) {
+                                    if (leftCol) leftCol.insertAdjacentHTML('beforeend', postHtml);
+                                } else {
+                                    if (rightCol) rightCol.insertAdjacentHTML('beforeend', postHtml);
+                                }
+                            });
+                        }
                     }
 
                     if (newAboutPosts.length > 0) {
@@ -1367,6 +1417,7 @@
             document.getElementById('publish-btn-contact').innerText = "SAVE";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
 
         function handleDeleteFeed(id) {
             document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
