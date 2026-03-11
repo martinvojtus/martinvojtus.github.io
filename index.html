@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)">
 
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.png?v=2">
     <link rel="shortcut icon" type="image/png" href="favicon.png?v=2">
@@ -15,7 +15,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --black: #000000;
+            /* 🎨 Zjemnená čierna pre mäkší kontrast */
+            --black: #1a1a1a;
             --white: #ffffff;
             --grey-50: rgba(0, 0, 0, 0.5);
             --divider: rgba(0, 0, 0, 0.1);
@@ -23,21 +24,24 @@
             --glass-rgb: 255, 255, 255; 
             --content-width: 720px; 
             --border-radius: 1rem; 
-            --gap-item: 1rem; 
+            /* 🔲 Vzdušnejšie medzery */
+            --gap-item: 1.25rem; 
             --letter-spacing: 0.05em;
             --glass-opacity: 0.5; 
             --glass-blur: 1rem;   
             --size-large: 2.0rem;
-            --size-small: 1.0rem;
+            /* 📏 Väčší základný text (18px) */
+            --size-small: 1.125rem;
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --black: #ffffff;       
-                --white: #000000;       
+                /* 🎨 Zjemnená biela a čierna aj pre dark mode */
+                --black: #f5f5f5;       
+                --white: #121212;       
                 --grey-50: rgba(255, 255, 255, 0.5); 
                 --divider: rgba(255, 255, 255, 0.1); 
-                --glass-rgb: 0, 0, 0;   
+                --glass-rgb: 18, 18, 18;   
             }
         }
 
@@ -84,7 +88,7 @@
         }
 
         .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
-        .header-left svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
+        .header-left svg { width: 1.125rem; height: 1.125rem; display: block; flex-shrink: 0; }
         .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; pointer-events: auto; cursor: pointer; }
 
         .menu-toggle { 
@@ -187,12 +191,15 @@
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
 
-        .form-input { 
+        .form-input, .submit-btn { 
             border-radius: var(--border-radius); 
             font-size: var(--size-small); padding: 0 var(--gap-item); 
             outline: none; display: flex; align-items: center; gap: var(--gap-item); 
             box-shadow: none; -webkit-appearance: none; appearance: none; margin: 0;
-            height: 3rem;
+        }
+
+        .form-input { 
+            height: 3.5rem; /* Zväčšená výška formulárových prvkov pre vzdušnosť */
             background-color: transparent; 
             color: var(--black);
             border: 1px solid var(--divider); 
@@ -200,11 +207,7 @@
         .form-input::placeholder { color: var(--grey-50); } 
 
         .submit-btn { 
-            border-radius: var(--border-radius); 
-            font-size: var(--size-small); padding: 0 var(--gap-item); 
-            outline: none; display: flex; align-items: center; gap: var(--gap-item); 
-            box-shadow: none; -webkit-appearance: none; appearance: none; margin: 0;
-            height: 3rem;
+            height: 3.5rem; /* Zväčšená výška tlačidiel */
             background-color: var(--black); 
             color: var(--white);
             border: 1px solid var(--black); 
@@ -258,8 +261,8 @@
         .input-error span { color: var(--black) !important; }
 
         .thumbnail-container {
-            width: 3rem;
-            height: 3rem;
+            width: 3.5rem;
+            height: 3.5rem;
             flex-shrink: 0;
             border-radius: var(--border-radius);
             overflow: hidden;
@@ -276,10 +279,10 @@
         }
 
         .custom-checkbox {
-            appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black);
+            appearance: none; width: 1.125rem; height: 1.125rem; border: 1px solid var(--black);
             border-radius: calc(var(--border-radius) / 3); cursor: pointer; display: grid; place-content: center;
         }
-        .custom-checkbox::before { content: ""; width: 0.25rem; height: 0.5rem; border: solid var(--white); border-width: 0 1px 1px 0; transform: rotate(45deg); opacity: 0; margin-top: -0.125rem; }
+        .custom-checkbox::before { content: ""; width: 0.3rem; height: 0.55rem; border: solid var(--white); border-width: 0 2px 2px 0; transform: rotate(45deg); opacity: 0; margin-top: -0.15rem; }
         .custom-checkbox:checked { background-color: var(--black); border-color: var(--black); } 
         .custom-checkbox:checked::before { opacity: 1; }
 
@@ -327,7 +330,6 @@
         .about-text {
             font-size: var(--size-small);
             color: var(--black);
-            /* 🛠️ Zmena z justify na left */
             text-align: left;
             line-height: 1.6;
             -webkit-hyphens: auto;
@@ -353,7 +355,8 @@
             gap: var(--gap-item);
             background-color: var(--divider);
             border-radius: var(--border-radius);
-            padding: var(--gap-item);
+            /* 🔲 Vzdušnejší luxusný padding vo vnútri boxov */
+            padding: 1.5rem;
         }
 
         .two-col-layout .col-image {
@@ -381,7 +384,7 @@
         <div class="header-content">
             <div class="logo-link" onclick="showFeed()">
                 <div class="header-left">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="72.35 270 935.31 810" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1.125rem" height="1.125rem" viewBox="72.35 270 935.31 810" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
                 </div>
             </div>
             <div class="logo-text" onclick="showFeed()"><span>martinvojtus</span> • space</div>
@@ -414,7 +417,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.9 • 2026</div>
+            <div class="footer-info">build v7.1.0 • 2026</div>
         </div>
     </nav>
 
@@ -458,7 +461,7 @@
         <div id="section-feed">
             <div id="status-container" class="status-feed view-grid"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.9 • 2026</div>
+            <div class="footer-info">build v7.1.0 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-about">
@@ -468,7 +471,7 @@
 
             <form id="editor-form-about" onsubmit="handleAboutSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                 <input type="text" id="edit-title-about" class="form-input" placeholder="Title..." style="width: 100%;" oninput="updateAboutUIState()">
-                <textarea id="edit-text-about" class="form-input" placeholder="Content..." style="width: 100%; min-height: 6rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateAboutUIState();"></textarea>
+                <textarea id="edit-text-about" class="form-input" placeholder="Content..." style="width: 100%; min-height: 6rem; padding-top: 1rem; padding-bottom: 1rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateAboutUIState();"></textarea>
 
                 <input type="file" id="edit-image-about" accept="image/*" style="display: none;" onchange="updateAboutImageUIState()">
                 
@@ -499,7 +502,7 @@
         <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="about-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.9 • 2026</div>
+            <div class="footer-info">build v7.1.0 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-contact">
@@ -509,7 +512,7 @@
 
             <form id="editor-form-contact" onsubmit="handleContactSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
                 <input type="text" id="edit-title-contact" class="form-input" placeholder="Title..." style="width: 100%;" oninput="updateContactUIState()">
-                <textarea id="edit-text-contact" class="form-input" placeholder="Content..." style="width: 100%; min-height: 6rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateContactUIState();"></textarea>
+                <textarea id="edit-text-contact" class="form-input" placeholder="Content..." style="width: 100%; min-height: 6rem; padding-top: 1rem; padding-bottom: 1rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateContactUIState();"></textarea>
 
                 <input type="file" id="edit-image-contact" accept="image/*" style="display: none;" onchange="updateContactImageUIState()">
                 
@@ -540,7 +543,7 @@
         <div id="section-contact" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="contact-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.0.9 • 2026</div>
+            <div class="footer-info">build v7.1.0 • 2026</div>
         </div>
         
         <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
@@ -575,7 +578,6 @@
         let currentViewMode = localStorage.getItem('mv_view_mode') || 'grid';
         let currentSection = 'feed'; 
 
-        // 🛠️ Globálna premenná pre počet stĺpcov podľa šírky obrazovky
         let currentGridCols = window.innerWidth > 600 ? 3 : 2;
 
         const passInput = document.getElementById('admin-pass');
@@ -589,7 +591,6 @@
             });
         }
 
-        // 🛠️ Sledovanie zmeny veľkosti okna na prekreslenie mriežky
         window.addEventListener('resize', () => {
             const newCols = window.innerWidth > 600 ? 3 : 2;
             if (newCols !== currentGridCols) {
