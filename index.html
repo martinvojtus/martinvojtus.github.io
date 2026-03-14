@@ -99,9 +99,11 @@
             line-height: 1; text-transform: uppercase;
         }
 
-        /* 🛠️ CSS pre desktopové menu */
         .desktop-menu { display: none; }
         .desktop-link { font-size: var(--size-small); color: var(--black); cursor: pointer; text-transform: uppercase; }
+        
+        /* 🛠️ Nový CSS trieda pre oddeľovač na desktope */
+        .desktop-divider { width: 1px; height: 1rem; background-color: var(--divider); }
 
         @media (min-width: 600px) {
             .logo-text { position: static; transform: none; margin-left: 0.5rem; }
@@ -370,13 +372,14 @@
                 <div class="logo-text"><span>martinvojtus</span> • space</div>
             </div>
             
-            <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">MENU</div>
+            <div class="menu-toggle" id="menuToggle" onclick="toggleMenu(event)">MENU</div>
 
             <div class="desktop-menu">
                 <div class="desktop-link" onclick="showFeed()">Feed</div>
                 <div class="desktop-link" onclick="showAbout()">About</div>
                 <div class="desktop-link" onclick="showContact()">Contact</div>
-                <div class="desktop-link" id="desktop-login-btn" onclick="toggleMenu()">Login</div>
+                <div class="desktop-divider"></div>
+                <div class="desktop-link" id="desktop-login-btn" onclick="toggleMenu(event)">Login</div>
                 <div class="desktop-link" id="desktop-logout-btn" onclick="handleLogout()" style="display: none;">Logout</div>
             </div>
         </div>
@@ -406,7 +409,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.9 • 2026</div>
+            <div class="footer-info">build v7.2.0 • 2026</div>
         </div>
     </nav>
 
@@ -450,7 +453,7 @@
         <div id="section-feed">
             <div id="status-container" class="status-feed view-grid"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.9 • 2026</div>
+            <div class="footer-info">build v7.2.0 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-about">
@@ -491,7 +494,7 @@
         <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="about-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.9 • 2026</div>
+            <div class="footer-info">build v7.2.0 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-contact">
@@ -532,7 +535,7 @@
         <div id="section-contact" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="contact-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.9 • 2026</div>
+            <div class="footer-info">build v7.2.0 • 2026</div>
         </div>
         
         <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
@@ -698,11 +701,14 @@
             refreshFeedUI(globalPosts.filter(p => p.author !== 'about' && p.author !== 'contact'));
         }
 
-        function toggleMenu() { 
+        // 🛠️ Oprava preklápania menu, aby zachytávalo event a zabránilo globálnemu kliku ho hneď zatvoriť
+        function toggleMenu(e) { 
+            if (e) e.stopPropagation();
             const isActive = menuToggle.classList.toggle('active'); 
             navOverlay.classList.toggle('active'); 
             menuToggle.innerText = isActive ? 'CLOSE' : 'MENU';
         }
+        
         function closeMenu() { 
             menuToggle.classList.remove('active'); 
             navOverlay.classList.remove('active'); 
@@ -727,7 +733,6 @@
                     document.getElementById('admin-upload-zone-contact').style.display = 'flex';
                 }
 
-                // 🛠️ Desktop menu logika - prihlásený
                 const dLogin = document.getElementById('desktop-login-btn');
                 if (dLogin) dLogin.style.display = 'none';
                 const dLogout = document.getElementById('desktop-logout-btn');
@@ -744,7 +749,6 @@
                 collapseAboutEditor();
                 collapseContactEditor();
 
-                // 🛠️ Desktop menu logika - odhlásený
                 const dLogin = document.getElementById('desktop-login-btn');
                 if (dLogin) dLogin.style.display = 'block';
                 const dLogout = document.getElementById('desktop-logout-btn');
@@ -1598,7 +1602,10 @@
 
         checkRememberedLogin();
         fetchStatuses(true);
-        document.addEventListener('click', (e) => { if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); });
+        // 🛠️ Zjednodušený globálny poslucháč na zatvorenie menu, pretože sme použili stopPropagation
+        document.addEventListener('click', (e) => { 
+            if (!navOverlay.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); 
+        });
     </script>
 </body>
 </html>
