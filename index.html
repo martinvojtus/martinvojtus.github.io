@@ -26,10 +26,9 @@
             .btn-danger { @apply flex items-center justify-center h-12 px-6 rounded-full font-bold text-xs uppercase tracking-widest bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 cursor-pointer whitespace-nowrap; }
             
             .input { @apply w-full px-4 py-3 bg-neutral-50 border border-neutral-200 text-black rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-colors; }
-            .label { @apply text-xs font-bold text-black uppercase tracking-widest block mb-1; }
-            .hint { @apply text-xs text-neutral-400 mb-3 block leading-relaxed; }
+            .label { @apply text-xs font-bold text-neutral-400 uppercase tracking-widest block mb-2; }
             
-            .card { @apply flex flex-col gap-8 bg-white border border-gray-200 rounded-2xl p-6 md:p-8 w-full; }
+            .card { @apply flex flex-col gap-6 bg-white border border-gray-200 rounded-2xl p-6 md:p-8 w-full; }
             .editorial-dropcap > div:first-child::first-letter { @apply text-7xl font-bold float-left mr-4 leading-[0.8] mt-2; }
         }
 
@@ -57,7 +56,7 @@
         
         const DEFAULT_CONFIG = {
             siteTitle: "martinvojtus • space",
-            footerText: "build v1.3.2 • 2026",
+            footerText: "build v1.4.0 • 2026",
             pages: [
                 { id: "grid", title: "Gallery", type: "gallery" },
                 { id: "about", title: "About", type: "profile" },
@@ -75,6 +74,9 @@
             isMenuOpen: false,
             isLoading: true
         };
+
+        // --- CORE STATE ---
+        let dragStartIndex = null;
 
         async function init() {
             App.isLoading = true;
@@ -252,6 +254,8 @@
 
         function renderPublicContact(page) {
             const post = App.posts.find(p => p.author === page.id);
+            if (!post) return `<div class="text-neutral-400 mt-10 text-sm font-bold tracking-widest uppercase">Content pending.</div>`;
+            
             return `
             <div class="flex flex-col md:flex-row w-full gap-12 items-center md:items-start min-h-[60vh] mt-12 animate-fade-in">
                 <div class="w-full md:w-1/2 flex items-center md:pt-10">
@@ -266,6 +270,8 @@
 
         function renderPublicArticle(page) {
             const post = App.posts.find(p => p.author === page.id);
+            if (!post) return `<div class="text-neutral-400 mt-10 text-sm font-bold tracking-widest uppercase">Content pending.</div>`;
+            
             return `
             <article class="flex flex-col w-full max-w-2xl mx-auto animate-fade-in mt-8">
                 ${post?.title ? `<h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-10 leading-tight">${post.title}</h1>` : ''}
@@ -276,6 +282,8 @@
 
         function renderPublicLinks(page) {
             const post = App.posts.find(p => p.author === page.id);
+            if (!post) return `<div class="text-neutral-400 mt-10 text-sm font-bold tracking-widest uppercase">Content pending.</div>`;
+            
             let data = { desc: '', links: [] }; try { data = JSON.parse(post?.text || "{}"); } catch(e) {}
 
             let linksHtml = '';
@@ -337,32 +345,82 @@
             `;
         }
 
-        // --- DASHBOARD COMPONENTS ---
+        // --- DASHBOARD COMPONENTS & D&D ---
+        
+        // D&D Handlers
+        function handleDragStart(e, index) {
+            dragStartIndex = index;
+            e.dataTransfer.effectAllowed = 'move';
+            e.target.classList.add('opacity-50', 'border-dashed', 'border-black');
+        }
+        function handleDragOver(e) {
+            e.preventDefault(); e.dataTransfer.dropEffect = 'move'; return false;
+        }
+        function handleDragEnter(e) {
+            e.preventDefault(); e.currentTarget.classList.add('bg-neutral-100');
+        }
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('bg-neutral-100');
+        }
+        function handleDrop(e, dropIndex) {
+            e.stopPropagation(); e.currentTarget.classList.remove('bg-neutral-100');
+            if (dragStartIndex === null || dragStartIndex === dropIndex) return false;
+
+            const draggedItem = App.config.pages.splice(dragStartIndex, 1)[0];
+            App.config.pages.splice(dropIndex, 0, draggedItem);
+            
+            saveGlobalConfig(); // Save instantly
+            return false;
+        }
+        function handleDragEnd(e) {
+            e.target.classList.remove('opacity-50', 'border-dashed', 'border-black');
+            dragStartIndex = null;
+        }
+
+
         function renderDashSettings() {
             const pagesList = App.config.pages.map((p, i) => `
-                <div class="flex items-center justify-between p-4 bg-neutral-50 rounded-xl border border-neutral-200">
-                    <div class="flex flex-col"><span class="font-bold">${p.title}</span><span class="text-xs text-neutral-400 font-mono mt-1">${p.type} | /${p.id}</span></div>
-                    <button onclick="removePage(${i})" class="text-red-500 hover:text-red-700 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                <div class="flex items-center justify-between p-4 bg-neutral-50 rounded-xl border border-neutral-200 transition-all cursor-move"
+                     draggable="true" 
+                     ondragstart="handleDragStart(event, ${i})" 
+                     ondragover="handleDragOver(event)" 
+                     ondragenter="handleDragEnter(event)" 
+                     ondragleave="handleDragLeave(event)" 
+                     ondrop="handleDrop(event, ${i})" 
+                     ondragend="handleDragEnd(event)">
+                    
+                    <div class="flex items-center gap-4">
+                        <div class="text-neutral-400 opacity-50 hover:opacity-100 transition-opacity">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8h16M4 16h16"></path></svg>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-bold">${p.title}</span>
+                            <span class="text-xs text-neutral-400 font-mono mt-1">${p.type} | /${p.id}</span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="removePage(${i})" class="text-red-500 hover:text-red-700 p-2 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                 </div>
             `).join('');
 
             return `
                 <div class="card">
                     <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Global Configuration</div>
-                    <div><label class="label">Site Title</label><span class="hint">The main logo text in the header.</span><input type="text" id="cfg-title" class="input font-bold" value="${App.config.siteTitle}"></div>
-                    <div><label class="label">Footer Text</label><span class="hint">Small text displayed at the absolute bottom of the site.</span><input type="text" id="cfg-footer" class="input" value="${App.config.footerText}"></div>
+                    <div><label class="label">Site Title</label><input type="text" id="cfg-title" class="input font-bold" value="${App.config.siteTitle}"></div>
+                    <div><label class="label">Footer Text</label><input type="text" id="cfg-footer" class="input" value="${App.config.footerText}"></div>
                     <button onclick="saveGlobalConfig()" id="btn-save-cfg" class="btn-dark w-full mt-4">Save Configuration</button>
                 </div>
 
                 <div class="card">
                     <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Menu Architecture</div>
+                    <span class="text-xs text-neutral-500 mb-2">Drag and drop the items below to reorder your menu. Changes are saved automatically.</span>
                     <div class="flex flex-col gap-3">${pagesList}</div>
                     
                     <div class="flex flex-col md:flex-row gap-4 p-6 bg-neutral-50 rounded-2xl border border-neutral-200 border-dashed mt-4 items-end">
-                        <div class="flex flex-col gap-2 w-full"><label class="label !mb-0">Slug</label><span class="hint !mb-1">URL identifier</span><input type="text" id="new-page-id" class="input font-mono !h-12 !py-0" placeholder="e.g. log"></div>
-                        <div class="flex flex-col gap-2 w-full"><label class="label !mb-0">Title</label><span class="hint !mb-1">Menu display name</span><input type="text" id="new-page-title" class="input !h-12 !py-0" placeholder="e.g. My Log"></div>
-                        <div class="flex flex-col gap-2 w-full"><label class="label !mb-0">Type</label><span class="hint !mb-1">Page layout</span><select id="new-page-type" class="input !h-12 !py-0 !px-2 bg-white"><option value="gallery">Gallery (Photos)</option><option value="profile">Profile / Resume</option><option value="contact">Contact / Split</option><option value="article">Article / Standard</option><option value="links">Linktree / Buttons</option></select></div>
-                        <button onclick="addPage()" class="btn-dark w-full md:w-auto !h-12 px-6">+ Add</button>
+                        <div class="flex flex-col gap-2 w-full"><label class="label !mb-0">Slug</label><input type="text" id="new-page-id" class="input font-mono !h-10 !py-0" placeholder="e.g. log"></div>
+                        <div class="flex flex-col gap-2 w-full"><label class="label !mb-0">Title</label><input type="text" id="new-page-title" class="input !h-10 !py-0" placeholder="e.g. My Log"></div>
+                        <div class="flex flex-col gap-2 w-full"><label class="label !mb-0">Type</label><select id="new-page-type" class="input !h-10 !py-0 !px-2 bg-white"><option value="gallery">Gallery (Photos)</option><option value="profile">Profile / Resume</option><option value="contact">Contact / Split</option><option value="article">Article / Standard</option><option value="links">Linktree / Buttons</option></select></div>
+                        <button onclick="addPage()" class="btn-dark w-full md:w-auto !h-10 px-6">+ Add</button>
                     </div>
                 </div>
             `;
@@ -379,10 +437,9 @@
 
             return `
                 <div class="card">
-                    <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Manage Gallery: ${page.title}</div>
-                    <span class="hint">Upload images to build your masonry gallery. They will be ordered by date.</span>
+                    <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Manage: ${page.title}</div>
                     <input type="file" id="gal-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${page.id}', null, 'gallery')">
-                    <button id="btn-upload-gal" onclick="document.getElementById('gal-upload').click()" class="h-14 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Upload New Photo</button>
+                    <button id="btn-upload-gal" onclick="document.getElementById('gal-upload').click()" class="h-14 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-sm uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Upload Photo</button>
                     <div class="flex flex-col gap-3 mt-4">${listHtml.length > 0 ? listHtml : '<div class="text-neutral-400 text-sm">No photos yet.</div>'}</div>
                 </div>
             `;
@@ -398,8 +455,7 @@
                 <div class="card">
                     <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${page.title}</div>
                     <div>
-                        <label class="label">1. Profile Picture</label>
-                        <span class="hint">Click the image to change it, or click the red 'X' to remove it completely.</span>
+                        <label class="label">Profile Cover</label>
                         <input type="file" id="prf-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${page.id}', ${post ? post.id : null}, 'profile')">
                         ${post && post.image_url ? `
                         <div class="relative w-max group">
@@ -408,22 +464,13 @@
                         </div>
                         ` : `<button onclick="document.getElementById('prf-img-upload').click()" type="button" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Select Image</button>`}
                     </div>
+                    <div><label class="label">Intro Short Text</label><textarea id="prf-intro" class="input" rows="2" oninput="autoResizeTextarea(this)">${data.intro || ''}</textarea></div>
+                    <div><label class="label">Main About Text</label><textarea id="prf-text" class="input" rows="6" oninput="autoResizeTextarea(this)">${data.text || ''}</textarea></div>
                     <div>
-                        <label class="label">2. Short Tagline / Intro</label>
-                        <span class="hint">A brief, punchy sentence displayed right below your title.</span>
-                        <textarea id="prf-intro" class="input" rows="2" oninput="autoResizeTextarea(this)" placeholder="e.g. Digital Designer based in Slovakia.">${data.intro || ''}</textarea>
-                    </div>
-                    <div>
-                        <label class="label">3. Full Biography</label>
-                        <span class="hint">Your main background story. Supports multiple paragraphs.</span>
-                        <textarea id="prf-text" class="input" rows="6" oninput="autoResizeTextarea(this)" placeholder="Write your full story here...">${data.text || ''}</textarea>
-                    </div>
-                    <div>
-                        <div class="flex justify-between items-center mb-1"><label class="label !mb-0">4. Experience Timeline</label><button type="button" onclick="addExpRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add Job</button></div>
-                        <span class="hint">List your previous roles, education, or achievements.</span>
+                        <div class="flex justify-between items-center mb-4"><label class="label !mb-0">Experience</label><button type="button" onclick="addExpRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add Row</button></div>
                         <div id="prf-exp-container" class="flex flex-col gap-3">${window.tempExps.map((e) => buildExpRowHtml(e.title, e.company, e.date)).join('')}</div>
                     </div>
-                    <button type="button" onclick="saveProfileConfig('${page.id}', ${post ? post.id : null}, '${post && post.image_url ? post.image_url : ''}')" id="btn-save-prf" class="btn-dark w-full mt-4">Save Changes</button>
+                    <button onclick="saveProfileConfig('${page.id}', ${post ? post.id : null}, '${post && post.image_url ? post.image_url : ''}')" id="btn-save-prf" class="btn-dark w-full mt-4">Save Changes</button>
                 </div>
             `;
         }
@@ -434,8 +481,7 @@
                 <div class="card">
                     <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${page.title}</div>
                     <div>
-                        <label class="label">1. Small Image (Optional)</label>
-                        <span class="hint">Displays next to your contact info.</span>
+                        <label class="label">Small Image (Optional)</label>
                         <input type="file" id="cnt-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${page.id}', ${post ? post.id : null}, 'contact')">
                         ${post && post.image_url ? `
                         <div class="relative w-max group">
@@ -444,17 +490,9 @@
                         </div>
                         ` : `<button onclick="document.getElementById('cnt-img-upload').click()" type="button" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Select Image</button>`}
                     </div>
-                    <div>
-                        <label class="label">2. Big Headline</label>
-                        <span class="hint">The massive text taking up the left side of the screen.</span>
-                        <input type="text" id="cnt-title" class="input font-bold text-lg" value="${post ? post.title : ''}" placeholder="e.g. Hello.">
-                    </div>
-                    <div>
-                        <label class="label">3. Contact Info</label>
-                        <span class="hint">Your email, phone, or any other details.</span>
-                        <textarea id="cnt-text" class="input" rows="6" oninput="autoResizeTextarea(this)" placeholder="Email: ...">${post ? post.text : ''}</textarea>
-                    </div>
-                    <button type="button" onclick="saveContactConfig('${page.id}', ${post ? post.id : null}, '${post && post.image_url ? post.image_url : ''}')" id="btn-save-cnt" class="btn-dark w-full mt-4">Save Changes</button>
+                    <div><label class="label">Big Headline</label><input type="text" id="cnt-title" class="input font-bold text-lg" value="${post ? post.title : ''}" placeholder="e.g. Hello."></div>
+                    <div><label class="label">Contact Info / Links</label><textarea id="cnt-text" class="input" rows="6" oninput="autoResizeTextarea(this)">${post ? post.text : ''}</textarea></div>
+                    <button onclick="saveContactConfig('${page.id}', ${post ? post.id : null}, '${post && post.image_url ? post.image_url : ''}')" id="btn-save-cnt" class="btn-dark w-full mt-4">Save Changes</button>
                 </div>
             `;
         }
@@ -465,8 +503,7 @@
                 <div class="card">
                     <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${page.title}</div>
                     <div>
-                        <label class="label">1. Article Cover</label>
-                        <span class="hint">Wide image displayed at the top of the article.</span>
+                        <label class="label">Article Cover</label>
                         <input type="file" id="art-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${page.id}', ${post ? post.id : null}, 'article')">
                         ${post && post.image_url ? `
                         <div class="relative w-full group">
@@ -475,17 +512,9 @@
                         </div>
                         ` : `<button onclick="document.getElementById('art-img-upload').click()" type="button" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Select Cover</button>`}
                     </div>
-                    <div>
-                        <label class="label">2. Headline</label>
-                        <span class="hint">The main title of your article or service.</span>
-                        <input type="text" id="art-title" class="input font-bold text-lg" value="${post ? post.title : ''}" placeholder="Article title...">
-                    </div>
-                    <div>
-                        <label class="label">3. Article Body</label>
-                        <span class="hint">The first letter automatically becomes a large editorial Drop Cap.</span>
-                        <textarea id="art-text" class="input" rows="12" oninput="autoResizeTextarea(this)" placeholder="Start writing here...">${post ? post.text : ''}</textarea>
-                    </div>
-                    <button type="button" onclick="saveArticleConfig('${page.id}', ${post ? post.id : null}, '${post && post.image_url ? post.image_url : ''}')" id="btn-save-art" class="btn-dark w-full mt-4">Save Changes</button>
+                    <div><label class="label">Headline</label><input type="text" id="art-title" class="input font-bold text-lg" value="${post ? post.title : ''}"></div>
+                    <div><label class="label">Article Body</label><textarea id="art-text" class="input" rows="12" oninput="autoResizeTextarea(this)">${post ? post.text : ''}</textarea></div>
+                    <button onclick="saveArticleConfig('${page.id}', ${post ? post.id : null}, '${post && post.image_url ? post.image_url : ''}')" id="btn-save-art" class="btn-dark w-full mt-4">Save Changes</button>
                 </div>
             `;
         }
@@ -500,8 +529,7 @@
                 <div class="card">
                     <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${page.title}</div>
                     <div>
-                        <label class="label">1. Avatar Picture</label>
-                        <span class="hint">Centered circular image at the top of the links list.</span>
+                        <label class="label">Avatar Picture</label>
                         <input type="file" id="lnk-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${page.id}', ${post ? post.id : null}, 'links')">
                         ${post && post.image_url ? `
                         <div class="relative w-max group">
@@ -510,26 +538,17 @@
                         </div>
                         ` : `<button onclick="document.getElementById('lnk-img-upload').click()" type="button" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Select Avatar</button>`}
                     </div>
-                    <div>
-                        <label class="label">2. Name / Title</label>
-                        <span class="hint">Displayed below the avatar.</span>
-                        <input type="text" id="lnk-title" class="input font-bold" value="${post ? post.title : ''}" placeholder="e.g. @martinvojtus">
-                    </div>
-                    <div>
-                        <label class="label">3. Short Bio</label>
-                        <span class="hint">A quick description of what these links are for.</span>
-                        <textarea id="lnk-desc" class="input" rows="2" oninput="autoResizeTextarea(this)" placeholder="Check out my work...">${data.desc || ''}</textarea>
-                    </div>
+                    <div><label class="label">Name / Title</label><input type="text" id="lnk-title" class="input font-bold" value="${post ? post.title : ''}"></div>
+                    <div><label class="label">Short Bio</label><textarea id="lnk-desc" class="input" rows="2" oninput="autoResizeTextarea(this)">${data.desc || ''}</textarea></div>
                     
                     <div>
-                        <div class="flex justify-between items-center mb-2"><label class="label !mb-0">4. Link Buttons</label><button type="button" onclick="addLinkRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add Link</button></div>
-                        <span class="hint">List of URLs and their button titles.</span>
+                        <div class="flex justify-between items-center mb-4"><label class="label !mb-0">Links</label><button type="button" onclick="addLinkRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add Link</button></div>
                         <div id="lnk-exp-container" class="flex flex-col gap-3">
                             ${window.tempLinks.map(l => buildLinkRowHtml(l.title, l.url)).join('')}
                         </div>
                     </div>
 
-                    <button type="button" onclick="saveLinksConfig('${page.id}', ${post ? post.id : null}, '${post && post.image_url ? post.image_url : ''}')" id="btn-save-lnk" class="btn-dark w-full mt-4">Save Changes</button>
+                    <button onclick="saveLinksConfig('${page.id}', ${post ? post.id : null}, '${post && post.image_url ? post.image_url : ''}')" id="btn-save-lnk" class="btn-dark w-full mt-4">Save Changes</button>
                 </div>
             `;
         }
@@ -592,7 +611,7 @@
 
         // Global Config Saving
         async function saveGlobalConfig() {
-            const btn = document.getElementById('btn-save-cfg'); btn.innerText = "SAVING..."; btn.disabled = true;
+            const btn = document.getElementById('btn-save-cfg'); if(btn) { btn.innerText = "SAVING..."; btn.disabled = true; }
             App.config.siteTitle = document.getElementById('cfg-title').value.trim();
             App.config.footerText = document.getElementById('cfg-footer').value.trim();
             
@@ -601,7 +620,7 @@
             const url = App.configPostId ? `${API_URL}/posts/${App.configPostId}` : `${API_URL}/posts`;
 
             try { await fetch(url, { method, headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify(payload) }); await init(); } 
-            catch(e) { btn.innerText = "Error. Retry."; btn.disabled = false; }
+            catch(e) { if(btn) { btn.innerText = "Error. Retry."; btn.disabled = false; } }
         }
 
         function addPage() {
@@ -627,7 +646,7 @@
             }
         }
 
-        // Universal Image Compressor, Uploader & Remover
+        // Universal Image Compressor & Uploader
         const compressImage = (f, max=1600, q=0.8) => new Promise(res => { const r=new FileReader(); r.readAsDataURL(f); r.onload=e=>{ const i=new Image(); i.src=e.target.result; i.onload=()=>{ const c=document.createElement('canvas'); let w=i.width, h=i.height; if(w>max){h=Math.round(h*max/w); w=max;} c.width=w; c.height=h; c.getContext('2d').drawImage(i,0,0,w,h); c.toBlob(b=>res(new File([b],f.name.replace(/\.[^/.]+$/,"")+".jpg",{type:'image/jpeg'})),'image/jpeg',q); };};});
 
         async function uploadGenericImage(authorSlug, postId, type) {
@@ -650,7 +669,7 @@
         }
 
         async function removePageImage(postId) {
-            if(!confirm('Delete this image?')) return;
+            if(!confirm('Permanentne zmazať túto fotku?')) return;
             document.body.style.cursor = 'wait';
             try {
                 const post = App.posts.find(p => p.id === postId);
@@ -664,8 +683,6 @@
         }
 
         // Form HTML Builders
-        function autoResizeTextarea(el) { el.style.height = 'auto'; el.style.height = el.value.trim() === '' ? '' : el.scrollHeight + 'px'; }
-
         function buildExpRowHtml(t='', c='', d='') {
             return `<div class="flex flex-col gap-3 p-4 bg-neutral-50 rounded-xl border border-neutral-200 relative exp-row-item"><input type="text" class="input !h-10 !py-2 !bg-white exp-t font-bold" placeholder="Job Title" value="${t}"><input type="text" class="input !h-10 !py-2 !bg-white exp-c" placeholder="Company" value="${c}"><input type="text" class="input !h-10 !py-2 !bg-white exp-d" placeholder="Date" value="${d}"><button type="button" onclick="this.parentElement.remove()" class="absolute top-4 right-4 text-red-500 text-xs font-bold uppercase hover:text-red-700">X</button></div>`;
         }
