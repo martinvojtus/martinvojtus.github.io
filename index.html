@@ -100,9 +100,9 @@
         }
 
         .desktop-menu { display: none; }
-        .desktop-link { font-size: var(--size-small); color: var(--black); cursor: pointer; text-transform: uppercase; }
+        /* 🛠️ Zrušený text-transform: uppercase; */
+        .desktop-link { font-size: var(--size-small); color: var(--black); cursor: pointer; }
         
-        /* 🛠️ Nový CSS trieda pre oddeľovač na desktope */
         .desktop-divider { width: 1px; height: 1rem; background-color: var(--divider); }
 
         @media (min-width: 600px) {
@@ -409,7 +409,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.2.0 • 2026</div>
+            <div class="footer-info">build v7.2.1 • 2026</div>
         </div>
     </nav>
 
@@ -453,7 +453,7 @@
         <div id="section-feed">
             <div id="status-container" class="status-feed view-grid"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.2.0 • 2026</div>
+            <div class="footer-info">build v7.2.1 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-about">
@@ -494,7 +494,7 @@
         <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="about-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.2.0 • 2026</div>
+            <div class="footer-info">build v7.2.1 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-contact">
@@ -535,7 +535,7 @@
         <div id="section-contact" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="contact-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.2.0 • 2026</div>
+            <div class="footer-info">build v7.2.1 • 2026</div>
         </div>
         
         <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
@@ -701,7 +701,6 @@
             refreshFeedUI(globalPosts.filter(p => p.author !== 'about' && p.author !== 'contact'));
         }
 
-        // 🛠️ Oprava preklápania menu, aby zachytávalo event a zabránilo globálnemu kliku ho hneď zatvoriť
         function toggleMenu(e) { 
             if (e) e.stopPropagation();
             const isActive = menuToggle.classList.toggle('active'); 
