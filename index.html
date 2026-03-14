@@ -39,6 +39,11 @@
         
         .spinner { border: 2px solid #f3f3f3; border-top: 2px solid #000; border-radius: 50%; width: 1.5rem; height: 1.5rem; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .masonry { column-count: 1; column-gap: 2rem; }
+        @media (min-width: 640px) { .masonry { column-count: 2; } }
+        @media (min-width: 1024px) { .masonry { column-count: 3; } }
+        .masonry-item { break-inside: avoid; margin-bottom: 2rem; display: block; width: 100%; }
     </style>
 </head>
 <body class="font-sans min-h-screen flex flex-col selection:bg-black selection:text-white">
@@ -51,7 +56,7 @@
         
         const DEFAULT_CONFIG = {
             siteTitle: "martinvojtus • space",
-            footerText: "build v1.3.0 • 2026",
+            footerText: "build v1.3.1 • 2026",
             pages: [
                 { id: "grid", title: "Gallery", type: "gallery" },
                 { id: "about", title: "About", type: "profile" },
@@ -195,9 +200,7 @@
             return `<div>Unknown page type.</div>`;
         }
 
-        // --- PUBLIC VIEWS (Fully Redesigned Mobile/Desktop) ---
-
-        // 1. GALLERY: Native Tailwind Columns
+        // --- PUBLIC VIEWS ---
         function renderPublicGallery(page) {
             const posts = App.posts.filter(p => p.author === page.id).sort((a,b) => new Date(b.at) - new Date(a.at));
             if (posts.length === 0) return `<div class="w-full py-32 text-center text-neutral-300 font-bold text-sm tracking-widest uppercase">No photos uploaded.</div>`;
@@ -214,7 +217,6 @@
             return `<div class="w-full columns-1 sm:columns-2 lg:columns-3 gap-6 animate-fade-in">${itemsHtml}</div>`;
         }
 
-        // 2. PROFILE: Sticky Sidebar on Desktop
         function renderPublicProfile(page) {
             const post = App.posts.find(p => p.author === page.id);
             let data = { intro: '', text: '', exps: [] };
@@ -246,7 +248,6 @@
             </div>`;
         }
 
-        // 3. CONTACT: Massive Typography Split
         function renderPublicContact(page) {
             const post = App.posts.find(p => p.author === page.id);
             return `
@@ -261,7 +262,6 @@
             </div>`;
         }
 
-        // 4. ARTICLE: Editorial Layout
         function renderPublicArticle(page) {
             const post = App.posts.find(p => p.author === page.id);
             return `
@@ -272,7 +272,6 @@
             </article>`;
         }
 
-        // 5. LINKS: Linktree style
         function renderPublicLinks(page) {
             const post = App.posts.find(p => p.author === page.id);
             let data = { desc: '', links: [] }; try { data = JSON.parse(post?.text || "{}"); } catch(e) {}
@@ -287,8 +286,8 @@
             }
 
             return `
-            <div class="flex flex-col items-center w-full max-w-lg mx-auto animate-fade-in mt-12">
-                ${post?.image_url ? `<img src="${post.image_url}" class="w-32 h-32 rounded-full object-cover border border-neutral-200 mb-6 shadow-sm">` : ''}
+            <div class="flex flex-col items-center w-full max-w-md mx-auto animate-fade-in mt-12">
+                ${post?.image_url ? `<img src="${post.image_url}" class="w-32 h-32 rounded-full object-cover border border-neutral-100 mb-6 shadow-sm">` : ''}
                 ${post?.title ? `<div class="text-2xl font-bold tracking-tight mb-2">${post.title}</div>` : ''}
                 ${data.desc ? `<p class="text-base text-neutral-500 mb-10 text-center">${data.desc}</p>` : ''}
                 <div class="flex flex-col gap-4 w-full">${linksHtml}</div>
@@ -297,7 +296,11 @@
 
         // --- DASHBOARD ROUTER ---
         function renderDashboard() {
-            if (App.dashTab !== 'settings' && !App.config.pages.find(p => p.id === App.dashTab)) App.dashTab = 'settings';
+            // 🐛 Oprava: Ak tab neexistuje (alebo bolo zmazané z menu), prepni na settings
+            let checkId = App.dashTab.startsWith('page_') ? App.dashTab.replace('page_', '') : null;
+            if (App.dashTab !== 'settings' && (!checkId || !App.config.pages.find(p => p.id === checkId))) {
+                App.dashTab = 'settings';
+            }
 
             const tabs = [{ id: 'settings', label: 'Settings' }, ...App.config.pages.map(p => ({ id: `page_${p.id}`, label: `${p.title}` }))];
             const tabsHtml = tabs.map(t => `<button onclick="App.dashTab = '${t.id}'; render();" class="h-10 px-4 rounded-full font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-colors ${App.dashTab === t.id ? 'bg-black text-white' : 'bg-neutral-50 text-neutral-500 hover:bg-neutral-100 border border-neutral-200'}">${t.label}</button>`).join('');
@@ -318,9 +321,17 @@
 
             return `
             <div class="w-full flex flex-col gap-8 animate-fade-in">
-                <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
-                <div class="flex gap-2 overflow-x-auto hide-scroll pb-2 w-full border-b border-neutral-100">${tabsHtml}</div>
-                <div class="w-full flex flex-col gap-8">${activeContent}</div>
+                <div class="flex flex-col gap-2">
+                    <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
+                </div>
+                
+                <div class="flex gap-2 overflow-x-auto hide-scroll pb-2 w-full border-b border-neutral-100">
+                    ${tabsHtml}
+                </div>
+
+                <div class="w-full flex flex-col gap-8">
+                    ${activeContent}
+                </div>
             </div>
             `;
         }
@@ -546,14 +557,17 @@
             if(confirm("Remove this page from menu AND delete all its content from the database?")) {
                 const pageId = App.config.pages[index].id;
                 
-                // Delete associated posts from database
+                // 🧹 BUG FIX: Fyzicky zmaže všetky posty pre danú stránku z databázy
                 const postsToDelete = App.posts.filter(p => p.author === pageId);
+                document.body.style.cursor = 'wait';
+                
                 for (let p of postsToDelete) {
                     await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": App.token } });
                 }
                 
                 App.config.pages.splice(index, 1); 
-                saveGlobalConfig(); 
+                await saveGlobalConfig(); 
+                document.body.style.cursor = 'default';
             }
         }
 
@@ -625,7 +639,7 @@
             const root = document.getElementById('modal-root');
             root.innerHTML = `
                 <div class="max-w-sm w-full bg-white border border-neutral-200 rounded-2xl p-8 flex flex-col gap-6 items-center text-center shadow-2xl">
-                    <div class="text-2xl font-bold">Delete Photo?</div>
+                    <div class="text-2xl font-bold">Delete Item?</div>
                     <p class="text-neutral-500 text-sm">This cannot be undone.</p>
                     <div id="m-actions" class="flex gap-4 w-full mt-2">
                         <button class="btn-light flex-1" onclick="closeModalRoot()">Cancel</button>
@@ -641,6 +655,7 @@
             try { await fetch(`${API_URL}/posts/${deleteActionId}`,{method:"DELETE",headers:{"x-admin-password":App.token}}); await init(); closeModalRoot(); } catch(e){}
         }
 
+        // Start
         init();
     </script>
 </body>
