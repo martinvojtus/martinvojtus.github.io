@@ -12,7 +12,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=2">
     
     <title>martinvojtus.space</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --black: #000000;
@@ -376,7 +376,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.4 • 2026</div>
+            <div class="footer-info">build v7.1.5 • 2026</div>
         </div>
     </nav>
 
@@ -420,7 +420,7 @@
         <div id="section-feed">
             <div id="status-container" class="status-feed view-grid"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.4 • 2026</div>
+            <div class="footer-info">build v7.1.5 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-about">
@@ -461,7 +461,7 @@
         <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="about-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.4 • 2026</div>
+            <div class="footer-info">build v7.1.5 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-contact">
@@ -502,7 +502,7 @@
         <div id="section-contact" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="contact-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.4 • 2026</div>
+            <div class="footer-info">build v7.1.5 • 2026</div>
         </div>
         
         <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
@@ -875,8 +875,8 @@
                         <button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="openDeleteAboutModal(${p.id})">DELETE</button>
                     </div>
                     ` : ''}
-                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
                     ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
+                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2; font-weight: bold;">${p.title}</div>` : ''}
                     ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
                 </div>
             </div>
@@ -897,8 +897,8 @@
                         <button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="openDeleteContactModal(${p.id})">DELETE</button>
                     </div>
                     ` : ''}
-                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2;">${p.title}</div>` : ''}
                     ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
+                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2; font-weight: bold;">${p.title}</div>` : ''}
                     ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
                 </div>
             </div>
@@ -1042,7 +1042,6 @@
             }
         }
 
-        // 🛠️ Divider presunutý nad topRow pre čistejší Feed
         function renderSinglePost(s) {
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             
