@@ -30,7 +30,6 @@
             
             .card { @apply flex flex-col gap-6 bg-white border border-gray-200 rounded-2xl p-6 md:p-8 w-full; }
 
-            /* Editorial Drop Cap for Articles */
             .editorial-text > div:first-child::first-letter { @apply text-6xl font-bold float-left mr-3 leading-[0.8] mt-2; }
         }
 
@@ -42,7 +41,6 @@
         .spinner { border: 2px solid #f3f3f3; border-top: 2px solid #000; border-radius: 50%; width: 1.5rem; height: 1.5rem; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Masonry Grid */
         .masonry { column-count: 1; column-gap: 2rem; }
         @media (min-width: 640px) { .masonry { column-count: 2; } }
         @media (min-width: 1024px) { .masonry { column-count: 3; } }
@@ -59,7 +57,7 @@
         
         const DEFAULT_CONFIG = {
             siteTitle: "martinvojtus • space",
-            footerText: "build v1.2.0 • 2026",
+            footerText: "build v1.2.1 • 2026",
             pages: [
                 { id: "grid", title: "Gallery", type: "gallery" },
                 { id: "about", title: "About", type: "profile" },
@@ -203,9 +201,7 @@
             return `<div>Unknown page type.</div>`;
         }
 
-        // --- PUBLIC VIEWS (The 5 Core Designs) ---
-
-        // 1. GALLERY: High-end masonry, grayscale to color on hover.
+        // --- PUBLIC VIEWS ---
         function renderPublicGallery(page) {
             const posts = App.posts.filter(p => p.author === page.id).sort((a,b) => new Date(b.at) - new Date(a.at));
             if (posts.length === 0) return `<div class="w-full py-32 text-center text-neutral-300 font-bold text-sm tracking-widest uppercase">No photos uploaded.</div>`;
@@ -222,7 +218,6 @@
             return `<div class="w-full masonry animate-fade-in">${itemsHtml}</div>`;
         }
 
-        // 2. PROFILE: Asymmetric Split Layout (Sticky Sidebar + Scrolling Content)
         function renderPublicProfile(page) {
             const post = App.posts.find(p => p.author === page.id);
             if (!post) return `<div class="text-neutral-400 mt-10 text-sm font-bold tracking-widest uppercase">Content pending.</div>`;
@@ -243,22 +238,18 @@
 
             return `
             <div class="flex flex-col md:flex-row gap-12 lg:gap-24 w-full animate-fade-in items-start mt-8">
-                
                 <div class="w-full md:w-1/3 flex flex-col md:sticky md:top-32">
                     ${post.image_url ? `<img src="${post.image_url}" class="w-48 md:w-full aspect-square rounded-full object-cover grayscale mb-8 border border-neutral-100">` : ''}
                     <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">${page.title}</h1>
                     ${data.intro ? `<p class="text-lg text-neutral-500 leading-relaxed font-medium">${data.intro}</p>` : ''}
                 </div>
-
                 <div class="w-full md:w-2/3 flex flex-col pt-2">
                     ${data.text ? `<div><div class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-6">About</div><div class="text-lg leading-relaxed text-black whitespace-pre-wrap">${data.text}</div></div>` : ''}
                     ${expsHtml}
                 </div>
-
             </div>`;
         }
 
-        // 3. CONTACT: Massive Typography
         function renderPublicContact(page) {
             const post = App.posts.find(p => p.author === page.id);
             if (!post) return `<div class="text-neutral-400 mt-10 text-sm font-bold tracking-widest uppercase">Content pending.</div>`;
@@ -271,7 +262,6 @@
             </div>`;
         }
 
-        // 4. ARTICLE: Classic Editorial reading view
         function renderPublicArticle(page) {
             const post = App.posts.find(p => p.author === page.id);
             if (!post) return `<div class="text-neutral-400 mt-10 text-sm font-bold tracking-widest uppercase">Content pending.</div>`;
@@ -284,7 +274,6 @@
             </article>`;
         }
 
-        // 5. LINKS: Clean Linktree alternative
         function renderPublicLinks(page) {
             const post = App.posts.find(p => p.author === page.id);
             if (!post) return `<div class="text-neutral-400 mt-10 text-sm font-bold tracking-widest uppercase">Content pending.</div>`;
@@ -310,14 +299,24 @@
             </div>`;
         }
 
-
         // --- DASHBOARD ROUTER ---
         function renderDashboard() {
-            if (App.dashTab !== 'settings' && !App.config.pages.find(p => p.id === App.dashTab)) App.dashTab = 'settings';
+            // BUG FIX: Ensure the tab exists. The ID format is `page_{slug}`
+            if (App.dashTab !== 'settings') {
+                const checkId = App.dashTab.replace('page_', '');
+                if (!App.config.pages.find(p => p.id === checkId)) {
+                    App.dashTab = 'settings';
+                }
+            }
 
-            const tabs = [{ id: 'settings', label: 'Settings' }, ...App.config.pages.map(p => ({ id: `page_${p.id}`, label: `${p.title}` }))];
+            const tabs = [
+                { id: 'settings', label: 'Settings' },
+                ...App.config.pages.map(p => ({ id: `page_${p.id}`, label: `${p.title}` }))
+            ];
 
-            const tabsHtml = tabs.map(t => `<button onclick="App.dashTab = '${t.id}'; render();" class="h-10 px-4 rounded-full font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-colors ${App.dashTab === t.id ? 'bg-black text-white' : 'bg-neutral-50 text-neutral-500 hover:bg-neutral-100 border border-neutral-200'}">${t.label}</button>`).join('');
+            const tabsHtml = tabs.map(t => `
+                <button onclick="App.dashTab = '${t.id}'; render();" class="h-10 px-4 rounded-full font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-colors ${App.dashTab === t.id ? 'bg-black text-white' : 'bg-neutral-50 text-neutral-500 hover:bg-neutral-100 border border-neutral-200'}">${t.label}</button>
+            `).join('');
 
             let activeContent = '';
             if (App.dashTab === 'settings') activeContent = renderDashSettings();
@@ -334,10 +333,18 @@
             }
 
             return `
-            <div class="w-full flex flex-col gap-8">
-                <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
-                <div class="flex gap-2 overflow-x-auto hide-scroll pb-2 w-full border-b border-neutral-100">${tabsHtml}</div>
-                <div class="w-full flex flex-col gap-8">${activeContent}</div>
+            <div class="w-full flex flex-col gap-8 animate-fade-in">
+                <div class="flex flex-col gap-2">
+                    <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
+                </div>
+                
+                <div class="flex gap-2 overflow-x-auto hide-scroll pb-2 w-full border-b border-neutral-100">
+                    ${tabsHtml}
+                </div>
+
+                <div class="w-full flex flex-col gap-8">
+                    ${activeContent}
+                </div>
             </div>
             `;
         }
@@ -346,7 +353,10 @@
         function renderDashSettings() {
             const pagesList = App.config.pages.map((p, i) => `
                 <div class="flex items-center justify-between p-4 bg-neutral-50 rounded-xl border border-neutral-200">
-                    <div class="flex flex-col"><span class="font-bold">${p.title}</span><span class="text-xs text-neutral-400 font-mono mt-1">${p.type} | /${p.id}</span></div>
+                    <div class="flex flex-col">
+                        <span class="font-bold">${p.title}</span>
+                        <span class="text-xs text-neutral-400 font-mono mt-1">${p.type} | /${p.id}</span>
+                    </div>
                     <button onclick="removePage(${i})" class="text-red-500 hover:text-red-700 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                 </div>
             `).join('');
@@ -402,12 +412,12 @@
                 <div class="card">
                     <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${page.title}</div>
                     <div>
-                        <label class="label">Avatar / Profile Picture</label>
+                        <label class="label">Profile Cover</label>
                         <input type="file" id="prf-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${page.id}', ${post ? post.id : null}, 'profile')">
                         ${post && post.image_url ? `<img src="${post.image_url}" class="w-32 h-32 object-cover rounded-full border border-neutral-200 cursor-pointer" onclick="document.getElementById('prf-img-upload').click()">` : `<button onclick="document.getElementById('prf-img-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Select Image</button>`}
                     </div>
-                    <div><label class="label">Intro Short Text</label><textarea id="prf-intro" class="input" rows="2">${data.intro || ''}</textarea></div>
-                    <div><label class="label">Main About Text</label><textarea id="prf-text" class="input" rows="6">${data.text || ''}</textarea></div>
+                    <div><label class="label">Intro Short Text</label><textarea id="prf-intro" class="input" rows="2" oninput="autoResizeTextarea(this)">${data.intro || ''}</textarea></div>
+                    <div><label class="label">Main About Text</label><textarea id="prf-text" class="input" rows="6" oninput="autoResizeTextarea(this)">${data.text || ''}</textarea></div>
                     <div>
                         <div class="flex justify-between items-center mb-4"><label class="label !mb-0">Experience</label><button type="button" onclick="addExpRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add Row</button></div>
                         <div id="prf-exp-container" class="flex flex-col gap-3">${window.tempExps.map((e) => buildExpRowHtml(e.title, e.company, e.date)).join('')}</div>
@@ -428,7 +438,7 @@
                         ${post && post.image_url ? `<img src="${post.image_url}" class="w-24 h-24 object-cover rounded-full border border-neutral-200 cursor-pointer" onclick="document.getElementById('cnt-img-upload').click()">` : `<button onclick="document.getElementById('cnt-img-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Select Image</button>`}
                     </div>
                     <div><label class="label">Big Headline</label><input type="text" id="cnt-title" class="input font-bold text-lg" value="${post ? post.title : ''}" placeholder="e.g. Hello."></div>
-                    <div><label class="label">Contact Info / Links</label><textarea id="cnt-text" class="input" rows="6">${post ? post.text : ''}</textarea></div>
+                    <div><label class="label">Contact Info / Links</label><textarea id="cnt-text" class="input" rows="6" oninput="autoResizeTextarea(this)">${post ? post.text : ''}</textarea></div>
                     <button onclick="saveContactConfig('${page.id}', ${post ? post.id : null}, '${post ? post.image_url : ''}')" id="btn-save-cnt" class="btn-dark w-full mt-4">Save Changes</button>
                 </div>
             `;
@@ -445,7 +455,7 @@
                         ${post && post.image_url ? `<img src="${post.image_url}" class="w-full h-48 object-cover rounded-xl border border-neutral-200 cursor-pointer" onclick="document.getElementById('art-img-upload').click()">` : `<button onclick="document.getElementById('art-img-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Select Cover</button>`}
                     </div>
                     <div><label class="label">Headline</label><input type="text" id="art-title" class="input font-bold text-lg" value="${post ? post.title : ''}"></div>
-                    <div><label class="label">Article Body</label><textarea id="art-text" class="input" rows="12">${post ? post.text : ''}</textarea></div>
+                    <div><label class="label">Article Body</label><textarea id="art-text" class="input" rows="12" oninput="autoResizeTextarea(this)">${post ? post.text : ''}</textarea></div>
                     <button onclick="saveArticleConfig('${page.id}', ${post ? post.id : null}, '${post ? post.image_url : ''}')" id="btn-save-art" class="btn-dark w-full mt-4">Save Changes</button>
                 </div>
             `;
@@ -465,8 +475,8 @@
                         <input type="file" id="lnk-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${page.id}', ${post ? post.id : null}, 'links')">
                         ${post && post.image_url ? `<img src="${post.image_url}" class="w-24 h-24 rounded-full object-cover border border-neutral-200 cursor-pointer" onclick="document.getElementById('lnk-img-upload').click()">` : `<button onclick="document.getElementById('lnk-img-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Select Avatar</button>`}
                     </div>
-                    <div><label class="label">Name</label><input type="text" id="lnk-title" class="input font-bold" value="${post ? post.title : ''}"></div>
-                    <div><label class="label">Short Bio</label><textarea id="lnk-desc" class="input" rows="2">${data.desc || ''}</textarea></div>
+                    <div><label class="label">Name / Title</label><input type="text" id="lnk-title" class="input font-bold" value="${post ? post.title : ''}"></div>
+                    <div><label class="label">Short Bio</label><textarea id="lnk-desc" class="input" rows="2" oninput="autoResizeTextarea(this)">${data.desc || ''}</textarea></div>
                     
                     <div>
                         <div class="flex justify-between items-center mb-4"><label class="label !mb-0">Links</label><button type="button" onclick="addLinkRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add Link</button></div>
@@ -541,9 +551,13 @@
             const btn = document.getElementById('btn-save-cfg'); btn.innerText = "SAVING..."; btn.disabled = true;
             App.config.siteTitle = document.getElementById('cfg-title').value.trim();
             App.config.footerText = document.getElementById('cfg-footer').value.trim();
-            const method = App.configPostId ? "PUT" : "POST"; const url = App.configPostId ? `${API_URL}/posts/${App.configPostId}` : `${API_URL}/posts`;
-            try { await fetch(url, { method, headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify({ title: "", text: JSON.stringify(App.config), image_url: "", show_date: false, author: "_system_config" }) }); await init(); } 
-            catch(e) { btn.innerText = "Error"; btn.disabled = false; }
+            
+            const payload = { title: "", text: JSON.stringify(App.config), image_url: "", show_date: false, author: "_system_config" };
+            const method = App.configPostId ? "PUT" : "POST";
+            const url = App.configPostId ? `${API_URL}/posts/${App.configPostId}` : `${API_URL}/posts`;
+
+            try { await fetch(url, { method, headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify(payload) }); await init(); } 
+            catch(e) { btn.innerText = "Error. Retry."; btn.disabled = false; }
         }
 
         function addPage() {
@@ -580,6 +594,8 @@
         }
 
         // Form HTML Builders
+        function autoResizeTextarea(el) { el.style.height = 'auto'; el.style.height = el.value.trim() === '' ? '' : el.scrollHeight + 'px'; }
+
         function buildExpRowHtml(t='', c='', d='') {
             return `<div class="flex flex-col gap-3 p-4 bg-neutral-50 rounded-xl border border-neutral-200 relative exp-row-item"><input type="text" class="input !h-10 !py-2 !bg-white exp-t font-bold" placeholder="Job Title" value="${t}"><input type="text" class="input !h-10 !py-2 !bg-white exp-c" placeholder="Company" value="${c}"><input type="text" class="input !h-10 !py-2 !bg-white exp-d" placeholder="Date" value="${d}"><button type="button" onclick="this.parentElement.remove()" class="absolute top-4 right-4 text-red-500 text-xs font-bold uppercase hover:text-red-700">X</button></div>`;
         }
