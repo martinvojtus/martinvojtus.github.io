@@ -32,7 +32,7 @@
             .card { @apply flex flex-col gap-6 bg-white border border-gray-200 rounded-2xl p-6 md:p-8 w-full; }
             .editorial-dropcap > div:first-child::first-letter { @apply text-7xl font-bold float-left mr-4 leading-[0.8] mt-2; }
 
-            .img-container { @apply relative overflow-hidden rounded-[1.5rem] bg-neutral-50 border border-neutral-100; -webkit-mask-image: -webkit-radial-gradient(white, black); }
+            .img-container { @apply relative overflow-hidden rounded-[1.5rem] bg-neutral-50 border border-neutral-100; -webkit-mask-image: -webkit-radial-gradient(white, black); transform: translateZ(0); }
         }
 
         html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
@@ -42,6 +42,11 @@
         
         .spinner { border: 2px solid #f3f3f3; border-top: 2px solid #000; border-radius: 50%; width: 1.5rem; height: 1.5rem; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .masonry { column-count: 1; column-gap: 2rem; }
+        @media (min-width: 640px) { .masonry { column-count: 2; } }
+        @media (min-width: 1024px) { .masonry { column-count: 3; } }
+        .masonry-item { break-inside: avoid; margin-bottom: 2rem; display: block; width: 100%; }
     </style>
 </head>
 <body class="font-sans min-h-screen flex flex-col selection:bg-black selection:text-white">
@@ -54,7 +59,7 @@
         
         const DEFAULT_CONFIG = {
             siteTitle: "martinvojtus • space",
-            footerText: "build v1.4.4 • 2026",
+            footerText: "build v1.4.5 • 2026",
             pages: [
                 { id: "grid", title: "Gallery", type: "gallery" },
                 { id: "about", title: "About", type: "profile" },
@@ -180,7 +185,7 @@
             });
 
             const renderCol = (arr) => arr.map(p => `
-                <div class="img-container mb-6 group cursor-pointer">
+                <div class="img-container mb-6 group cursor-pointer inline-block w-full break-inside-avoid">
                     <img src="${p.image_url}" class="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-500 hover:scale-[1.03]" loading="lazy">
                     <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-black uppercase opacity-0 group-hover:opacity-100 transition-opacity">
                         ${new Date(p.at).toLocaleDateString('en-US', {month:'short', year:'numeric'})}
@@ -203,39 +208,62 @@
 
         function renderPublicContact(page) {
             const post = App.posts.find(p => p.author === page.id);
-            let rawText = '';
-            
-            // Bezpecne spracovanie textu pre contact - vyhneme sa JSON formatovaniu 
+            let data = { intro: '', text: '', contacts: [] };
             if (post) {
-                 try {
-                     const parsed = JSON.parse(post.text);
-                     rawText = parsed.text || '';
-                 } catch(e) {
-                     rawText = post.text || '';
-                 }
+                try {
+                    const parsed = JSON.parse(post.text);
+                    if (parsed.text !== undefined || parsed.intro !== undefined) data = parsed;
+                    else data.text = post.text;
+                } catch(e) { data.text = post.text || ''; }
             }
-            
+
+            let contactsHtml = '';
+            if (data.contacts && data.contacts.length > 0) {
+                contactsHtml = `<div class="flex flex-col gap-4 w-full mt-4">` + data.contacts.map(c => `
+                    <div class="flex flex-col border-b border-neutral-100 pb-4">
+                        <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1">${c.label}</span>
+                        ${c.url ? `<a href="${c.url}" target="_blank" class="text-lg font-bold hover:text-neutral-500 transition-colors">${c.value}</a>` : `<span class="text-lg font-bold">${c.value}</span>`}
+                    </div>
+                `).join('') + `</div>`;
+            }
+
             return `
-            <div class="flex flex-col md:flex-row w-full gap-12 animate-fade-in items-start min-h-[50vh] mt-12">
-                <div class="w-full md:w-1/2 flex items-center justify-center md:justify-start md:pt-10">
-                    <h1 class="text-6xl lg:text-8xl font-bold tracking-tighter leading-none">${post ? post.title : 'Hello.'}</h1>
+            <div class="flex flex-col lg:flex-row w-full gap-12 lg:gap-24 animate-fade-in items-start min-h-[50vh] mt-12">
+                <div class="w-full lg:w-1/2 flex lg:sticky lg:top-32 h-fit md:pt-10">
+                    <h1 class="text-6xl lg:text-8xl font-bold tracking-tighter leading-none">${post && post.title ? post.title : 'Hello.'}</h1>
                 </div>
-                <div class="w-full md:w-1/2 flex flex-col gap-10 md:pt-12 leading-relaxed">
-                    <div class="editorial-dropcap text-lg md:text-xl leading-relaxed text-neutral-800 font-medium whitespace-pre-wrap"><div>${rawText}</div></div>
+                <div class="w-full lg:w-1/2 flex flex-col gap-8 lg:pt-12 leading-relaxed">
+                    ${data.intro ? `<div class="text-2xl font-bold tracking-tight">${data.intro}</div>` : ''}
+                    ${data.text ? `<div class="text-lg leading-relaxed text-neutral-500 font-medium whitespace-pre-wrap">${data.text}</div>` : ''}
+                    ${contactsHtml}
                 </div>
             </div>`;
         }
 
         function renderPublicArticle(page) {
             const post = App.posts.find(p => p.author === page.id);
-            return `<article class="flex flex-col w-full max-w-2xl mx-auto animate-fade-in mt-8">${post?.title ? `<h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-10 leading-tight">${post.title}</h1>` : ''}${post?.image_url ? `<img src="${post.image_url}" class="w-full h-auto rounded-2xl object-cover border border-neutral-100 mb-12">` : ''}${post?.text ? `<div class="editorial-dropcap text-lg md:text-xl leading-relaxed text-neutral-800 whitespace-pre-wrap"><div>${post.text}</div></div>` : ''}</article>`;
+            let data = { intro: '', text: '' };
+            if (post) {
+                try {
+                    const parsed = JSON.parse(post.text);
+                    if (parsed.text !== undefined || parsed.intro !== undefined) data = parsed;
+                    else data.text = post.text;
+                } catch(e) { data.text = post.text || ''; }
+            }
+
+            return `<article class="flex flex-col w-full max-w-2xl mx-auto animate-fade-in mt-8">
+                ${post?.title ? `<h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-8 leading-tight">${post.title}</h1>` : ''}
+                ${data.intro ? `<p class="text-xl md:text-2xl text-neutral-500 leading-relaxed font-medium mb-12">${data.intro}</p>` : ''}
+                ${post?.image_url ? `<div class="img-container mb-12"><img src="${post.image_url}" class="w-full h-auto"></div>` : ''}
+                ${data.text ? `<div class="editorial-dropcap text-lg md:text-xl leading-relaxed text-neutral-800 whitespace-pre-wrap"><div>${data.text}</div></div>` : ''}
+            </article>`;
         }
 
         function renderPublicLinks(page) {
             const post = App.posts.find(p => p.author === page.id);
             let data = { desc: '', links: [] }; try { data = JSON.parse(post?.text || "{}"); } catch(e) {}
             let linksHtml = (data.links || []).map(l => `<a href="${l.url}" target="_blank" class="flex items-center justify-center w-full h-16 bg-neutral-50 hover:bg-black hover:text-white border border-neutral-200 rounded-full font-bold text-sm tracking-widest uppercase transition-all duration-300 px-6 text-center">${l.title}</a>`).join('');
-            return `<div class="flex flex-col items-center w-full max-w-lg mx-auto animate-fade-in mt-12">${post?.image_url ? `<img src="${post.image_url}" class="w-32 h-32 rounded-full object-cover border border-neutral-200 mb-6">` : ''}${post?.title ? `<div class="text-2xl font-bold tracking-tight mb-2">${post.title}</div>` : ''}${data.desc ? `<p class="text-base text-neutral-500 mb-10 text-center">${data.desc}</p>` : ''}<div class="flex flex-col gap-4 w-full">${linksHtml}</div></div>`;
+            return `<div class="flex flex-col items-center w-full max-w-lg mx-auto animate-fade-in mt-12">${post?.image_url ? `<div class="w-32 h-32 img-container !rounded-full mb-6"><img src="${post.image_url}" class="w-full h-full object-cover"></div>` : ''}${post?.title ? `<div class="text-2xl font-bold tracking-tight mb-2">${post.title}</div>` : ''}${data.desc ? `<p class="text-base text-neutral-500 mb-10 text-center">${data.desc}</p>` : ''}<div class="flex flex-col gap-4 w-full">${linksHtml}</div></div>`;
         }
 
         // --- DASHBOARD CORE ---
@@ -315,34 +343,34 @@
 
         function renderDashContact(p) {
             const post = App.posts.find(x => x.author === p.id);
-            let rawText = '';
-            if (post) {
-                try {
-                    const parsed = JSON.parse(post.text);
-                    rawText = parsed.text || '';
-                } catch(e) {
-                    rawText = post.text || '';
-                }
-            }
+            let data = { intro: '', text: '', contacts: [] }; 
+            if(post) { try { const parsed = JSON.parse(post.text); if(parsed.text !== undefined || parsed.intro !== undefined) data = parsed; else data.text = post.text; } catch(e){ data.text = post.text || ''; } }
+            window.tempContacts = data.contacts || [];
 
-            return `
-                <div class="card">
-                    <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${p.title}</div>
-                    <div><label class="label">1. Headline</label><input type="text" id="cnt-title" class="input font-bold" value="${post?post.title:''}" placeholder="e.g. Hello."></div>
-                    <div><label class="label">2. Info</label><textarea id="cnt-text" class="input" rows="6" oninput="autoResizeTextarea(this)">${rawText}</textarea></div>
-                    <button onclick="saveContactConfig('${p.id}', ${post?post.id:null})" id="btn-save-cnt" class="btn-dark w-full mt-4">Save Changes</button>
-                </div>
-            `;
+            return `<div class="card"><div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${p.title}</div>
+            <div><label class="label">1. Big Headline</label><span class="hint">The massive text taking up the left side.</span><input type="text" id="cnt-title" class="input font-bold text-lg" value="${post?post.title:''}" placeholder="e.g. Hello."></div>
+            <div><label class="label">2. Intro Subheadline</label><span class="hint">A punchy secondary title.</span><textarea id="cnt-intro" class="input" rows="2" oninput="autoResizeTextarea(this)">${data.intro || ''}</textarea></div>
+            <div><label class="label">3. Message / Info</label><span class="hint">Detailed text message.</span><textarea id="cnt-text" class="input" rows="6" oninput="autoResizeTextarea(this)">${data.text || ''}</textarea></div>
+            <div><div class="flex justify-between items-center mb-2"><label class="label !mb-0">4. Contact Methods</label><button type="button" onclick="addCntRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add Method</button></div><span class="hint">Dynamic list for emails, phone numbers, or socials.</span><div id="cnt-exp-container" class="flex flex-col gap-3">${window.tempContacts.map(c => buildCntRowHtml(c.label, c.value, c.url)).join('')}</div></div>
+            <button onclick="saveContactConfig('${p.id}', ${post?post.id:null})" id="btn-save-cnt" class="btn-dark w-full mt-4">Save Changes</button></div>`;
         }
 
         function renderDashArticle(p) {
             const post = App.posts.find(x => x.author === p.id);
-            return `<div class="card"><div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${p.title}</div><div><label class="label">1. Cover</label><input type="file" id="art-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${p.id}', ${post?post.id:null}, 'article')">${post && post.image_url ? `<div class="relative w-full group"><img src="${post.image_url}" class="w-full h-48 object-cover rounded-xl border cursor-pointer" onclick="document.getElementById('art-img-upload').click()"><button type="button" onclick="removePageImage(${post.id})" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/90 backdrop-blur border border-red-100 rounded-full w-12 h-12 flex items-center justify-center text-red-500 shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-white hover:scale-110"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>` : `<button onclick="document.getElementById('art-img-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase w-full">+ Select Cover</button>`}</div><div><label class="label">2. Headline</label><input type="text" id="art-title" class="input font-bold" value="${post?post.title:''}"></div><div><label class="label">3. Body</label><textarea id="art-text" class="input" rows="12" oninput="autoResizeTextarea(this)">${post?post.text:''}</textarea></div><button onclick="saveArticleConfig('${p.id}', ${post?post.id:null}, '${post?.image_url || ''}')" id="btn-save-art" class="btn-dark w-full mt-4">Save Changes</button></div>`;
+            let data = { intro: '', text: '' }; 
+            if(post) { try { const parsed = JSON.parse(post.text); if(parsed.text !== undefined || parsed.intro !== undefined) data = parsed; else data.text = post.text; } catch(e){ data.text = post.text || ''; } }
+
+            return `<div class="card"><div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${p.title}</div>
+            <div><label class="label">1. Cover Image</label><input type="file" id="art-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${p.id}', ${post?post.id:null}, 'article')">${post && post.image_url ? `<div class="relative w-full group"><img src="${post.image_url}" class="w-full h-48 object-cover rounded-xl border cursor-pointer" onclick="document.getElementById('art-img-upload').click()"><button type="button" onclick="removePageImage(${post.id})" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/90 backdrop-blur border border-red-100 rounded-full w-12 h-12 flex items-center justify-center text-red-500 shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-white hover:scale-110"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>` : `<button onclick="document.getElementById('art-img-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase w-full">+ Select Cover</button>`}</div>
+            <div><label class="label">2. Main Headline</label><input type="text" id="art-title" class="input font-bold" value="${post?post.title:''}"></div>
+            <div><label class="label">3. Intro / Subtitle</label><span class="hint">A brief summary or bold lead paragraph.</span><textarea id="art-intro" class="input" rows="2" oninput="autoResizeTextarea(this)">${data.intro || ''}</textarea></div>
+            <div><label class="label">4. Full Body Content</label><textarea id="art-text" class="input" rows="12" oninput="autoResizeTextarea(this)">${data.text || ''}</textarea></div>
+            <button onclick="saveArticleConfig('${p.id}', ${post?post.id:null}, '${post?.image_url || ''}')" id="btn-save-art" class="btn-dark w-full mt-4">Save Changes</button></div>`;
         }
 
         function renderDashLinks(p) {
             const post = App.posts.find(x => x.author === p.id); let data = { desc: '', links: [] }; try { data = JSON.parse(post.text); } catch(e){}
-            return `<div class="card"><div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${p.title}</div><div><label class="label">1. Avatar</label><input type="file" id="lnk-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${p.id}', ${post?post.id:null}, 'links')">${post && post.image_url ? `<div class="relative w-max group"><img src="${post.image_url}" class="w-24 h-24 rounded-full object-cover border cursor-pointer" onclick="document.getElementById('lnk-img-upload').click()"><button type="button" onclick="removePageImage(${post.id})" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/90 backdrop-blur border border-red-100 rounded-full w-10 h-10 flex items-center justify-center text-red-500 shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-white hover:scale-110"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>` : `<button onclick="document.getElementById('lnk-img-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase w-full">+ Select Avatar</button>`}</div><div><label class="label">2. Name</label><input type="text" id="lnk-title" class="input font-bold" value="${post?post.title:''}"></div><div><label class="label">3. Bio</label><textarea id="lnk-desc" class="input" rows="2" oninput="autoResizeTextarea(this)">${data.desc || ''}</textarea></div><div><div class="flex justify-between items-center mb-2"><label class="label !mb-0">4. Links</label><button type="button" onclick="addLinkRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add</button></div><div id="lnk-exp-container" class="flex flex-col gap-3">${(data.links||[]).map(l => buildLinkRowHtml(l.title, l.url)).join('')}</div></div><button onclick="saveLinksConfig('${p.id}', ${post?post.id:null}, '${post?.image_url || ''}')" id="btn-save-lnk" class="btn-dark w-full mt-4">Save Changes</button></div>`;
+            return `<div class="card"><div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${p.title}</div><div><label class="label">1. Avatar</label><input type="file" id="lnk-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${p.id}', ${post?post.id:null}, 'links')">${post && post.image_url ? `<div class="relative w-max group"><img src="${post.image_url}" class="w-24 h-24 rounded-full object-cover border cursor-pointer" onclick="document.getElementById('lnk-img-upload').click()"><button type="button" onclick="removePageImage(${post.id})" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/90 backdrop-blur border border-red-100 rounded-full w-10 h-10 flex items-center justify-center text-red-500 shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-white hover:scale-110"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>` : `<button onclick="document.getElementById('lnk-img-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase w-full">+ Avatar</button>`}</div><div><label class="label">2. Name</label><input type="text" id="lnk-title" class="input font-bold" value="${post?post.title:''}"></div><div><label class="label">3. Bio</label><textarea id="lnk-desc" class="input" rows="2" oninput="autoResizeTextarea(this)">${data.desc || ''}</textarea></div><div><div class="flex justify-between items-center mb-2"><label class="label !mb-0">4. Links</label><button type="button" onclick="addLinkRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add</button></div><div id="lnk-exp-container" class="flex flex-col gap-3">${(data.links||[]).map(l => buildLinkRowHtml(l.title, l.url)).join('')}</div></div><button onclick="saveLinksConfig('${p.id}', ${post?post.id:null}, '${post?.image_url || ''}')" id="btn-save-lnk" class="btn-dark w-full mt-4">Save Changes</button></div>`;
         }
 
         // API Helpers
@@ -374,8 +402,18 @@
             }); 
             savePageData(s,id,{title:"",text:JSON.stringify({v:2,intro:document.getElementById('prf-intro').value,text:document.getElementById('prf-text').value,exps}),image_url:img,show_date:false,author:s},'btn-save-prf'); 
         }
-        function saveContactConfig(s,id) { savePageData(s,id,{title:document.getElementById('cnt-title').value,text:JSON.stringify({ text: document.getElementById('cnt-text').value }),show_date:false,author:s},'btn-save-cnt'); }
-        function saveArticleConfig(s,id,img) { savePageData(s,id,{title:document.getElementById('art-title').value,text:document.getElementById('art-text').value,image_url:img,show_date:false,author:s},'btn-save-art'); }
+        function saveContactConfig(s,id) { 
+            const contacts=[]; 
+            document.querySelectorAll('.cnt-row-item').forEach(el=>{ 
+                contacts.push({label:el.querySelector('.cnt-l').value,value:el.querySelector('.cnt-v').value,url:el.querySelector('.cnt-u').value}); 
+            }); 
+            const data = { intro: document.getElementById('cnt-intro').value, text: document.getElementById('cnt-text').value, contacts: contacts };
+            savePageData(s,id,{title:document.getElementById('cnt-title').value,text:JSON.stringify(data),image_url:"",show_date:false,author:s},'btn-save-cnt'); 
+        }
+        function saveArticleConfig(s,id,img) { 
+            const data = { intro: document.getElementById('art-intro').value, text: document.getElementById('art-text').value };
+            savePageData(s,id,{title:document.getElementById('art-title').value,text:JSON.stringify(data),image_url:img,show_date:false,author:s},'btn-save-art'); 
+        }
         function saveLinksConfig(s,id,img) { const links=[]; document.querySelectorAll('.link-row-item').forEach(el=>{ links.push({title:el.querySelector('.lnk-t').value,url:el.querySelector('.lnk-u').value}); }); savePageData(s,id,{title:document.getElementById('lnk-title').value,text:JSON.stringify({desc:document.getElementById('lnk-desc').value,links}),image_url:img,show_date:false,author:s},'btn-save-lnk'); }
 
         async function saveGlobalConfig() { const btn=document.getElementById('btn-save-cfg'); if(btn){btn.innerText="SAVING..."; btn.disabled=true;} App.config.siteTitle=document.getElementById('cfg-title').value.trim(); App.config.footerText=document.getElementById('cfg-footer').value.trim(); const method=App.configPostId?"PUT":"POST"; const url=App.configPostId?`${API_URL}/posts/${App.configPostId}`:`${API_URL}/posts`; try{ await fetch(url,{method,headers:{"Content-Type":"application/json","x-admin-password":App.token},body:JSON.stringify({title:"",text:JSON.stringify(App.config),image_url:"",show_date:false,author:"_system_config"})}); await init(); }catch(e){if(btn){btn.innerText="Error"; btn.disabled=false;}} }
@@ -395,6 +433,16 @@
         }
         function addExpRowToDOM() { document.getElementById('prf-exp-container').insertAdjacentHTML('beforeend', buildExpRowHtml()); }
         
+        function buildCntRowHtml(l='', v='', u='') { 
+            return `<div class="flex flex-col gap-3 p-4 bg-neutral-50 rounded-xl border border-neutral-200 relative cnt-row-item">
+                <input type="text" class="input !h-10 !py-2 !bg-white cnt-l font-bold pr-8" placeholder="Label (e.g. Email)" value="${l}">
+                <input type="text" class="input !h-10 !py-2 !bg-white cnt-v" placeholder="Value (e.g. hello@space.com)" value="${v}">
+                <input type="text" class="input !h-10 !py-2 !bg-white cnt-u" placeholder="URL (optional, e.g. mailto:hello@space.com)" value="${u}">
+                <button type="button" onclick="this.parentElement.remove()" class="absolute top-4 right-4 text-red-500 font-bold uppercase">X</button>
+            </div>`; 
+        }
+        function addCntRowToDOM() { document.getElementById('cnt-exp-container').insertAdjacentHTML('beforeend', buildCntRowHtml()); }
+
         function buildLinkRowHtml(t='',u='') { return `<div class="flex flex-col gap-3 p-4 bg-neutral-50 rounded-xl border border-neutral-200 relative link-row-item"><input type="text" class="input !h-10 !py-2 !bg-white lnk-t font-bold pr-8" placeholder="Title" value="${t}"><input type="text" class="input !h-10 !py-2 !bg-white lnk-u" placeholder="URL" value="${u}"><button type="button" onclick="this.parentElement.remove()" class="absolute top-4 right-4 text-red-500 font-bold uppercase">X</button></div>`; }
         function addLinkRowToDOM() { document.getElementById('lnk-exp-container').insertAdjacentHTML('beforeend', buildLinkRowHtml()); }
 
