@@ -4,28 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>martinvojtus.space</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
-                    colors: { black: '#000000', white: '#ffffff', gray: { 50: '#fafafa', 100: '#f5f5f5', 200: '#e5e5e5', 400: '#a3a3a3', 500: '#737373', 900: '#171717' } }
+                    colors: { black: '#000000', white: '#ffffff', gray: { 50: '#f9fafb', 100: '#f3f4f6', 200: '#e5e7eb', 400: '#9ca3af', 500: '#6b7280', 900: '#111827' } },
+                    animation: { 'fade-in': 'fadeIn 0.3s ease-out forwards' },
+                    keyframes: { fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } } }
                 }
             }
         }
     </script>
-    <style>
+    
+    <style type="text/tailwindcss">
+        @layer components {
+            .btn-dark { @apply flex items-center justify-center h-12 px-6 rounded-full font-bold text-xs uppercase tracking-widest bg-black text-white hover:bg-gray-800 transition-colors disabled:opacity-50 cursor-pointer whitespace-nowrap; }
+            .btn-light { @apply flex items-center justify-center h-12 px-6 rounded-full font-bold text-xs uppercase tracking-widest bg-transparent text-black border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-50 cursor-pointer whitespace-nowrap; }
+            .btn-danger { @apply flex items-center justify-center h-12 px-6 rounded-full font-bold text-xs uppercase tracking-widest bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 cursor-pointer whitespace-nowrap; }
+            
+            .input { @apply w-full px-4 py-3 bg-gray-50 border border-gray-200 text-black rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-all; }
+            .label { @apply text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2; }
+        }
+
         html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
         body { background-color: #ffffff; color: #000000; overflow-x: hidden; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-        .masonry-grid { display: flex; flex-direction: row; gap: 1.5rem; align-items: flex-start; }
-        .masonry-col { display: flex; flex-direction: column; gap: 1.5rem; flex: 1; min-width: 0; }
-        /* Simple spinner */
+        
         .spinner { border: 2px solid #f3f3f3; border-top: 2px solid #000; border-radius: 50%; width: 1.5rem; height: 1.5rem; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Pure CSS Masonry Gallery */
+        .masonry { column-count: 1; column-gap: 1.5rem; }
+        @media (min-width: 640px) { .masonry { column-count: 2; } }
+        @media (min-width: 1024px) { .masonry { column-count: 3; } }
+        .masonry-item { break-inside: avoid; margin-bottom: 1.5rem; display: block; width: 100%; }
     </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col selection:bg-black selection:text-white">
@@ -37,10 +55,10 @@
     <script>
         const API_URL = "https://mv-backend-ak8l.onrender.com";
         
-        // DEFAULT CONFIGURATION (used if no config is found in DB)
+        // 1. DEFAULT SYSTEM CONFIG
         const DEFAULT_CONFIG = {
             siteTitle: "martinvojtus.space",
-            footerText: "build v9.0.0 • 2026",
+            footerText: "build v9.0.1 • 2026",
             pages: [
                 { id: "grid", title: "Grid", type: "gallery" },
                 { id: "about", title: "About", type: "resume" },
@@ -48,76 +66,67 @@
             ]
         };
 
-        // GLOBAL APP STATE
+        // 2. GLOBAL APP STATE
         const App = {
             token: localStorage.getItem('mv_admin_key') || "",
             posts: [],
             config: JSON.parse(JSON.stringify(DEFAULT_CONFIG)),
             configPostId: null,
-            route: "grid", // default route
+            route: "grid", // Default route
             dashTab: "settings",
             isMenuOpen: false,
             isLoading: true
         };
 
-        // --- CORE INITIALIZATION ---
+        // 3. CORE INITIALIZATION
         async function init() {
-            renderShell(); // Show loading state
-            await fetchData();
-            
-            // Set initial route to first available page if it exists
-            if (App.config.pages.length > 0 && !App.config.pages.find(p => p.id === App.route) && App.route !== 'dashboard') {
-                App.route = App.config.pages[0].id;
-            }
-            
-            // Verify token silently
-            if(App.token) {
-                try {
-                    const res = await fetch(`${API_URL}/verify`, { headers: { 'x-admin-password': App.token } });
-                    if(!res.ok) throw new Error();
-                } catch(e) { App.token = ""; localStorage.removeItem('mv_admin_key'); }
-            }
+            App.isLoading = true;
+            render(); // Show spinner
 
-            App.isLoading = false;
-            render();
-        }
-
-        async function fetchData() {
             try {
+                // Fetch all data
                 const res = await fetch(`${API_URL}/posts?skip=0&limit=1000`);
                 App.posts = await res.json();
                 
-                // Extract System Config
+                // Find and apply config if it exists
                 const configPost = App.posts.find(p => p.author === "_system_config");
                 if (configPost) {
                     App.configPostId = configPost.id;
                     try { App.config = JSON.parse(configPost.text); } catch(e) {}
                 }
                 document.title = App.config.siteTitle;
+
+                // Validate current route
+                if (App.config.pages.length > 0 && !App.config.pages.find(p => p.id === App.route) && App.route !== 'dashboard') {
+                    App.route = App.config.pages[0].id;
+                }
+
+                // Verify token silently
+                if (App.token) {
+                    const authRes = await fetch(`${API_URL}/verify`, { headers: { 'x-admin-password': App.token } });
+                    if (!authRes.ok) throw new Error();
+                }
             } catch (e) {
-                console.error("Failed to fetch data", e);
+                App.token = ""; localStorage.removeItem('mv_admin_key');
             }
+
+            App.isLoading = false;
+            render();
         }
 
-        // --- RENDER ENGINE ---
+        // 4. RENDER ENGINE
         function render() {
             const root = document.getElementById('app-root');
             root.innerHTML = `
                 ${renderHeader()}
                 ${App.isMenuOpen ? renderMobileMenu() : ''}
                 <main class="w-full max-w-3xl mx-auto pt-28 pb-12 px-4 flex flex-col flex-grow items-center">
-                    ${App.isLoading ? `<div class="mt-20"><div class="spinner"></div></div>` : renderMainContent()}
+                    ${App.isLoading ? `<div class="mt-32"><div class="spinner"></div></div>` : renderMainContent()}
                 </main>
                 ${renderFooter()}
             `;
         }
 
-        function renderShell() {
-            const root = document.getElementById('app-root');
-            root.innerHTML = `<main class="w-full min-h-screen flex items-center justify-center"><div class="spinner"></div></main>`;
-        }
-
-        // --- COMPONENTS ---
         function renderHeader() {
             const icon = App.isMenuOpen 
                 ? `<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>`
@@ -156,9 +165,6 @@
                 links += `<div class="w-full h-px bg-gray-200 my-4"></div>`;
                 links += `<button onclick="navigate('dashboard')" class="text-3xl font-bold text-left tracking-tight ${App.route === 'dashboard' ? 'text-black' : 'text-gray-400'}">Dashboard</button>`;
                 links += `<button onclick="logout()" class="text-3xl font-bold text-left tracking-tight text-red-500 mt-4">Logout</button>`;
-            } else {
-                links += `<div class="w-full h-px bg-gray-200 my-4"></div>`;
-                links += `<button onclick="openLoginModal()" class="text-lg font-bold text-left text-gray-400 hover:text-black">Admin Access</button>`;
             }
 
             return `
@@ -170,10 +176,10 @@
 
         function renderFooter() {
             return `
-            <footer class="w-full mt-24 mb-12 flex flex-col items-center gap-6">
+            <footer class="w-full mt-24 mb-8 flex flex-col items-center gap-6">
                 <div class="w-12 h-px bg-gray-200"></div>
-                <div class="text-xs font-bold text-gray-400 tracking-widest uppercase">${App.config.footerText}</div>
-                ${!App.token ? `<button onclick="openLoginModal()" class="w-4 h-4 rounded-full bg-transparent absolute bottom-4 right-4 opacity-0 hover:opacity-10 cursor-pointer"></button>` : ''}
+                <div class="text-xs font-bold text-gray-400 tracking-widest uppercase text-center">${App.config.footerText}</div>
+                ${!App.token ? `<button onclick="openLoginModal()" class="w-12 h-12 absolute bottom-0 right-0 opacity-0 cursor-pointer"></button>` : ''}
             </footer>
             `;
         }
@@ -194,24 +200,21 @@
             return `<div>Unknown page type.</div>`;
         }
 
-        // --- PUBLIC PAGE RENDERERS ---
-
+        // 5. PUBLIC PAGE VIEWS
         function renderGallery(pageId) {
             const posts = App.posts.filter(p => p.author === pageId).sort((a,b) => new Date(b.at) - new Date(a.at));
             if (posts.length === 0) return `<div class="w-full py-20 border border-dashed border-gray-200 rounded-3xl text-center text-gray-400 font-bold text-sm tracking-widest uppercase">No content yet.</div>`;
 
-            // Using Masonry 2-column for generic view
-            let col1 = '', col2 = '';
-            posts.forEach((p, i) => {
-                const img = `<div class="w-full flex flex-col gap-4"><div class="w-full h-px bg-gray-100"></div><span class="text-[10px] font-bold text-gray-400 tracking-widest uppercase px-2">${new Date(p.at).toLocaleDateString('en-US', {month:'short', year:'numeric'})}</span><img src="${p.image_url}" class="w-full h-auto object-cover rounded-[1.5rem]" loading="lazy"></div>`;
-                if(i % 2 === 0) col1 += img; else col2 += img;
-            });
+            const itemsHtml = posts.map(p => `
+                <div class="masonry-item group relative">
+                    <img src="${p.image_url}" class="w-full h-auto rounded-2xl bg-gray-50" loading="lazy">
+                    <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-black tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity">
+                        ${new Date(p.at).toLocaleDateString('en-US', {month:'short', year:'numeric'})}
+                    </div>
+                </div>
+            `).join('');
 
-            return `
-            <div class="w-full flex flex-col md:flex-row gap-6 md:gap-8 items-start">
-                <div class="flex flex-col gap-10 flex-1 w-full min-w-0">${col1}</div>
-                <div class="flex flex-col gap-10 flex-1 w-full min-w-0">${col2}</div>
-            </div>`;
+            return `<div class="w-full masonry animate-fade-in">${itemsHtml}</div>`;
         }
 
         function renderResume(pageId) {
@@ -219,11 +222,11 @@
             if (!post) return `<div class="text-gray-400">Content pending.</div>`;
             
             let data = {};
-            try { data = JSON.parse(post.text); } catch(e) { return `<div class="text-gray-400">Invalid data format.</div>`; }
+            try { data = JSON.parse(post.text); } catch(e) {}
 
             let expsHtml = '';
             if (data.exps && data.exps.length > 0) {
-                expsHtml = `<div class="text-3xl font-bold tracking-tight mt-20 mb-8">Experience</div>` + 
+                expsHtml = `<div class="text-2xl md:text-3xl font-bold tracking-tight mt-20 mb-8">Experience</div>` + 
                 data.exps.map((e, i) => `
                     <div class="flex flex-col items-start w-full">
                         <div class="text-xl font-bold mb-1">${e.title}</div>
@@ -238,7 +241,7 @@
                 <div class="bg-gray-50 border border-gray-200 rounded-[2rem] p-8 md:p-12 flex flex-col items-start mt-20 w-full">
                     <div class="text-2xl md:text-3xl font-bold tracking-tight mb-4">${data.ctaTitle}</div>
                     <div class="text-gray-500 mb-8 leading-relaxed max-w-xl">${data.ctaText}</div>
-                    <button class="h-12 px-8 rounded-full bg-black text-white font-bold text-xs uppercase tracking-widest hover:bg-gray-800 transition-colors" onclick="navigate('contact')">${data.ctaBtn || 'Get in touch'}</button>
+                    <button class="btn-dark" onclick="navigate('${App.config.pages.find(p=>p.type==='contact')?.id || ''}')">${data.ctaBtn || 'Get in touch'}</button>
                 </div>
             ` : '';
 
@@ -248,7 +251,7 @@
                 <div class="w-16 h-1.5 bg-black rounded-full mb-12"></div>
                 ${post.image_url ? `<img src="${post.image_url}" class="w-full h-auto rounded-[2rem] mb-12 object-cover">` : ''}
                 ${data.intro ? `<div class="text-xl md:text-2xl text-gray-500 leading-relaxed mb-12 font-medium">${data.intro}</div>` : ''}
-                ${data.approach ? `<div class="text-2xl font-bold tracking-tight mb-6">My Approach</div><div class="text-lg leading-relaxed text-gray-800 mb-12 max-w-2xl">${data.approach}</div>` : ''}
+                ${data.approach ? `<div class="text-2xl font-bold tracking-tight mb-6">My Approach</div><div class="text-lg leading-relaxed text-gray-800 mb-12 max-w-2xl whitespace-pre-wrap">${data.approach}</div>` : ''}
                 ${expsHtml}
                 ${ctaHtml}
             </div>`;
@@ -266,18 +269,15 @@
             </div>`;
         }
 
-
-        // --- DASHBOARD RENDERER ---
-
+        // 6. DASHBOARD VIEWS
         function renderDashboard() {
-            // Dashboard Navigation
             const tabs = [
                 { id: 'settings', label: 'Global Settings' },
                 ...App.config.pages.map(p => ({ id: `page_${p.id}`, label: `Page: ${p.title}` }))
             ];
 
             const tabsHtml = tabs.map(t => `
-                <button onclick="App.dashTab = '${t.id}'; render();" class="h-10 px-4 rounded-full font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-colors ${App.dashTab === t.id ? 'bg-black text-white' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}">${t.label}</button>
+                <button onclick="App.dashTab = '${t.id}'; render();" class="h-10 px-5 rounded-full font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-colors ${App.dashTab === t.id ? 'bg-black text-white' : 'bg-gray-50 text-gray-500 hover:bg-gray-100 border border-gray-200'}">${t.label}</button>
             `).join('');
 
             let activeContent = '';
@@ -299,7 +299,7 @@
                     <p class="text-gray-500 text-lg">System Control Center</p>
                 </div>
                 
-                <div class="flex gap-2 overflow-x-auto hide-scroll border-b border-gray-100 pb-4 w-full">
+                <div class="flex gap-2 overflow-x-auto hide-scroll pb-2 w-full">
                     ${tabsHtml}
                 </div>
 
@@ -310,13 +310,12 @@
             `;
         }
 
-        // Dashboard: Settings & Menu Builder
         function renderDashSettings() {
             const pagesList = App.config.pages.map((p, i) => `
-                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200">
                     <div class="flex flex-col">
                         <span class="font-bold">${p.title}</span>
-                        <span class="text-xs text-gray-400 font-mono">slug: ${p.id} | type: ${p.type}</span>
+                        <span class="text-xs text-gray-400 font-mono mt-1">id: ${p.id} | type: ${p.type}</span>
                     </div>
                     <button onclick="removePage(${i})" class="text-red-500 hover:text-red-700 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                 </div>
@@ -325,40 +324,48 @@
             return `
                 <div class="text-2xl font-bold tracking-tight border-b border-gray-100 pb-4">General Info</div>
                 <div class="flex flex-col gap-2">
-                    <label class="text-xs font-bold text-gray-400 uppercase tracking-widest">Site Title</label>
-                    <input type="text" id="cfg-title" class="w-full h-12 px-4 bg-gray-50 border border-gray-200 rounded-xl font-bold text-lg" value="${App.config.siteTitle}">
+                    <label class="label">Site Title</label>
+                    <input type="text" id="cfg-title" class="input font-bold text-lg" value="${App.config.siteTitle}">
                 </div>
                 <div class="flex flex-col gap-2">
-                    <label class="text-xs font-bold text-gray-400 uppercase tracking-widest">Footer Text</label>
-                    <input type="text" id="cfg-footer" class="w-full h-12 px-4 bg-gray-50 border border-gray-200 rounded-xl" value="${App.config.footerText}">
+                    <label class="label">Footer Text</label>
+                    <input type="text" id="cfg-footer" class="input" value="${App.config.footerText}">
                 </div>
                 
                 <div class="text-2xl font-bold tracking-tight border-b border-gray-100 pb-4 mt-8">Menu & Pages Builder</div>
                 <div class="flex flex-col gap-3">${pagesList}</div>
                 
-                <div class="flex flex-col md:flex-row gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-200 border-dashed mt-4">
-                    <input type="text" id="new-page-id" class="w-full h-12 px-4 border border-gray-200 rounded-xl text-sm font-mono" placeholder="slug (e.g. projects)">
-                    <input type="text" id="new-page-title" class="w-full h-12 px-4 border border-gray-200 rounded-xl text-sm" placeholder="Title (e.g. My Projects)">
-                    <select id="new-page-type" class="w-full h-12 px-4 border border-gray-200 rounded-xl text-sm bg-white">
-                        <option value="gallery">Gallery (Photos)</option>
-                        <option value="resume">Resume (Text & Exp)</option>
-                        <option value="contact">Contact</option>
-                    </select>
-                    <button onclick="addPage()" class="h-12 px-6 rounded-xl bg-black text-white font-bold text-xs uppercase tracking-widest whitespace-nowrap">Add</button>
+                <div class="flex flex-col md:flex-row gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-200 border-dashed mt-4 items-end">
+                    <div class="flex flex-col gap-2 w-full">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">ID (slug)</label>
+                        <input type="text" id="new-page-id" class="input font-mono" placeholder="e.g. projects">
+                    </div>
+                    <div class="flex flex-col gap-2 w-full">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Title (Menu)</label>
+                        <input type="text" id="new-page-title" class="input" placeholder="e.g. My Projects">
+                    </div>
+                    <div class="flex flex-col gap-2 w-full">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Page Type</label>
+                        <select id="new-page-type" class="input !py-0 !h-[3.5rem]">
+                            <option value="gallery">Gallery (Photos)</option>
+                            <option value="resume">Resume (Text & Exp)</option>
+                            <option value="contact">Contact Page</option>
+                        </select>
+                    </div>
+                    <button onclick="addPage()" class="btn-dark w-full md:w-auto h-[3.5rem]">Add</button>
                 </div>
 
-                <button onclick="saveGlobalConfig()" id="btn-save-cfg" class="h-14 mt-8 rounded-full bg-black text-white font-bold text-sm uppercase tracking-widest hover:bg-gray-800 transition-colors w-full">Save Settings</button>
+                <button onclick="saveGlobalConfig()" id="btn-save-cfg" class="btn-dark w-full mt-8">Save Settings</button>
             `;
         }
 
-        // Dashboard: Gallery Manager
         function renderDashGallery(pageConfig) {
             const items = App.posts.filter(p => p.author === pageConfig.id).sort((a,b) => new Date(b.at) - new Date(a.at));
             const listHtml = items.map(p => `
-                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200">
                     <div class="flex items-center gap-4">
-                        <img src="${p.image_url}" class="w-12 h-12 rounded-lg object-cover bg-gray-200">
-                        <span class="text-xs font-mono text-gray-500">${new Date(p.at).toLocaleDateString()}</span>
+                        <img src="${p.image_url}" class="w-16 h-16 rounded-lg object-cover bg-gray-200 border border-gray-200">
+                        <span class="text-xs font-bold text-gray-500 tracking-widest uppercase">${new Date(p.at).toLocaleDateString()}</span>
                     </div>
                     <button onclick="confirmDelete(${p.id})" class="text-red-500 hover:text-red-700 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                 </div>
@@ -368,102 +375,128 @@
                 <div class="text-2xl font-bold tracking-tight border-b border-gray-100 pb-4">Manage: ${pageConfig.title}</div>
                 <div class="flex flex-col gap-4">
                     <input type="file" id="gal-upload" accept="image/*" class="hidden" onchange="uploadGalleryImage('${pageConfig.id}')">
-                    <button id="btn-upload-gal" onclick="document.getElementById('gal-upload').click()" class="h-14 rounded-xl border-2 border-dashed border-gray-300 text-gray-500 font-bold text-sm uppercase tracking-widest hover:bg-gray-50 transition-colors w-full">+ Upload New Photo</button>
+                    <button id="btn-upload-gal" onclick="document.getElementById('gal-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-gray-300 text-gray-500 font-bold text-sm uppercase tracking-widest hover:bg-gray-50 transition-colors w-full">+ Upload New Photo</button>
                 </div>
-                <div class="flex flex-col gap-3 mt-4">${listHtml}</div>
+                <div class="flex flex-col gap-3 mt-4">${listHtml.length > 0 ? listHtml : '<div class="text-gray-400 text-sm">No photos uploaded yet.</div>'}</div>
             `;
         }
 
-        // Dashboard: Resume Builder
         function renderDashResume(pageConfig) {
             const post = App.posts.find(p => p.author === pageConfig.id);
             let data = { intro: '', approach: '', exps: [], ctaTitle: '', ctaText: '', ctaBtn: '' };
             if(post) { try { data = JSON.parse(post.text); } catch(e){} }
-            // To handle dynamic rows safely without losing focus, we construct HTML string. In vanilla, it's easier to let user type, but we must store state if we rebuild.
-            // Simplified: we will store these values in DOM, then extract on save.
             
-            let expRows = (data.exps || []).map((e, i) => `
-                <div class="flex flex-col gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200 relative exp-row-item">
-                    <input type="text" class="w-full h-10 px-3 bg-white border border-gray-200 rounded-lg text-sm exp-t" placeholder="Job Title" value="${e.title}">
-                    <input type="text" class="w-full h-10 px-3 bg-white border border-gray-200 rounded-lg text-sm exp-c" placeholder="Company" value="${e.company}">
-                    <input type="text" class="w-full h-10 px-3 bg-white border border-gray-200 rounded-lg text-sm exp-d" placeholder="Date" value="${e.date}">
-                    <button type="button" onclick="this.parentElement.remove()" class="absolute top-4 right-4 text-red-500 text-xs font-bold uppercase">Remove</button>
-                </div>
-            `).join('');
+            // To safely edit arrays in DOM without state framework
+            window.tempExps = data.exps || [];
 
             return `
                 <div class="text-2xl font-bold tracking-tight border-b border-gray-100 pb-4">Builder: ${pageConfig.title}</div>
                 
                 <div class="flex flex-col gap-2">
-                    <label class="text-xs font-bold text-gray-400 uppercase tracking-widest">Cover Image</label>
+                    <label class="label">Cover Image</label>
                     <input type="file" id="res-img-upload" accept="image/*" class="hidden" onchange="uploadResumeImage('${pageConfig.id}', ${post ? post.id : null})">
                     ${post && post.image_url ? `<img src="${post.image_url}" class="w-full h-48 object-cover rounded-xl border border-gray-200 cursor-pointer" onclick="document.getElementById('res-img-upload').click()">` : `<button onclick="document.getElementById('res-img-upload').click()" class="h-20 rounded-xl border-2 border-dashed border-gray-300 text-gray-500 font-bold text-xs uppercase tracking-widest hover:bg-gray-50 transition-colors w-full">+ Upload Cover</button>`}
                 </div>
 
                 <div class="flex flex-col gap-2 mt-4">
-                    <label class="text-xs font-bold text-gray-400 uppercase tracking-widest">Intro</label>
-                    <textarea id="res-intro" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm" rows="3">${data.intro || ''}</textarea>
+                    <label class="label">Intro</label>
+                    <textarea id="res-intro" class="input" rows="3" placeholder="Hello! I'm...">${data.intro || ''}</textarea>
                 </div>
 
                 <div class="flex flex-col gap-2 mt-4">
-                    <label class="text-xs font-bold text-gray-400 uppercase tracking-widest">Approach</label>
-                    <textarea id="res-approach" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm" rows="4">${data.approach || ''}</textarea>
+                    <label class="label">Approach / Details</label>
+                    <textarea id="res-approach" class="input" rows="4" placeholder="My approach is...">${data.approach || ''}</textarea>
                 </div>
 
                 <div class="flex flex-col gap-2 mt-8">
-                    <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0">Experience</label><button type="button" onclick="document.getElementById('res-exp-container').insertAdjacentHTML('beforeend', '<div class=\\'flex flex-col gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200 relative exp-row-item\\'><input type=\\'text\\' class=\\'w-full h-10 px-3 bg-white border border-gray-200 rounded-lg text-sm exp-t\\' placeholder=\\'Job Title\\'><input type=\\'text\\' class=\\'w-full h-10 px-3 bg-white border border-gray-200 rounded-lg text-sm exp-c\\' placeholder=\\'Company\\'><input type=\\'text\\' class=\\'w-full h-10 px-3 bg-white border border-gray-200 rounded-lg text-sm exp-d\\' placeholder=\\'Date\\'><button type=\\'button\\' onclick=\\'this.parentElement.remove()\\' class=\\'absolute top-4 right-4 text-red-500 text-xs font-bold uppercase\\'>Remove</button></div>')" class="text-xs font-bold uppercase bg-gray-100 px-3 py-1 rounded-full">+ Add</button></div>
-                    <div id="res-exp-container" class="flex flex-col gap-4">${expRows}</div>
+                    <div class="flex justify-between items-center"><label class="label !mb-0">Experience</label><button type="button" onclick="addExpRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add Row</button></div>
+                    <div id="res-exp-container" class="flex flex-col gap-4">
+                        ${window.tempExps.map((e, i) => buildExpRowHtml(e.title, e.company, e.date)).join('')}
+                    </div>
                 </div>
 
-                <div class="flex flex-col gap-2 mt-8 p-6 border border-gray-200 rounded-2xl">
-                    <label class="text-xs font-bold text-gray-400 uppercase tracking-widest">Call To Action Box</label>
-                    <input type="text" id="res-cta-t" class="w-full h-12 px-4 bg-gray-50 border border-gray-200 rounded-xl text-sm mb-2" placeholder="Title" value="${data.ctaTitle || ''}">
-                    <textarea id="res-cta-tx" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm mb-2" placeholder="Text" rows="2">${data.ctaText || ''}</textarea>
-                    <input type="text" id="res-cta-b" class="w-full h-12 px-4 bg-gray-50 border border-gray-200 rounded-xl text-sm" placeholder="Button Label" value="${data.ctaBtn || ''}">
+                <div class="flex flex-col gap-2 mt-8 p-6 bg-gray-50 border border-gray-200 rounded-2xl">
+                    <label class="label">Call To Action Box</label>
+                    <input type="text" id="res-cta-t" class="input mb-2" placeholder="Title" value="${data.ctaTitle || ''}">
+                    <textarea id="res-cta-tx" class="input mb-2" placeholder="Text" rows="2">${data.ctaText || ''}</textarea>
+                    <input type="text" id="res-cta-b" class="input" placeholder="Button Label" value="${data.ctaBtn || ''}">
                 </div>
 
-                <button onclick="saveResumeConfig('${pageConfig.id}', ${post ? post.id : null}, '${post ? post.image_url : ''}')" id="btn-save-res" class="h-14 mt-8 rounded-full bg-black text-white font-bold text-sm uppercase tracking-widest hover:bg-gray-800 transition-colors w-full">Save Changes</button>
+                <button onclick="saveResumeConfig('${pageConfig.id}', ${post ? post.id : null}, '${post ? post.image_url : ''}')" id="btn-save-res" class="btn-dark w-full mt-8">Save Changes</button>
             `;
         }
 
-        // Dashboard: Contact Builder
         function renderDashContact(pageConfig) {
             const post = App.posts.find(p => p.author === pageConfig.id);
             return `
                 <div class="text-2xl font-bold tracking-tight border-b border-gray-100 pb-4">Editor: ${pageConfig.title}</div>
                 
                 <div class="flex flex-col gap-2">
-                    <label class="text-xs font-bold text-gray-400 uppercase tracking-widest">Cover Image</label>
+                    <label class="label">Cover Image</label>
                     <input type="file" id="cnt-img-upload" accept="image/*" class="hidden" onchange="uploadContactImage('${pageConfig.id}', ${post ? post.id : null})">
                     ${post && post.image_url ? `<img src="${post.image_url}" class="w-full h-48 object-cover rounded-xl border border-gray-200 cursor-pointer" onclick="document.getElementById('cnt-img-upload').click()">` : `<button onclick="document.getElementById('cnt-img-upload').click()" class="h-20 rounded-xl border-2 border-dashed border-gray-300 text-gray-500 font-bold text-xs uppercase tracking-widest hover:bg-gray-50 transition-colors w-full">+ Upload Cover</button>`}
                 </div>
 
                 <div class="flex flex-col gap-2 mt-4">
-                    <label class="text-xs font-bold text-gray-400 uppercase tracking-widest">Headline</label>
-                    <input type="text" id="cnt-title" class="w-full h-14 px-4 bg-gray-50 border border-gray-200 rounded-xl text-lg font-bold" value="${post ? post.title : ''}">
+                    <label class="label">Headline</label>
+                    <input type="text" id="cnt-title" class="input text-lg font-bold" placeholder="Hello." value="${post ? post.title : ''}">
                 </div>
 
                 <div class="flex flex-col gap-2 mt-4">
-                    <label class="text-xs font-bold text-gray-400 uppercase tracking-widest">Text Details</label>
-                    <textarea id="cnt-text" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm" rows="6">${post ? post.text : ''}</textarea>
+                    <label class="label">Contact Info</label>
+                    <textarea id="cnt-text" class="input" rows="6" placeholder="Email, links...">${post ? post.text : ''}</textarea>
                 </div>
 
-                <button onclick="saveContactConfig('${pageConfig.id}', ${post ? post.id : null}, '${post ? post.image_url : ''}')" id="btn-save-cnt" class="h-14 mt-8 rounded-full bg-black text-white font-bold text-sm uppercase tracking-widest hover:bg-gray-800 transition-colors w-full">Save Changes</button>
+                <button onclick="saveContactConfig('${pageConfig.id}', ${post ? post.id : null}, '${post ? post.image_url : ''}')" id="btn-save-cnt" class="btn-dark w-full mt-8">Save Changes</button>
             `;
         }
 
         // --- DASHBOARD ACTIONS ---
+        function navigate(id) { if(!id) return; App.route = id; App.isMenuOpen = false; render(); window.scrollTo(0,0); }
+        function toggleMenu() { App.isMenuOpen = !App.isMenuOpen; render(); }
         
+        function openLoginModal() {
+            App.isMenuOpen = false; render();
+            const root = document.getElementById('modal-root');
+            root.innerHTML = `
+                <div class="w-full max-w-sm bg-white border border-gray-200 rounded-2xl p-8 flex flex-col gap-6 shadow-2xl">
+                    <div class="text-xl font-bold text-center">Admin Access</div>
+                    <form onsubmit="handleLogin(event)" class="flex flex-col gap-4">
+                        <input type="password" id="admin-pass" class="input" placeholder="Password...">
+                        <label class="flex items-center gap-3 text-sm text-gray-600 font-bold cursor-pointer">
+                            <input type="checkbox" id="remember-login" class="w-5 h-5 rounded border-gray-300 text-black focus:ring-black"> Remember me
+                        </label>
+                        <div class="flex gap-4 mt-4">
+                            <button type="button" class="btn-light flex-1" onclick="closeModal()">Cancel</button>
+                            <button type="submit" id="login-btn" class="btn-dark flex-1">Login</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            root.classList.remove('hidden'); root.classList.add('flex');
+        }
+        function closeModal() { document.getElementById('modal-root').classList.add('hidden'); document.getElementById('modal-root').classList.remove('flex'); document.getElementById('modal-root').innerHTML = ''; }
+
+        async function handleLogin(e) {
+            e.preventDefault(); const pass = document.getElementById('admin-pass').value; const btn = document.getElementById('login-btn'); btn.innerText = 'Verifying...';
+            try {
+                const res = await fetch(`${API_URL}/verify`, { headers: { 'x-admin-password': pass } });
+                if (res.ok) {
+                    App.token = pass; if(document.getElementById('remember-login').checked) localStorage.setItem('mv_admin_key', pass);
+                    closeModal(); navigate('dashboard');
+                } else throw new Error();
+            } catch (err) { alert('Invalid password'); btn.innerText = 'Login'; }
+        }
+
+        function logout() { App.token = ""; localStorage.removeItem('mv_admin_key'); navigate(App.config.pages[0]?.id || 'grid'); }
+
+        // Settings / Pages Edit
         async function saveGlobalConfig() {
             const btn = document.getElementById('btn-save-cfg'); btn.innerText = "SAVING..."; btn.disabled = true;
             App.config.siteTitle = document.getElementById('cfg-title').value.trim();
             App.config.footerText = document.getElementById('cfg-footer').value.trim();
-            
-            const payload = { title: "", text: JSON.stringify(App.config), image_url: "", show_date: false, author: "_system_config" };
-            const method = App.configPostId ? "PUT" : "POST";
-            const url = App.configPostId ? `${API_URL}/posts/${App.configPostId}` : `${API_URL}/posts`;
-
-            try { await fetch(url, { method, headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify(payload) }); await init(); } 
+            const method = App.configPostId ? "PUT" : "POST"; const url = App.configPostId ? `${API_URL}/posts/${App.configPostId}` : `${API_URL}/posts`;
+            try { await fetch(url, { method, headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify({ title: "", text: JSON.stringify(App.config), image_url: "", show_date: false, author: "_system_config" }) }); await init(); } 
             catch(e) { btn.innerText = "Error. Retry."; btn.disabled = false; }
         }
 
@@ -473,89 +506,91 @@
             const type = document.getElementById('new-page-type').value;
             if(!id || !title) return alert('Fill ID and Title');
             if(App.config.pages.find(p => p.id === id)) return alert('Slug must be unique');
-            App.config.pages.push({id, title, type});
-            saveGlobalConfig();
+            App.config.pages.push({id, title, type}); saveGlobalConfig();
         }
 
-        function removePage(index) {
-            if(confirm("Remove this page from menu? Data will not be deleted, just unlinked.")) {
-                App.config.pages.splice(index, 1);
-                saveGlobalConfig();
-            }
-        }
+        function removePage(index) { if(confirm("Remove this page from menu?")) { App.config.pages.splice(index, 1); saveGlobalConfig(); } }
 
+        // Core Image Compressor
+        const compressImage = (f, max=1600, q=0.8) => new Promise(res => { const r=new FileReader(); r.readAsDataURL(f); r.onload=e=>{ const i=new Image(); i.src=e.target.result; i.onload=()=>{ const c=document.createElement('canvas'); let w=i.width, h=i.height; if(w>max){h=Math.round(h*max/w); w=max;} c.width=w; c.height=h; c.getContext('2d').drawImage(i,0,0,w,h); c.toBlob(b=>res(new File([b],f.name.replace(/\.[^/.]+$/,"")+".jpg",{type:'image/jpeg'})),'image/jpeg',q); };};});
+
+        // Gallery Edit
         async function uploadGalleryImage(authorSlug) {
             const file = document.getElementById('gal-upload').files[0]; if(!file) return;
             const btn = document.getElementById('btn-upload-gal'); btn.innerText = "UPLOADING..."; btn.disabled = true;
             try {
-                const formData = new FormData(); formData.append("file", await compressImage(file));
-                const finalImageUrl = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": App.token }, body: formData })).json()).image_url;
-                await fetch(`${API_URL}/posts`, { method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify({ title: "", text: "", image_url: finalImageUrl, show_date: true, author: authorSlug }) });
+                const f = new FormData(); f.append("file", await compressImage(file));
+                const finalImgUrl = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": App.token }, body: f })).json()).image_url;
+                await fetch(`${API_URL}/posts`, { method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify({ title: "", text: "", image_url: finalImgUrl, show_date: true, author: authorSlug }) });
                 await init();
             } catch(e) { btn.innerText = "+ Upload New Photo"; btn.disabled = false; }
         }
 
+        function confirmDelete(id) {
+            const root = document.getElementById('modal-root');
+            root.innerHTML = `
+                <div class="max-w-sm w-full bg-white border border-gray-200 rounded-2xl p-8 flex flex-col gap-6 items-center text-center shadow-2xl">
+                    <div class="text-2xl font-bold">Delete Item?</div>
+                    <p class="text-gray-500 text-sm">This cannot be undone.</p>
+                    <div id="m-actions" class="flex gap-4 w-full mt-2"><button class="btn-light flex-1" onclick="closeModal()">Cancel</button><button class="btn-danger flex-1" onclick="executeDelete(${id})">Delete</button></div>
+                    <div id="m-loading" class="btn-light w-full hidden border-dashed">Deleting...</div>
+                </div>`;
+            root.classList.remove('hidden'); root.classList.add('flex');
+        }
+
+        async function executeDelete(id) {
+            document.getElementById('m-actions').classList.add('hidden'); document.getElementById('m-loading').classList.remove('hidden'); document.getElementById('m-loading').classList.add('flex');
+            try { await fetch(`${API_URL}/posts/${id}`,{method:"DELETE",headers:{"x-admin-password":App.token}}); await init(); closeModal(); } catch(e){}
+        }
+
+        // Resume Edit
+        function buildExpRowHtml(t='', c='', d='') {
+            return `
+            <div class="flex flex-col gap-3 p-4 bg-white rounded-xl border border-gray-200 relative exp-row-item">
+                <input type="text" class="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm exp-t font-bold" placeholder="Job Title" value="${t}">
+                <input type="text" class="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm exp-c" placeholder="Company" value="${c}">
+                <input type="text" class="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm exp-d" placeholder="Date" value="${d}">
+                <button type="button" onclick="this.parentElement.remove()" class="absolute top-4 right-4 text-red-500 text-xs font-bold uppercase hover:text-red-700">Remove</button>
+            </div>`;
+        }
+        function addExpRowToDOM() { document.getElementById('res-exp-container').insertAdjacentHTML('beforeend', buildExpRowHtml()); }
+
         async function uploadResumeImage(authorSlug, postId) {
             const file = document.getElementById('res-img-upload').files[0]; if(!file) return;
             try {
-                const formData = new FormData(); formData.append("file", await compressImage(file));
-                const finalImageUrl = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": App.token }, body: formData })).json()).image_url;
-                saveResumeConfig(authorSlug, postId, finalImageUrl); // Auto save
+                const f = new FormData(); f.append("file", await compressImage(file));
+                const img = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": App.token }, body: f })).json()).image_url;
+                saveResumeConfig(authorSlug, postId, img);
             } catch(e) {}
         }
 
         async function saveResumeConfig(authorSlug, postId, imageUrl) {
             const btn = document.getElementById('btn-save-res'); if(btn) { btn.innerText = "SAVING..."; btn.disabled = true; }
-            const exps = [];
-            document.querySelectorAll('.exp-row-item').forEach(el => { exps.push({ title: el.querySelector('.exp-t').value, company: el.querySelector('.exp-c').value, date: el.querySelector('.exp-d').value }); });
-            
-            const data = { v: 2, intro: document.getElementById('res-intro').value, approach: document.getElementById('res-approach').value, exps: exps, ctaTitle: document.getElementById('res-cta-t').value, ctaText: document.getElementById('res-cta-tx').value, ctaBtn: document.getElementById('res-cta-b').value };
-            
-            const payload = { title: "", text: JSON.stringify(data), image_url: imageUrl || "", show_date: false, author: authorSlug };
+            const exps = []; document.querySelectorAll('.exp-row-item').forEach(el => { exps.push({ title: el.querySelector('.exp-t').value, company: el.querySelector('.exp-c').value, date: el.querySelector('.exp-d').value }); });
+            const data = { v: 2, intro: document.getElementById('res-intro').value, approach: document.getElementById('res-approach').value, exps, ctaTitle: document.getElementById('res-cta-t').value, ctaText: document.getElementById('res-cta-tx').value, ctaBtn: document.getElementById('res-cta-b').value };
             const method = postId ? "PUT" : "POST"; const url = postId ? `${API_URL}/posts/${postId}` : `${API_URL}/posts`;
-            try { await fetch(url, { method, headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify(payload) }); await init(); } 
+            try { await fetch(url, { method, headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify({ title: "", text: JSON.stringify(data), image_url: imageUrl || "", show_date: false, author: authorSlug }) }); await init(); } 
             catch(e) { if(btn){btn.innerText = "Save Changes"; btn.disabled = false;} }
         }
 
+        // Contact Edit
         async function uploadContactImage(authorSlug, postId) {
             const file = document.getElementById('cnt-img-upload').files[0]; if(!file) return;
             try {
-                const formData = new FormData(); formData.append("file", await compressImage(file));
-                const finalImageUrl = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": App.token }, body: formData })).json()).image_url;
-                saveContactConfig(authorSlug, postId, finalImageUrl);
+                const f = new FormData(); f.append("file", await compressImage(file));
+                const img = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": App.token }, body: f })).json()).image_url;
+                saveContactConfig(authorSlug, postId, img);
             } catch(e) {}
         }
 
         async function saveContactConfig(authorSlug, postId, imageUrl) {
             const btn = document.getElementById('btn-save-cnt'); if(btn) { btn.innerText = "SAVING..."; btn.disabled = true; }
-            const title = document.getElementById('cnt-title').value;
-            const text = document.getElementById('cnt-text').value;
-            const payload = { title: title, text: text, image_url: imageUrl || "", show_date: false, author: authorSlug };
             const method = postId ? "PUT" : "POST"; const url = postId ? `${API_URL}/posts/${postId}` : `${API_URL}/posts`;
-            try { await fetch(url, { method, headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify(payload) }); await init(); } 
+            try { await fetch(url, { method, headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify({ title: document.getElementById('cnt-title').value, text: document.getElementById('cnt-text').value, image_url: imageUrl || "", show_date: false, author: authorSlug }) }); await init(); } 
             catch(e) { if(btn){btn.innerText = "Save Changes"; btn.disabled = false;} }
         }
 
-        // --- GLOBAL ACTIONS ---
-        function navigate(id) { if(!id) return; App.route = id; closeMenu(); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        
-        function openLoginModal() { closeMenu(); document.getElementById('modal-root').innerHTML = `<div class="w-full max-w-sm bg-white border border-gray-200 rounded-2xl p-8 flex flex-col gap-4 shadow-2xl"><div class="text-xl font-bold">Admin Access</div><form onsubmit="handleLogin(event)" class="flex flex-col gap-4"><input type="password" id="admin-pass" class="input" placeholder="Password..."><label class="flex items-center gap-3 text-sm text-gray-500"><input type="checkbox" id="remember-login" class="w-4 h-4 rounded border-gray-300"> Remember me</label><div class="flex gap-3 mt-2"><button type="button" class="btn-light flex-1" onclick="closeModalRoot()">Cancel</button><button type="submit" id="login-btn" class="btn-dark flex-1">Login</button></div></form></div>`; document.getElementById('modal-root').classList.remove('hidden'); document.getElementById('modal-root').classList.add('flex'); }
-        function closeModalRoot() { document.getElementById('modal-root').classList.add('hidden'); document.getElementById('modal-root').classList.remove('flex'); document.getElementById('modal-root').innerHTML = ''; }
-
-        function confirmDelete(id) {
-            deleteActionType = id;
-            document.getElementById('modal-root').innerHTML = `<div class="max-w-sm w-full bg-white border border-gray-200 rounded-2xl p-8 flex flex-col gap-6 items-center text-center shadow-2xl"><div class="text-2xl font-bold">Are you sure?</div><p class="text-gray-500">This action cannot be undone.</p><div id="m-actions" class="flex gap-4 w-full mt-2"><button class="btn-light flex-1" onclick="closeModalRoot()">Cancel</button><button class="btn-danger flex-1" onclick="executeDelete()">Delete</button></div><div id="m-loading" class="btn-light w-full hidden border-dashed">Deleting...</div></div>`;
-            document.getElementById('modal-root').classList.remove('hidden'); document.getElementById('modal-root').classList.add('flex');
-        }
-
-        async function executeDelete() {
-            document.getElementById('m-actions').classList.add('hidden'); document.getElementById('m-loading').classList.remove('hidden'); document.getElementById('m-loading').classList.add('flex');
-            try { await fetch(`${API_URL}/posts/${deleteActionType}`,{method:"DELETE",headers:{"x-admin-password":App.token}}); await init(); closeModalRoot(); } catch(e){}
-        }
-
-        const compressImage = (f, max=1600, q=0.8) => new Promise(res => { const r=new FileReader(); r.readAsDataURL(f); r.onload=e=>{ const i=new Image(); i.src=e.target.result; i.onload=()=>{ const c=document.createElement('canvas'); let w=i.width, h=i.height; if(w>max){h=Math.round(h*max/w); w=max;} c.width=w; c.height=h; c.getContext('2d').drawImage(i,0,0,w,h); c.toBlob(b=>res(new File([b],f.name.replace(/\.[^/.]+$/,"")+".jpg",{type:'image/jpeg'})),'image/jpeg',q); };};});
-
-        // Start App
+        // RUN
         init();
     </script>
 </body>
