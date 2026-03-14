@@ -63,11 +63,9 @@
             min-height: 100vh;
         }
 
-        .form-input, .admin-bar-item {
-            line-height: 1;
-        }
+        .form-input { line-height: 1; }
 
-        header, .nav-overlay, .status-confirm-overlay, #delete-modal {
+        header, .nav-overlay, #delete-modal {
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
         }
@@ -134,7 +132,7 @@
             flex-grow: 1; display: flex; flex-direction: column; align-items: center; 
         }
 
-        /* 🛠️ Nové CSS pre Dashboard */
+        /* DASHBOARD CSS */
         #section-dashboard { display: none; width: 100%; flex-direction: column; gap: var(--gap-item); }
         .dash-header { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
         .dash-title { font-size: 2.5rem; font-weight: 700; line-height: 1.1; }
@@ -162,6 +160,7 @@
         .form-section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
         .form-label { font-size: 0.875rem; color: var(--grey-50); text-transform: uppercase; margin-bottom: 0.25rem; display: block; }
 
+        /* PUBLIC SECTIONS CSS */
         #section-feed, #section-about, #section-contact { display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; }
         
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
@@ -197,9 +196,9 @@
         .btn-danger { background-color: #ff3333 !important; color: #000000 !important; border: none !important; }
         .btn-loading { background-color: var(--divider) !important; color: var(--grey-50) !important; border: none !important; pointer-events: none !important; opacity: 1 !important; }
         .btn-ghost { background-color: var(--divider) !important; color: var(--black) !important; border: none !important; pointer-events: none !important; opacity: 1 !important; }
+        .btn-outline { background-color: transparent !important; color: var(--black) !important; border: 1px solid var(--divider) !important; }
 
         .input-error { border: 1px solid var(--black) !important; }
-        .input-error span { color: var(--black) !important; }
 
         .thumbnail-container { width: 4rem; height: 4rem; flex-shrink: 0; border-radius: 0.5rem; overflow: hidden; background-color: var(--divider); cursor: pointer; position: relative; }
         .thumbnail-img { width: 100%; height: 100%; object-fit: cover; }
@@ -209,7 +208,7 @@
         .custom-checkbox:checked { background-color: var(--black); border-color: var(--black); } 
         .custom-checkbox:checked::before { opacity: 1; }
 
-        .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; text-align: center; width: 100%; }
+        .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; text-align: center; width: 100%; margin-top: 1rem; }
 
         #delete-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3000; display: none; flex-direction: column; justify-content: center; align-items: center; background: transparent; }
         #delete-modal::before { content: ""; position: absolute; inset: 0; background: rgba(var(--glass-rgb), var(--glass-opacity)); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); z-index: -1; }
@@ -289,7 +288,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.3.0 • 2026</div>
+            <div class="footer-info">build v7.3.1 • 2026</div>
         </div>
     </nav>
 
@@ -315,18 +314,18 @@
                 <form id="editor-form-feed" onsubmit="handleFeedSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0; background: var(--divider); padding: 1.5rem; border-radius: 1.5rem;">
                     <div class="form-section-title" style="margin: 0;">Create New Post</div>
                     <input type="file" id="edit-image-feed" accept="image/*" style="display: none;" onchange="updateFeedFormState()">
-                    <div id="upload-empty-state-feed" class="submit-btn btn-outline" style="width: 100%; background: transparent;" onclick="document.getElementById('edit-image-feed').click()">
+                    <div id="upload-empty-state-feed" class="submit-btn btn-outline" style="width: 100%;" onclick="document.getElementById('edit-image-feed').click()">
                         + SELECT IMAGE
                     </div>
                     <div id="upload-filled-state-feed" class="action-row" style="display: none;">
                         <div class="thumbnail-container" style="width:4rem;height:4rem;" onclick="document.getElementById('edit-image-feed').click()">
                             <img id="upload-preview-img-feed" class="thumbnail-img" src="" alt="">
                         </div>
-                        <div class="submit-btn btn-outline" style="flex-grow: 1; background: transparent;" onclick="clearFeedImageSelection(event)">REMOVE</div>
+                        <div class="submit-btn btn-outline" style="flex-grow: 1;" onclick="clearFeedImageSelection(event)">REMOVE</div>
                     </div>
                     <div class="action-row" style="padding: 0;">
                         <button type="submit" id="publish-btn-feed" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>PUBLISH</button>
-                        <div class="submit-btn btn-outline" style="background: transparent;" onclick="document.getElementById('editor-form-feed').style.display='none'; document.querySelector('#dash-tab-posts > button').style.display='flex'; resetFeedForm();">CANCEL</div>
+                        <div class="submit-btn btn-outline" onclick="document.getElementById('editor-form-feed').style.display='none'; document.querySelector('#dash-tab-posts > button').style.display='flex'; resetFeedForm();">CANCEL</div>
                     </div>
                 </form>
 
@@ -351,10 +350,10 @@
                         <div>
                             <span class="form-label">1. Main Cover Image</span>
                             <input type="file" id="edit-image-about" accept="image/*" style="display: none;" onchange="updateAboutFormState()">
-                            <div id="upload-empty-state-about" class="submit-btn btn-outline" style="width: 100%; background: transparent;" onclick="document.getElementById('edit-image-about').click()">+ SELECT IMAGE</div>
+                            <div id="upload-empty-state-about" class="submit-btn btn-outline" style="width: 100%;" onclick="document.getElementById('edit-image-about').click()">+ SELECT IMAGE</div>
                             <div id="upload-filled-state-about" class="action-row" style="display: none;">
                                 <div class="thumbnail-container" style="width: 4rem; height: 4rem;" onclick="document.getElementById('edit-image-about').click()"><img id="upload-preview-img-about" class="thumbnail-img" src="" alt=""></div>
-                                <div class="submit-btn btn-outline" style="flex-grow: 1; background: transparent;" onclick="clearAboutImageSelection(event)">REMOVE</div>
+                                <div class="submit-btn btn-outline" style="flex-grow: 1;" onclick="clearAboutImageSelection(event)">REMOVE</div>
                             </div>
                         </div>
 
@@ -367,7 +366,7 @@
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                                 <span class="form-label" style="margin:0;">3. Experience</span>
-                                <button type="button" class="submit-btn btn-outline" style="height: 2rem; font-size: 0.75rem; padding: 0 0.75rem; background: transparent;" onclick="addExperienceRow()">+ ADD ROW</button>
+                                <button type="button" class="submit-btn btn-outline" style="height: 2rem; font-size: 0.75rem; padding: 0 0.75rem;" onclick="addExperienceRow()">+ ADD ROW</button>
                             </div>
                             <div id="about-exp-list" style="display: flex; flex-direction: column; gap: 1rem;"></div>
                         </div>
@@ -381,7 +380,6 @@
 
                         <div class="action-row" style="padding: 0; margin-top: 1rem;">
                             <button type="submit" id="publish-btn-about" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>SAVE CHANGES</button>
-                            <button type="button" class="submit-btn btn-danger" style="flex-grow: 0;" onclick="handleDeleteDashPost(editingAboutPostId)">DELETE</button>
                         </div>
                     </form>
                 </div>
@@ -395,10 +393,10 @@
                         <div>
                             <span class="form-label">Cover Image</span>
                             <input type="file" id="edit-image-contact" accept="image/*" style="display: none;" onchange="updateContactFormState()">
-                            <div id="upload-empty-state-contact" class="submit-btn btn-outline" style="width: 100%; background: transparent;" onclick="document.getElementById('edit-image-contact').click()">+ SELECT IMAGE</div>
+                            <div id="upload-empty-state-contact" class="submit-btn btn-outline" style="width: 100%;" onclick="document.getElementById('edit-image-contact').click()">+ SELECT IMAGE</div>
                             <div id="upload-filled-state-contact" class="action-row" style="display: none;">
                                 <div class="thumbnail-container" style="width: 4rem; height: 4rem;" onclick="document.getElementById('edit-image-contact').click()"><img id="upload-preview-img-contact" class="thumbnail-img" src="" alt=""></div>
-                                <div class="submit-btn btn-outline" style="flex-grow: 1; background: transparent;" onclick="clearContactImageSelection(event)">REMOVE</div>
+                                <div class="submit-btn btn-outline" style="flex-grow: 1;" onclick="clearContactImageSelection(event)">REMOVE</div>
                             </div>
                         </div>
 
@@ -410,7 +408,6 @@
 
                         <div class="action-row" style="padding: 0; margin-top: 1rem;">
                             <button type="submit" id="publish-btn-contact" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>SAVE CHANGES</button>
-                            <button type="button" class="submit-btn btn-danger" style="flex-grow: 0;" onclick="handleDeleteDashPost(editingContactPostId)">DELETE</button>
                         </div>
                     </form>
                 </div>
@@ -429,10 +426,10 @@
                         <div>
                             <span class="form-label">Profile Image / Avatar</span>
                             <input type="file" id="setting-image" accept="image/*" style="display: none;" onchange="updateSettingsFormState()">
-                            <div id="upload-empty-state-setting" class="submit-btn btn-outline" style="width: 100%; background: transparent;" onclick="document.getElementById('setting-image').click()">+ UPLOAD AVATAR</div>
+                            <div id="upload-empty-state-setting" class="submit-btn btn-outline" style="width: 100%;" onclick="document.getElementById('setting-image').click()">+ UPLOAD AVATAR</div>
                             <div id="upload-filled-state-setting" class="action-row" style="display: none; align-items: center; justify-content: flex-start;">
                                 <img id="upload-preview-img-setting" src="" alt="" style="width: 4rem; height: 4rem; border-radius: 50%; object-fit: cover; background: var(--divider); cursor: pointer;" onclick="document.getElementById('setting-image').click()">
-                                <button type="button" class="submit-btn btn-outline" style="background: transparent; height: 2.5rem;" onclick="clearSettingImageSelection(event)">REMOVE</button>
+                                <button type="button" class="submit-btn btn-outline" style="height: 2.5rem;" onclick="clearSettingImageSelection(event)">REMOVE</button>
                             </div>
                         </div>
 
@@ -448,19 +445,19 @@
         <div id="section-feed">
             <div id="status-container" class="status-feed view-grid"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.3.0 • 2026</div>
+            <div class="footer-info">build v7.3.1 • 2026</div>
         </div>
 
-        <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
+        <div id="section-about" style="display: none; width: 100%; flex-direction: column;">
             <div id="about-posts-container" style="display: flex; flex-direction: column; width: 100%;"></div>
             <div class="divider-line" style="margin-top: 2rem;"></div>
-            <div class="footer-info">build v7.3.0 • 2026</div>
+            <div class="footer-info">build v7.3.1 • 2026</div>
         </div>
 
-        <div id="section-contact" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
+        <div id="section-contact" style="display: none; width: 100%; flex-direction: column;">
             <div id="contact-posts-container" style="display: flex; flex-direction: column; width: 100%;"></div>
             <div class="divider-line" style="margin-top: 2rem;"></div>
-            <div class="footer-info">build v7.3.0 • 2026</div>
+            <div class="footer-info">build v7.3.1 • 2026</div>
         </div>
         
         <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
@@ -468,7 +465,7 @@
 
     <div id="delete-modal">
         <div id="modal-action-zone" class="action-row">
-            <button id="modal-del-btn" class="submit-btn" onclick="executeModalDelete()">DELETE</button>
+            <button id="modal-del-btn" class="submit-btn btn-danger" onclick="executeModalDelete()">DELETE</button>
             <button id="modal-cancel-btn" class="submit-btn btn-tonal" onclick="closeDeleteModal()">CANCEL</button>
         </div>
         <div id="modal-loading-zone" class="action-row" style="display: none;">
@@ -512,7 +509,7 @@
 
         function autoResizeTextarea(el) { el.style.height = 'auto'; if(el.value.trim() === '') el.style.height = ''; else el.style.height = el.scrollHeight + 'px'; }
 
-        // 🛠️ Navigácia
+        // ROUTING
         function hideAllSections() {
             document.getElementById('section-feed').style.display = 'none';
             document.getElementById('section-about').style.display = 'none';
@@ -584,7 +581,7 @@
                         updateUIVisibility(); closeMenu(); fetchStatuses(true); passInput.value = ''; 
                         if (rememberMe) localStorage.setItem('mv_admin_key', secretKey); else localStorage.removeItem('mv_admin_key');
                         loginBtn.innerText = 'LOGIN'; loginBtn.classList.remove('btn-ghost');
-                        showDashboard(); // Auto-redirect to dashboard
+                        showDashboard();
                     }, 1000);
                 } else { 
                     passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; 
@@ -609,11 +606,10 @@
             updateUIVisibility(); closeMenu(); fetchStatuses(true);
         }
 
-        // 🛠️ CMS DASHBOARD LOGIC
+        // CMS DASHBOARD FILLER
         function populateDashboard() {
             if (!secretKey) return;
             
-            // 1. Fill Posts Table
             const feedPosts = globalPosts.filter(p => p.author === '');
             const listEl = document.getElementById('dash-posts-list');
             let tableHtml = '';
@@ -641,7 +637,6 @@
             }
             listEl.innerHTML = tableHtml;
 
-            // 2. Fill About Form
             const aboutP = globalPosts.find(p => p.author === 'about');
             editingAboutPostId = aboutP ? aboutP.id : null;
             existingAboutImageUrl = aboutP ? aboutP.image_url : null;
@@ -664,7 +659,6 @@
             }
             updateAboutFormState();
 
-            // 3. Fill Contact Form
             const contP = globalPosts.find(p => p.author === 'contact');
             editingContactPostId = contP ? contP.id : null;
             existingContactImageUrl = contP ? contP.image_url : null;
@@ -672,7 +666,6 @@
             document.getElementById('edit-text-contact').value = contP ? (contP.text || "") : "";
             updateContactFormState();
 
-            // 4. Fill Settings Form
             const setP = globalPosts.find(p => p.author === 'settings');
             editingSettingsPostId = setP ? setP.id : null;
             existingSettingsImageUrl = setP ? setP.image_url : null;
@@ -695,8 +688,45 @@
             document.title = sTitle;
         }
 
-        // PUBLIC VIEWS RENDERERS
-        function toggleViewMode() { const newMode = currentViewMode === 'feed' ? 'grid' : 'feed'; currentViewMode = newMode; localStorage.setItem('mv_view_mode', newMode); refreshFeedUI(globalPosts.filter(p => p.author === '')); }
+        // PUBLIC RENDERERS (100% Čisté od edit tlačidiel)
+        function refreshFeedUI(feedPosts) { 
+            const container = document.getElementById('status-container');
+            if (feedPosts.length === 0) {
+                container.className = 'status-feed view-feed';
+                container.innerHTML = `<div class="divider-line"></div><div class="submit-btn btn-tonal-disabled" style="width: 100%; cursor: default;">NOTHING HERE YET.</div>`;
+                return;
+            }
+
+            if (currentViewMode === 'feed') {
+                container.className = 'status-feed view-feed';
+                let html = `<div class="feed-toggle-wrapper"><button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">GRID VIEW</button></div>`;
+                feedPosts.forEach(post => { html += renderSinglePost(post); });
+                container.innerHTML = html;
+            } else {
+                container.className = 'status-feed view-grid';
+                let html = '';
+                
+                if (currentGridCols === 3) {
+                    let leftCol = '<div class="masonry-col col-left">'; let midCol = '<div class="masonry-col col-mid">'; let rightCol = '<div class="masonry-col col-right">';
+                    midCol += `<button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">FEED VIEW</button>`;
+                    feedPosts.forEach((post, index) => {
+                        if (index % 3 === 0) leftCol += renderSinglePost(post);
+                        else if (index % 3 === 1) midCol += renderSinglePost(post);
+                        else rightCol += renderSinglePost(post);
+                    });
+                    html += `<div class="grid-columns-wrapper">${leftCol}</div>${midCol}</div>${rightCol}</div></div>`;
+                } else {
+                    let leftCol = '<div class="masonry-col col-left">'; let rightCol = '<div class="masonry-col col-right">';
+                    rightCol += `<button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">FEED VIEW</button>`;
+                    feedPosts.forEach((post, index) => {
+                        if (index % 2 === 0) leftCol += renderSinglePost(post);
+                        else rightCol += renderSinglePost(post);
+                    });
+                    html += `<div class="grid-columns-wrapper">${leftCol}</div>${rightCol}</div></div>`;
+                }
+                container.innerHTML = html;
+            }
+        }
 
         function renderSinglePost(s) {
             const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
@@ -733,10 +763,9 @@
         }
 
         function getContactPostHtml(p) {
-            return `<div style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item);"><div class="status-card" style="gap: var(--gap-item);">${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2; font-weight: bold;">${p.title}</div>` : ''}${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}</div></div>`;
+            return `<div style="display: flex; flex-direction: column; width: 100%;"><div class="status-card" style="gap: var(--gap-item);">${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2; font-weight: bold;">${p.title}</div>` : ''}${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}</div></div>`;
         }
 
-        // COMPRESS
         function compressImage(file, maxWidth = 1200, quality = 0.8) {
             return new Promise((resolve) => {
                 const reader = new FileReader(); reader.readAsDataURL(file);
@@ -753,7 +782,6 @@
             });
         }
 
-        // FETCH
         async function fetchStatuses(reset = false) {
             if (reset) { currentOffset = 0; hasMorePosts = true; globalPosts = []; document.getElementById('status-container').innerHTML = ''; }
             if (isLoading || !hasMorePosts) return;
@@ -777,7 +805,6 @@
                     if (currentViewMode === 'feed') {
                         document.getElementById('status-container').insertAdjacentHTML('beforeend', newFeedPosts.map(p => renderSinglePost(p)).join(''));
                     } else {
-                        // Grid layout append logic (simplified for snippet size)
                         refreshFeedUI(feedPosts); 
                     }
                 }
@@ -791,10 +818,17 @@
         }
         window.addEventListener('scroll', () => { if (currentSection === 'feed' && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
 
-        // FEED FORM (Dashboard)
+        function handleImageClick(id) {
+            if (currentViewMode === 'grid') {
+                currentViewMode = 'feed'; localStorage.setItem('mv_view_mode', 'feed');
+                refreshFeedUI(globalPosts.filter(p => p.author === ''));
+                setTimeout(() => document.getElementById(`post-img-${id}`)?.closest('.status-card').scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+            }
+        }
+
+        // CMS DASHBOARD FORMS SUBMITS
         function updateFeedFormState() {
-            const input = document.getElementById('edit-image-feed');
-            const hasImage = (input && input.files && input.files.length > 0);
+            const input = document.getElementById('edit-image-feed'); const hasImage = (input && input.files && input.files.length > 0);
             document.getElementById('upload-empty-state-feed').style.display = hasImage ? 'none' : 'flex';
             document.getElementById('upload-filled-state-feed').style.display = hasImage ? 'flex' : 'none';
             if(hasImage) document.getElementById('upload-preview-img-feed').src = URL.createObjectURL(input.files[0]);
@@ -807,8 +841,7 @@
             e.preventDefault(); const imageFile = document.getElementById('edit-image-feed').files[0]; if (!imageFile) return;
             const btn = document.getElementById('publish-btn-feed'); btn.innerText = "UPLOADING..."; btn.className = "submit-btn btn-loading";
             try {
-                const compressedFile = await compressImage(imageFile);
-                const formData = new FormData(); formData.append("file", compressedFile);
+                const compressedFile = await compressImage(imageFile); const formData = new FormData(); formData.append("file", compressedFile);
                 const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
                 const finalImageUrl = (await upRes.json()).image_url;
                 await fetch(`${API_URL}/posts`, { method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify({ title: "", text: "", image_url: finalImageUrl, show_date: true, author: "" }) });
@@ -816,7 +849,6 @@
             } catch (err) { btn.innerText = "PUBLISH"; btn.className = "submit-btn"; }
         }
 
-        // ABOUT FORM (Dashboard)
         function addExperienceRow(title = '', company = '', date = '') {
             const container = document.getElementById('about-exp-list');
             const row = document.createElement('div'); row.className = 'about-exp-row';
@@ -825,13 +857,11 @@
             container.appendChild(row); updateAboutFormState();
         }
         function updateAboutFormState() {
-            const input = document.getElementById('edit-image-about');
-            const hasImage = (input && input.files && input.files.length > 0) || existingAboutImageUrl;
+            const input = document.getElementById('edit-image-about'); const hasImage = (input && input.files && input.files.length > 0) || existingAboutImageUrl;
             document.getElementById('upload-empty-state-about').style.display = hasImage ? 'none' : 'flex';
             document.getElementById('upload-filled-state-about').style.display = hasImage ? 'flex' : 'none';
-            if(input && input.files && input.files.length > 0) document.getElementById('upload-preview-img-about').src = URL.createObjectURL(input.files[0]);
-            else if(existingAboutImageUrl) document.getElementById('upload-preview-img-about').src = existingAboutImageUrl;
-            const btn = document.getElementById('publish-btn-about'); btn.disabled = false; btn.className = "submit-btn";
+            if(input && input.files && input.files.length > 0) document.getElementById('upload-preview-img-about').src = URL.createObjectURL(input.files[0]); else if(existingAboutImageUrl) document.getElementById('upload-preview-img-about').src = existingAboutImageUrl;
+            document.getElementById('publish-btn-about').disabled = false; document.getElementById('publish-btn-about').className = "submit-btn";
         }
         function clearAboutImageSelection(e) { e.stopPropagation(); document.getElementById('edit-image-about').value = ""; existingAboutImageUrl = null; updateAboutFormState(); }
         async function handleAboutSubmit(e) { 
@@ -855,15 +885,12 @@
             } catch (err) { btn.innerText = "SAVE CHANGES"; btn.className = "submit-btn"; }
         }
 
-        // CONTACT FORM (Dashboard)
         function updateContactFormState() {
-            const input = document.getElementById('edit-image-contact');
-            const hasImage = (input && input.files && input.files.length > 0) || existingContactImageUrl;
+            const input = document.getElementById('edit-image-contact'); const hasImage = (input && input.files && input.files.length > 0) || existingContactImageUrl;
             document.getElementById('upload-empty-state-contact').style.display = hasImage ? 'none' : 'flex';
             document.getElementById('upload-filled-state-contact').style.display = hasImage ? 'flex' : 'none';
-            if(input && input.files && input.files.length > 0) document.getElementById('upload-preview-img-contact').src = URL.createObjectURL(input.files[0]);
-            else if(existingContactImageUrl) document.getElementById('upload-preview-img-contact').src = existingContactImageUrl;
-            const btn = document.getElementById('publish-btn-contact'); btn.disabled = false; btn.className = "submit-btn";
+            if(input && input.files && input.files.length > 0) document.getElementById('upload-preview-img-contact').src = URL.createObjectURL(input.files[0]); else if(existingContactImageUrl) document.getElementById('upload-preview-img-contact').src = existingContactImageUrl;
+            document.getElementById('publish-btn-contact').disabled = false; document.getElementById('publish-btn-contact').className = "submit-btn";
         }
         function clearContactImageSelection(e) { e.stopPropagation(); document.getElementById('edit-image-contact').value = ""; existingContactImageUrl = null; updateContactFormState(); }
         async function handleContactSubmit(e) { 
@@ -884,21 +911,17 @@
             } catch (err) { btn.innerText = "SAVE CHANGES"; btn.className = "submit-btn"; }
         }
 
-        // SETTINGS FORM (Dashboard)
         function updateSettingsFormState() {
-            const input = document.getElementById('setting-image');
-            const hasImage = (input && input.files && input.files.length > 0) || existingSettingsImageUrl;
+            const input = document.getElementById('setting-image'); const hasImage = (input && input.files && input.files.length > 0) || existingSettingsImageUrl;
             document.getElementById('upload-empty-state-setting').style.display = hasImage ? 'none' : 'flex';
             document.getElementById('upload-filled-state-setting').style.display = hasImage ? 'flex' : 'none';
-            if(input && input.files && input.files.length > 0) document.getElementById('upload-preview-img-setting').src = URL.createObjectURL(input.files[0]);
-            else if(existingSettingsImageUrl) document.getElementById('upload-preview-img-setting').src = existingSettingsImageUrl;
-            const btn = document.getElementById('publish-btn-settings'); btn.disabled = false; btn.className = "submit-btn";
+            if(input && input.files && input.files.length > 0) document.getElementById('upload-preview-img-setting').src = URL.createObjectURL(input.files[0]); else if(existingSettingsImageUrl) document.getElementById('upload-preview-img-setting').src = existingSettingsImageUrl;
+            document.getElementById('publish-btn-settings').disabled = false; document.getElementById('publish-btn-settings').className = "submit-btn";
         }
         function clearSettingImageSelection(e) { e.stopPropagation(); document.getElementById('setting-image').value = ""; existingSettingsImageUrl = null; updateSettingsFormState(); }
         async function handleSettingsSubmit(e) {
             e.preventDefault();
-            const title = document.getElementById('setting-title').value.trim();
-            const imageFile = document.getElementById('setting-image').files[0];
+            const title = document.getElementById('setting-title').value.trim(); const imageFile = document.getElementById('setting-image').files[0];
             const btn = document.getElementById('publish-btn-settings'); btn.innerText = "SAVING..."; btn.className = "submit-btn btn-loading";
             try {
                 let finalImageUrl = existingSettingsImageUrl;
@@ -906,18 +929,15 @@
                     const compressedFile = await compressImage(imageFile); const formData = new FormData(); formData.append("file", compressedFile);
                     finalImageUrl = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData })).json()).image_url;
                 }
-                const jsonPayload = { title };
-                const payload = { title: "", text: JSON.stringify(jsonPayload), image_url: finalImageUrl || "", show_date: false, author: "settings" };
+                const jsonPayload = { title }; const payload = { title: "", text: JSON.stringify(jsonPayload), image_url: finalImageUrl || "", show_date: false, author: "settings" };
                 const method = editingSettingsPostId ? "PUT" : "POST"; const url = editingSettingsPostId ? `${API_URL}/posts/${editingSettingsPostId}` : `${API_URL}/posts`;
                 await fetch(url, { method: method, headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify(payload) });
                 fetchStatuses(true); btn.innerText = "SAVE SETTINGS"; btn.className = "submit-btn";
             } catch (err) { btn.innerText = "SAVE SETTINGS"; btn.className = "submit-btn"; }
         }
 
-        // DELETION MODALS
         function openDeleteModal(type) { deleteActionType = type; document.getElementById('delete-modal').style.display = 'flex'; document.getElementById('modal-action-zone').style.display = 'flex'; document.getElementById('modal-loading-zone').style.display = 'none'; document.getElementById('modal-success-zone').style.display = 'none'; }
         function closeDeleteModal() { document.getElementById('delete-modal').style.display = 'none'; deleteActionType = null; }
-        
         async function executeModalDelete() {
             document.getElementById('modal-action-zone').style.display = 'none'; document.getElementById('modal-loading-zone').style.display = 'flex';
             if (deleteActionType === 'delete_all') {
@@ -927,7 +947,6 @@
             document.getElementById('modal-loading-zone').style.display = 'none'; document.getElementById('modal-success-zone').style.display = 'flex';
             setTimeout(() => { fetchStatuses(true); closeDeleteModal(); }, 1000);
         }
-        function handleDeleteDashPost(id) { if(id) openDeleteModal(id); }
 
         checkRememberedLogin(); fetchStatuses(true);
         document.addEventListener('click', (e) => { if (!navOverlay.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); });
