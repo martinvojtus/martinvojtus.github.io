@@ -19,6 +19,7 @@
             --white: #ffffff;
             --grey-50: rgba(0, 0, 0, 0.5);
             --divider: rgba(0, 0, 0, 0.1);
+            --divider-hover: rgba(0, 0, 0, 0.05);
             
             --glass-rgb: 255, 255, 255; 
             --content-width: 720px; 
@@ -37,6 +38,7 @@
                 --white: #000000;       
                 --grey-50: rgba(255, 255, 255, 0.5); 
                 --divider: rgba(255, 255, 255, 0.1); 
+                --divider-hover: rgba(255, 255, 255, 0.05);
                 --glass-rgb: 0, 0, 0;   
             }
         }
@@ -101,7 +103,6 @@
 
         .desktop-menu { display: none; }
         .desktop-link { font-size: var(--size-small); color: var(--black); cursor: pointer; }
-        
         .desktop-divider { width: 1px; height: 1rem; background-color: var(--divider); }
 
         @media (min-width: 600px) {
@@ -123,14 +124,9 @@
         
         .menu-items { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); }
 
-        .menu-nav-link {
-            font-size: var(--size-small);
-            color: var(--black);
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-            display: block;
-        }
+        .menu-nav-link { font-size: var(--size-small); color: var(--black); cursor: pointer; width: 100%; text-align: left; display: block; }
+        .admin-only { display: none; }
+        body.is-logged-in .admin-only { display: block !important; }
 
         main {
             padding: calc(3rem + var(--gap-item)) var(--gap-item) var(--gap-item); 
@@ -138,230 +134,95 @@
             flex-grow: 1; display: flex; flex-direction: column; align-items: center; 
         }
 
-        #section-feed { display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; }
+        /* 🛠️ Nové CSS pre Dashboard */
+        #section-dashboard { display: none; width: 100%; flex-direction: column; gap: var(--gap-item); }
+        .dash-header { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+        .dash-title { font-size: 2.5rem; font-weight: 700; line-height: 1.1; }
+        .dash-subtitle { font-size: 1rem; color: var(--grey-50); }
+        
+        .dash-tabs { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem; border-bottom: 1px solid var(--divider); margin-bottom: 1rem; }
+        .dash-tab { padding: 0.75rem 1.5rem; border-radius: var(--border-radius); font-size: 1rem; font-weight: 700; cursor: pointer; border: none; background: transparent; color: var(--grey-50); transition: all 0.2s; white-space: nowrap; }
+        .dash-tab.active { background: var(--black); color: var(--white); }
+
+        .dash-card { background: transparent; border: 1px solid var(--divider); border-radius: 1.5rem; padding: 1.5rem; width: 100%; display: flex; flex-direction: column; gap: 1rem; }
+        
+        .dash-table-header { display: flex; justify-content: space-between; font-size: 0.875rem; color: var(--grey-50); text-transform: uppercase; padding-bottom: 0.5rem; border-bottom: 1px solid var(--divider); margin-bottom: 0.5rem; }
+        .dash-table-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--divider); }
+        .dash-table-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .dash-col-main { flex: 1; display: flex; align-items: center; gap: 1rem; overflow: hidden; }
+        .dash-row-thumb { width: 3rem; height: 3rem; border-radius: 0.5rem; object-fit: cover; background: var(--divider); flex-shrink: 0; }
+        .dash-row-title { font-size: 1rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .dash-col-date { width: 120px; color: var(--grey-50); font-size: 0.875rem; text-align: left; }
+        .dash-col-actions { display: flex; gap: 0.5rem; width: 80px; justify-content: flex-end; }
+        
+        .action-icon-btn { background: transparent; border: none; cursor: pointer; color: var(--grey-50); display: flex; align-items: center; justify-content: center; padding: 0.5rem; border-radius: 0.5rem; }
+        .action-icon-btn:hover { color: var(--black); background: var(--divider-hover); }
+        .action-icon-btn svg { width: 1.25rem; height: 1.25rem; }
+
+        .form-section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+        .form-label { font-size: 0.875rem; color: var(--grey-50); text-transform: uppercase; margin-bottom: 0.25rem; display: block; }
+
+        #section-feed, #section-about, #section-contact { display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; }
         
         #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
         #logout-ui { display: none; }
-        
-        #admin-upload-zone, #admin-upload-zone-about, #admin-upload-zone-contact { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; margin-bottom: var(--gap-item); }
 
-        .status-feed { 
-            max-width: var(--content-width); width: 100%; margin: 0 auto; 
-        }
-
-        .status-feed.view-feed {
-            display: flex; flex-direction: column; gap: var(--gap-item);
-        }
-        
-        .status-feed.view-grid {
-            display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;
-        }
-        
-        .grid-columns-wrapper {
-            display: flex; flex-direction: row; gap: var(--gap-item); align-items: flex-start; width: 100%;
-        }
-
-        .masonry-col {
-            display: flex; flex-direction: column; gap: var(--gap-item); flex: 1; min-width: 0;
-        }
+        .status-feed { max-width: var(--content-width); width: 100%; margin: 0 auto; }
+        .status-feed.view-feed { display: flex; flex-direction: column; gap: var(--gap-item); }
+        .status-feed.view-grid { display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; }
+        .grid-columns-wrapper { display: flex; flex-direction: row; gap: var(--gap-item); align-items: flex-start; width: 100%; }
+        .masonry-col { display: flex; flex-direction: column; gap: var(--gap-item); flex: 1; min-width: 0; }
 
         .status-feed.view-grid .feed-top-row,
-        .status-feed.view-grid .status-confirm-overlay,
-        .status-feed.view-grid .feed-admin-actions,
-        .status-feed.view-grid .feed-divider {
-            display: none !important;
-        }
+        .status-feed.view-grid .feed-divider { display: none !important; }
+        .status-feed.view-feed .status-card:last-child .feed-divider { display: none !important; }
+        .status-feed.view-grid .status-media-wrapper { background-color: transparent; }
 
-        .status-feed.view-feed .status-card:last-child .feed-divider {
-            display: none !important;
-        }
-
-        .status-feed.view-grid .status-media-wrapper {
-            background-color: transparent; 
-        }
-
-        .feed-toggle-wrapper {
-            display: flex; flex-direction: column; align-items: center; width: 100%; gap: var(--gap-item);
-        }
-
-        .divider-line {
-            width: 100%;
-            height: 1px;
-            background-color: var(--divider);
-            flex-shrink: 0;
-        }
+        .feed-toggle-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; gap: var(--gap-item); }
+        .divider-line { width: 100%; height: 1px; background-color: var(--divider); flex-shrink: 0; }
 
         .status-card { display: flex; flex-direction: column; position: relative; }
-
-        .status-media-wrapper {
-            position: relative;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            transform: translateZ(0); 
-            min-height: 3rem;
-            background-color: var(--divider); 
-        }
-
-        .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
-        .admin-delete-link { cursor: pointer; color: var(--black); text-decoration: none; }
-
+        .status-media-wrapper { position: relative; border-radius: var(--border-radius); overflow: hidden; transform: translateZ(0); min-height: 3rem; background-color: var(--divider); }
         .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); cursor: pointer; }
         
         .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
 
-        .form-input, .submit-btn { 
-            border-radius: var(--border-radius); 
-            font-size: var(--size-small); padding: 0 var(--gap-item); 
-            outline: none; display: flex; align-items: center; gap: var(--gap-item); 
-            box-shadow: none; -webkit-appearance: none; appearance: none; margin: 0;
-        }
-
-        .form-input { 
-            height: 3rem;
-            background-color: transparent; 
-            color: var(--black);
-            border: 1px solid var(--divider); 
-        }
+        .form-input, .submit-btn { border-radius: var(--border-radius); font-size: var(--size-small); padding: 0 var(--gap-item); outline: none; display: flex; align-items: center; gap: var(--gap-item); box-shadow: none; -webkit-appearance: none; appearance: none; margin: 0; }
+        .form-input { height: 3.5rem; background-color: transparent; color: var(--black); border: 1px solid var(--divider); }
         .form-input::placeholder { color: var(--grey-50); } 
+        .submit-btn { height: 3.5rem; background-color: var(--black); color: var(--white); border: 1px solid var(--black); justify-content: center; text-transform: uppercase; cursor: pointer; white-space: nowrap; font-weight: 700; line-height: normal; }
 
-        .submit-btn { 
-            height: 3rem;
-            background-color: var(--black); 
-            color: var(--white);
-            border: 1px solid var(--black); 
-            justify-content: center; text-transform: uppercase; cursor: pointer; white-space: nowrap;
-            line-height: normal;
-        }
-
-        .btn-tonal {
-            background-color: var(--divider) !important;
-            color: var(--black) !important;
-            border: none !important;
-        }
-
-        .btn-tonal-disabled {
-            background-color: var(--divider) !important;
-            color: var(--grey-50) !important;
-            border: none !important;
-            cursor: default !important;
-            pointer-events: none !important;
-        }
-
-        .btn-danger {
-            background-color: #ff3333 !important;
-            color: #000000 !important;
-            border: none !important;
-        }
-
-        .btn-outline {
-            background-color: transparent; 
-            color: var(--black);
-            border: 1px solid var(--black);
-        }
-
-        .btn-loading {
-            background-color: var(--divider) !important;
-            color: var(--grey-50) !important; 
-            border: none !important;
-            pointer-events: none !important;
-            opacity: 1 !important; 
-        }
-
-        .btn-ghost {
-            background-color: var(--divider) !important; 
-            color: var(--black) !important; 
-            border: none !important;
-            pointer-events: none !important; 
-            opacity: 1 !important; 
-        }
+        .btn-tonal { background-color: var(--divider) !important; color: var(--black) !important; border: none !important; }
+        .btn-tonal-disabled { background-color: var(--divider) !important; color: var(--grey-50) !important; border: none !important; cursor: default !important; pointer-events: none !important; }
+        .btn-danger { background-color: #ff3333 !important; color: #000000 !important; border: none !important; }
+        .btn-loading { background-color: var(--divider) !important; color: var(--grey-50) !important; border: none !important; pointer-events: none !important; opacity: 1 !important; }
+        .btn-ghost { background-color: var(--divider) !important; color: var(--black) !important; border: none !important; pointer-events: none !important; opacity: 1 !important; }
 
         .input-error { border: 1px solid var(--black) !important; }
         .input-error span { color: var(--black) !important; }
 
-        .thumbnail-container {
-            width: 3rem;
-            height: 3rem;
-            flex-shrink: 0;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            background-color: var(--divider);
-            cursor: pointer;
-            position: relative;
-            -webkit-mask-image: -webkit-radial-gradient(white, black);
-            mask-image: radial-gradient(white, black);
-        }
-        .thumbnail-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; 
-        }
+        .thumbnail-container { width: 4rem; height: 4rem; flex-shrink: 0; border-radius: 0.5rem; overflow: hidden; background-color: var(--divider); cursor: pointer; position: relative; }
+        .thumbnail-img { width: 100%; height: 100%; object-fit: cover; }
 
-        .custom-checkbox {
-            appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black);
-            border-radius: calc(var(--border-radius) / 3); cursor: pointer; display: grid; place-content: center;
-        }
+        .custom-checkbox { appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black); border-radius: calc(var(--border-radius) / 3); cursor: pointer; display: grid; place-content: center; }
         .custom-checkbox::before { content: ""; width: 0.25rem; height: 0.5rem; border: solid var(--white); border-width: 0 1px 1px 0; transform: rotate(45deg); opacity: 0; margin-top: -0.125rem; }
         .custom-checkbox:checked { background-color: var(--black); border-color: var(--black); } 
         .custom-checkbox:checked::before { opacity: 1; }
 
-        .footer-info { 
-            font-size: var(--size-small); color: var(--grey-50); 
-            text-transform: uppercase; text-align: center; width: 100%; 
-        }
+        .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; text-align: center; width: 100%; }
 
-        .status-confirm-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 20;
-            display: none; flex-direction: column; justify-content: center; align-items: center;
-            border-radius: var(--border-radius);
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); 
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-        }
+        #delete-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3000; display: none; flex-direction: column; justify-content: center; align-items: center; background: transparent; }
+        #delete-modal::before { content: ""; position: absolute; inset: 0; background: rgba(var(--glass-rgb), var(--glass-opacity)); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); z-index: -1; }
 
-        #delete-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 3000;
-            display: none; flex-direction: column; justify-content: center; align-items: center;
-            background: transparent;
-        }
-        #delete-modal::before {
-            content: "";
-            position: absolute; inset: 0;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); 
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            z-index: -1;
-        }
+        .modal-content { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); }
+        .action-row { display: flex; flex-direction: row; gap: var(--gap-item); justify-content: center; width: 100%; padding: 0; }
 
-        .modal-content {
-            width: 100%; max-width: var(--content-width);
-            display: flex; flex-direction: column; gap: var(--gap-item);
-            padding: 0 var(--gap-item);
-        }
-
-        .action-row {
-            display: flex; flex-direction: row; gap: var(--gap-item); justify-content: center;
-            width: 100%; padding: 0;
-        }
-
-        .about-text {
-            font-size: var(--size-small);
-            color: var(--black);
-            text-align: left;
-            line-height: 1.6;
-            -webkit-hyphens: auto;
-            -ms-hyphens: auto;
-            hyphens: auto;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-        }
-
-        /* 🛠️ Nové dizajnové prvky pre komplexnú sekciu About */
-        .about-page-title { font-size: 2.5rem; font-weight: 700; line-height: 1.1; margin-bottom: 0.5rem; }
+        /* Public About Elements */
+        .about-text { font-size: var(--size-small); color: var(--black); text-align: left; line-height: 1.6; -webkit-hyphens: auto; -ms-hyphens: auto; hyphens: auto; word-wrap: break-word; overflow-wrap: break-word; }
+        .about-page-title { font-size: 3rem; font-weight: 700; line-height: 1.1; margin-bottom: 0.5rem; letter-spacing: -0.02em;}
         .about-title-line { width: 4rem; height: 4px; background-color: var(--black); margin-bottom: 2rem; border-radius: 2px; }
         .about-intro-text { font-size: 1.25rem; color: var(--grey-50); line-height: 1.6; margin-bottom: 2rem; text-align: left; }
-        .about-section-title { font-size: 1.75rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; }
+        .about-section-title { font-size: 2rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; letter-spacing: -0.02em;}
         
         .about-exp-item { display: flex; flex-direction: column; align-items: flex-start; width: 100%; }
         .about-exp-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem; }
@@ -370,10 +231,10 @@
         .about-exp-divider { width: 100%; height: 1px; background-color: var(--divider); margin: 2rem 0; flex-shrink: 0; }
         .about-exp-item:last-of-type .about-exp-divider { display: none; }
 
-        .about-cta-card { background-color: var(--divider); border-radius: 1.5rem; padding: 2rem; display: flex; flex-direction: column; align-items: flex-start; margin-top: 2rem; width: 100%; }
-        .about-cta-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
-        .about-cta-text { font-size: 1rem; color: var(--grey-50); line-height: 1.6; margin-bottom: 1.5rem; text-align: left; }
-        .about-cta-btn { background-color: var(--black); color: var(--white); padding: 0.75rem 1.5rem; border-radius: 2rem; font-size: 1rem; font-weight: 700; text-decoration: none; display: inline-block; cursor: pointer; border: none; }
+        .about-cta-card { background-color: var(--divider); border-radius: 1.5rem; padding: 2.5rem 2rem; display: flex; flex-direction: column; align-items: flex-start; margin-top: 3rem; width: 100%; }
+        .about-cta-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 1rem; letter-spacing: -0.02em;}
+        .about-cta-text { font-size: 1rem; color: var(--grey-50); line-height: 1.6; margin-bottom: 2rem; text-align: left; }
+        .about-cta-btn { background-color: var(--black); color: var(--white); padding: 1rem 2rem; border-radius: 2rem; font-size: 1rem; font-weight: 700; text-decoration: none; display: inline-block; cursor: pointer; border: none; }
     </style>
 </head>
 <body>
@@ -386,7 +247,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="72.35 270 935.31 810" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
                     </div>
                 </div>
-                <div class="logo-text"><span>martinvojtus</span> • space</div>
+                <div class="logo-text"><span id="public-site-title">martinvojtus.space</span></div>
             </div>
             
             <div class="menu-toggle" id="menuToggle" onclick="toggleMenu(event)">MENU</div>
@@ -395,9 +256,10 @@
                 <div class="desktop-link" onclick="showFeed()">Feed</div>
                 <div class="desktop-link" onclick="showAbout()">About</div>
                 <div class="desktop-link" onclick="showContact()">Contact</div>
+                <div class="desktop-link admin-only" onclick="showDashboard()">Dashboard</div>
                 <div class="desktop-divider"></div>
                 <div class="desktop-link" id="desktop-login-btn" onclick="toggleMenu(event)">Login</div>
-                <div class="desktop-link" id="desktop-logout-btn" onclick="handleLogout()" style="display: none;">Logout</div>
+                <div class="desktop-link admin-only" id="desktop-logout-btn" onclick="handleLogout()">Logout</div>
             </div>
         </div>
     </header>
@@ -407,6 +269,7 @@
             <div class="menu-nav-link mobile-only" onclick="showFeed()">Feed</div>
             <div class="menu-nav-link mobile-only" onclick="showAbout()">About</div>
             <div class="menu-nav-link mobile-only" onclick="showContact()">Contact</div>
+            <div class="menu-nav-link mobile-only admin-only" onclick="showDashboard()">Dashboard</div>
             
             <div class="divider-line mobile-only"></div>
 
@@ -426,145 +289,178 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.2.2 • 2026</div>
+            <div class="footer-info">build v7.3.0 • 2026</div>
         </div>
     </nav>
 
     <main>
-        <div id="admin-upload-zone">
-            <div id="editor-collapsed-state" class="submit-btn btn-tonal" style="width: 100%;" onclick="expandEditor()">
-                +
+        
+        <div id="section-dashboard">
+            <div class="dash-header">
+                <div class="dash-title">Dashboard</div>
+                <div class="dash-subtitle">Manage your content and site settings.</div>
             </div>
 
-            <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
-                <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
+            <div class="dash-tabs">
+                <button class="dash-tab active" id="tab-btn-posts" onclick="switchDashTab('posts')">Posts</button>
+                <button class="dash-tab" id="tab-btn-about" onclick="switchDashTab('about')">About</button>
+                <button class="dash-tab" id="tab-btn-contact" onclick="switchDashTab('contact')">Contact</button>
+                <button class="dash-tab" id="tab-btn-settings" onclick="switchDashTab('settings')">Settings</button>
+            </div>
+
+            <div id="dash-tab-posts" style="display: flex; flex-direction: column; width: 100%; gap: 1.5rem;">
                 
-                <div id="upload-empty-state" class="submit-btn btn-tonal" style="width: 100%;" onclick="document.getElementById('edit-image').click()">
-                    + ADD IMAGE
+                <button class="submit-btn" style="width: fit-content; padding: 0 1.5rem;" onclick="document.getElementById('editor-form-feed').style.display='flex'; this.style.display='none';">+ New Post</button>
+
+                <form id="editor-form-feed" onsubmit="handleFeedSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0; background: var(--divider); padding: 1.5rem; border-radius: 1.5rem;">
+                    <div class="form-section-title" style="margin: 0;">Create New Post</div>
+                    <input type="file" id="edit-image-feed" accept="image/*" style="display: none;" onchange="updateFeedFormState()">
+                    <div id="upload-empty-state-feed" class="submit-btn btn-outline" style="width: 100%; background: transparent;" onclick="document.getElementById('edit-image-feed').click()">
+                        + SELECT IMAGE
+                    </div>
+                    <div id="upload-filled-state-feed" class="action-row" style="display: none;">
+                        <div class="thumbnail-container" style="width:4rem;height:4rem;" onclick="document.getElementById('edit-image-feed').click()">
+                            <img id="upload-preview-img-feed" class="thumbnail-img" src="" alt="">
+                        </div>
+                        <div class="submit-btn btn-outline" style="flex-grow: 1; background: transparent;" onclick="clearFeedImageSelection(event)">REMOVE</div>
+                    </div>
+                    <div class="action-row" style="padding: 0;">
+                        <button type="submit" id="publish-btn-feed" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>PUBLISH</button>
+                        <div class="submit-btn btn-outline" style="background: transparent;" onclick="document.getElementById('editor-form-feed').style.display='none'; document.querySelector('#dash-tab-posts > button').style.display='flex'; resetFeedForm();">CANCEL</div>
+                    </div>
+                </form>
+
+                <div class="dash-card">
+                    <div class="dash-table-header">
+                        <div class="dash-col-main" style="padding-left: 0.5rem;">POST</div>
+                        <div class="dash-col-date">DATE</div>
+                        <div class="dash-col-actions">ACTIONS</div>
+                    </div>
+                    <div id="dash-posts-list" style="display: flex; flex-direction: column;">
+                        </div>
                 </div>
 
-                <div id="upload-filled-state" class="action-row" style="display: none;">
-                    <div class="thumbnail-container" onclick="document.getElementById('edit-image').click()">
-                        <img id="upload-preview-img" class="thumbnail-img" src="" alt="">
-                    </div>
-                    <div class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="clearImageSelection(event)">DELETE IMAGE</div>
-                </div>
+                <button type="button" class="submit-btn btn-danger" style="width: 100%; margin-top: 1rem;" onclick="openDeleteModal('delete_all')">DELETE ALL POSTS</button>
+            </div>
 
-                <div id="upload-details-zone" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;">
-                    <div id="upload-action-row" class="action-row" style="padding: 0;">
-                        <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>UPLOAD</button>
-                        <div class="submit-btn btn-tonal" onclick="collapseEditor()">CANCEL</div>
-                    </div>
-                    <div id="upload-loading-row" class="action-row" style="display: none; padding: 0;">
-                        <div id="upload-loading-btn" class="submit-btn btn-loading" style="flex-grow: 1;">UPLOADING...</div>
-                    </div>
-                    <div id="upload-success-row" class="action-row" style="display: none; padding: 0;">
-                        <div id="upload-success-btn" class="submit-btn btn-ghost" style="flex-grow: 1;">UPLOADED</div>
-                    </div>
+            <div id="dash-tab-about" style="display: none; flex-direction: column; width: 100%;">
+                <div class="dash-card">
+                    <div class="form-section-title">About Page Builder</div>
+                    <form id="editor-form-about" onsubmit="handleAboutSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: 1.5rem; margin: 0;">
+                        
+                        <div>
+                            <span class="form-label">1. Main Cover Image</span>
+                            <input type="file" id="edit-image-about" accept="image/*" style="display: none;" onchange="updateAboutFormState()">
+                            <div id="upload-empty-state-about" class="submit-btn btn-outline" style="width: 100%; background: transparent;" onclick="document.getElementById('edit-image-about').click()">+ SELECT IMAGE</div>
+                            <div id="upload-filled-state-about" class="action-row" style="display: none;">
+                                <div class="thumbnail-container" style="width: 4rem; height: 4rem;" onclick="document.getElementById('edit-image-about').click()"><img id="upload-preview-img-about" class="thumbnail-img" src="" alt=""></div>
+                                <div class="submit-btn btn-outline" style="flex-grow: 1; background: transparent;" onclick="clearAboutImageSelection(event)">REMOVE</div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="form-label">2. Story & Approach</span>
+                            <textarea id="about-intro" class="form-input" placeholder="Intro Text (e.g. Hello! I'm Martin...)" style="width: 100%; min-height: 6rem; padding-top: 1rem; padding-bottom: 1rem; resize: none; overflow: hidden; margin-bottom: 1rem;" oninput="autoResizeTextarea(this); updateAboutFormState();"></textarea>
+                            <textarea id="about-approach" class="form-input" placeholder="My Approach details..." style="width: 100%; min-height: 8rem; padding-top: 1rem; padding-bottom: 1rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateAboutFormState();"></textarea>
+                        </div>
+
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span class="form-label" style="margin:0;">3. Experience</span>
+                                <button type="button" class="submit-btn btn-outline" style="height: 2rem; font-size: 0.75rem; padding: 0 0.75rem; background: transparent;" onclick="addExperienceRow()">+ ADD ROW</button>
+                            </div>
+                            <div id="about-exp-list" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+                        </div>
+
+                        <div>
+                            <span class="form-label">4. Call to Action Box</span>
+                            <input type="text" id="about-cta-title" class="form-input" placeholder="CTA Title (e.g. Let's work together)" style="width: 100%; margin-bottom: 1rem;" oninput="updateAboutFormState()">
+                            <textarea id="about-cta-text" class="form-input" placeholder="CTA Subtext..." style="width: 100%; min-height: 5rem; padding-top: 1rem; padding-bottom: 1rem; resize: none; overflow: hidden; margin-bottom: 1rem;" oninput="autoResizeTextarea(this); updateAboutFormState();"></textarea>
+                            <input type="text" id="about-cta-btn" class="form-input" placeholder="Button Label (e.g. Get in touch)" style="width: 100%;" oninput="updateAboutFormState()">
+                        </div>
+
+                        <div class="action-row" style="padding: 0; margin-top: 1rem;">
+                            <button type="submit" id="publish-btn-about" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>SAVE CHANGES</button>
+                            <button type="button" class="submit-btn btn-danger" style="flex-grow: 0;" onclick="handleDeleteDashPost(editingAboutPostId)">DELETE</button>
+                        </div>
+                    </form>
                 </div>
-                
-                <button type="button" id="delete-all-btn" class="submit-btn btn-danger" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
-            </form>
+            </div>
+
+            <div id="dash-tab-contact" style="display: none; flex-direction: column; width: 100%;">
+                <div class="dash-card">
+                    <div class="form-section-title">Contact Page Editor</div>
+                    <form id="editor-form-contact" onsubmit="handleContactSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: 1.5rem; margin: 0;">
+                        
+                        <div>
+                            <span class="form-label">Cover Image</span>
+                            <input type="file" id="edit-image-contact" accept="image/*" style="display: none;" onchange="updateContactFormState()">
+                            <div id="upload-empty-state-contact" class="submit-btn btn-outline" style="width: 100%; background: transparent;" onclick="document.getElementById('edit-image-contact').click()">+ SELECT IMAGE</div>
+                            <div id="upload-filled-state-contact" class="action-row" style="display: none;">
+                                <div class="thumbnail-container" style="width: 4rem; height: 4rem;" onclick="document.getElementById('edit-image-contact').click()"><img id="upload-preview-img-contact" class="thumbnail-img" src="" alt=""></div>
+                                <div class="submit-btn btn-outline" style="flex-grow: 1; background: transparent;" onclick="clearContactImageSelection(event)">REMOVE</div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="form-label">Contact Details</span>
+                            <input type="text" id="edit-title-contact" class="form-input" placeholder="Title (e.g. Hello)" style="width: 100%; margin-bottom: 1rem;" oninput="updateContactFormState()">
+                            <textarea id="edit-text-contact" class="form-input" placeholder="Text or links..." style="width: 100%; min-height: 8rem; padding-top: 1rem; padding-bottom: 1rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateContactFormState();"></textarea>
+                        </div>
+
+                        <div class="action-row" style="padding: 0; margin-top: 1rem;">
+                            <button type="submit" id="publish-btn-contact" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>SAVE CHANGES</button>
+                            <button type="button" class="submit-btn btn-danger" style="flex-grow: 0;" onclick="handleDeleteDashPost(editingContactPostId)">DELETE</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="dash-tab-settings" style="display: none; flex-direction: column; width: 100%;">
+                <div class="dash-card">
+                    <div class="form-section-title">Site Settings</div>
+                    <form id="editor-form-settings" onsubmit="handleSettingsSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: 1.5rem; margin: 0;">
+                        
+                        <div>
+                            <span class="form-label">Site Title</span>
+                            <input type="text" id="setting-title" class="form-input" placeholder="e.g. martinvojtus.space" style="width: 100%;" value="martinvojtus.space" oninput="updateSettingsFormState()">
+                        </div>
+
+                        <div>
+                            <span class="form-label">Profile Image / Avatar</span>
+                            <input type="file" id="setting-image" accept="image/*" style="display: none;" onchange="updateSettingsFormState()">
+                            <div id="upload-empty-state-setting" class="submit-btn btn-outline" style="width: 100%; background: transparent;" onclick="document.getElementById('setting-image').click()">+ UPLOAD AVATAR</div>
+                            <div id="upload-filled-state-setting" class="action-row" style="display: none; align-items: center; justify-content: flex-start;">
+                                <img id="upload-preview-img-setting" src="" alt="" style="width: 4rem; height: 4rem; border-radius: 50%; object-fit: cover; background: var(--divider); cursor: pointer;" onclick="document.getElementById('setting-image').click()">
+                                <button type="button" class="submit-btn btn-outline" style="background: transparent; height: 2.5rem;" onclick="clearSettingImageSelection(event)">REMOVE</button>
+                            </div>
+                        </div>
+
+                        <div class="action-row" style="padding: 0; margin-top: 1rem;">
+                            <button type="submit" id="publish-btn-settings" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>SAVE SETTINGS</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
         </div>
 
         <div id="section-feed">
             <div id="status-container" class="status-feed view-grid"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.2.2 • 2026</div>
-        </div>
-
-        <div id="admin-upload-zone-about">
-            <div id="editor-collapsed-state-about" class="submit-btn btn-tonal" style="width: 100%;" onclick="expandAboutEditor()">
-                + BUILD ABOUT PAGE
-            </div>
-
-            <form id="editor-form-about" onsubmit="handleAboutSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
-                
-                <div style="font-weight: bold; padding: 0.5rem 0 0 0;">1. Main Cover</div>
-                <input type="file" id="edit-image-about" accept="image/*" style="display: none;" onchange="updateAboutImageUIState()">
-                <div id="upload-empty-state-about" class="submit-btn btn-tonal" style="width: 100%;" onclick="document.getElementById('edit-image-about').click()">
-                    + ADD COVER IMAGE
-                </div>
-                <div id="upload-filled-state-about" class="action-row" style="display: none;">
-                    <div class="thumbnail-container" onclick="document.getElementById('edit-image-about').click()">
-                        <img id="upload-preview-img-about" class="thumbnail-img" src="" alt="">
-                    </div>
-                    <div class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="clearAboutImageSelection(event)">DELETE IMAGE</div>
-                </div>
-
-                <div style="font-weight: bold; padding: 0.5rem 0 0 0;">2. Story & Approach</div>
-                <textarea id="about-intro" class="form-input" placeholder="Intro Text (e.g. Hello! I'm Martin...)" style="width: 100%; min-height: 6rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateAboutUIState();"></textarea>
-                <textarea id="about-approach" class="form-input" placeholder="My Approach details..." style="width: 100%; min-height: 8rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateAboutUIState();"></textarea>
-
-                <div style="font-weight: bold; padding: 0.5rem 0 0 0; display: flex; justify-content: space-between; align-items: center;">
-                    <span>3. Experience</span>
-                    <button type="button" class="submit-btn btn-tonal" style="height: 2.2rem; font-size: 0.8rem; padding: 0 1rem;" onclick="addExperienceRow()">+ ADD ROW</button>
-                </div>
-                <div id="about-exp-list" style="display: flex; flex-direction: column; gap: 1rem;"></div>
-
-                <div style="font-weight: bold; padding: 0.5rem 0 0 0;">4. Call to Action Box</div>
-                <input type="text" id="about-cta-title" class="form-input" placeholder="CTA Title (e.g. Let's work together)" style="width: 100%;" oninput="updateAboutUIState()">
-                <textarea id="about-cta-text" class="form-input" placeholder="CTA Subtext..." style="width: 100%; min-height: 5rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateAboutUIState();"></textarea>
-                <input type="text" id="about-cta-btn" class="form-input" placeholder="Button Label (e.g. Get in touch)" style="width: 100%;" oninput="updateAboutUIState()">
-
-                <div id="upload-details-zone-about" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; margin-top: 1rem;">
-                    <div id="upload-action-row-about" class="action-row" style="padding: 0;">
-                        <button type="submit" id="publish-btn-about" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>SAVE PAGE</button>
-                        <div id="clear-btn-about" class="submit-btn btn-tonal-disabled" onclick="clearAboutTextFields(event)" style="flex-grow: 0;" disabled>CLEAR</div>
-                        <div class="submit-btn btn-tonal" onclick="collapseAboutEditor()" style="flex-grow: 0;">CANCEL</div>
-                    </div>
-                    <div id="upload-loading-row-about" class="action-row" style="display: none; padding: 0;">
-                        <div class="submit-btn btn-loading" style="flex-grow: 1;">SAVING...</div>
-                    </div>
-                </div>
-            </form>
+            <div class="footer-info">build v7.3.0 • 2026</div>
         </div>
 
         <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
-            <div id="about-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
-            <div class="divider-line"></div>
-            <div class="footer-info">build v7.2.2 • 2026</div>
-        </div>
-
-        <div id="admin-upload-zone-contact">
-            <div id="editor-collapsed-state-contact" class="submit-btn btn-tonal" style="width: 100%;" onclick="expandContactEditor()">
-                + ADD POST
-            </div>
-
-            <form id="editor-form-contact" onsubmit="handleContactSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
-                <input type="text" id="edit-title-contact" class="form-input" placeholder="Title..." style="width: 100%;" oninput="updateContactUIState()">
-                <textarea id="edit-text-contact" class="form-input" placeholder="Content..." style="width: 100%; min-height: 6rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateContactUIState();"></textarea>
-
-                <input type="file" id="edit-image-contact" accept="image/*" style="display: none;" onchange="updateContactImageUIState()">
-                
-                <div id="upload-empty-state-contact" class="submit-btn btn-tonal" style="width: 100%;" onclick="document.getElementById('edit-image-contact').click()">
-                    + ADD IMAGE
-                </div>
-
-                <div id="upload-filled-state-contact" class="action-row" style="display: none;">
-                    <div class="thumbnail-container" onclick="document.getElementById('edit-image-contact').click()">
-                        <img id="upload-preview-img-contact" class="thumbnail-img" src="" alt="">
-                    </div>
-                    <div class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="clearContactImageSelection(event)">DELETE IMAGE</div>
-                </div>
-
-                <div id="upload-details-zone-contact" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;">
-                    <div id="upload-action-row-contact" class="action-row" style="padding: 0;">
-                        <button type="submit" id="publish-btn-contact" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>UPLOAD</button>
-                        <div id="clear-btn-contact" class="submit-btn btn-tonal-disabled" onclick="clearContactTextFields(event)" style="flex-grow: 0;" disabled>CLEAR</div>
-                        <div class="submit-btn btn-tonal" onclick="collapseContactEditor()" style="flex-grow: 0;">CANCEL</div>
-                    </div>
-                    <div id="upload-loading-row-contact" class="action-row" style="display: none; padding: 0;">
-                        <div class="submit-btn btn-loading" style="flex-grow: 1;">UPLOADING...</div>
-                    </div>
-                </div>
-            </form>
+            <div id="about-posts-container" style="display: flex; flex-direction: column; width: 100%;"></div>
+            <div class="divider-line" style="margin-top: 2rem;"></div>
+            <div class="footer-info">build v7.3.0 • 2026</div>
         </div>
 
         <div id="section-contact" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
-            <div id="contact-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
-            <div class="divider-line"></div>
-            <div class="footer-info">build v7.2.2 • 2026</div>
+            <div id="contact-posts-container" style="display: flex; flex-direction: column; width: 100%;"></div>
+            <div class="divider-line" style="margin-top: 2rem;"></div>
+            <div class="footer-info">build v7.3.0 • 2026</div>
         </div>
         
         <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
@@ -590,15 +486,12 @@
         let isLoading = false; let hasMorePosts = true;
         let deleteActionType = null;
         
-        let editingAboutPostId = null;
-        let existingAboutImageUrl = null;
-        
-        let editingContactPostId = null;
-        let existingContactImageUrl = null;
+        let editingAboutPostId = null; let existingAboutImageUrl = null;
+        let editingContactPostId = null; let existingContactImageUrl = null;
+        let editingSettingsPostId = null; let existingSettingsImageUrl = null;
 
         let currentViewMode = localStorage.getItem('mv_view_mode') || 'grid';
         let currentSection = 'feed'; 
-
         let currentGridCols = window.innerWidth > 600 ? 3 : 2;
 
         const passInput = document.getElementById('admin-pass');
@@ -606,128 +499,48 @@
         const navOverlay = document.getElementById('navOverlay');
 
         if(passInput) {
-            passInput.addEventListener('input', () => {
-                passInput.classList.remove('input-error');
-                passInput.placeholder = 'Password...';
-            });
+            passInput.addEventListener('input', () => { passInput.classList.remove('input-error'); passInput.placeholder = 'Password...'; });
         }
 
         window.addEventListener('resize', () => {
             const newCols = window.innerWidth > 600 ? 3 : 2;
             if (newCols !== currentGridCols) {
                 currentGridCols = newCols;
-                if (currentSection === 'feed' && currentViewMode === 'grid') {
-                    refreshFeedUI(globalPosts.filter(p => p.author !== 'about' && p.author !== 'contact'));
-                }
+                if (currentSection === 'feed' && currentViewMode === 'grid') refreshFeedUI(globalPosts.filter(p => p.author === ''));
             }
         });
 
-        function autoResizeTextarea(el) {
-            el.style.height = 'auto';
-            if(el.value.trim() === '') {
-                el.style.height = ''; 
-            } else {
-                el.style.height = el.scrollHeight + 'px';
-            }
-        }
+        function autoResizeTextarea(el) { el.style.height = 'auto'; if(el.value.trim() === '') el.style.height = ''; else el.style.height = el.scrollHeight + 'px'; }
 
-        function showFeed() {
-            currentSection = 'feed';
-            document.getElementById('section-about').style.display = 'none';
-            document.getElementById('section-contact').style.display = 'none';
-            document.getElementById('section-feed').style.display = 'flex';
-            updateUIVisibility();
-            closeMenu();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function showAbout() {
-            currentSection = 'about';
-            document.getElementById('section-feed').style.display = 'none';
-            document.getElementById('section-contact').style.display = 'none';
-            document.getElementById('section-about').style.display = 'flex';
-            updateUIVisibility();
-            closeMenu();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function showContact() {
-            currentSection = 'contact';
+        // 🛠️ Navigácia
+        function hideAllSections() {
             document.getElementById('section-feed').style.display = 'none';
             document.getElementById('section-about').style.display = 'none';
-            document.getElementById('section-contact').style.display = 'flex';
-            updateUIVisibility();
+            document.getElementById('section-contact').style.display = 'none';
+            document.getElementById('section-dashboard').style.display = 'none';
+        }
+
+        function showFeed() { currentSection = 'feed'; hideAllSections(); document.getElementById('section-feed').style.display = 'flex'; closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function showAbout() { currentSection = 'about'; hideAllSections(); document.getElementById('section-about').style.display = 'flex'; closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function showContact() { currentSection = 'contact'; hideAllSections(); document.getElementById('section-contact').style.display = 'flex'; closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        
+        function showDashboard() {
+            if(!secretKey) return;
+            currentSection = 'dashboard';
+            hideAllSections();
+            document.getElementById('section-dashboard').style.display = 'flex';
             closeMenu();
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            populateDashboard();
         }
 
-        function checkPostLimits() {
-            const aboutCount = globalPosts.filter(p => p.author === 'about').length;
-            const btnAbout = document.getElementById('editor-collapsed-state-about');
-            if (btnAbout) {
-                if (aboutCount >= 1) {
-                    btnAbout.className = 'submit-btn btn-tonal-disabled';
-                    btnAbout.onclick = null;
-                    if (document.getElementById('editor-form-about').style.display === 'flex') {
-                        collapseAboutEditor();
-                    }
-                } else {
-                    btnAbout.className = 'submit-btn btn-tonal';
-                    btnAbout.onclick = expandAboutEditor;
-                }
-            }
-
-            const contactCount = globalPosts.filter(p => p.author === 'contact').length;
-            const btnContact = document.getElementById('editor-collapsed-state-contact');
-            if (btnContact) {
-                if (contactCount >= 1) {
-                    btnContact.className = 'submit-btn btn-tonal-disabled';
-                    btnContact.onclick = null;
-                    if (document.getElementById('editor-form-contact').style.display === 'flex') {
-                        collapseContactEditor();
-                    }
-                } else {
-                    btnContact.className = 'submit-btn btn-tonal';
-                    btnContact.onclick = expandContactEditor;
-                }
-            }
-        }
-
-        function expandEditor() {
-            document.getElementById('editor-collapsed-state').style.display = 'none';
-            document.getElementById('editor-form').style.display = 'flex';
-        }
-        function collapseEditor() {
-            document.getElementById('editor-collapsed-state').style.display = 'flex';
-            document.getElementById('editor-form').style.display = 'none';
-            resetEditor(); 
-        }
-
-        function expandAboutEditor() {
-            document.getElementById('editor-collapsed-state-about').style.display = 'none';
-            document.getElementById('editor-form-about').style.display = 'flex';
-        }
-        function collapseAboutEditor() {
-            document.getElementById('editor-collapsed-state-about').style.display = 'flex';
-            document.getElementById('editor-form-about').style.display = 'none';
-            resetAboutEditor(); 
-        }
-
-        function expandContactEditor() {
-            document.getElementById('editor-collapsed-state-contact').style.display = 'none';
-            document.getElementById('editor-form-contact').style.display = 'flex';
-        }
-        function collapseContactEditor() {
-            document.getElementById('editor-collapsed-state-contact').style.display = 'flex';
-            document.getElementById('editor-form-contact').style.display = 'none';
-            resetContactEditor(); 
-        }
-
-        function toggleViewMode() {
-            const newMode = currentViewMode === 'feed' ? 'grid' : 'feed';
-            currentViewMode = newMode;
-            localStorage.setItem('mv_view_mode', newMode);
-            refreshFeedUI(globalPosts.filter(p => p.author !== 'about' && p.author !== 'contact'));
+        function switchDashTab(tabName) {
+            ['posts', 'about', 'contact', 'settings'].forEach(t => {
+                document.getElementById(`dash-tab-${t}`).style.display = 'none';
+                document.getElementById(`tab-btn-${t}`).classList.remove('active');
+            });
+            document.getElementById(`dash-tab-${tabName}`).style.display = 'flex';
+            document.getElementById(`tab-btn-${tabName}`).classList.add('active');
         }
 
         function toggleMenu(e) { 
@@ -736,12 +549,7 @@
             navOverlay.classList.toggle('active'); 
             menuToggle.innerText = isActive ? 'CLOSE' : 'MENU';
         }
-        
-        function closeMenu() { 
-            menuToggle.classList.remove('active'); 
-            navOverlay.classList.remove('active'); 
-            menuToggle.innerText = 'MENU';
-        }
+        function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); menuToggle.innerText = 'MENU'; }
 
         function updateUIVisibility() {
             if (secretKey) {
@@ -749,76 +557,40 @@
                 document.getElementById('login-ui').style.display = 'none';
                 document.getElementById('logout-ui').style.display = 'flex';
                 
-                document.getElementById('admin-upload-zone').style.display = 'none';
-                document.getElementById('admin-upload-zone-about').style.display = 'none';
-                document.getElementById('admin-upload-zone-contact').style.display = 'none';
-
-                if (currentSection === 'feed') {
-                    document.getElementById('admin-upload-zone').style.display = 'flex';
-                } else if (currentSection === 'about') {
-                    document.getElementById('admin-upload-zone-about').style.display = 'flex';
-                } else if (currentSection === 'contact') {
-                    document.getElementById('admin-upload-zone-contact').style.display = 'flex';
-                }
-
-                const dLogin = document.getElementById('desktop-login-btn');
-                if (dLogin) dLogin.style.display = 'none';
-                const dLogout = document.getElementById('desktop-logout-btn');
-                if (dLogout) dLogout.style.display = 'block';
-
+                const dLogin = document.getElementById('desktop-login-btn'); if (dLogin) dLogin.style.display = 'none';
+                const dLogout = document.getElementById('desktop-logout-btn'); if (dLogout) dLogout.style.display = 'block';
             } else {
                 document.body.classList.remove('is-logged-in');
                 document.getElementById('login-ui').style.display = 'flex';
-                document.getElementById('admin-upload-zone').style.display = 'none';
-                document.getElementById('admin-upload-zone-about').style.display = 'none';
-                document.getElementById('admin-upload-zone-contact').style.display = 'none';
                 document.getElementById('logout-ui').style.display = 'none';
-                collapseEditor(); 
-                collapseAboutEditor();
-                collapseContactEditor();
-
-                const dLogin = document.getElementById('desktop-login-btn');
-                if (dLogin) dLogin.style.display = 'block';
-                const dLogout = document.getElementById('desktop-logout-btn');
-                if (dLogout) dLogout.style.display = 'none';
+                
+                const dLogin = document.getElementById('desktop-login-btn'); if (dLogin) dLogin.style.display = 'block';
+                const dLogout = document.getElementById('desktop-logout-btn'); if (dLogout) dLogout.style.display = 'none';
+                
+                if (currentSection === 'dashboard') showFeed();
             }
-            checkPostLimits();
         }
 
         async function handleLogin(e) {
             e.preventDefault();
-            const loginBtn = document.getElementById('login-btn');
-            loginBtn.innerText = 'LOGGING IN...';
-            loginBtn.classList.add('btn-loading'); 
-
-            const tempKey = passInput.value;
-            const rememberMe = document.getElementById('remember-login').checked;
+            const loginBtn = document.getElementById('login-btn'); loginBtn.innerText = 'LOGGING IN...'; loginBtn.classList.add('btn-loading'); 
+            const tempKey = passInput.value; const rememberMe = document.getElementById('remember-login').checked;
             try {
                 const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': tempKey } });
                 if (res.ok) { 
-                    loginBtn.classList.remove('btn-loading');
-                    loginBtn.classList.add('btn-ghost');
-                    loginBtn.innerText = 'SUCCESS';
-                    
+                    loginBtn.classList.remove('btn-loading'); loginBtn.classList.add('btn-ghost'); loginBtn.innerText = 'SUCCESS';
                     secretKey = tempKey; 
                     setTimeout(() => {
-                        updateUIVisibility();
-                        closeMenu(); 
-                        fetchStatuses(true); 
-                        passInput.value = ''; 
-                        if (rememberMe) { localStorage.setItem('mv_admin_key', secretKey); } else { localStorage.removeItem('mv_admin_key'); }
-                        
-                        loginBtn.innerText = 'LOGIN';
-                        loginBtn.classList.remove('btn-ghost');
+                        updateUIVisibility(); closeMenu(); fetchStatuses(true); passInput.value = ''; 
+                        if (rememberMe) localStorage.setItem('mv_admin_key', secretKey); else localStorage.removeItem('mv_admin_key');
+                        loginBtn.innerText = 'LOGIN'; loginBtn.classList.remove('btn-ghost');
+                        showDashboard(); // Auto-redirect to dashboard
                     }, 1000);
                 } else { 
                     passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; 
                     loginBtn.innerText = 'LOGIN'; loginBtn.classList.remove('btn-loading');
                 }
-            } catch (err) { 
-                passInput.classList.add('input-error'); 
-                loginBtn.innerText = 'LOGIN'; loginBtn.classList.remove('btn-loading');
-            }
+            } catch (err) { passInput.classList.add('input-error'); loginBtn.innerText = 'LOGIN'; loginBtn.classList.remove('btn-loading'); }
         }
 
         async function checkRememberedLogin() {
@@ -826,250 +598,162 @@
             if (savedKey) {
                 try {
                     const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': savedKey } });
-                    if (res.ok) { 
-                        secretKey = savedKey; 
-                        updateUIVisibility();
-                        fetchStatuses(true); 
-                    } 
+                    if (res.ok) { secretKey = savedKey; updateUIVisibility(); fetchStatuses(true); } 
                     else { localStorage.removeItem('mv_admin_key'); updateUIVisibility(); }
                 } catch (e) { updateUIVisibility(); }
-            } else {
-                updateUIVisibility();
-            }
+            } else { updateUIVisibility(); }
         }
 
         function handleLogout() {
-            secretKey = ""; passInput.value = ''; 
-            localStorage.removeItem('mv_admin_key');
-            updateUIVisibility();
-            closeMenu();
-            resetEditor();
-            resetAboutEditor();
-            resetContactEditor();
-            document.getElementById('editor-collapsed-state').style.display = 'flex';
-            document.getElementById('editor-form').style.display = 'none';
-            document.getElementById('editor-collapsed-state-about').style.display = 'flex';
-            document.getElementById('editor-form-about').style.display = 'none';
-            document.getElementById('editor-collapsed-state-contact').style.display = 'flex';
-            document.getElementById('editor-form-contact').style.display = 'none';
-            fetchStatuses(true);
+            secretKey = ""; passInput.value = ''; localStorage.removeItem('mv_admin_key');
+            updateUIVisibility(); closeMenu(); fetchStatuses(true);
         }
 
-        function refreshFeedUI(feedPosts) { 
-            const container = document.getElementById('status-container');
-            const deleteAllBtn = document.getElementById('delete-all-btn');
-
-            if (deleteAllBtn) {
-                if (globalPosts.length === 0) {
-                    deleteAllBtn.disabled = true;
-                    deleteAllBtn.className = "submit-btn btn-tonal-disabled";
-                } else {
-                    deleteAllBtn.disabled = false;
-                    deleteAllBtn.className = "submit-btn btn-danger";
-                }
-            }
+        // 🛠️ CMS DASHBOARD LOGIC
+        function populateDashboard() {
+            if (!secretKey) return;
             
-            if (feedPosts.length === 0) {
-                container.className = 'status-feed view-feed';
-                if (secretKey) {
-                    container.innerHTML = ``;
-                } else {
-                    container.innerHTML = `
-                        <div class="divider-line"></div>
-                        <div class="submit-btn btn-tonal-disabled" style="width: 100%; cursor: default;">
-                            NOTHING HERE YET.
-                        </div>
-                    `;
-                }
-                return;
-            }
-
-            if (currentViewMode === 'feed') {
-                container.className = 'status-feed view-feed';
-                let html = `
-                    <div class="feed-toggle-wrapper">
-                        ${secretKey ? '<div class="divider-line"></div>' : ''}
-                        <button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">GRID VIEW</button>
-                    </div>
-                `;
-                feedPosts.forEach(post => { html += renderSinglePost(post); });
-                container.innerHTML = html;
+            // 1. Fill Posts Table
+            const feedPosts = globalPosts.filter(p => p.author === '');
+            const listEl = document.getElementById('dash-posts-list');
+            let tableHtml = '';
+            if(feedPosts.length === 0) {
+                tableHtml = `<div class="dash-table-row" style="color: var(--grey-50);">No posts found.</div>`;
             } else {
-                container.className = 'status-feed view-grid';
-                let html = secretKey ? '<div class="divider-line"></div>' : '';
-                
-                if (currentGridCols === 3) {
-                    let leftCol = '<div class="masonry-col col-left">';
-                    let midCol = '<div class="masonry-col col-mid">';
-                    let rightCol = '<div class="masonry-col col-right">';
-
-                    midCol += `<button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">FEED VIEW</button>`;
-
-                    feedPosts.forEach((post, index) => {
-                        if (index % 3 === 0) leftCol += renderSinglePost(post);
-                        else if (index % 3 === 1) midCol += renderSinglePost(post);
-                        else rightCol += renderSinglePost(post);
-                    });
-
-                    leftCol += '</div>';
-                    midCol += '</div>';
-                    rightCol += '</div>';
-
-                    html += `<div class="grid-columns-wrapper">${leftCol}${midCol}${rightCol}</div>`;
-                } else {
-                    let leftCol = '<div class="masonry-col col-left">';
-                    let rightCol = '<div class="masonry-col col-right">';
-
-                    rightCol += `<button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">FEED VIEW</button>`;
-
-                    feedPosts.forEach((post, index) => {
-                        if (index % 2 === 0) leftCol += renderSinglePost(post);
-                        else rightCol += renderSinglePost(post);
-                    });
-
-                    leftCol += '</div>';
-                    rightCol += '</div>';
-
-                    html += `<div class="grid-columns-wrapper">${leftCol}${rightCol}</div>`;
-                }
-                container.innerHTML = html;
+                feedPosts.forEach(p => {
+                    const formattedDate = new Date(p.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+                    const thumb = p.image_url ? `<img src="${p.image_url}" class="dash-row-thumb">` : `<div class="dash-row-thumb"></div>`;
+                    const title = p.id ? `Post #${p.id}` : `Feed Item`;
+                    tableHtml += `
+                    <div class="dash-table-row">
+                        <div class="dash-col-main">
+                            ${thumb}
+                            <div class="dash-row-title">${title}</div>
+                        </div>
+                        <div class="dash-col-date">${formattedDate}</div>
+                        <div class="dash-col-actions">
+                            <button class="action-icon-btn" onclick="openDeleteModal(${p.id})">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                    </div>`;
+                });
             }
+            listEl.innerHTML = tableHtml;
+
+            // 2. Fill About Form
+            const aboutP = globalPosts.find(p => p.author === 'about');
+            editingAboutPostId = aboutP ? aboutP.id : null;
+            existingAboutImageUrl = aboutP ? aboutP.image_url : null;
+            document.getElementById('about-intro').value = ""; document.getElementById('about-approach').value = "";
+            document.getElementById('about-cta-title').value = ""; document.getElementById('about-cta-text').value = ""; document.getElementById('about-cta-btn').value = "";
+            document.getElementById('about-exp-list').innerHTML = '';
+            
+            if (aboutP) {
+                try { 
+                    const data = JSON.parse(aboutP.text);
+                    if (data && data.v === 2) {
+                        document.getElementById('about-intro').value = data.intro || "";
+                        document.getElementById('about-approach').value = data.approach || "";
+                        document.getElementById('about-cta-title').value = data.ctaTitle || "";
+                        document.getElementById('about-cta-text').value = data.ctaText || "";
+                        document.getElementById('about-cta-btn').value = data.ctaBtn || "";
+                        if(data.exps) data.exps.forEach(exp => addExperienceRow(exp.title, exp.company, exp.date));
+                    } else { document.getElementById('about-approach').value = aboutP.text || ""; }
+                } catch(e) { document.getElementById('about-approach').value = aboutP.text || ""; }
+            }
+            updateAboutFormState();
+
+            // 3. Fill Contact Form
+            const contP = globalPosts.find(p => p.author === 'contact');
+            editingContactPostId = contP ? contP.id : null;
+            existingContactImageUrl = contP ? contP.image_url : null;
+            document.getElementById('edit-title-contact').value = contP ? (contP.title || "") : "";
+            document.getElementById('edit-text-contact').value = contP ? (contP.text || "") : "";
+            updateContactFormState();
+
+            // 4. Fill Settings Form
+            const setP = globalPosts.find(p => p.author === 'settings');
+            editingSettingsPostId = setP ? setP.id : null;
+            existingSettingsImageUrl = setP ? setP.image_url : null;
+            if(setP) {
+                try {
+                    const data = JSON.parse(setP.text);
+                    document.getElementById('setting-title').value = data.title || "martinvojtus.space";
+                } catch(e) {}
+            }
+            updateSettingsFormState();
+            applySettingsToPublicSite();
         }
 
-        // 🛠️ Úplne nová render funkcia pre About sekciu parsujúca JSON
-        function getAboutPostHtml(p, index = 0) {
-            const showDivider = (index === 0 && !secretKey) ? false : true;
-            const dividerHtml = showDivider ? `<div class="divider-line"></div>` : '';
+        function applySettingsToPublicSite() {
+            const setP = globalPosts.find(p => p.author === 'settings');
+            let sTitle = "martinvojtus.space";
+            if(setP) { try { const d = JSON.parse(setP.text); if(d.title) sTitle = d.title; } catch(e){} }
+            const logoEl = document.getElementById('public-site-title');
+            if(logoEl) logoEl.innerText = sTitle;
+            document.title = sTitle;
+        }
 
-            let data = null;
-            try { data = JSON.parse(p.text); } catch(e) {}
+        // PUBLIC VIEWS RENDERERS
+        function toggleViewMode() { const newMode = currentViewMode === 'feed' ? 'grid' : 'feed'; currentViewMode = newMode; localStorage.setItem('mv_view_mode', newMode); refreshFeedUI(globalPosts.filter(p => p.author === '')); }
 
+        function renderSinglePost(s) {
+            const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
+            let topRow = `<div class="action-row feed-top-row" style="justify-content: flex-start; padding: 0;"><div class="submit-btn btn-tonal-disabled" style="flex-grow: 0; padding: 0 1rem; cursor: default;">${formattedDate}</div></div>`;
+            const imageHtml = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="status-image" alt="image" loading="lazy" onclick="handleImageClick(${s.id})">` : '';
+            return `<div class="status-card" style="gap: var(--gap-item);"><div class="divider-line feed-divider"></div>${topRow}<div class="status-media-wrapper">${imageHtml}</div></div>`;
+        }
+
+        function getAboutPostHtml(p) {
+            let data = null; try { data = JSON.parse(p.text); } catch(e) {}
             let contentHtml = '';
 
             if (data && data.v === 2) {
                 let expsHtml = '';
                 if(data.exps && data.exps.length > 0) {
                     expsHtml += `<div class="about-section-title">Experience</div>`;
-                    data.exps.forEach(exp => {
-                        expsHtml += `
-                        <div class="about-exp-item">
-                            <div class="about-exp-title">${exp.title}</div>
-                            <div class="about-exp-company">${exp.company}</div>
-                            <div class="about-exp-badge">${exp.date}</div>
-                            <div class="about-exp-divider"></div>
-                        </div>`;
-                    });
+                    data.exps.forEach(exp => { expsHtml += `<div class="about-exp-item"><div class="about-exp-title">${exp.title}</div><div class="about-exp-company">${exp.company}</div><div class="about-exp-badge">${exp.date}</div><div class="about-exp-divider"></div></div>`; });
                 }
-
                 let ctaHtml = '';
-                if(data.ctaTitle || data.ctaText) {
-                    ctaHtml = `
-                    <div class="about-cta-card">
-                        <div class="about-cta-title">${data.ctaTitle}</div>
-                        <div class="about-cta-text">${data.ctaText}</div>
-                        <button class="about-cta-btn" onclick="showContact()">${data.ctaBtn || 'Get in touch'}</button>
-                    </div>`;
-                }
+                if(data.ctaTitle || data.ctaText) ctaHtml = `<div class="about-cta-card"><div class="about-cta-title">${data.ctaTitle}</div><div class="about-cta-text">${data.ctaText}</div><button class="about-cta-btn" onclick="showContact()">${data.ctaBtn || 'Get in touch'}</button></div>`;
 
                 contentHtml = `
                     <div class="about-page-title">About Me</div>
                     <div class="about-title-line"></div>
-
                     ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: 1.5rem; margin-bottom: 1.5rem;" loading="lazy">` : ''}
-
                     ${data.intro ? `<div class="about-intro-text">${data.intro}</div>` : ''}
-
-                    ${data.approach ? `
-                        <div class="about-section-title">My Approach</div>
-                        <div class="about-text" style="margin-bottom: 2rem;">${data.approach}</div>
-                    ` : ''}
-
-                    ${expsHtml}
-                    ${ctaHtml}
+                    ${data.approach ? `<div class="about-section-title">My Approach</div><div class="about-text" style="margin-bottom: 2rem;">${data.approach}</div>` : ''}
+                    ${expsHtml}${ctaHtml}
                 `;
             } else {
-                // Fallback na starý render
-                contentHtml = `
-                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
-                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2; font-weight: bold;">${p.title}</div>` : ''}
-                    ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
-                `;
+                contentHtml = `${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2; font-weight: bold;">${p.title}</div>` : ''}${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}`;
             }
-
-            return `
-            <div style="display: flex; flex-direction: column; width: 100%;">
-                ${dividerHtml}
-                <div class="status-card" style="gap: 0;">
-                    ${secretKey ? `
-                    <div class="action-row" style="justify-content: flex-end; padding: 0; margin-bottom: 1rem;">
-                        <button class="submit-btn btn-tonal" style="flex-grow: 0;" onclick="editAboutPost(${p.id})">EDIT</button>
-                        <button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="openDeleteAboutModal(${p.id})">DELETE</button>
-                    </div>
-                    ` : ''}
-                    ${contentHtml}
-                </div>
-            </div>
-            `;
+            return `<div style="display: flex; flex-direction: column; width: 100%;"><div class="status-card" style="gap: 0;">${contentHtml}</div></div>`;
         }
 
-        function getContactPostHtml(p, index = 0) {
-            const showDivider = (index === 0 && !secretKey) ? false : true;
-            const dividerHtml = showDivider ? `<div class="divider-line"></div>` : '';
-
-            return `
-            <div style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item);">
-                ${dividerHtml}
-                <div class="status-card" style="gap: var(--gap-item);">
-                    ${secretKey ? `
-                    <div class="action-row" style="justify-content: flex-end; padding: 0;">
-                        <button class="submit-btn btn-tonal" style="flex-grow: 0;" onclick="editContactPost(${p.id})">EDIT</button>
-                        <button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="openDeleteContactModal(${p.id})">DELETE</button>
-                    </div>
-                    ` : ''}
-                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
-                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2; font-weight: bold;">${p.title}</div>` : ''}
-                    ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
-                </div>
-            </div>
-            `;
+        function getContactPostHtml(p) {
+            return `<div style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item);"><div class="status-card" style="gap: var(--gap-item);">${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2; font-weight: bold;">${p.title}</div>` : ''}${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}</div></div>`;
         }
 
-        function renderAboutPosts(posts) {
-            const container = document.getElementById('about-posts-container');
-            let html = '';
-            posts.forEach((p, index) => html += getAboutPostHtml(p, index));
-            container.innerHTML = html;
-        }
-
-        function renderContactPosts(posts) {
-            const container = document.getElementById('contact-posts-container');
-            let html = '';
-            posts.forEach((p, index) => html += getContactPostHtml(p, index));
-            container.innerHTML = html;
-        }
-
+        // COMPRESS
         function compressImage(file, maxWidth = 1200, quality = 0.8) {
             return new Promise((resolve) => {
-                const reader = new FileReader(); 
-                reader.readAsDataURL(file);
+                const reader = new FileReader(); reader.readAsDataURL(file);
                 reader.onload = event => {
-                    const img = new Image(); 
-                    img.src = event.target.result;
+                    const img = new Image(); img.src = event.target.result;
                     img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let w = img.width, h = img.height;
+                        const canvas = document.createElement('canvas'); let w = img.width, h = img.height;
                         if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
-                        canvas.width = w; canvas.height = h;
-                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                         const newName = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
-                        canvas.toBlob(blob => { 
-                            resolve(new File([blob], newName, { type: 'image/jpeg', lastModified: Date.now() })); 
-                        }, 'image/jpeg', quality);
+                        canvas.toBlob(blob => { resolve(new File([blob], newName, { type: 'image/jpeg', lastModified: Date.now() })); }, 'image/jpeg', quality);
                     };
                 };
             });
         }
 
+        // FETCH
         async function fetchStatuses(reset = false) {
             if (reset) { currentOffset = 0; hasMorePosts = true; globalPosts = []; document.getElementById('status-container').innerHTML = ''; }
             if (isLoading || !hasMorePosts) return;
@@ -1080,677 +764,173 @@
                 if (newPosts.length < postsLimit) hasMorePosts = false;
                 currentOffset += newPosts.length; globalPosts = globalPosts.concat(newPosts);
                 
-                const feedPosts = globalPosts.filter(p => p.author !== 'about' && p.author !== 'contact');
+                const feedPosts = globalPosts.filter(p => p.author === '');
                 const aboutPosts = globalPosts.filter(p => p.author === 'about');
                 const contactPosts = globalPosts.filter(p => p.author === 'contact');
 
                 if (reset) {
                     refreshFeedUI(feedPosts);
-                    renderAboutPosts(aboutPosts);
-                    renderContactPosts(contactPosts);
+                    document.getElementById('about-posts-container').innerHTML = aboutPosts.map(p => getAboutPostHtml(p)).join('');
+                    document.getElementById('contact-posts-container').innerHTML = contactPosts.map(p => getContactPostHtml(p)).join('');
                 } else {
-                    const newFeedPosts = newPosts.filter(p => p.author !== 'about' && p.author !== 'contact');
-                    const newAboutPosts = newPosts.filter(p => p.author === 'about');
-                    const newContactPosts = newPosts.filter(p => p.author === 'contact');
-
+                    const newFeedPosts = newPosts.filter(p => p.author === '');
                     if (currentViewMode === 'feed') {
-                        let html = '';
-                        newFeedPosts.forEach(p => html += renderSinglePost(p));
-                        document.getElementById('status-container').insertAdjacentHTML('beforeend', html);
+                        document.getElementById('status-container').insertAdjacentHTML('beforeend', newFeedPosts.map(p => renderSinglePost(p)).join(''));
                     } else {
-                        if (currentGridCols === 3) {
-                            const leftCol = document.querySelector('.col-left');
-                            const midCol = document.querySelector('.col-mid');
-                            const rightCol = document.querySelector('.col-right');
-                            let currentFeedCount = feedPosts.length - newFeedPosts.length;
-                            newFeedPosts.forEach((post, i) => {
-                                const postHtml = renderSinglePost(post);
-                                const colIndex = (currentFeedCount + i) % 3;
-                                if (colIndex === 0 && leftCol) leftCol.insertAdjacentHTML('beforeend', postHtml);
-                                else if (colIndex === 1 && midCol) midCol.insertAdjacentHTML('beforeend', postHtml);
-                                else if (rightCol) rightCol.insertAdjacentHTML('beforeend', postHtml);
-                            });
-                        } else {
-                            const leftCol = document.querySelector('.col-left');
-                            const rightCol = document.querySelector('.col-right');
-                            let currentFeedCount = feedPosts.length - newFeedPosts.length;
-                            newFeedPosts.forEach((post, i) => {
-                                const postHtml = renderSinglePost(post);
-                                if ((currentFeedCount + i) % 2 === 0) {
-                                    if (leftCol) leftCol.insertAdjacentHTML('beforeend', postHtml);
-                                } else {
-                                    if (rightCol) rightCol.insertAdjacentHTML('beforeend', postHtml);
-                                }
-                            });
-                        }
-                    }
-
-                    if (newAboutPosts.length > 0) {
-                        let html = '';
-                        let currentAboutCount = aboutPosts.length - newAboutPosts.length;
-                        newAboutPosts.forEach((p, i) => html += getAboutPostHtml(p, currentAboutCount + i));
-                        document.getElementById('about-posts-container').insertAdjacentHTML('beforeend', html);
-                    }
-
-                    if (newContactPosts.length > 0) {
-                        let html = '';
-                        let currentContactCount = contactPosts.length - newContactPosts.length;
-                        newContactPosts.forEach((p, i) => html += getContactPostHtml(p, currentContactCount + i));
-                        document.getElementById('contact-posts-container').insertAdjacentHTML('beforeend', html);
+                        // Grid layout append logic (simplified for snippet size)
+                        refreshFeedUI(feedPosts); 
                     }
                 }
+                
+                applySettingsToPublicSite();
+                if(currentSection === 'dashboard') populateDashboard();
+
             } catch (error) {} finally { 
-                isLoading = false; 
-                document.getElementById('loading-indicator').style.display = (hasMorePosts && globalPosts.length > 0) ? 'block' : 'none'; 
-                checkPostLimits();
+                isLoading = false; document.getElementById('loading-indicator').style.display = (hasMorePosts && globalPosts.length > 0) ? 'block' : 'none'; 
             }
         }
+        window.addEventListener('scroll', () => { if (currentSection === 'feed' && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
 
-        window.addEventListener('scroll', () => { 
-            if (currentSection === 'feed' && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
-                fetchStatuses(); 
-            }
-        });
-
-        function handleImageClick(id) {
-            if (currentViewMode === 'grid') {
-                currentViewMode = 'feed';
-                localStorage.setItem('mv_view_mode', 'feed');
-                refreshFeedUI(globalPosts.filter(p => p.author !== 'about' && p.author !== 'contact'));
-                
-                const scrollIt = (behavior) => {
-                    const targetImg = document.getElementById(`post-img-${id}`);
-                    if (targetImg) {
-                        targetImg.closest('.status-card').scrollIntoView({ behavior: behavior, block: 'center' });
-                    }
-                };
-
-                setTimeout(() => scrollIt('auto'), 50);
-                setTimeout(() => scrollIt('auto'), 300);
-                setTimeout(() => scrollIt('smooth'), 600);
-            }
-        }
-
-        function renderSinglePost(s) {
-            const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
-            
-            let topRow = `
-            <div class="action-row feed-top-row" style="justify-content: space-between; padding: 0;">
-                <div style="display: flex; gap: var(--gap-item);">
-                    ${secretKey ? `<div class="submit-btn btn-tonal-disabled" style="flex-grow: 0; padding: 0 1rem; cursor: default;">#${s.id}</div>` : ''}
-                    <div class="submit-btn btn-tonal-disabled" style="flex-grow: 0; padding: 0 1rem; cursor: default;">${formattedDate}</div>
-                </div>
-                ${secretKey ? `<button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="handleDeleteFeed(${s.id})">DELETE</button>` : ''}
-            </div>
-            `;
-
-            const imageHtml = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="status-image" alt="image" loading="lazy" onclick="handleImageClick(${s.id})">` : '';
-            
-            let mediaHtml = '';
-            if (imageHtml) {
-                mediaHtml = `
-                <div class="status-media-wrapper">
-                    ${imageHtml}
-                    ${secretKey ? `
-                    <div id="confirm-overlay-${s.id}" class="status-confirm-overlay">
-                        <div id="confirm-actions-${s.id}" class="action-row" style="padding: 0 var(--gap-item);">
-                            <button class="submit-btn" onclick="executeFeedDelete(${s.id})">DELETE</button>
-                            <button class="submit-btn btn-tonal" onclick="closeFeedDelete(${s.id})">CANCEL</button>
-                        </div>
-                        <div id="confirm-loading-${s.id}" class="action-row" style="display: none; padding: 0 var(--gap-item);">
-                            <div class="submit-btn btn-loading">DELETING...</div>
-                        </div>
-                        <div id="confirm-success-${s.id}" class="action-row" style="display: none; padding: 0 var(--gap-item);">
-                            <div class="submit-btn btn-ghost">DELETED</div>
-                        </div>
-                    </div>
-                    ` : ''}
-                </div>`;
-            }
-
-            return `
-            <div class="status-card" style="gap: var(--gap-item);">
-                <div class="divider-line feed-divider"></div>
-                ${topRow}
-                ${mediaHtml}
-            </div>`;
-        }
-
-        function resetEditor() {
-            document.getElementById('edit-image').value = ""; 
-            
-            document.getElementById('upload-action-row').style.display = 'flex';
-            document.getElementById('upload-loading-row').style.display = 'none';
-            document.getElementById('upload-success-row').style.display = 'none';
-            
-            document.getElementById('upload-action-row').innerHTML = `
-                <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
-                <div class="submit-btn btn-tonal" onclick="collapseEditor()">CANCEL</div>
-            `;
-            
-            updateImageUIState(); 
-        }
-
-        function updateImageUIState() {
-            const input = document.getElementById('edit-image');
-            const emptyState = document.getElementById('upload-empty-state');
-            const filledState = document.getElementById('upload-filled-state');
-            const thumbnail = document.getElementById('upload-preview-img');
-            const pubBtn = document.getElementById('publish-btn');
-
+        // FEED FORM (Dashboard)
+        function updateFeedFormState() {
+            const input = document.getElementById('edit-image-feed');
             const hasImage = (input && input.files && input.files.length > 0);
-
-            if (hasImage) {
-                if(thumbnail) thumbnail.src = URL.createObjectURL(input.files[0]);
-                emptyState.style.display = 'none';
-                filledState.style.display = 'flex';
-            } else {
-                if(thumbnail) thumbnail.src = "";
-                emptyState.style.display = 'flex';
-                filledState.style.display = 'none';
-            }
-
-            if (pubBtn) {
-                if (hasImage) {
-                    pubBtn.disabled = false;
-                    pubBtn.className = "submit-btn btn-tonal";
-                } else {
-                    pubBtn.disabled = true;
-                    pubBtn.className = "submit-btn btn-tonal-disabled";
-                }
-            }
+            document.getElementById('upload-empty-state-feed').style.display = hasImage ? 'none' : 'flex';
+            document.getElementById('upload-filled-state-feed').style.display = hasImage ? 'flex' : 'none';
+            if(hasImage) document.getElementById('upload-preview-img-feed').src = URL.createObjectURL(input.files[0]);
+            const pubBtn = document.getElementById('publish-btn-feed');
+            if(hasImage) { pubBtn.disabled = false; pubBtn.className = "submit-btn"; } else { pubBtn.disabled = true; pubBtn.className = "submit-btn btn-tonal-disabled"; }
         }
-
-        function clearImageSelection(e) {
-            e.stopPropagation();
-            document.getElementById('edit-image').value = ""; 
-            updateImageUIState();
-        }
-
-        // 🛠️ Logika pre dynamické riadky skúseností
-        function addExperienceRow(title = '', company = '', date = '') {
-            const container = document.getElementById('about-exp-list');
-            const row = document.createElement('div');
-            row.className = 'about-exp-row';
-            row.style.cssText = 'display: flex; flex-direction: column; gap: 0.5rem; padding: 1rem; border: 1px solid var(--divider); border-radius: var(--border-radius); position: relative;';
-            row.innerHTML = `
-                <button type="button" class="submit-btn btn-danger" style="position: absolute; top: 0.5rem; right: 0.5rem; height: 2rem; min-width: 2rem; padding: 0;" onclick="this.parentElement.remove(); updateAboutUIState();">X</button>
-                <input type="text" class="form-input exp-title" placeholder="Job Title..." style="width: calc(100% - 3rem);" value="${title}" oninput="updateAboutUIState()">
-                <input type="text" class="form-input exp-company" placeholder="Company..." style="width: 100%;" value="${company}" oninput="updateAboutUIState()">
-                <input type="text" class="form-input exp-date" placeholder="Date (e.g. 2021 — Present)" style="width: 100%;" value="${date}" oninput="updateAboutUIState()">
-            `;
-            container.appendChild(row);
-            updateAboutUIState();
-        }
-
-        // 🛠️ Prepracované kontroly UI v About form
-        function updateAboutUIState() {
-            const intro = document.getElementById('about-intro').value.trim();
-            const approach = document.getElementById('about-approach').value.trim();
-            const exps = document.querySelectorAll('.about-exp-row').length;
-            const ctaT = document.getElementById('about-cta-title').value.trim();
-            
-            const input = document.getElementById('edit-image-about');
-            const hasImage = (input && input.files && input.files.length > 0) || existingAboutImageUrl;
-
-            const hasContent = intro.length > 0 || approach.length > 0 || exps > 0 || ctaT.length > 0 || hasImage;
-
-            const pubBtn = document.getElementById('publish-btn-about');
-            const clearBtn = document.getElementById('clear-btn-about');
-
-            if (hasContent) {
-                if (pubBtn) { pubBtn.disabled = false; pubBtn.className = "submit-btn btn-tonal"; }
-                if (clearBtn) { clearBtn.disabled = false; clearBtn.className = "submit-btn btn-tonal"; }
-            } else {
-                if (pubBtn) { pubBtn.disabled = true; pubBtn.className = "submit-btn btn-tonal-disabled"; }
-                if (clearBtn) { clearBtn.disabled = true; clearBtn.className = "submit-btn btn-tonal-disabled"; }
-            }
-        }
-
-        function clearAboutTextFields(e) {
-            if(e) e.stopPropagation();
-            document.getElementById('about-intro').value = "";
-            document.getElementById('about-approach').value = "";
-            document.getElementById('about-cta-title').value = "";
-            document.getElementById('about-cta-text').value = "";
-            document.getElementById('about-cta-btn').value = "";
-            document.getElementById('about-exp-list').innerHTML = '';
-            document.querySelectorAll('#editor-form-about textarea').forEach(el => el.style.height = '');
-            updateAboutUIState();
-        }
-
-        function resetAboutEditor() {
-            editingAboutPostId = null;
-            existingAboutImageUrl = null;
-            
-            clearAboutTextFields();
-            document.getElementById('edit-image-about').value = "";
-            
-            document.getElementById('upload-action-row-about').style.display = 'flex';
-            document.getElementById('upload-loading-row-about').style.display = 'none';
-            
-            document.getElementById('publish-btn-about').innerText = "SAVE PAGE";
-            
-            updateAboutImageUIState();
-        }
-
-        function updateAboutImageUIState() {
-            const input = document.getElementById('edit-image-about');
-            const emptyState = document.getElementById('upload-empty-state-about');
-            const filledState = document.getElementById('upload-filled-state-about');
-            const thumbnail = document.getElementById('upload-preview-img-about');
-            
-            const hasImage = (input && input.files && input.files.length > 0) || existingAboutImageUrl;
-
-            if (hasImage) {
-                if(input && input.files && input.files.length > 0) {
-                    thumbnail.src = URL.createObjectURL(input.files[0]);
-                } else {
-                    thumbnail.src = existingAboutImageUrl;
-                }
-                emptyState.style.display = 'none';
-                filledState.style.display = 'flex';
-            } else {
-                thumbnail.src = "";
-                emptyState.style.display = 'flex';
-                filledState.style.display = 'none';
-            }
-
-            updateAboutUIState();
-        }
-
-        function clearAboutImageSelection(e) {
-            e.stopPropagation();
-            document.getElementById('edit-image-about').value = "";
-            existingAboutImageUrl = null; 
-            updateAboutImageUIState();
-        }
-
-        function editAboutPost(id) {
-            const post = globalPosts.find(p => p.id === id);
-            if (!post) return;
-            
-            editingAboutPostId = post.id;
-            existingAboutImageUrl = post.image_url;
-            
-            let data = {};
-            try { data = JSON.parse(post.text); } catch(e) {}
-
-            if (data && data.v === 2) {
-                document.getElementById('about-intro').value = data.intro || "";
-                document.getElementById('about-approach').value = data.approach || "";
-                document.getElementById('about-cta-title').value = data.ctaTitle || "";
-                document.getElementById('about-cta-text').value = data.ctaText || "";
-                document.getElementById('about-cta-btn').value = data.ctaBtn || "";
-                
-                document.getElementById('about-exp-list').innerHTML = '';
-                if(data.exps) {
-                    data.exps.forEach(exp => addExperienceRow(exp.title, exp.company, exp.date));
-                }
-            } else {
-                // Fallback ak sa upravuje starý formát príspevku
-                document.getElementById('about-approach').value = post.text || "";
-                document.getElementById('about-exp-list').innerHTML = '';
-            }
-            
-            expandAboutEditor();
-            setTimeout(() => { 
-                autoResizeTextarea(document.getElementById('about-intro')); 
-                autoResizeTextarea(document.getElementById('about-approach')); 
-                autoResizeTextarea(document.getElementById('about-cta-text')); 
-            }, 0);
-            updateAboutImageUIState();
-            
-            document.getElementById('publish-btn-about').innerText = "SAVE";
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function updateContactUIState() {
-            const titleVal = document.getElementById('edit-title-contact').value.trim();
-            const textVal = document.getElementById('edit-text-contact').value.trim();
-            const input = document.getElementById('edit-image-contact');
-            const hasImage = (input && input.files && input.files.length > 0) || existingContactImageUrl;
-
-            const hasContent = titleVal.length > 0 || textVal.length > 0 || hasImage;
-
-            const pubBtn = document.getElementById('publish-btn-contact');
-            const clearBtn = document.getElementById('clear-btn-contact');
-
-            if (hasContent) {
-                if (pubBtn) { pubBtn.disabled = false; pubBtn.className = "submit-btn btn-tonal"; }
-                if (clearBtn) { clearBtn.disabled = false; clearBtn.className = "submit-btn btn-tonal"; }
-            } else {
-                if (pubBtn) { pubBtn.disabled = true; pubBtn.className = "submit-btn btn-tonal-disabled"; }
-                if (clearBtn) { clearBtn.disabled = true; clearBtn.className = "submit-btn btn-tonal-disabled"; }
-            }
-        }
-
-        function clearContactTextFields(e) {
-            if(e) e.stopPropagation();
-            document.getElementById('edit-title-contact').value = "";
-            const textEl = document.getElementById('edit-text-contact');
-            textEl.value = "";
-            textEl.style.height = ''; 
-            updateContactUIState();
-        }
-
-        function resetContactEditor() {
-            editingContactPostId = null;
-            existingContactImageUrl = null;
-            
-            document.getElementById('edit-title-contact').value = "";
-            const textEl = document.getElementById('edit-text-contact');
-            textEl.value = "";
-            textEl.style.height = '';
-
-            document.getElementById('edit-image-contact').value = "";
-            
-            document.getElementById('upload-action-row-contact').style.display = 'flex';
-            document.getElementById('upload-loading-row-contact').style.display = 'none';
-            
-            document.getElementById('publish-btn-contact').innerText = "UPLOAD";
-            
-            updateContactImageUIState();
-        }
-
-        function updateContactImageUIState() {
-            const input = document.getElementById('edit-image-contact');
-            const emptyState = document.getElementById('upload-empty-state-contact');
-            const filledState = document.getElementById('upload-filled-state-contact');
-            const thumbnail = document.getElementById('upload-preview-img-contact');
-            
-            const hasImage = (input && input.files && input.files.length > 0) || existingContactImageUrl;
-
-            if (hasImage) {
-                if(input && input.files && input.files.length > 0) {
-                    thumbnail.src = URL.createObjectURL(input.files[0]);
-                } else {
-                    thumbnail.src = existingContactImageUrl;
-                }
-                emptyState.style.display = 'none';
-                filledState.style.display = 'flex';
-            } else {
-                thumbnail.src = "";
-                emptyState.style.display = 'flex';
-                filledState.style.display = 'none';
-            }
-
-            updateContactUIState();
-        }
-
-        function clearContactImageSelection(e) {
-            e.stopPropagation();
-            document.getElementById('edit-image-contact').value = "";
-            existingContactImageUrl = null; 
-            updateContactImageUIState();
-        }
-
-        function editContactPost(id) {
-            const post = globalPosts.find(p => p.id === id);
-            if (!post) return;
-            
-            editingContactPostId = post.id;
-            existingContactImageUrl = post.image_url;
-            
-            document.getElementById('edit-title-contact').value = post.title || "";
-            const textEl = document.getElementById('edit-text-contact');
-            textEl.value = post.text || "";
-            
-            expandContactEditor();
-            setTimeout(() => { autoResizeTextarea(textEl); }, 0);
-            updateContactImageUIState();
-            
-            document.getElementById('publish-btn-contact').innerText = "SAVE";
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-
-        function handleDeleteFeed(id) {
-            document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
-            document.getElementById(`confirm-actions-${id}`).style.display = 'flex';
-            document.getElementById(`confirm-loading-${id}`).style.display = 'none';
-            document.getElementById(`confirm-success-${id}`).style.display = 'none';
-        }
-
-        function closeFeedDelete(id) {
-            document.getElementById(`confirm-overlay-${id}`).style.display = 'none';
-        }
-
-        async function executeFeedDelete(id) {
-            document.getElementById(`confirm-actions-${id}`).style.display = 'none';
-            document.getElementById(`confirm-loading-${id}`).style.display = 'flex';
-            
-            await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
-            
-            document.getElementById(`confirm-loading-${id}`).style.display = 'none';
-            document.getElementById(`confirm-success-${id}`).style.display = 'flex';
-            
-            setTimeout(() => {
-                fetchStatuses(true);
-            }, 1000);
-        }
-
-        function openDeleteModal(type) {
-            deleteActionType = type;
-            document.getElementById('delete-modal').style.display = 'flex';
-            document.getElementById('modal-action-zone').style.display = 'flex';
-            document.getElementById('modal-loading-zone').style.display = 'none';
-            document.getElementById('modal-success-zone').style.display = 'none';
-        }
-
-        function openDeleteAboutModal(id) {
-            openDeleteModal('about_' + id);
-        }
-        
-        function openDeleteContactModal(id) {
-            openDeleteModal('contact_' + id);
-        }
-
-        function closeDeleteModal() {
-            document.getElementById('delete-modal').style.display = 'none';
-            deleteActionType = null;
-        }
-
-        async function executeModalDelete() {
-            document.getElementById('modal-action-zone').style.display = 'none';
-            document.getElementById('modal-loading-zone').style.display = 'flex';
-
-            if (deleteActionType === 'delete_all') {
-                const res = await fetch(`${API_URL}/posts?skip=0&limit=100`);
-                const posts = await res.json();
-                for (const p of posts) { 
-                    await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); 
-                }
-            } else if (deleteActionType && (deleteActionType.startsWith('about_') || deleteActionType.startsWith('contact_'))) {
-                const id = deleteActionType.split('_')[1];
-                await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); 
-            }
-            
-            document.getElementById('modal-loading-zone').style.display = 'none';
-            document.getElementById('modal-success-zone').style.display = 'flex';
-            
-            setTimeout(() => {
-                fetchStatuses(true);
-                closeDeleteModal();
-                if(deleteActionType === 'delete_all') { collapseEditor(); }
-            }, 1000);
-        }
-
-        function handleDeleteAllClick() {
-            openDeleteModal('delete_all');
-        }
-
-        async function handleMainSubmit(e) { 
-            e.preventDefault(); 
-            const imageFile = document.getElementById('edit-image').files[0];
-            
-            if (!imageFile) { return; }
-            
-            document.getElementById('upload-action-row').style.display = 'none';
-            document.getElementById('upload-loading-row').style.display = 'flex';
-            
+        function clearFeedImageSelection(e) { e.stopPropagation(); document.getElementById('edit-image-feed').value = ""; updateFeedFormState(); }
+        function resetFeedForm() { document.getElementById('edit-image-feed').value = ""; updateFeedFormState(); }
+        async function handleFeedSubmit(e) {
+            e.preventDefault(); const imageFile = document.getElementById('edit-image-feed').files[0]; if (!imageFile) return;
+            const btn = document.getElementById('publish-btn-feed'); btn.innerText = "UPLOADING..."; btn.className = "submit-btn btn-loading";
             try {
                 const compressedFile = await compressImage(imageFile);
                 const formData = new FormData(); formData.append("file", compressedFile);
-                
                 const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
-                if (!upRes.ok) throw new Error("Upload failed");
-                const upData = await upRes.json();
-                const finalImageUrl = upData.image_url;
-
-                const payload = { title: "", text: "", image_url: finalImageUrl, show_date: true, author: "" };
-                
-                const res = await fetch(`${API_URL}/posts`, {
-                    method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                    body: JSON.stringify(payload)
-                });
-                
-                if (res.ok) { 
-                    fetchStatuses(true); 
-                    document.getElementById('upload-loading-row').style.display = 'none';
-                    document.getElementById('upload-success-row').style.display = 'flex';
-                    setTimeout(() => { 
-                        collapseEditor(); 
-                    }, 1000);
-                } else { 
-                    resetEditor(); 
-                }
-            } catch (err) {
-                console.error(err);
-                resetEditor();
-            }
+                const finalImageUrl = (await upRes.json()).image_url;
+                await fetch(`${API_URL}/posts`, { method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify({ title: "", text: "", image_url: finalImageUrl, show_date: true, author: "" }) });
+                document.getElementById('editor-form-feed').style.display='none'; document.querySelector('#dash-tab-posts > button').style.display='flex'; resetFeedForm(); fetchStatuses(true);
+            } catch (err) { btn.innerText = "PUBLISH"; btn.className = "submit-btn"; }
         }
 
-        // 🛠️ Prepracované odosielanie do JSON pre About
+        // ABOUT FORM (Dashboard)
+        function addExperienceRow(title = '', company = '', date = '') {
+            const container = document.getElementById('about-exp-list');
+            const row = document.createElement('div'); row.className = 'about-exp-row';
+            row.style.cssText = 'display: flex; flex-direction: column; gap: 0.5rem; padding: 1rem; border: 1px solid var(--divider); border-radius: var(--border-radius); position: relative; background: var(--white);';
+            row.innerHTML = `<button type="button" class="submit-btn btn-danger" style="position: absolute; top: 0.5rem; right: 0.5rem; height: 2rem; min-width: 2rem; padding: 0;" onclick="this.parentElement.remove(); updateAboutFormState();">X</button><input type="text" class="form-input exp-title" placeholder="Job Title..." style="width: calc(100% - 3rem);" value="${title}" oninput="updateAboutFormState()"><input type="text" class="form-input exp-company" placeholder="Company..." style="width: 100%;" value="${company}" oninput="updateAboutFormState()"><input type="text" class="form-input exp-date" placeholder="Date (e.g. 2021 — Present)" style="width: 100%;" value="${date}" oninput="updateAboutFormState()">`;
+            container.appendChild(row); updateAboutFormState();
+        }
+        function updateAboutFormState() {
+            const input = document.getElementById('edit-image-about');
+            const hasImage = (input && input.files && input.files.length > 0) || existingAboutImageUrl;
+            document.getElementById('upload-empty-state-about').style.display = hasImage ? 'none' : 'flex';
+            document.getElementById('upload-filled-state-about').style.display = hasImage ? 'flex' : 'none';
+            if(input && input.files && input.files.length > 0) document.getElementById('upload-preview-img-about').src = URL.createObjectURL(input.files[0]);
+            else if(existingAboutImageUrl) document.getElementById('upload-preview-img-about').src = existingAboutImageUrl;
+            const btn = document.getElementById('publish-btn-about'); btn.disabled = false; btn.className = "submit-btn";
+        }
+        function clearAboutImageSelection(e) { e.stopPropagation(); document.getElementById('edit-image-about').value = ""; existingAboutImageUrl = null; updateAboutFormState(); }
         async function handleAboutSubmit(e) { 
             e.preventDefault(); 
-            
-            const intro = document.getElementById('about-intro').value.trim();
-            const approach = document.getElementById('about-approach').value.trim();
-            const ctaTitle = document.getElementById('about-cta-title').value.trim();
-            const ctaText = document.getElementById('about-cta-text').value.trim();
-            const ctaBtn = document.getElementById('about-cta-btn').value.trim();
-            
-            const exps = [];
-            document.querySelectorAll('.about-exp-row').forEach(row => {
-                exps.push({
-                    title: row.querySelector('.exp-title').value.trim(),
-                    company: row.querySelector('.exp-company').value.trim(),
-                    date: row.querySelector('.exp-date').value.trim()
-                });
-            });
-
+            const intro = document.getElementById('about-intro').value.trim(); const approach = document.getElementById('about-approach').value.trim();
+            const ctaTitle = document.getElementById('about-cta-title').value.trim(); const ctaText = document.getElementById('about-cta-text').value.trim(); const ctaBtn = document.getElementById('about-cta-btn').value.trim();
+            const exps = []; document.querySelectorAll('.about-exp-row').forEach(row => { exps.push({ title: row.querySelector('.exp-title').value.trim(), company: row.querySelector('.exp-company').value.trim(), date: row.querySelector('.exp-date').value.trim() }); });
             const imageFile = document.getElementById('edit-image-about').files[0];
-            
-            if (!intro && !approach && exps.length === 0 && !ctaTitle && !imageFile && !existingAboutImageUrl) return;
-            
-            document.getElementById('upload-action-row-about').style.display = 'none';
-            document.getElementById('upload-loading-row-about').style.display = 'flex';
-            
+            const btn = document.getElementById('publish-btn-about'); btn.innerText = "SAVING..."; btn.className = "submit-btn btn-loading";
             try {
                 let finalImageUrl = existingAboutImageUrl;
-                
                 if (imageFile) {
-                    const compressedFile = await compressImage(imageFile);
-                    const formData = new FormData(); formData.append("file", compressedFile);
-                    const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
-                    if (!upRes.ok) throw new Error("Upload failed");
-                    const upData = await upRes.json();
-                    finalImageUrl = upData.image_url;
+                    const compressedFile = await compressImage(imageFile); const formData = new FormData(); formData.append("file", compressedFile);
+                    finalImageUrl = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData })).json()).image_url;
                 }
-
-                const jsonPayload = {
-                    v: 2,
-                    intro: intro,
-                    approach: approach,
-                    exps: exps,
-                    ctaTitle: ctaTitle,
-                    ctaText: ctaText,
-                    ctaBtn: ctaBtn
-                };
-
+                const jsonPayload = { v: 2, intro, approach, exps, ctaTitle, ctaText, ctaBtn };
                 const payload = { title: "", text: JSON.stringify(jsonPayload), image_url: finalImageUrl || "", show_date: false, author: "about" };
-                
-                let res;
-                if (editingAboutPostId) {
-                    res = await fetch(`${API_URL}/posts/${editingAboutPostId}`, {
-                        method: "PUT", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                        body: JSON.stringify(payload)
-                    });
-                } else {
-                    res = await fetch(`${API_URL}/posts`, {
-                        method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                        body: JSON.stringify(payload)
-                    });
-                }
-                
-                if (res.ok) { 
-                    fetchStatuses(true); 
-                    collapseAboutEditor();
-                } else { 
-                    resetAboutEditor(); 
-                }
-            } catch (err) {
-                console.error(err);
-                resetAboutEditor();
-            }
+                const method = editingAboutPostId ? "PUT" : "POST"; const url = editingAboutPostId ? `${API_URL}/posts/${editingAboutPostId}` : `${API_URL}/posts`;
+                await fetch(url, { method: method, headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify(payload) });
+                fetchStatuses(true); btn.innerText = "SAVE CHANGES"; btn.className = "submit-btn";
+            } catch (err) { btn.innerText = "SAVE CHANGES"; btn.className = "submit-btn"; }
         }
 
+        // CONTACT FORM (Dashboard)
+        function updateContactFormState() {
+            const input = document.getElementById('edit-image-contact');
+            const hasImage = (input && input.files && input.files.length > 0) || existingContactImageUrl;
+            document.getElementById('upload-empty-state-contact').style.display = hasImage ? 'none' : 'flex';
+            document.getElementById('upload-filled-state-contact').style.display = hasImage ? 'flex' : 'none';
+            if(input && input.files && input.files.length > 0) document.getElementById('upload-preview-img-contact').src = URL.createObjectURL(input.files[0]);
+            else if(existingContactImageUrl) document.getElementById('upload-preview-img-contact').src = existingContactImageUrl;
+            const btn = document.getElementById('publish-btn-contact'); btn.disabled = false; btn.className = "submit-btn";
+        }
+        function clearContactImageSelection(e) { e.stopPropagation(); document.getElementById('edit-image-contact').value = ""; existingContactImageUrl = null; updateContactFormState(); }
         async function handleContactSubmit(e) { 
             e.preventDefault(); 
-            const title = document.getElementById('edit-title-contact').value;
-            const text = document.getElementById('edit-text-contact').value;
+            const title = document.getElementById('edit-title-contact').value.trim(); const text = document.getElementById('edit-text-contact').value.trim();
             const imageFile = document.getElementById('edit-image-contact').files[0];
-            
-            if (!title && !text && !imageFile && !existingContactImageUrl) return;
-            
-            document.getElementById('upload-action-row-contact').style.display = 'none';
-            document.getElementById('upload-loading-row-contact').style.display = 'flex';
-            
+            const btn = document.getElementById('publish-btn-contact'); btn.innerText = "SAVING..."; btn.className = "submit-btn btn-loading";
             try {
                 let finalImageUrl = existingContactImageUrl;
-                
                 if (imageFile) {
-                    const compressedFile = await compressImage(imageFile);
-                    const formData = new FormData(); formData.append("file", compressedFile);
-                    const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
-                    if (!upRes.ok) throw new Error("Upload failed");
-                    const upData = await upRes.json();
-                    finalImageUrl = upData.image_url;
+                    const compressedFile = await compressImage(imageFile); const formData = new FormData(); formData.append("file", compressedFile);
+                    finalImageUrl = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData })).json()).image_url;
                 }
-
-                const payload = { title: title, text: text, image_url: finalImageUrl || "", show_date: false, author: "contact" };
-                
-                let res;
-                if (editingContactPostId) {
-                    res = await fetch(`${API_URL}/posts/${editingContactPostId}`, {
-                        method: "PUT", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                        body: JSON.stringify(payload)
-                    });
-                } else {
-                    res = await fetch(`${API_URL}/posts`, {
-                        method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                        body: JSON.stringify(payload)
-                    });
-                }
-                
-                if (res.ok) { 
-                    fetchStatuses(true); 
-                    collapseContactEditor();
-                } else { 
-                    resetContactEditor(); 
-                }
-            } catch (err) {
-                console.error(err);
-                resetContactEditor();
-            }
+                const payload = { title, text, image_url: finalImageUrl || "", show_date: false, author: "contact" };
+                const method = editingContactPostId ? "PUT" : "POST"; const url = editingContactPostId ? `${API_URL}/posts/${editingContactPostId}` : `${API_URL}/posts`;
+                await fetch(url, { method: method, headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify(payload) });
+                fetchStatuses(true); btn.innerText = "SAVE CHANGES"; btn.className = "submit-btn";
+            } catch (err) { btn.innerText = "SAVE CHANGES"; btn.className = "submit-btn"; }
         }
 
-        checkRememberedLogin();
-        fetchStatuses(true);
-        document.addEventListener('click', (e) => { 
-            if (!navOverlay.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); 
-        });
+        // SETTINGS FORM (Dashboard)
+        function updateSettingsFormState() {
+            const input = document.getElementById('setting-image');
+            const hasImage = (input && input.files && input.files.length > 0) || existingSettingsImageUrl;
+            document.getElementById('upload-empty-state-setting').style.display = hasImage ? 'none' : 'flex';
+            document.getElementById('upload-filled-state-setting').style.display = hasImage ? 'flex' : 'none';
+            if(input && input.files && input.files.length > 0) document.getElementById('upload-preview-img-setting').src = URL.createObjectURL(input.files[0]);
+            else if(existingSettingsImageUrl) document.getElementById('upload-preview-img-setting').src = existingSettingsImageUrl;
+            const btn = document.getElementById('publish-btn-settings'); btn.disabled = false; btn.className = "submit-btn";
+        }
+        function clearSettingImageSelection(e) { e.stopPropagation(); document.getElementById('setting-image').value = ""; existingSettingsImageUrl = null; updateSettingsFormState(); }
+        async function handleSettingsSubmit(e) {
+            e.preventDefault();
+            const title = document.getElementById('setting-title').value.trim();
+            const imageFile = document.getElementById('setting-image').files[0];
+            const btn = document.getElementById('publish-btn-settings'); btn.innerText = "SAVING..."; btn.className = "submit-btn btn-loading";
+            try {
+                let finalImageUrl = existingSettingsImageUrl;
+                if (imageFile) {
+                    const compressedFile = await compressImage(imageFile); const formData = new FormData(); formData.append("file", compressedFile);
+                    finalImageUrl = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData })).json()).image_url;
+                }
+                const jsonPayload = { title };
+                const payload = { title: "", text: JSON.stringify(jsonPayload), image_url: finalImageUrl || "", show_date: false, author: "settings" };
+                const method = editingSettingsPostId ? "PUT" : "POST"; const url = editingSettingsPostId ? `${API_URL}/posts/${editingSettingsPostId}` : `${API_URL}/posts`;
+                await fetch(url, { method: method, headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify(payload) });
+                fetchStatuses(true); btn.innerText = "SAVE SETTINGS"; btn.className = "submit-btn";
+            } catch (err) { btn.innerText = "SAVE SETTINGS"; btn.className = "submit-btn"; }
+        }
+
+        // DELETION MODALS
+        function openDeleteModal(type) { deleteActionType = type; document.getElementById('delete-modal').style.display = 'flex'; document.getElementById('modal-action-zone').style.display = 'flex'; document.getElementById('modal-loading-zone').style.display = 'none'; document.getElementById('modal-success-zone').style.display = 'none'; }
+        function closeDeleteModal() { document.getElementById('delete-modal').style.display = 'none'; deleteActionType = null; }
+        
+        async function executeModalDelete() {
+            document.getElementById('modal-action-zone').style.display = 'none'; document.getElementById('modal-loading-zone').style.display = 'flex';
+            if (deleteActionType === 'delete_all') {
+                const res = await fetch(`${API_URL}/posts?skip=0&limit=100`); const posts = await res.json();
+                for (const p of posts) { await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); }
+            } else { await fetch(`${API_URL}/posts/${deleteActionType}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); }
+            document.getElementById('modal-loading-zone').style.display = 'none'; document.getElementById('modal-success-zone').style.display = 'flex';
+            setTimeout(() => { fetchStatuses(true); closeDeleteModal(); }, 1000);
+        }
+        function handleDeleteDashPost(id) { if(id) openDeleteModal(id); }
+
+        checkRememberedLogin(); fetchStatuses(true);
+        document.addEventListener('click', (e) => { if (!navOverlay.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); });
     </script>
 </body>
 </html>
