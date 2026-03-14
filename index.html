@@ -100,7 +100,6 @@
         }
 
         .desktop-menu { display: none; }
-        /* 🛠️ Zrušený text-transform: uppercase; */
         .desktop-link { font-size: var(--size-small); color: var(--black); cursor: pointer; }
         
         .desktop-divider { width: 1px; height: 1rem; background-color: var(--divider); }
@@ -357,6 +356,24 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
+
+        /* 🛠️ Nové dizajnové prvky pre komplexnú sekciu About */
+        .about-page-title { font-size: 2.5rem; font-weight: 700; line-height: 1.1; margin-bottom: 0.5rem; }
+        .about-title-line { width: 4rem; height: 4px; background-color: var(--black); margin-bottom: 2rem; border-radius: 2px; }
+        .about-intro-text { font-size: 1.25rem; color: var(--grey-50); line-height: 1.6; margin-bottom: 2rem; text-align: left; }
+        .about-section-title { font-size: 1.75rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; }
+        
+        .about-exp-item { display: flex; flex-direction: column; align-items: flex-start; width: 100%; }
+        .about-exp-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .about-exp-company { font-size: 1rem; color: var(--grey-50); margin-bottom: 1rem; }
+        .about-exp-badge { display: inline-block; padding: 0.25rem 0.75rem; background-color: var(--divider); border-radius: 1rem; font-size: 0.875rem; color: var(--black); }
+        .about-exp-divider { width: 100%; height: 1px; background-color: var(--divider); margin: 2rem 0; flex-shrink: 0; }
+        .about-exp-item:last-of-type .about-exp-divider { display: none; }
+
+        .about-cta-card { background-color: var(--divider); border-radius: 1.5rem; padding: 2rem; display: flex; flex-direction: column; align-items: flex-start; margin-top: 2rem; width: 100%; }
+        .about-cta-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+        .about-cta-text { font-size: 1rem; color: var(--grey-50); line-height: 1.6; margin-bottom: 1.5rem; text-align: left; }
+        .about-cta-btn { background-color: var(--black); color: var(--white); padding: 0.75rem 1.5rem; border-radius: 2rem; font-size: 1rem; font-weight: 700; text-decoration: none; display: inline-block; cursor: pointer; border: none; }
     </style>
 </head>
 <body>
@@ -409,7 +426,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.2.1 • 2026</div>
+            <div class="footer-info">build v7.2.2 • 2026</div>
         </div>
     </nav>
 
@@ -453,24 +470,21 @@
         <div id="section-feed">
             <div id="status-container" class="status-feed view-grid"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.2.1 • 2026</div>
+            <div class="footer-info">build v7.2.2 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-about">
             <div id="editor-collapsed-state-about" class="submit-btn btn-tonal" style="width: 100%;" onclick="expandAboutEditor()">
-                + ADD POST
+                + BUILD ABOUT PAGE
             </div>
 
             <form id="editor-form-about" onsubmit="handleAboutSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
-                <input type="text" id="edit-title-about" class="form-input" placeholder="Title..." style="width: 100%;" oninput="updateAboutUIState()">
-                <textarea id="edit-text-about" class="form-input" placeholder="Content..." style="width: 100%; min-height: 6rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateAboutUIState();"></textarea>
-
-                <input type="file" id="edit-image-about" accept="image/*" style="display: none;" onchange="updateAboutImageUIState()">
                 
+                <div style="font-weight: bold; padding: 0.5rem 0 0 0;">1. Main Cover</div>
+                <input type="file" id="edit-image-about" accept="image/*" style="display: none;" onchange="updateAboutImageUIState()">
                 <div id="upload-empty-state-about" class="submit-btn btn-tonal" style="width: 100%;" onclick="document.getElementById('edit-image-about').click()">
-                    + ADD IMAGE
+                    + ADD COVER IMAGE
                 </div>
-
                 <div id="upload-filled-state-about" class="action-row" style="display: none;">
                     <div class="thumbnail-container" onclick="document.getElementById('edit-image-about').click()">
                         <img id="upload-preview-img-about" class="thumbnail-img" src="" alt="">
@@ -478,14 +492,29 @@
                     <div class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="clearAboutImageSelection(event)">DELETE IMAGE</div>
                 </div>
 
-                <div id="upload-details-zone-about" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;">
+                <div style="font-weight: bold; padding: 0.5rem 0 0 0;">2. Story & Approach</div>
+                <textarea id="about-intro" class="form-input" placeholder="Intro Text (e.g. Hello! I'm Martin...)" style="width: 100%; min-height: 6rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateAboutUIState();"></textarea>
+                <textarea id="about-approach" class="form-input" placeholder="My Approach details..." style="width: 100%; min-height: 8rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateAboutUIState();"></textarea>
+
+                <div style="font-weight: bold; padding: 0.5rem 0 0 0; display: flex; justify-content: space-between; align-items: center;">
+                    <span>3. Experience</span>
+                    <button type="button" class="submit-btn btn-tonal" style="height: 2.2rem; font-size: 0.8rem; padding: 0 1rem;" onclick="addExperienceRow()">+ ADD ROW</button>
+                </div>
+                <div id="about-exp-list" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+
+                <div style="font-weight: bold; padding: 0.5rem 0 0 0;">4. Call to Action Box</div>
+                <input type="text" id="about-cta-title" class="form-input" placeholder="CTA Title (e.g. Let's work together)" style="width: 100%;" oninput="updateAboutUIState()">
+                <textarea id="about-cta-text" class="form-input" placeholder="CTA Subtext..." style="width: 100%; min-height: 5rem; padding-top: 0.8rem; padding-bottom: 0.8rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateAboutUIState();"></textarea>
+                <input type="text" id="about-cta-btn" class="form-input" placeholder="Button Label (e.g. Get in touch)" style="width: 100%;" oninput="updateAboutUIState()">
+
+                <div id="upload-details-zone-about" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; margin-top: 1rem;">
                     <div id="upload-action-row-about" class="action-row" style="padding: 0;">
-                        <button type="submit" id="publish-btn-about" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>UPLOAD</button>
+                        <button type="submit" id="publish-btn-about" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>SAVE PAGE</button>
                         <div id="clear-btn-about" class="submit-btn btn-tonal-disabled" onclick="clearAboutTextFields(event)" style="flex-grow: 0;" disabled>CLEAR</div>
                         <div class="submit-btn btn-tonal" onclick="collapseAboutEditor()" style="flex-grow: 0;">CANCEL</div>
                     </div>
                     <div id="upload-loading-row-about" class="action-row" style="display: none; padding: 0;">
-                        <div class="submit-btn btn-loading" style="flex-grow: 1;">UPLOADING...</div>
+                        <div class="submit-btn btn-loading" style="flex-grow: 1;">SAVING...</div>
                     </div>
                 </div>
             </form>
@@ -494,7 +523,7 @@
         <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="about-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.2.1 • 2026</div>
+            <div class="footer-info">build v7.2.2 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-contact">
@@ -535,7 +564,7 @@
         <div id="section-contact" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="contact-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.2.1 • 2026</div>
+            <div class="footer-info">build v7.2.2 • 2026</div>
         </div>
         
         <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
@@ -907,23 +936,77 @@
             }
         }
 
+        // 🛠️ Úplne nová render funkcia pre About sekciu parsujúca JSON
         function getAboutPostHtml(p, index = 0) {
             const showDivider = (index === 0 && !secretKey) ? false : true;
             const dividerHtml = showDivider ? `<div class="divider-line"></div>` : '';
 
+            let data = null;
+            try { data = JSON.parse(p.text); } catch(e) {}
+
+            let contentHtml = '';
+
+            if (data && data.v === 2) {
+                let expsHtml = '';
+                if(data.exps && data.exps.length > 0) {
+                    expsHtml += `<div class="about-section-title">Experience</div>`;
+                    data.exps.forEach(exp => {
+                        expsHtml += `
+                        <div class="about-exp-item">
+                            <div class="about-exp-title">${exp.title}</div>
+                            <div class="about-exp-company">${exp.company}</div>
+                            <div class="about-exp-badge">${exp.date}</div>
+                            <div class="about-exp-divider"></div>
+                        </div>`;
+                    });
+                }
+
+                let ctaHtml = '';
+                if(data.ctaTitle || data.ctaText) {
+                    ctaHtml = `
+                    <div class="about-cta-card">
+                        <div class="about-cta-title">${data.ctaTitle}</div>
+                        <div class="about-cta-text">${data.ctaText}</div>
+                        <button class="about-cta-btn" onclick="showContact()">${data.ctaBtn || 'Get in touch'}</button>
+                    </div>`;
+                }
+
+                contentHtml = `
+                    <div class="about-page-title">About Me</div>
+                    <div class="about-title-line"></div>
+
+                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: 1.5rem; margin-bottom: 1.5rem;" loading="lazy">` : ''}
+
+                    ${data.intro ? `<div class="about-intro-text">${data.intro}</div>` : ''}
+
+                    ${data.approach ? `
+                        <div class="about-section-title">My Approach</div>
+                        <div class="about-text" style="margin-bottom: 2rem;">${data.approach}</div>
+                    ` : ''}
+
+                    ${expsHtml}
+                    ${ctaHtml}
+                `;
+            } else {
+                // Fallback na starý render
+                contentHtml = `
+                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
+                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2; font-weight: bold;">${p.title}</div>` : ''}
+                    ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
+                `;
+            }
+
             return `
-            <div style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item);">
+            <div style="display: flex; flex-direction: column; width: 100%;">
                 ${dividerHtml}
-                <div class="status-card" style="gap: var(--gap-item);">
+                <div class="status-card" style="gap: 0;">
                     ${secretKey ? `
-                    <div class="action-row" style="justify-content: flex-end; padding: 0;">
+                    <div class="action-row" style="justify-content: flex-end; padding: 0; margin-bottom: 1rem;">
                         <button class="submit-btn btn-tonal" style="flex-grow: 0;" onclick="editAboutPost(${p.id})">EDIT</button>
                         <button class="submit-btn btn-danger" style="flex-grow: 0;" onclick="openDeleteAboutModal(${p.id})">DELETE</button>
                     </div>
                     ` : ''}
-                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}
-                    ${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2; font-weight: bold;">${p.title}</div>` : ''}
-                    ${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}
+                    ${contentHtml}
                 </div>
             </div>
             `;
@@ -1184,13 +1267,33 @@
             updateImageUIState();
         }
 
+        // 🛠️ Logika pre dynamické riadky skúseností
+        function addExperienceRow(title = '', company = '', date = '') {
+            const container = document.getElementById('about-exp-list');
+            const row = document.createElement('div');
+            row.className = 'about-exp-row';
+            row.style.cssText = 'display: flex; flex-direction: column; gap: 0.5rem; padding: 1rem; border: 1px solid var(--divider); border-radius: var(--border-radius); position: relative;';
+            row.innerHTML = `
+                <button type="button" class="submit-btn btn-danger" style="position: absolute; top: 0.5rem; right: 0.5rem; height: 2rem; min-width: 2rem; padding: 0;" onclick="this.parentElement.remove(); updateAboutUIState();">X</button>
+                <input type="text" class="form-input exp-title" placeholder="Job Title..." style="width: calc(100% - 3rem);" value="${title}" oninput="updateAboutUIState()">
+                <input type="text" class="form-input exp-company" placeholder="Company..." style="width: 100%;" value="${company}" oninput="updateAboutUIState()">
+                <input type="text" class="form-input exp-date" placeholder="Date (e.g. 2021 — Present)" style="width: 100%;" value="${date}" oninput="updateAboutUIState()">
+            `;
+            container.appendChild(row);
+            updateAboutUIState();
+        }
+
+        // 🛠️ Prepracované kontroly UI v About form
         function updateAboutUIState() {
-            const titleVal = document.getElementById('edit-title-about').value.trim();
-            const textVal = document.getElementById('edit-text-about').value.trim();
+            const intro = document.getElementById('about-intro').value.trim();
+            const approach = document.getElementById('about-approach').value.trim();
+            const exps = document.querySelectorAll('.about-exp-row').length;
+            const ctaT = document.getElementById('about-cta-title').value.trim();
+            
             const input = document.getElementById('edit-image-about');
             const hasImage = (input && input.files && input.files.length > 0) || existingAboutImageUrl;
 
-            const hasContent = titleVal.length > 0 || textVal.length > 0 || hasImage;
+            const hasContent = intro.length > 0 || approach.length > 0 || exps > 0 || ctaT.length > 0 || hasImage;
 
             const pubBtn = document.getElementById('publish-btn-about');
             const clearBtn = document.getElementById('clear-btn-about');
@@ -1206,10 +1309,13 @@
 
         function clearAboutTextFields(e) {
             if(e) e.stopPropagation();
-            document.getElementById('edit-title-about').value = "";
-            const textEl = document.getElementById('edit-text-about');
-            textEl.value = "";
-            textEl.style.height = ''; 
+            document.getElementById('about-intro').value = "";
+            document.getElementById('about-approach').value = "";
+            document.getElementById('about-cta-title').value = "";
+            document.getElementById('about-cta-text').value = "";
+            document.getElementById('about-cta-btn').value = "";
+            document.getElementById('about-exp-list').innerHTML = '';
+            document.querySelectorAll('#editor-form-about textarea').forEach(el => el.style.height = '');
             updateAboutUIState();
         }
 
@@ -1217,17 +1323,13 @@
             editingAboutPostId = null;
             existingAboutImageUrl = null;
             
-            document.getElementById('edit-title-about').value = "";
-            const textEl = document.getElementById('edit-text-about');
-            textEl.value = "";
-            textEl.style.height = '';
-
+            clearAboutTextFields();
             document.getElementById('edit-image-about').value = "";
             
             document.getElementById('upload-action-row-about').style.display = 'flex';
             document.getElementById('upload-loading-row-about').style.display = 'none';
             
-            document.getElementById('publish-btn-about').innerText = "UPLOAD";
+            document.getElementById('publish-btn-about').innerText = "SAVE PAGE";
             
             updateAboutImageUIState();
         }
@@ -1271,12 +1373,32 @@
             editingAboutPostId = post.id;
             existingAboutImageUrl = post.image_url;
             
-            document.getElementById('edit-title-about').value = post.title || "";
-            const textEl = document.getElementById('edit-text-about');
-            textEl.value = post.text || "";
+            let data = {};
+            try { data = JSON.parse(post.text); } catch(e) {}
+
+            if (data && data.v === 2) {
+                document.getElementById('about-intro').value = data.intro || "";
+                document.getElementById('about-approach').value = data.approach || "";
+                document.getElementById('about-cta-title').value = data.ctaTitle || "";
+                document.getElementById('about-cta-text').value = data.ctaText || "";
+                document.getElementById('about-cta-btn').value = data.ctaBtn || "";
+                
+                document.getElementById('about-exp-list').innerHTML = '';
+                if(data.exps) {
+                    data.exps.forEach(exp => addExperienceRow(exp.title, exp.company, exp.date));
+                }
+            } else {
+                // Fallback ak sa upravuje starý formát príspevku
+                document.getElementById('about-approach').value = post.text || "";
+                document.getElementById('about-exp-list').innerHTML = '';
+            }
             
             expandAboutEditor();
-            setTimeout(() => { autoResizeTextarea(textEl); }, 0);
+            setTimeout(() => { 
+                autoResizeTextarea(document.getElementById('about-intro')); 
+                autoResizeTextarea(document.getElementById('about-approach')); 
+                autoResizeTextarea(document.getElementById('about-cta-text')); 
+            }, 0);
             updateAboutImageUIState();
             
             document.getElementById('publish-btn-about').innerText = "SAVE";
@@ -1499,13 +1621,28 @@
             }
         }
 
+        // 🛠️ Prepracované odosielanie do JSON pre About
         async function handleAboutSubmit(e) { 
             e.preventDefault(); 
-            const title = document.getElementById('edit-title-about').value;
-            const text = document.getElementById('edit-text-about').value;
+            
+            const intro = document.getElementById('about-intro').value.trim();
+            const approach = document.getElementById('about-approach').value.trim();
+            const ctaTitle = document.getElementById('about-cta-title').value.trim();
+            const ctaText = document.getElementById('about-cta-text').value.trim();
+            const ctaBtn = document.getElementById('about-cta-btn').value.trim();
+            
+            const exps = [];
+            document.querySelectorAll('.about-exp-row').forEach(row => {
+                exps.push({
+                    title: row.querySelector('.exp-title').value.trim(),
+                    company: row.querySelector('.exp-company').value.trim(),
+                    date: row.querySelector('.exp-date').value.trim()
+                });
+            });
+
             const imageFile = document.getElementById('edit-image-about').files[0];
             
-            if (!title && !text && !imageFile && !existingAboutImageUrl) return;
+            if (!intro && !approach && exps.length === 0 && !ctaTitle && !imageFile && !existingAboutImageUrl) return;
             
             document.getElementById('upload-action-row-about').style.display = 'none';
             document.getElementById('upload-loading-row-about').style.display = 'flex';
@@ -1522,7 +1659,17 @@
                     finalImageUrl = upData.image_url;
                 }
 
-                const payload = { title: title, text: text, image_url: finalImageUrl || "", show_date: false, author: "about" };
+                const jsonPayload = {
+                    v: 2,
+                    intro: intro,
+                    approach: approach,
+                    exps: exps,
+                    ctaTitle: ctaTitle,
+                    ctaText: ctaText,
+                    ctaBtn: ctaBtn
+                };
+
+                const payload = { title: "", text: JSON.stringify(jsonPayload), image_url: finalImageUrl || "", show_date: false, author: "about" };
                 
                 let res;
                 if (editingAboutPostId) {
@@ -1601,7 +1748,6 @@
 
         checkRememberedLogin();
         fetchStatuses(true);
-        // 🛠️ Zjednodušený globálny poslucháč na zatvorenie menu, pretože sme použili stopPropagation
         document.addEventListener('click', (e) => { 
             if (!navOverlay.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); 
         });
