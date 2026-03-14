@@ -83,9 +83,11 @@
             display: flex; justify-content: space-between; align-items: center; padding: 0 var(--gap-item); 
         }
 
+        .header-brand {
+            display: flex; align-items: center; cursor: pointer; text-decoration: none; color: inherit;
+        }
+
         .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
-        
-        /* 🔙 Obnovené pôvodné CSS pre SVG logo */
         .header-left svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
         
         .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; pointer-events: auto; cursor: pointer; }
@@ -95,6 +97,17 @@
             cursor: pointer; z-index: 2100; position: relative;
             font-size: var(--size-small); font-weight: 400; user-select: none;
             line-height: 1; text-transform: uppercase;
+        }
+
+        /* 🛠️ CSS pre desktopové menu */
+        .desktop-menu { display: none; }
+        .desktop-link { font-size: var(--size-small); color: var(--black); cursor: pointer; text-transform: uppercase; }
+
+        @media (min-width: 600px) {
+            .logo-text { position: static; transform: none; margin-left: 0.5rem; }
+            .menu-toggle { display: none !important; }
+            .desktop-menu { display: flex; gap: 1.5rem; align-items: center; }
+            .mobile-only { display: none !important; }
         }
 
         .nav-overlay {
@@ -155,6 +168,10 @@
         .status-feed.view-grid .status-confirm-overlay,
         .status-feed.view-grid .feed-admin-actions,
         .status-feed.view-grid .feed-divider {
+            display: none !important;
+        }
+
+        .status-feed.view-feed .status-card:last-child .feed-divider {
             display: none !important;
         }
 
@@ -344,24 +361,34 @@
 
     <header>
         <div class="header-content">
-            <div class="logo-link" onclick="showFeed()">
-                <div class="header-left">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="72.35 270 935.31 810" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
+            <div class="header-brand" onclick="showFeed()">
+                <div class="logo-link">
+                    <div class="header-left">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="72.35 270 935.31 810" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
+                    </div>
                 </div>
+                <div class="logo-text"><span>martinvojtus</span> • space</div>
             </div>
-            <div class="logo-text" onclick="showFeed()"><span>martinvojtus</span> • space</div>
             
             <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">MENU</div>
+
+            <div class="desktop-menu">
+                <div class="desktop-link" onclick="showFeed()">Feed</div>
+                <div class="desktop-link" onclick="showAbout()">About</div>
+                <div class="desktop-link" onclick="showContact()">Contact</div>
+                <div class="desktop-link" id="desktop-login-btn" onclick="toggleMenu()">Login</div>
+                <div class="desktop-link" id="desktop-logout-btn" onclick="handleLogout()" style="display: none;">Logout</div>
+            </div>
         </div>
     </header>
 
     <nav class="nav-overlay" id="navOverlay">
         <div class="menu-items">
-            <div class="menu-nav-link" onclick="showFeed()">Feed</div>
-            <div class="menu-nav-link" onclick="showAbout()">About</div>
-            <div class="menu-nav-link" onclick="showContact()">Contact</div>
+            <div class="menu-nav-link mobile-only" onclick="showFeed()">Feed</div>
+            <div class="menu-nav-link mobile-only" onclick="showAbout()">About</div>
+            <div class="menu-nav-link mobile-only" onclick="showContact()">Contact</div>
             
-            <div class="divider-line"></div>
+            <div class="divider-line mobile-only"></div>
 
             <div id="login-ui">
                 <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
@@ -379,7 +406,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.8 • 2026</div>
+            <div class="footer-info">build v7.1.9 • 2026</div>
         </div>
     </nav>
 
@@ -423,7 +450,7 @@
         <div id="section-feed">
             <div id="status-container" class="status-feed view-grid"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.8 • 2026</div>
+            <div class="footer-info">build v7.1.9 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-about">
@@ -464,7 +491,7 @@
         <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="about-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.8 • 2026</div>
+            <div class="footer-info">build v7.1.9 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-contact">
@@ -505,7 +532,7 @@
         <div id="section-contact" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="contact-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.8 • 2026</div>
+            <div class="footer-info">build v7.1.9 • 2026</div>
         </div>
         
         <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
@@ -699,6 +726,13 @@
                 } else if (currentSection === 'contact') {
                     document.getElementById('admin-upload-zone-contact').style.display = 'flex';
                 }
+
+                // 🛠️ Desktop menu logika - prihlásený
+                const dLogin = document.getElementById('desktop-login-btn');
+                if (dLogin) dLogin.style.display = 'none';
+                const dLogout = document.getElementById('desktop-logout-btn');
+                if (dLogout) dLogout.style.display = 'block';
+
             } else {
                 document.body.classList.remove('is-logged-in');
                 document.getElementById('login-ui').style.display = 'flex';
@@ -709,6 +743,12 @@
                 collapseEditor(); 
                 collapseAboutEditor();
                 collapseContactEditor();
+
+                // 🛠️ Desktop menu logika - odhlásený
+                const dLogin = document.getElementById('desktop-login-btn');
+                if (dLogin) dLogin.style.display = 'block';
+                const dLogout = document.getElementById('desktop-logout-btn');
+                if (dLogout) dLogout.style.display = 'none';
             }
             checkPostLimits();
         }
