@@ -3,43 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>martinvojtus.space</title>
+    <title>martinvojtus • space</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
-                    colors: { black: '#000000', white: '#ffffff', gray: { 50: '#fafafa', 100: '#f5f5f5', 200: '#e5e5e5', 400: '#a3a3a3', 500: '#737373', 900: '#171717' } },
-                    animation: { 'fade-in': 'fadeIn 0.3s ease-out forwards' },
-                    keyframes: { fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } } }
+                    colors: { black: '#000000', white: '#ffffff' }
                 }
             }
         }
     </script>
+    
     <style type="text/tailwindcss">
         @layer components {
-            .btn-dark { @apply flex items-center justify-center h-12 px-6 rounded-full font-bold text-xs uppercase tracking-widest bg-black text-white hover:bg-gray-800 transition-colors disabled:opacity-50 cursor-pointer whitespace-nowrap; }
-            .btn-light { @apply flex items-center justify-center h-12 px-6 rounded-full font-bold text-xs uppercase tracking-widest bg-transparent text-black border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-50 cursor-pointer whitespace-nowrap; }
+            .btn-dark { @apply flex items-center justify-center h-12 px-6 rounded-full font-bold text-xs uppercase tracking-widest bg-black text-white hover:bg-neutral-800 transition-colors disabled:opacity-50 cursor-pointer whitespace-nowrap; }
+            .btn-light { @apply flex items-center justify-center h-12 px-6 rounded-full font-bold text-xs uppercase tracking-widest bg-transparent text-black border border-neutral-200 hover:bg-neutral-50 transition-colors disabled:opacity-50 cursor-pointer whitespace-nowrap; }
             .btn-danger { @apply flex items-center justify-center h-12 px-6 rounded-full font-bold text-xs uppercase tracking-widest bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 cursor-pointer whitespace-nowrap; }
-            .input { @apply w-full min-h-[3.5rem] px-4 py-3 bg-gray-50 border border-gray-200 text-black rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-colors; }
+            
+            .input { @apply w-full px-4 py-3 bg-neutral-50 border border-neutral-200 text-black rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-colors; }
+            .label { @apply text-xs font-bold text-neutral-400 uppercase tracking-widest block mb-2; }
+            
+            .card { @apply flex flex-col gap-6 bg-white border border-neutral-200 rounded-2xl p-6 md:p-8 w-full; }
         }
+
         html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
         body { background-color: #ffffff; color: #000000; overflow-x: hidden; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
         
+        .spinner { border: 2px solid #f3f3f3; border-top: 2px solid #000; border-radius: 50%; width: 1.5rem; height: 1.5rem; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         .masonry { column-count: 1; column-gap: 1.5rem; }
         @media (min-width: 640px) { .masonry { column-count: 2; } }
         @media (min-width: 1024px) { .masonry { column-count: 3; } }
         .masonry-item { break-inside: avoid; margin-bottom: 1.5rem; display: block; width: 100%; }
-
-        .spinner { border: 2px solid #f3f3f3; border-top: 2px solid #000; border-radius: 50%; width: 1.5rem; height: 1.5rem; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="font-sans antialiased min-h-screen flex flex-col selection:bg-black selection:text-white">
+<body class="font-sans min-h-screen flex flex-col selection:bg-black selection:text-white">
 
     <div id="app-root" class="flex flex-col min-h-screen w-full"></div>
     <div id="modal-root" class="fixed inset-0 bg-white/95 backdrop-blur-sm z-[9999] hidden flex-col justify-center items-center px-4 transition-opacity"></div>
@@ -47,12 +53,13 @@
     <script>
         const API_URL = "https://mv-backend-ak8l.onrender.com";
         
+        // 🛠️ CMS CORE: Default configuration if DB is empty
         const DEFAULT_CONFIG = {
-            siteTitle: "martinvojtus.space",
-            footerText: "build v9.0.2 • 2026",
+            siteTitle: "martinvojtus • space",
+            footerText: "build v1.0.1 • 2026",
             pages: [
                 { id: "grid", title: "Grid", type: "gallery" },
-                { id: "about", title: "About", type: "resume" },
+                { id: "about", title: "About", type: "profile" },
                 { id: "contact", title: "Contact", type: "contact" }
             ]
         };
@@ -68,29 +75,11 @@
             isLoading: true
         };
 
-        // --- CORE INITIALIZATION ---
+        // 🚀 INIT
         async function init() {
-            renderShell();
-            
-            // First silently verify token so we can fetch all posts safely
-            if(App.token) {
-                try {
-                    const res = await fetch(`${API_URL}/verify`, { headers: { 'x-admin-password': App.token } });
-                    if(!res.ok) throw new Error();
-                } catch(e) { App.token = ""; localStorage.removeItem('mv_admin_key'); }
-            }
-
-            await fetchData();
-            
-            if (App.config.pages.length > 0 && !App.config.pages.find(p => p.id === App.route) && App.route !== 'dashboard') {
-                App.route = App.config.pages[0].id;
-            }
-
-            App.isLoading = false;
+            App.isLoading = true;
             render();
-        }
 
-        async function fetchData() {
             try {
                 const headers = App.token ? { 'x-admin-password': App.token } : {};
                 const res = await fetch(`${API_URL}/posts?skip=0&limit=1000`, { headers });
@@ -102,26 +91,35 @@
                     try { App.config = JSON.parse(configPost.text); } catch(e) {}
                 }
                 document.title = App.config.siteTitle;
+
+                // Validate route
+                if (App.config.pages.length > 0 && !App.config.pages.find(p => p.id === App.route) && App.route !== 'dashboard') {
+                    App.route = App.config.pages[0].id;
+                }
+
+                if (App.token) {
+                    const authRes = await fetch(`${API_URL}/verify`, { headers: { 'x-admin-password': App.token } });
+                    if (!authRes.ok) throw new Error();
+                }
             } catch (e) {
-                console.error("Failed to fetch data", e);
+                App.token = ""; localStorage.removeItem('mv_admin_key');
             }
+
+            App.isLoading = false;
+            render();
         }
 
-        // --- RENDER ENGINE ---
+        // 🎨 RENDER ENGINE
         function render() {
             const root = document.getElementById('app-root');
             root.innerHTML = `
                 ${renderHeader()}
                 ${App.isMenuOpen ? renderMobileMenu() : ''}
                 <main class="w-full max-w-3xl mx-auto pt-28 pb-12 px-4 flex flex-col flex-grow items-center">
-                    ${App.isLoading ? `<div class="mt-20"><div class="spinner"></div></div>` : renderMainContent()}
+                    ${App.isLoading ? `<div class="mt-32"><div class="spinner"></div></div>` : renderMainContent()}
                 </main>
                 ${renderFooter()}
             `;
-        }
-
-        function renderShell() {
-            document.getElementById('app-root').innerHTML = `<main class="w-full min-h-screen flex items-center justify-center"><div class="spinner"></div></main>`;
         }
 
         function renderHeader() {
@@ -130,21 +128,24 @@
                 : `<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>`;
 
             let desktopLinks = App.config.pages.map(p => `
-                <button onclick="navigate('${p.id}')" class="text-sm font-semibold tracking-wide transition-colors ${App.route === p.id ? 'text-black' : 'text-gray-400 hover:text-black'}">${p.title}</button>
+                <button onclick="navigate('${p.id}')" class="text-sm font-semibold tracking-wide transition-colors ${App.route === p.id ? 'text-black' : 'text-neutral-400 hover:text-black'}">${p.title}</button>
             `).join('');
 
+            desktopLinks += `<div class="w-px h-4 bg-neutral-200 mx-2"></div>`;
+
             if (App.token) {
-                desktopLinks += `<div class="w-px h-4 bg-gray-200 mx-2"></div>`;
-                desktopLinks += `<button onclick="navigate('dashboard')" class="text-sm font-bold tracking-wide transition-colors ${App.route === 'dashboard' ? 'text-black' : 'text-gray-400 hover:text-black'}">Dashboard</button>`;
+                desktopLinks += `<button onclick="navigate('dashboard')" class="text-sm font-bold tracking-wide transition-colors ${App.route === 'dashboard' ? 'text-black' : 'text-neutral-400 hover:text-black'}">Dashboard</button>`;
                 desktopLinks += `<button onclick="logout()" class="text-sm font-bold tracking-wide text-red-500 hover:text-red-700 transition-colors ml-2">Logout</button>`;
+            } else {
+                desktopLinks += `<button onclick="openLoginModal()" class="text-sm font-bold tracking-wide text-neutral-400 hover:text-black transition-colors">Login</button>`;
             }
 
             return `
-            <header class="fixed top-0 left-0 w-full bg-white/95 backdrop-blur-md border-b border-gray-100 z-50">
+            <header class="fixed top-0 left-0 w-full bg-white/95 backdrop-blur-md border-b border-neutral-100 z-50">
                 <div class="max-w-3xl mx-auto px-4 py-5 flex justify-between items-center w-full">
                     <div class="flex items-center gap-3 cursor-pointer group" onclick="navigate('${App.config.pages[0]?.id || ''}')">
-                        <svg class="w-4 h-4 text-black group-hover:opacity-70 transition-opacity" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path fill="currentColor" d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z"/></g></svg>
-                        <div class="font-bold text-sm tracking-widest uppercase">${App.config.siteTitle}</div>
+                        <svg class="w-4 h-4 text-black" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path fill="currentColor" d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z"/></g></svg>
+                        <div class="font-bold text-sm tracking-widest lowercase">${App.config.siteTitle}</div>
                     </div>
                     <button class="md:hidden text-black p-1" onclick="toggleMenu()">${icon}</button>
                     <nav class="hidden md:flex items-center gap-6">${desktopLinks}</nav>
@@ -155,16 +156,16 @@
 
         function renderMobileMenu() {
             let links = App.config.pages.map(p => `
-                <button onclick="navigate('${p.id}')" class="text-3xl font-bold text-left tracking-tight ${App.route === p.id ? 'text-black' : 'text-gray-400'}">${p.title}</button>
+                <button onclick="navigate('${p.id}')" class="text-3xl font-bold text-left tracking-tight ${App.route === p.id ? 'text-black' : 'text-neutral-400'}">${p.title}</button>
             `).join('');
 
+            links += `<div class="w-full h-px bg-neutral-200 my-4"></div>`;
+
             if (App.token) {
-                links += `<div class="w-full h-px bg-gray-200 my-4"></div>`;
-                links += `<button onclick="navigate('dashboard')" class="text-3xl font-bold text-left tracking-tight ${App.route === 'dashboard' ? 'text-black' : 'text-gray-400'}">Dashboard</button>`;
+                links += `<button onclick="navigate('dashboard')" class="text-3xl font-bold text-left tracking-tight ${App.route === 'dashboard' ? 'text-black' : 'text-neutral-400'}">Dashboard</button>`;
                 links += `<button onclick="logout()" class="text-3xl font-bold text-left tracking-tight text-red-500 mt-4">Logout</button>`;
             } else {
-                links += `<div class="w-full h-px bg-gray-200 my-4"></div>`;
-                links += `<button onclick="openLoginModal()" class="text-lg font-bold text-left text-gray-400 hover:text-black">Admin Access</button>`;
+                links += `<button onclick="openLoginModal()" class="text-xl font-bold text-left text-neutral-400 hover:text-black">Login</button>`;
             }
 
             return `
@@ -176,10 +177,9 @@
 
         function renderFooter() {
             return `
-            <footer class="w-full mt-24 mb-12 flex flex-col items-center gap-6 relative">
-                <div class="w-12 h-px bg-gray-200"></div>
-                <div class="text-xs font-bold text-gray-400 tracking-widest uppercase">${App.config.footerText}</div>
-                ${!App.token ? `<button onclick="openLoginModal()" class="w-10 h-10 rounded-full bg-transparent absolute -top-2 right-0 opacity-0 cursor-pointer"></button>` : ''}
+            <footer class="w-full mt-24 mb-12 flex flex-col items-center gap-6">
+                <div class="w-12 h-px bg-neutral-200"></div>
+                <div class="text-xs font-bold text-neutral-400 tracking-widest uppercase text-center">${App.config.footerText}</div>
             </footer>
             `;
         }
@@ -191,282 +191,268 @@
             }
 
             const pageConfig = App.config.pages.find(p => p.id === App.route);
-            if (!pageConfig) return `<div class="text-gray-400 mt-20 font-bold text-sm tracking-widest uppercase">Page not found.</div>`;
+            if (!pageConfig) return `<div class="text-neutral-400 mt-20 text-sm font-bold tracking-widest uppercase">Page not found.</div>`;
 
-            if (pageConfig.type === 'gallery') return renderGallery(pageConfig.id);
-            if (pageConfig.type === 'resume') return renderResume(pageConfig.id);
-            if (pageConfig.type === 'contact') return renderContact(pageConfig.id);
+            if (pageConfig.type === 'gallery') return renderPublicGallery(pageConfig);
+            if (pageConfig.type === 'profile') return renderPublicProfile(pageConfig);
+            if (pageConfig.type === 'contact') return renderPublicContact(pageConfig);
 
             return `<div>Unknown page type.</div>`;
         }
 
-        // --- PUBLIC PAGE RENDERERS ---
-        function renderGallery(pageId) {
-            const posts = App.posts.filter(p => p.author === pageId).sort((a,b) => new Date(b.at) - new Date(a.at));
-            if (posts.length === 0) return `<div class="w-full py-20 border border-dashed border-gray-200 rounded-2xl text-center text-gray-400 font-bold text-sm tracking-widest uppercase">No content yet.</div>`;
+        // --- PUBLIC VIEWS ---
+        function renderPublicGallery(page) {
+            const posts = App.posts.filter(p => p.author === page.id).sort((a,b) => new Date(b.at) - new Date(a.at));
+            if (posts.length === 0) return `<div class="w-full py-20 border border-dashed border-neutral-200 rounded-2xl text-center text-neutral-400 font-bold text-sm tracking-widest uppercase">No photos uploaded.</div>`;
 
             const itemsHtml = posts.map(p => `
                 <div class="masonry-item relative group">
-                    <img src="${p.image_url}" class="w-full h-auto rounded-2xl bg-gray-50 object-cover" loading="lazy">
-                    <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-black tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity">
-                        ${new Date(p.at).toLocaleDateString('en-US', {month:'short', year:'numeric'})}
-                    </div>
+                    <img src="${p.image_url}" class="w-full h-auto rounded-2xl bg-neutral-50 border border-neutral-100" loading="lazy">
                 </div>
             `).join('');
 
-            return `<div class="w-full masonry animate-fade-in">${itemsHtml}</div>`;
+            return `<div class="w-full masonry">${itemsHtml}</div>`;
         }
 
-        function renderResume(pageId) {
-            const post = App.posts.find(p => p.author === pageId);
-            if (!post) return `<div class="text-gray-400 mt-10 text-sm font-bold tracking-widest uppercase">Content pending.</div>`;
+        function renderPublicProfile(page) {
+            const post = App.posts.find(p => p.author === page.id);
+            if (!post) return `<div class="text-neutral-400 mt-10 text-sm font-bold tracking-widest uppercase">Content pending.</div>`;
             
             let data = {};
             try { data = JSON.parse(post.text); } catch(e) {}
 
             let expsHtml = '';
             if (data.exps && data.exps.length > 0) {
-                expsHtml = `<div class="text-3xl font-bold tracking-tight mt-20 mb-8">Experience</div>` + 
+                expsHtml = `<div class="text-2xl font-bold tracking-tight mt-16 mb-8">Experience</div>` + 
                 data.exps.map((e, i) => `
                     <div class="flex flex-col items-start w-full">
-                        <div class="text-xl font-bold mb-1">${e.title}</div>
-                        <div class="text-gray-500 mb-4">${e.company}</div>
-                        <div class="px-4 py-1.5 bg-gray-50 border border-gray-100 rounded-full text-xs font-bold text-gray-500 tracking-widest uppercase">${e.date}</div>
-                        ${i < data.exps.length - 1 ? `<div class="w-full h-px bg-gray-100 my-10"></div>` : ''}
+                        <div class="text-lg font-bold">${e.title}</div>
+                        <div class="text-neutral-500 mb-2">${e.company}</div>
+                        <div class="px-3 py-1 bg-neutral-100 rounded-md text-xs font-bold text-neutral-500 tracking-widest uppercase">${e.date}</div>
+                        ${i < data.exps.length - 1 ? `<div class="w-full h-px bg-neutral-100 my-8"></div>` : ''}
                     </div>
                 `).join('');
             }
 
-            let ctaHtml = data.ctaTitle ? `
-                <div class="bg-gray-50 border border-gray-200 rounded-[2rem] p-8 md:p-12 flex flex-col items-start mt-20 w-full">
-                    <div class="text-2xl md:text-3xl font-bold tracking-tight mb-4">${data.ctaTitle}</div>
-                    <div class="text-gray-500 mb-8 leading-relaxed max-w-xl">${data.ctaText}</div>
-                    <button class="h-12 px-8 rounded-full bg-black text-white font-bold text-xs uppercase tracking-widest hover:bg-gray-800 transition-colors" onclick="navigate('${App.config.pages.find(p=>p.type==='contact')?.id || ''}')">${data.ctaBtn || 'Get in touch'}</button>
-                </div>
-            ` : '';
-
             return `
-            <div class="flex flex-col w-full animate-fade-in">
-                <div class="text-4xl md:text-5xl font-bold tracking-tight mb-6">About Me</div>
-                <div class="w-16 h-1.5 bg-black rounded-full mb-12"></div>
-                ${post.image_url ? `<img src="${post.image_url}" class="w-full h-auto rounded-[2rem] mb-12 object-cover">` : ''}
-                ${data.intro ? `<div class="text-xl md:text-2xl text-gray-500 leading-relaxed mb-12 font-medium">${data.intro}</div>` : ''}
-                ${data.approach ? `<div class="text-2xl font-bold tracking-tight mb-6">My Approach</div><div class="text-lg leading-relaxed text-gray-800 mb-12 max-w-2xl whitespace-pre-wrap">${data.approach}</div>` : ''}
+            <div class="flex flex-col w-full">
+                <h1 class="text-4xl font-bold tracking-tight mb-12">${page.title}</h1>
+                ${post.image_url ? `<img src="${post.image_url}" class="w-full h-auto rounded-2xl mb-12 object-cover border border-neutral-100">` : ''}
+                ${data.intro ? `<div class="text-xl text-neutral-500 leading-relaxed mb-12 font-medium">${data.intro}</div>` : ''}
+                ${data.text ? `<div class="text-lg leading-relaxed text-black mb-12 whitespace-pre-wrap">${data.text}</div>` : ''}
                 ${expsHtml}
-                ${ctaHtml}
             </div>`;
         }
 
-        function renderContact(pageId) {
-            const post = App.posts.find(p => p.author === pageId);
-            if (!post) return `<div class="text-gray-400 mt-10 text-sm font-bold tracking-widest uppercase">Content pending.</div>`;
+        function renderPublicContact(page) {
+            const post = App.posts.find(p => p.author === page.id);
+            if (!post) return `<div class="text-neutral-400 mt-10 text-sm font-bold tracking-widest uppercase">Content pending.</div>`;
             
             return `
-            <div class="flex flex-col w-full gap-8 animate-fade-in">
-                ${post.image_url ? `<img src="${post.image_url}" class="w-full h-auto rounded-[2rem] object-cover mb-4">` : ''}
-                ${post.title ? `<div class="text-4xl md:text-5xl font-bold tracking-tight">${post.title}</div>` : ''}
-                ${post.text ? `<div class="text-lg md:text-xl text-gray-500 leading-relaxed whitespace-pre-wrap">${post.text}</div>` : ''}
+            <div class="flex flex-col w-full gap-8">
+                ${post.image_url ? `<img src="${post.image_url}" class="w-full h-auto rounded-2xl object-cover border border-neutral-100 mb-4">` : ''}
+                ${post.title ? `<div class="text-4xl font-bold tracking-tight">${post.title}</div>` : ''}
+                ${post.text ? `<div class="text-lg text-neutral-500 leading-relaxed whitespace-pre-wrap">${post.text}</div>` : ''}
             </div>`;
         }
 
-
-        // --- DASHBOARD RENDERER ---
+        // --- DASHBOARD ROUTER ---
         function renderDashboard() {
+            // Guarantee valid dashTab
+            if (App.dashTab !== 'settings' && !App.config.pages.find(p => p.id === App.dashTab)) {
+                App.dashTab = 'settings';
+            }
+
             const tabs = [
-                { id: 'settings', label: 'Global Settings' },
-                ...App.config.pages.map(p => ({ id: `page_${p.id}`, label: `Page: ${p.title}` }))
+                { id: 'settings', label: 'Settings' },
+                ...App.config.pages.map(p => ({ id: p.id, label: p.title }))
             ];
 
             const tabsHtml = tabs.map(t => `
-                <button onclick="App.dashTab = '${t.id}'; render();" class="h-10 px-4 rounded-full font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-colors ${App.dashTab === t.id ? 'bg-black text-white' : 'bg-gray-50 text-gray-500 hover:bg-gray-100 border border-gray-200'}">${t.label}</button>
+                <button onclick="App.dashTab = '${t.id}'; render();" class="h-10 px-5 rounded-full font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-colors ${App.dashTab === t.id ? 'bg-black text-white' : 'bg-neutral-50 text-neutral-500 hover:bg-neutral-100 border border-neutral-200'}">${t.label}</button>
             `).join('');
 
             let activeContent = '';
-            if (App.dashTab === 'settings') activeContent = renderDashSettings();
-            else if (App.dashTab.startsWith('page_')) {
-                const pageId = App.dashTab.replace('page_', '');
-                const pageConfig = App.config.pages.find(p => p.id === pageId);
-                if (pageConfig) {
-                    if (pageConfig.type === 'gallery') activeContent = renderDashGallery(pageConfig);
-                    if (pageConfig.type === 'resume') activeContent = renderDashResume(pageConfig);
-                    if (pageConfig.type === 'contact') activeContent = renderDashContact(pageConfig);
-                }
+            if (App.dashTab === 'settings') {
+                activeContent = renderDashSettings();
+            } else {
+                const pageConfig = App.config.pages.find(p => p.id === App.dashTab);
+                if (pageConfig.type === 'gallery') activeContent = renderDashGallery(pageConfig);
+                if (pageConfig.type === 'profile') activeContent = renderDashProfile(pageConfig);
+                if (pageConfig.type === 'contact') activeContent = renderDashContact(pageConfig);
             }
 
             return `
-            <div class="w-full flex flex-col gap-8 animate-fade-in">
+            <div class="w-full flex flex-col gap-8">
                 <div class="flex flex-col gap-2">
-                    <h1 class="text-4xl font-bold tracking-tight">Dashboard</h1>
-                    <p class="text-gray-500 text-lg">System Control Center</p>
+                    <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
                 </div>
                 
-                <div class="flex gap-2 overflow-x-auto hide-scroll border-b border-gray-100 pb-4 w-full">
+                <div class="flex gap-2 overflow-x-auto hide-scroll pb-2 w-full border-b border-neutral-100">
                     ${tabsHtml}
                 </div>
 
-                <div class="w-full bg-white border border-gray-200 rounded-[2rem] p-6 md:p-10 flex flex-col gap-8">
+                <div class="w-full flex flex-col gap-8">
                     ${activeContent}
                 </div>
             </div>
             `;
         }
 
+        // --- DASHBOARD COMPONENTS ---
         function renderDashSettings() {
             const pagesList = App.config.pages.map((p, i) => `
-                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                <div class="flex items-center justify-between p-4 bg-neutral-50 rounded-xl border border-neutral-200">
                     <div class="flex flex-col">
                         <span class="font-bold">${p.title}</span>
-                        <span class="text-xs text-gray-400 font-mono mt-1">slug: ${p.id} | type: ${p.type}</span>
+                        <span class="text-xs text-neutral-400 font-mono mt-1">${p.type} | /${p.id}</span>
                     </div>
                     <button onclick="removePage(${i})" class="text-red-500 hover:text-red-700 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                 </div>
             `).join('');
 
             return `
-                <div class="text-2xl font-bold tracking-tight border-b border-gray-100 pb-4">General Info</div>
-                <div class="flex flex-col gap-2">
-                    <label class="label">Site Title</label>
-                    <input type="text" id="cfg-title" class="input font-bold text-lg" value="${App.config.siteTitle}">
-                </div>
-                <div class="flex flex-col gap-2">
-                    <label class="label">Footer Text</label>
-                    <input type="text" id="cfg-footer" class="input" value="${App.config.footerText}">
-                </div>
-                
-                <div class="text-2xl font-bold tracking-tight border-b border-gray-100 pb-4 mt-8">Menu Architecture</div>
-                <div class="flex flex-col gap-3">${pagesList}</div>
-                
-                <div class="flex flex-col md:flex-row gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-200 border-dashed mt-4 items-end">
-                    <div class="flex flex-col gap-2 w-full">
-                        <label class="label !mb-0">Slug</label>
-                        <input type="text" id="new-page-id" class="input font-mono !h-12" placeholder="e.g. projects">
+                <div class="card">
+                    <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Global Configuration</div>
+                    <div>
+                        <label class="label">Site Title</label>
+                        <input type="text" id="cfg-title" class="input font-bold" value="${App.config.siteTitle}">
                     </div>
-                    <div class="flex flex-col gap-2 w-full">
-                        <label class="label !mb-0">Title</label>
-                        <input type="text" id="new-page-title" class="input !h-12" placeholder="e.g. My Projects">
+                    <div>
+                        <label class="label">Footer Text</label>
+                        <input type="text" id="cfg-footer" class="input" value="${App.config.footerText}">
                     </div>
-                    <div class="flex flex-col gap-2 w-full">
-                        <label class="label !mb-0">Type</label>
-                        <select id="new-page-type" class="input !h-12 bg-white">
-                            <option value="gallery">Gallery (Photos)</option>
-                            <option value="resume">Resume (Text & Exp)</option>
-                            <option value="contact">Contact</option>
-                        </select>
-                    </div>
-                    <button onclick="addPage()" class="btn-dark w-full md:w-auto !h-12 px-6">Add</button>
+                    <button onclick="saveGlobalConfig()" id="btn-save-cfg" class="btn-dark w-full mt-4">Save Configuration</button>
                 </div>
 
-                <button onclick="saveGlobalConfig()" id="btn-save-cfg" class="h-14 mt-8 rounded-full bg-black text-white font-bold text-sm uppercase tracking-widest hover:bg-gray-800 transition-colors w-full">Save Settings</button>
+                <div class="card">
+                    <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Menu Architecture</div>
+                    <div class="flex flex-col gap-3">${pagesList}</div>
+                    
+                    <div class="flex flex-col md:flex-row gap-4 p-4 bg-neutral-50 rounded-xl border border-neutral-200 border-dashed mt-4 items-end">
+                        <div class="flex flex-col gap-2 w-full">
+                            <label class="label !mb-0">Slug</label>
+                            <input type="text" id="new-page-id" class="input font-mono !h-10 !py-0" placeholder="e.g. log">
+                        </div>
+                        <div class="flex flex-col gap-2 w-full">
+                            <label class="label !mb-0">Title</label>
+                            <input type="text" id="new-page-title" class="input !h-10 !py-0" placeholder="e.g. My Log">
+                        </div>
+                        <div class="flex flex-col gap-2 w-full">
+                            <label class="label !mb-0">Type</label>
+                            <select id="new-page-type" class="input !h-10 !py-0 !px-2 bg-white">
+                                <option value="gallery">Gallery</option>
+                                <option value="profile">Profile / Resume</option>
+                                <option value="contact">Contact</option>
+                            </select>
+                        </div>
+                        <button onclick="addPage()" class="btn-dark w-full md:w-auto !h-10 px-6">+ Add</button>
+                    </div>
+                </div>
             `;
         }
 
-        function renderDashGallery(pageConfig) {
-            const items = App.posts.filter(p => p.author === pageConfig.id).sort((a,b) => new Date(b.at) - new Date(a.at));
+        function renderDashGallery(page) {
+            const items = App.posts.filter(p => p.author === page.id).sort((a,b) => new Date(b.at) - new Date(a.at));
             const listHtml = items.map(p => `
-                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                    <div class="flex items-center gap-4">
-                        <img src="${p.image_url}" class="w-12 h-12 rounded-lg object-cover bg-gray-200">
-                        <span class="text-xs font-bold text-gray-400 tracking-widest uppercase">${new Date(p.at).toLocaleDateString()}</span>
-                    </div>
+                <div class="flex items-center justify-between p-4 bg-neutral-50 rounded-xl border border-neutral-200">
+                    <img src="${p.image_url}" class="w-12 h-12 rounded bg-neutral-200 object-cover">
                     <button onclick="confirmDelete(${p.id})" class="text-red-500 hover:text-red-700 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                 </div>
             `).join('');
 
             return `
-                <div class="text-2xl font-bold tracking-tight border-b border-gray-100 pb-4">Manage: ${pageConfig.title}</div>
-                <div class="flex flex-col gap-4">
-                    <input type="file" id="gal-upload" accept="image/*" class="hidden" onchange="uploadGalleryImage('${pageConfig.id}')">
-                    <button id="btn-upload-gal" onclick="document.getElementById('gal-upload').click()" class="h-14 rounded-xl border-2 border-dashed border-gray-300 text-gray-500 font-bold text-sm uppercase tracking-widest hover:bg-gray-50 transition-colors w-full">+ Upload New Photo</button>
+                <div class="card">
+                    <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Manage: ${page.title}</div>
+                    <input type="file" id="gal-upload" accept="image/*" class="hidden" onchange="uploadGalleryImage('${page.id}')">
+                    <button id="btn-upload-gal" onclick="document.getElementById('gal-upload').click()" class="h-14 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Upload Photo</button>
+                    <div class="flex flex-col gap-3 mt-4">${listHtml.length > 0 ? listHtml : '<div class="text-neutral-400 text-sm">No photos yet.</div>'}</div>
                 </div>
-                <div class="flex flex-col gap-3 mt-4">${listHtml}</div>
             `;
         }
 
-        function renderDashResume(pageConfig) {
-            const post = App.posts.find(p => p.author === pageConfig.id);
-            let data = { intro: '', approach: '', exps: [], ctaTitle: '', ctaText: '', ctaBtn: '' };
+        function renderDashProfile(page) {
+            const post = App.posts.find(p => p.author === page.id);
+            let data = { intro: '', text: '', exps: [] };
             if(post) { try { data = JSON.parse(post.text); } catch(e){} }
             
-            // To prevent losing DOM state of arrays, we pass it back into DOM.
+            // To safely edit arrays in DOM without state framework
             window.tempExps = data.exps || [];
 
             return `
-                <div class="text-2xl font-bold tracking-tight border-b border-gray-100 pb-4">Builder: ${pageConfig.title}</div>
-                
-                <div class="flex flex-col gap-2">
-                    <label class="label">Cover Image</label>
-                    <input type="file" id="res-img-upload" accept="image/*" class="hidden" onchange="uploadResumeImage('${pageConfig.id}', ${post ? post.id : null})">
-                    ${post && post.image_url ? `<img src="${post.image_url}" class="w-full h-48 object-cover rounded-xl border border-gray-200 cursor-pointer" onclick="document.getElementById('res-img-upload').click()">` : `<button onclick="document.getElementById('res-img-upload').click()" class="h-20 rounded-xl border-2 border-dashed border-gray-300 text-gray-500 font-bold text-xs uppercase tracking-widest hover:bg-gray-50 transition-colors w-full">+ Upload Cover</button>`}
-                </div>
-
-                <div class="flex flex-col gap-2 mt-4">
-                    <label class="label">Intro Text</label>
-                    <textarea id="res-intro" class="input" rows="3" placeholder="Hello! I'm...">${data.intro || ''}</textarea>
-                </div>
-
-                <div class="flex flex-col gap-2 mt-4">
-                    <label class="label">My Approach</label>
-                    <textarea id="res-approach" class="input" rows="4" placeholder="My approach is...">${data.approach || ''}</textarea>
-                </div>
-
-                <div class="flex flex-col gap-2 mt-8">
-                    <div class="flex justify-between items-center"><label class="label !mb-0">Experience Timeline</label><button type="button" onclick="addExpRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add Row</button></div>
-                    <div id="res-exp-container" class="flex flex-col gap-4">
-                        ${window.tempExps.map((e, i) => buildExpRowHtml(e.title, e.company, e.date)).join('')}
+                <div class="card">
+                    <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${page.title}</div>
+                    
+                    <div>
+                        <label class="label">Profile Cover</label>
+                        <input type="file" id="prf-img-upload" accept="image/*" class="hidden" onchange="uploadProfileImage('${page.id}', ${post ? post.id : null})">
+                        ${post && post.image_url ? `<img src="${post.image_url}" class="w-full h-48 object-cover rounded-xl border border-neutral-200 cursor-pointer" onclick="document.getElementById('prf-img-upload').click()">` : `<button onclick="document.getElementById('prf-img-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Select Image</button>`}
                     </div>
-                </div>
 
-                <div class="flex flex-col gap-2 mt-8 p-6 bg-gray-50 border border-gray-200 rounded-2xl">
-                    <label class="label">Call To Action Box</label>
-                    <input type="text" id="res-cta-t" class="input mb-2" placeholder="Title" value="${data.ctaTitle || ''}">
-                    <textarea id="res-cta-tx" class="input mb-2" placeholder="Text" rows="2">${data.ctaText || ''}</textarea>
-                    <input type="text" id="res-cta-b" class="input" placeholder="Button Label" value="${data.ctaBtn || ''}">
-                </div>
+                    <div>
+                        <label class="label">Intro Text</label>
+                        <textarea id="prf-intro" class="input" rows="2">${data.intro || ''}</textarea>
+                    </div>
 
-                <button onclick="saveResumeConfig('${pageConfig.id}', ${post ? post.id : null}, '${post ? post.image_url : ''}')" id="btn-save-res" class="h-14 mt-8 rounded-full bg-black text-white font-bold text-sm uppercase tracking-widest hover:bg-gray-800 transition-colors w-full">Save Changes</button>
+                    <div>
+                        <label class="label">Main Content</label>
+                        <textarea id="prf-text" class="input" rows="6">${data.text || ''}</textarea>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-4"><label class="label !mb-0">Experience</label><button type="button" onclick="addExpRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add Row</button></div>
+                        <div id="prf-exp-container" class="flex flex-col gap-3">
+                            ${window.tempExps.map((e) => buildExpRowHtml(e.title, e.company, e.date)).join('')}
+                        </div>
+                    </div>
+
+                    <button onclick="saveProfileConfig('${page.id}', ${post ? post.id : null}, '${post ? post.image_url : ''}')" id="btn-save-prf" class="btn-dark w-full mt-4">Save Changes</button>
+                </div>
             `;
         }
 
-        function renderDashContact(pageConfig) {
-            const post = App.posts.find(p => p.author === pageConfig.id);
+        function renderDashContact(page) {
+            const post = App.posts.find(p => p.author === page.id);
             return `
-                <div class="text-2xl font-bold tracking-tight border-b border-gray-100 pb-4">Editor: ${pageConfig.title}</div>
-                
-                <div class="flex flex-col gap-2">
-                    <label class="label">Cover Image</label>
-                    <input type="file" id="cnt-img-upload" accept="image/*" class="hidden" onchange="uploadContactImage('${pageConfig.id}', ${post ? post.id : null})">
-                    ${post && post.image_url ? `<img src="${post.image_url}" class="w-full h-48 object-cover rounded-xl border border-gray-200 cursor-pointer" onclick="document.getElementById('cnt-img-upload').click()">` : `<button onclick="document.getElementById('cnt-img-upload').click()" class="h-20 rounded-xl border-2 border-dashed border-gray-300 text-gray-500 font-bold text-xs uppercase tracking-widest hover:bg-gray-50 transition-colors w-full">+ Upload Cover</button>`}
-                </div>
+                <div class="card">
+                    <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${page.title}</div>
+                    
+                    <div>
+                        <label class="label">Cover Image</label>
+                        <input type="file" id="cnt-img-upload" accept="image/*" class="hidden" onchange="uploadContactImage('${page.id}', ${post ? post.id : null})">
+                        ${post && post.image_url ? `<img src="${post.image_url}" class="w-full h-48 object-cover rounded-xl border border-neutral-200 cursor-pointer" onclick="document.getElementById('cnt-img-upload').click()">` : `<button onclick="document.getElementById('cnt-img-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Select Image</button>`}
+                    </div>
 
-                <div class="flex flex-col gap-2 mt-4">
-                    <label class="label">Headline</label>
-                    <input type="text" id="cnt-title" class="input text-lg font-bold" value="${post ? post.title : ''}">
-                </div>
+                    <div>
+                        <label class="label">Headline</label>
+                        <input type="text" id="cnt-title" class="input font-bold text-lg" value="${post ? post.title : ''}">
+                    </div>
 
-                <div class="flex flex-col gap-2 mt-4">
-                    <label class="label">Contact Info</label>
-                    <textarea id="cnt-text" class="input" rows="6">${post ? post.text : ''}</textarea>
-                </div>
+                    <div>
+                        <label class="label">Contact Info</label>
+                        <textarea id="cnt-text" class="input" rows="6">${post ? post.text : ''}</textarea>
+                    </div>
 
-                <button onclick="saveContactConfig('${pageConfig.id}', ${post ? post.id : null}, '${post ? post.image_url : ''}')" id="btn-save-cnt" class="h-14 mt-8 rounded-full bg-black text-white font-bold text-sm uppercase tracking-widest hover:bg-gray-800 transition-colors w-full">Save Changes</button>
+                    <button onclick="saveContactConfig('${page.id}', ${post ? post.id : null}, '${post ? post.image_url : ''}')" id="btn-save-cnt" class="btn-dark w-full mt-4">Save Changes</button>
+                </div>
             `;
         }
 
-        // --- DASHBOARD & ACTIONS ---
+
+        // --- ACTIONS & API ---
         function navigate(id) { if(!id) return; App.route = id; App.isMenuOpen = false; render(); window.scrollTo(0,0); }
-        function toggleMenu(e) { if(e) e.stopPropagation(); App.isMenuOpen = !App.isMenuOpen; render(); }
-        function closeMenu() { App.isMenuOpen = false; render(); }
+        function toggleMenu() { App.isMenuOpen = !App.isMenuOpen; render(); }
         
         function openLoginModal() {
-            closeMenu();
+            App.isMenuOpen = false; render();
             const root = document.getElementById('modal-root');
             root.innerHTML = `
-                <div class="w-full max-w-sm bg-white border border-gray-200 rounded-2xl p-8 flex flex-col gap-6 shadow-2xl">
+                <div class="w-full max-w-sm bg-white border border-neutral-200 rounded-2xl p-8 flex flex-col gap-6 shadow-2xl">
                     <div class="text-xl font-bold text-center">Admin Access</div>
                     <form onsubmit="handleLogin(event)" class="flex flex-col gap-4">
                         <input type="password" id="admin-pass" class="input" placeholder="Password...">
-                        <label class="flex items-center gap-3 text-sm text-gray-600 font-bold cursor-pointer">
-                            <input type="checkbox" id="remember-login" class="w-5 h-5 rounded border-gray-300 text-black focus:ring-black"> Remember me
+                        <label class="flex items-center gap-3 text-sm text-neutral-600 font-bold cursor-pointer">
+                            <input type="checkbox" id="remember-login" class="w-5 h-5 rounded border-neutral-300 text-black focus:ring-black"> Remember me
                         </label>
                         <div class="flex gap-4 mt-4">
                             <button type="button" class="btn-light flex-1" onclick="closeModalRoot()">Cancel</button>
@@ -477,7 +463,6 @@
             `;
             root.classList.remove('hidden'); root.classList.add('flex');
         }
-
         function closeModalRoot() { 
             const root = document.getElementById('modal-root');
             root.classList.add('hidden'); root.classList.remove('flex'); root.innerHTML = ''; 
@@ -494,7 +479,7 @@
                     App.token = pass; 
                     if(document.getElementById('remember-login').checked) localStorage.setItem('mv_admin_key', pass);
                     closeModalRoot(); 
-                    await fetchData(); // Force fetch hidden admin data
+                    await init(); // Force full refresh
                     navigate('dashboard');
                 } else throw new Error();
             } catch (err) { 
@@ -505,11 +490,11 @@
 
         async function logout() { 
             App.token = ""; localStorage.removeItem('mv_admin_key'); 
-            await fetchData(); // Refetch without token to secure data
+            await init(); 
             navigate(App.config.pages[0]?.id || 'grid'); 
         }
 
-        // Config Editing
+        // Settings API
         async function saveGlobalConfig() {
             const btn = document.getElementById('btn-save-cfg'); btn.innerText = "SAVING..."; btn.disabled = true;
             App.config.siteTitle = document.getElementById('cfg-title').value.trim();
@@ -528,20 +513,18 @@
             const title = document.getElementById('new-page-title').value.trim();
             const type = document.getElementById('new-page-type').value;
             if(!id || !title) return alert('Fill ID and Title');
-            if(App.config.pages.find(p => p.id === id)) return alert('Slug must be unique');
+            if(App.config.pages.find(p => p.id === id) || id === 'dashboard') return alert('Slug must be unique and valid');
             App.config.pages.push({id, title, type}); saveGlobalConfig();
         }
 
         function removePage(index) {
-            if(confirm("Remove this page from menu? Content will not be deleted, just unlinked.")) {
-                App.config.pages.splice(index, 1); saveGlobalConfig();
-            }
+            if(confirm("Remove this page from menu?")) { App.config.pages.splice(index, 1); saveGlobalConfig(); }
         }
 
         // Image Compressor
         const compressImage = (f, max=1600, q=0.8) => new Promise(res => { const r=new FileReader(); r.readAsDataURL(f); r.onload=e=>{ const i=new Image(); i.src=e.target.result; i.onload=()=>{ const c=document.createElement('canvas'); let w=i.width, h=i.height; if(w>max){h=Math.round(h*max/w); w=max;} c.width=w; c.height=h; c.getContext('2d').drawImage(i,0,0,w,h); c.toBlob(b=>res(new File([b],f.name.replace(/\.[^/.]+$/,"")+".jpg",{type:'image/jpeg'})),'image/jpeg',q); };};});
 
-        // Dashboard Data Editing
+        // Gallery API
         async function uploadGalleryImage(authorSlug) {
             const file = document.getElementById('gal-upload').files[0]; if(!file) return;
             const btn = document.getElementById('btn-upload-gal'); btn.innerText = "UPLOADING..."; btn.disabled = true;
@@ -550,35 +533,36 @@
                 const finalImageUrl = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": App.token }, body: formData })).json()).image_url;
                 await fetch(`${API_URL}/posts`, { method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify({ title: "", text: "", image_url: finalImageUrl, show_date: true, author: authorSlug }) });
                 await init();
-            } catch(e) { btn.innerText = "+ Upload New Photo"; btn.disabled = false; }
+            } catch(e) { btn.innerText = "+ Upload Photo"; btn.disabled = false; }
         }
 
+        // Profile API
         function buildExpRowHtml(t='', c='', d='') {
             return `
-            <div class="flex flex-col gap-3 p-4 bg-white rounded-xl border border-gray-200 relative exp-row-item">
-                <input type="text" class="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold exp-t" placeholder="Job Title" value="${t}">
-                <input type="text" class="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm exp-c" placeholder="Company" value="${c}">
-                <input type="text" class="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm exp-d" placeholder="Date" value="${d}">
-                <button type="button" onclick="this.parentElement.remove()" class="absolute top-4 right-4 text-red-500 text-xs font-bold uppercase hover:text-red-700">Remove</button>
+            <div class="flex flex-col gap-3 p-4 bg-neutral-50 rounded-xl border border-neutral-200 relative exp-row-item">
+                <input type="text" class="w-full h-10 px-3 bg-white border border-neutral-200 rounded-md text-sm font-bold exp-t" placeholder="Job Title" value="${t}">
+                <input type="text" class="w-full h-10 px-3 bg-white border border-neutral-200 rounded-md text-sm exp-c" placeholder="Company" value="${c}">
+                <input type="text" class="w-full h-10 px-3 bg-white border border-neutral-200 rounded-md text-sm exp-d" placeholder="Date" value="${d}">
+                <button type="button" onclick="this.parentElement.remove()" class="absolute top-4 right-4 text-red-500 text-xs font-bold uppercase hover:text-red-700">X</button>
             </div>`;
         }
-        function addExpRowToDOM() { document.getElementById('res-exp-container').insertAdjacentHTML('beforeend', buildExpRowHtml()); }
+        function addExpRowToDOM() { document.getElementById('prf-exp-container').insertAdjacentHTML('beforeend', buildExpRowHtml()); }
 
-        async function uploadResumeImage(authorSlug, postId) {
-            const file = document.getElementById('res-img-upload').files[0]; if(!file) return;
+        async function uploadProfileImage(authorSlug, postId) {
+            const file = document.getElementById('prf-img-upload').files[0]; if(!file) return;
             try {
                 const f = new FormData(); f.append("file", await compressImage(file));
                 const img = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": App.token }, body: f })).json()).image_url;
-                saveResumeConfig(authorSlug, postId, img);
+                saveProfileConfig(authorSlug, postId, img);
             } catch(e) {}
         }
 
-        async function saveResumeConfig(authorSlug, postId, imageUrl) {
-            const btn = document.getElementById('btn-save-res'); if(btn) { btn.innerText = "SAVING..."; btn.disabled = true; }
+        async function saveProfileConfig(authorSlug, postId, imageUrl) {
+            const btn = document.getElementById('btn-save-prf'); if(btn) { btn.innerText = "SAVING..."; btn.disabled = true; }
             const exps = [];
             document.querySelectorAll('.exp-row-item').forEach(el => { exps.push({ title: el.querySelector('.exp-t').value, company: el.querySelector('.exp-c').value, date: el.querySelector('.exp-d').value }); });
             
-            const data = { v: 2, intro: document.getElementById('res-intro').value, approach: document.getElementById('res-approach').value, exps: exps, ctaTitle: document.getElementById('res-cta-t').value, ctaText: document.getElementById('res-cta-tx').value, ctaBtn: document.getElementById('res-cta-b').value };
+            const data = { v: 2, intro: document.getElementById('prf-intro').value, text: document.getElementById('prf-text').value, exps: exps };
             
             const payload = { title: "", text: JSON.stringify(data), image_url: imageUrl || "", show_date: false, author: authorSlug };
             const method = postId ? "PUT" : "POST"; const url = postId ? `${API_URL}/posts/${postId}` : `${API_URL}/posts`;
@@ -586,6 +570,7 @@
             catch(e) { if(btn){btn.innerText = "Save Changes"; btn.disabled = false;} }
         }
 
+        // Contact API
         async function uploadContactImage(authorSlug, postId) {
             const file = document.getElementById('cnt-img-upload').files[0]; if(!file) return;
             try {
@@ -603,15 +588,15 @@
             catch(e) { if(btn){btn.innerText = "Save Changes"; btn.disabled = false;} }
         }
 
-        // DELETION LOGIC
+        // Deletion API
         let deleteActionId = null;
         function confirmDelete(id) {
             deleteActionId = id;
             const root = document.getElementById('modal-root');
             root.innerHTML = `
-                <div class="max-w-sm w-full bg-white border border-gray-200 rounded-2xl p-8 flex flex-col gap-6 items-center text-center shadow-2xl">
+                <div class="max-w-sm w-full bg-white border border-neutral-200 rounded-2xl p-8 flex flex-col gap-6 items-center text-center shadow-2xl">
                     <div class="text-2xl font-bold">Delete Item?</div>
-                    <p class="text-gray-500 text-sm">This cannot be undone.</p>
+                    <p class="text-neutral-500 text-sm">This cannot be undone.</p>
                     <div id="m-actions" class="flex gap-4 w-full mt-2">
                         <button class="btn-light flex-1" onclick="closeModalRoot()">Cancel</button>
                         <button class="btn-danger flex-1" onclick="executeDelete()">Delete</button>
@@ -626,7 +611,7 @@
             try { await fetch(`${API_URL}/posts/${deleteActionId}`,{method:"DELETE",headers:{"x-admin-password":App.token}}); await init(); closeModalRoot(); } catch(e){}
         }
 
-        // Start
+        // Boot
         init();
     </script>
 </body>
