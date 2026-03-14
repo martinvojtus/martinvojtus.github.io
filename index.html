@@ -14,465 +14,316 @@
     <title>martinvojtus.space</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* 1. TOKENS & RESET */
         :root {
-            --black: #000000;
-            --white: #ffffff;
-            --grey-50: rgba(0, 0, 0, 0.5);
-            --divider: rgba(0, 0, 0, 0.1);
-            --divider-hover: rgba(0, 0, 0, 0.05);
-            
-            --glass-rgb: 255, 255, 255; 
-            --content-width: 720px; 
-            --border-radius: 1rem; 
-            --gap-item: 1rem; 
-            --letter-spacing: 0.05em;
-            --glass-opacity: 0.5; 
-            --glass-blur: 1rem;   
-            --size-large: 2.0rem;
-            --size-small: 1.0rem;
+            --bg: #ffffff;
+            --fg: #000000;
+            --muted: #737373;
+            --border: #e5e5e5;
+            --radius: 0.75rem;
+            --font: 'Plus Jakarta Sans', sans-serif;
+            --content-width: 720px;
         }
-
         @media (prefers-color-scheme: dark) {
             :root {
-                --black: #ffffff;       
-                --white: #000000;       
-                --grey-50: rgba(255, 255, 255, 0.5); 
-                --divider: rgba(255, 255, 255, 0.1); 
-                --divider-hover: rgba(255, 255, 255, 0.05);
-                --glass-rgb: 0, 0, 0;   
+                --bg: #0a0a0a;
+                --fg: #ffffff;
+                --muted: #a3a3a3;
+                --border: #262626;
             }
         }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font); -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg); color: var(--fg); line-height: 1.6; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        svg { display: block; flex-shrink: 0; fill: currentColor; }
 
-        html { -webkit-text-size-adjust: 100%; }
+        /* 2. TYPOGRAPHY (.t-*) */
+        .t-display { font-size: 3rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; }
+        .t-h1 { font-size: 2rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
+        .t-h2 { font-size: 1.5rem; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; }
+        .t-body-lg { font-size: 1.25rem; font-weight: 400; line-height: 1.6; }
+        .t-body { font-size: 1rem; font-weight: 400; }
+        .t-meta { font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .t-muted { color: var(--muted); }
+        .bold { font-weight: 700; }
+        .text-left { text-align: left; }
+        .text-center { text-align: center; }
+        .truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* 3. LAYOUT (.flex, .gap, .m, .p) */
+        .flex { display: flex; } .col { flex-direction: column; } .row { flex-direction: row; }
+        .items-center { align-items: center; } .items-start { align-items: flex-start; }
+        .justify-between { justify-content: space-between; } .justify-center { justify-content: center; }
         
-        * { 
-            -webkit-tap-highlight-color: transparent; 
-            box-sizing: border-box; 
-            font-weight: 400; 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            letter-spacing: var(--letter-spacing); 
-            transition: none !important; 
-            animation: none !important;
-        }
-
-        body {
-            margin: 0; padding: 0;
-            background-color: var(--white); color: var(--black);
-            line-height: 1.5; 
-            display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh;
-        }
-
-        .form-input { line-height: 1; }
-
-        header, .nav-overlay, #delete-modal {
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
-        }
-
-        header {
-            position: fixed; top: 0; left: 0; width: 100%; 
-            display: flex; justify-content: center; padding: var(--gap-item) 0; 
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
-            z-index: 2000;
-        }
-
-        .header-content {
-            width: 100%; max-width: var(--content-width);
-            display: flex; justify-content: space-between; align-items: center; padding: 0 var(--gap-item); 
-        }
-
-        .header-brand {
-            display: flex; align-items: center; cursor: pointer; text-decoration: none; color: inherit;
-        }
-
-        .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
-        .header-left svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
+        .gap-sm { gap: 0.5rem; } .gap-md { gap: 1rem; } .gap-lg { gap: 1.5rem; } .gap-xl { gap: 2.5rem; }
         
-        .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; pointer-events: auto; cursor: pointer; }
+        .w-full { width: 100%; } .max-w { max-width: var(--content-width); width: 100%; }
+        
+        .mt-sm { margin-top: 0.5rem; } .mt-md { margin-top: 1rem; } .mt-lg { margin-top: 1.5rem; } .mt-xl { margin-top: 3rem; }
+        .mb-xs { margin-bottom: 0.25rem; } .mb-sm { margin-bottom: 0.5rem; } .mb-md { margin-bottom: 1rem; } .mb-lg { margin-bottom: 1.5rem; } .mb-xl { margin-bottom: 2.5rem; }
+        
+        .p-md { padding: 1rem; } .p-lg { padding: 1.5rem; } .p-xl { padding: 2.5rem; }
+        .px-md { padding-left: 1rem; padding-right: 1rem; } .py-md { padding-top: 1rem; padding-bottom: 1rem; }
+        
+        .relative { position: relative; } .absolute { position: absolute; }
+        .top-right { top: 0.5rem; right: 0.5rem; }
+        .hidden { display: none !important; }
 
-        .menu-toggle { 
-            display: flex; justify-content: center; align-items: center; 
-            cursor: pointer; z-index: 2100; position: relative;
-            font-size: var(--size-small); font-weight: 400; user-select: none;
-            line-height: 1; text-transform: uppercase;
-        }
+        /* 4. COMPONENTS (.btn, .input, .card, etc.) */
+        .btn { height: 3.5rem; padding: 0 1.5rem; border-radius: 2rem; font-weight: 700; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; border: 1px solid transparent; text-decoration: none; transition: opacity 0.2s; outline: none; background: transparent; color: var(--fg); }
+        .btn-sm { height: 2.5rem; padding: 0 1rem; font-size: 0.75rem; border-radius: 1.5rem; }
+        .btn:disabled { opacity: 0.5; pointer-events: none; }
+        .btn-dark { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+        .btn-light { border-color: var(--border); }
+        .btn-light:hover { background: var(--border); }
+        .btn-ghost { border-color: transparent; }
 
-        .desktop-menu { display: none; }
-        .desktop-link { font-size: var(--size-small); color: var(--black); cursor: pointer; }
-        .desktop-divider { width: 1px; height: 1rem; background-color: var(--divider); }
+        .input { width: 100%; min-height: 3.5rem; padding: 1rem 1.25rem; border-radius: var(--radius); background: transparent; border: 1px solid var(--border); color: var(--fg); font-size: 1rem; outline: none; line-height: 1.5; }
+        .input::placeholder { color: var(--muted); }
+        .input-error { border-color: var(--fg); }
+        textarea.input { resize: none; overflow: hidden; padding-top: 1.25rem; padding-bottom: 1.25rem; }
 
-        @media (min-width: 600px) {
-            .logo-text { position: static; transform: none; margin-left: 0.5rem; }
-            .menu-toggle { display: none !important; }
-            .desktop-menu { display: flex; gap: 1.5rem; align-items: center; }
-            .mobile-only { display: none !important; }
-        }
+        .card { border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg); }
+        .divider { width: 100%; height: 1px; background: var(--border); flex-shrink: 0; }
+        .badge { display: inline-block; padding: 0.25rem 0.75rem; border: 1px solid var(--border); border-radius: 2rem; font-size: 0.875rem; color: var(--muted); }
 
-        .nav-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: auto;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
-            z-index: 1500; 
-            padding: calc(3rem + var(--gap-item)) 0 var(--gap-item) 0; 
-            display: none; flex-direction: column; align-items: center;
-        }
+        .img-fluid { width: 100%; height: auto; display: block; border-radius: var(--radius); }
+        .thumb { width: 4rem; height: 4rem; border-radius: 0.5rem; object-fit: cover; background: var(--border); flex-shrink: 0; }
+        
+        .cursor-pointer { cursor: pointer; }
+
+        /* 5. SPECIFIC STRUCTURES */
+        header { position: fixed; top: 0; left: 0; width: 100%; background: var(--bg); border-bottom: 1px solid var(--border); z-index: 2000; padding: 1rem 0; }
+        main { padding: 6rem 1rem 2rem 1rem; flex-grow: 1; display: flex; flex-direction: column; align-items: center; width: 100%; }
+        
+        .nav-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 1500; padding-top: 6rem; display: none; flex-direction: column; align-items: center; }
         .nav-overlay.active { display: flex; }
         
-        .menu-items { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); }
-
-        .menu-nav-link { font-size: var(--size-small); color: var(--black); cursor: pointer; width: 100%; text-align: left; display: block; }
-        .admin-only { display: none; }
-        body.is-logged-in .admin-only { display: block !important; }
-
-        main {
-            padding: calc(3rem + var(--gap-item)) var(--gap-item) var(--gap-item); 
-            width: 100%; max-width: var(--content-width); 
-            flex-grow: 1; display: flex; flex-direction: column; align-items: center; 
+        .desktop-menu { display: none; }
+        .desktop-divider { width: 1px; height: 1rem; background-color: var(--border); }
+        @media (min-width: 600px) {
+            .desktop-menu { display: flex; gap: 1.5rem; align-items: center; }
+            .menu-toggle, .mobile-only { display: none !important; }
         }
-
-        /* DASHBOARD CSS */
-        #section-dashboard { display: none; width: 100%; flex-direction: column; gap: var(--gap-item); }
-        .dash-header { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
-        .dash-title { font-size: 2.5rem; font-weight: 700; line-height: 1.1; }
-        .dash-subtitle { font-size: 1rem; color: var(--grey-50); }
         
-        .dash-tabs { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem; border-bottom: 1px solid var(--divider); margin-bottom: 1rem; }
-        .dash-tab { padding: 0.75rem 1.5rem; border-radius: var(--border-radius); font-size: 1rem; font-weight: 700; cursor: pointer; border: none; background: transparent; color: var(--grey-50); transition: all 0.2s; white-space: nowrap; }
-        .dash-tab.active { background: var(--black); color: var(--white); }
+        .admin-only { display: none; }
+        body.is-logged-in .admin-only { display: flex; }
+        body.is-logged-in .desktop-menu .admin-only { display: block; }
 
-        .dash-card { background: transparent; border: 1px solid var(--divider); border-radius: 1.5rem; padding: 1.5rem; width: 100%; display: flex; flex-direction: column; gap: 1rem; }
-        
-        .dash-table-header { display: flex; justify-content: space-between; font-size: 0.875rem; color: var(--grey-50); text-transform: uppercase; padding-bottom: 0.5rem; border-bottom: 1px solid var(--divider); margin-bottom: 0.5rem; }
-        .dash-table-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--divider); }
-        .dash-table-row:last-child { border-bottom: none; padding-bottom: 0; }
-        .dash-col-main { flex: 1; display: flex; align-items: center; gap: 1rem; overflow: hidden; }
-        .dash-row-thumb { width: 3rem; height: 3rem; border-radius: 0.5rem; object-fit: cover; background: var(--divider); flex-shrink: 0; }
-        .dash-row-title { font-size: 1rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .dash-col-date { width: 120px; color: var(--grey-50); font-size: 0.875rem; text-align: left; }
-        .dash-col-actions { display: flex; gap: 0.5rem; width: 80px; justify-content: flex-end; }
-        
-        .action-icon-btn { background: transparent; border: none; cursor: pointer; color: var(--grey-50); display: flex; align-items: center; justify-content: center; padding: 0.5rem; border-radius: 0.5rem; }
-        .action-icon-btn:hover { color: var(--black); background: var(--divider-hover); }
-        .action-icon-btn svg { width: 1.25rem; height: 1.25rem; }
-
-        .form-section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
-        .form-label { font-size: 0.875rem; color: var(--grey-50); text-transform: uppercase; margin-bottom: 0.25rem; display: block; }
-
-        /* PUBLIC SECTIONS CSS */
-        #section-feed, #section-about, #section-contact { display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; }
-        
-        #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
-        #logout-ui { display: none; }
-
-        .status-feed { max-width: var(--content-width); width: 100%; margin: 0 auto; }
-        .status-feed.view-feed { display: flex; flex-direction: column; gap: var(--gap-item); }
-        .status-feed.view-grid { display: flex; flex-direction: column; gap: var(--gap-item); width: 100%; }
-        .grid-columns-wrapper { display: flex; flex-direction: row; gap: var(--gap-item); align-items: flex-start; width: 100%; }
-        .masonry-col { display: flex; flex-direction: column; gap: var(--gap-item); flex: 1; min-width: 0; }
-
-        .status-feed.view-grid .feed-top-row,
-        .status-feed.view-grid .feed-divider { display: none !important; }
-        .status-feed.view-feed .status-card:last-child .feed-divider { display: none !important; }
-        .status-feed.view-grid .status-media-wrapper { background-color: transparent; }
-
-        .feed-toggle-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; gap: var(--gap-item); }
-        .divider-line { width: 100%; height: 1px; background-color: var(--divider); flex-shrink: 0; }
-
-        .status-card { display: flex; flex-direction: column; position: relative; }
-        .status-media-wrapper { position: relative; border-radius: var(--border-radius); overflow: hidden; transform: translateZ(0); min-height: 3rem; background-color: var(--divider); }
-        .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); cursor: pointer; }
-        
-        .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
-
-        .form-input, .submit-btn { border-radius: var(--border-radius); font-size: var(--size-small); padding: 0 var(--gap-item); outline: none; display: flex; align-items: center; gap: var(--gap-item); box-shadow: none; -webkit-appearance: none; appearance: none; margin: 0; }
-        .form-input { height: 3.5rem; background-color: transparent; color: var(--black); border: 1px solid var(--divider); }
-        .form-input::placeholder { color: var(--grey-50); } 
-        .submit-btn { height: 3.5rem; background-color: var(--black); color: var(--white); border: 1px solid var(--black); justify-content: center; text-transform: uppercase; cursor: pointer; white-space: nowrap; font-weight: 700; line-height: normal; }
-
-        .btn-tonal { background-color: var(--divider) !important; color: var(--black) !important; border: none !important; }
-        .btn-tonal-disabled { background-color: var(--divider) !important; color: var(--grey-50) !important; border: none !important; cursor: default !important; pointer-events: none !important; }
-        .btn-danger { background-color: #ff3333 !important; color: #000000 !important; border: none !important; }
-        .btn-loading { background-color: var(--divider) !important; color: var(--grey-50) !important; border: none !important; pointer-events: none !important; opacity: 1 !important; }
-        .btn-ghost { background-color: var(--divider) !important; color: var(--black) !important; border: none !important; pointer-events: none !important; opacity: 1 !important; }
-        .btn-outline { background-color: transparent !important; color: var(--black) !important; border: 1px solid var(--divider) !important; }
-
-        .input-error { border: 1px solid var(--black) !important; }
-
-        .thumbnail-container { width: 4rem; height: 4rem; flex-shrink: 0; border-radius: 0.5rem; overflow: hidden; background-color: var(--divider); cursor: pointer; position: relative; }
-        .thumbnail-img { width: 100%; height: 100%; object-fit: cover; }
-
-        .custom-checkbox { appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black); border-radius: calc(var(--border-radius) / 3); cursor: pointer; display: grid; place-content: center; }
-        .custom-checkbox::before { content: ""; width: 0.25rem; height: 0.5rem; border: solid var(--white); border-width: 0 1px 1px 0; transform: rotate(45deg); opacity: 0; margin-top: -0.125rem; }
-        .custom-checkbox:checked { background-color: var(--black); border-color: var(--black); } 
-        .custom-checkbox:checked::before { opacity: 1; }
-
-        .footer-info { font-size: var(--size-small); color: var(--grey-50); text-transform: uppercase; text-align: center; width: 100%; margin-top: 1rem; }
-
-        #delete-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3000; display: none; flex-direction: column; justify-content: center; align-items: center; background: transparent; }
-        #delete-modal::before { content: ""; position: absolute; inset: 0; background: rgba(var(--glass-rgb), var(--glass-opacity)); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); z-index: -1; }
-
-        .modal-content { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); }
-        .action-row { display: flex; flex-direction: row; gap: var(--gap-item); justify-content: center; width: 100%; padding: 0; }
-
-        /* Public About Elements */
-        .about-text { font-size: var(--size-small); color: var(--black); text-align: left; line-height: 1.6; -webkit-hyphens: auto; -ms-hyphens: auto; hyphens: auto; word-wrap: break-word; overflow-wrap: break-word; }
-        .about-page-title { font-size: 3rem; font-weight: 700; line-height: 1.1; margin-bottom: 0.5rem; letter-spacing: -0.02em;}
-        .about-title-line { width: 4rem; height: 4px; background-color: var(--black); margin-bottom: 2rem; border-radius: 2px; }
-        .about-intro-text { font-size: 1.25rem; color: var(--grey-50); line-height: 1.6; margin-bottom: 2rem; text-align: left; }
-        .about-section-title { font-size: 2rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; letter-spacing: -0.02em;}
-        
-        .about-exp-item { display: flex; flex-direction: column; align-items: flex-start; width: 100%; }
-        .about-exp-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem; }
-        .about-exp-company { font-size: 1rem; color: var(--grey-50); margin-bottom: 1rem; }
-        .about-exp-badge { display: inline-block; padding: 0.25rem 0.75rem; background-color: var(--divider); border-radius: 1rem; font-size: 0.875rem; color: var(--black); }
-        .about-exp-divider { width: 100%; height: 1px; background-color: var(--divider); margin: 2rem 0; flex-shrink: 0; }
-        .about-exp-item:last-of-type .about-exp-divider { display: none; }
-
-        .about-cta-card { background-color: var(--divider); border-radius: 1.5rem; padding: 2.5rem 2rem; display: flex; flex-direction: column; align-items: flex-start; margin-top: 3rem; width: 100%; }
-        .about-cta-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 1rem; letter-spacing: -0.02em;}
-        .about-cta-text { font-size: 1rem; color: var(--grey-50); line-height: 1.6; margin-bottom: 2rem; text-align: left; }
-        .about-cta-btn { background-color: var(--black); color: var(--white); padding: 1rem 2rem; border-radius: 2rem; font-size: 1rem; font-weight: 700; text-decoration: none; display: inline-block; cursor: pointer; border: none; }
+        #delete-modal { position: fixed; inset: 0; background: var(--bg); z-index: 3000; display: none; flex-direction: column; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="header-content">
-            <div class="header-brand" onclick="showFeed()">
-                <div class="logo-link">
-                    <div class="header-left">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="72.35 270 935.31 810" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
-                    </div>
-                </div>
-                <div class="logo-text"><span id="public-site-title">martinvojtus.space</span></div>
+        <div class="max-w flex row items-center justify-between px-md m-auto">
+            <div class="flex row items-center gap-sm cursor-pointer" onclick="showFeed()">
+                <svg width="1rem" height="1rem" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z"/></g></svg>
+                <div class="t-body bold truncate" id="public-site-title">martinvojtus.space</div>
             </div>
             
-            <div class="menu-toggle" id="menuToggle" onclick="toggleMenu(event)">MENU</div>
+            <div class="menu-toggle t-meta" id="menuToggle" onclick="toggleMenu(event)">Menu</div>
 
             <div class="desktop-menu">
-                <div class="desktop-link" onclick="showFeed()">Feed</div>
-                <div class="desktop-link" onclick="showAbout()">About</div>
-                <div class="desktop-link" onclick="showContact()">Contact</div>
-                <div class="desktop-link admin-only" onclick="showDashboard()">Dashboard</div>
+                <div class="t-body cursor-pointer" onclick="showFeed()">Feed</div>
+                <div class="t-body cursor-pointer" onclick="showAbout()">About</div>
+                <div class="t-body cursor-pointer" onclick="showContact()">Contact</div>
+                <div class="t-body cursor-pointer admin-only" onclick="showDashboard()">Dashboard</div>
                 <div class="desktop-divider"></div>
-                <div class="desktop-link" id="desktop-login-btn" onclick="toggleMenu(event)">Login</div>
-                <div class="desktop-link admin-only" id="desktop-logout-btn" onclick="handleLogout()">Logout</div>
+                <div class="t-body cursor-pointer" id="desktop-login-btn" onclick="toggleMenu(event)">Login</div>
+                <div class="t-body cursor-pointer admin-only" id="desktop-logout-btn" onclick="handleLogout()" style="display: none;">Logout</div>
             </div>
         </div>
     </header>
 
     <nav class="nav-overlay" id="navOverlay">
-        <div class="menu-items">
-            <div class="menu-nav-link mobile-only" onclick="showFeed()">Feed</div>
-            <div class="menu-nav-link mobile-only" onclick="showAbout()">About</div>
-            <div class="menu-nav-link mobile-only" onclick="showContact()">Contact</div>
-            <div class="menu-nav-link mobile-only admin-only" onclick="showDashboard()">Dashboard</div>
+        <div class="max-w flex col gap-md px-md">
+            <div class="t-h2 cursor-pointer mobile-only" onclick="showFeed()">Feed</div>
+            <div class="t-h2 cursor-pointer mobile-only" onclick="showAbout()">About</div>
+            <div class="t-h2 cursor-pointer mobile-only" onclick="showContact()">Contact</div>
+            <div class="t-h2 cursor-pointer mobile-only admin-only" onclick="showDashboard()">Dashboard</div>
             
-            <div class="divider-line mobile-only"></div>
+            <div class="divider mt-md mb-md mobile-only"></div>
 
-            <div id="login-ui">
-                <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
-                    <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="width: 100%;">
-                    <label class="form-input" style="cursor: pointer; justify-content: flex-start; user-select: none; width: 100%;">
-                        <input type="checkbox" id="remember-login" class="custom-checkbox">
-                        <span>Remember me</span>
-                    </label>
-                    <button type="submit" id="login-btn" class="submit-btn btn-tonal" style="width: 100%;">LOGIN</button>
+            <div id="login-ui" class="flex col gap-md w-full">
+                <form id="login-form" onsubmit="handleLogin(event)" class="flex col gap-md w-full">
+                    <input type="password" id="admin-pass" class="input" placeholder="Password...">
+                    <button type="submit" id="login-btn" class="btn btn-dark w-full">Login</button>
                 </form>
             </div>
 
-            <div id="logout-ui" style="display: none;">
-                <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
+            <div id="logout-ui" class="w-full" style="display: none;">
+                <button onclick="handleLogout()" class="btn btn-light w-full">Logout</button>
             </div>
-            
-            <div class="divider-line"></div>
-            <div class="footer-info">build v7.3.1 • 2026</div>
         </div>
     </nav>
 
     <main>
         
-        <div id="section-dashboard">
-            <div class="dash-header">
-                <div class="dash-title">Dashboard</div>
-                <div class="dash-subtitle">Manage your content and site settings.</div>
+        <div id="section-dashboard" class="max-w hidden col gap-lg">
+            <div class="flex col gap-sm mb-sm">
+                <div class="t-display">Dashboard</div>
+                <div class="t-body t-muted">Manage your content and site settings.</div>
             </div>
 
-            <div class="dash-tabs">
-                <button class="dash-tab active" id="tab-btn-posts" onclick="switchDashTab('posts')">Posts</button>
-                <button class="dash-tab" id="tab-btn-about" onclick="switchDashTab('about')">About</button>
-                <button class="dash-tab" id="tab-btn-contact" onclick="switchDashTab('contact')">Contact</button>
-                <button class="dash-tab" id="tab-btn-settings" onclick="switchDashTab('settings')">Settings</button>
+            <div class="flex row gap-sm border-b" style="overflow-x: auto;">
+                <button class="btn btn-dark btn-sm" id="tab-btn-posts" onclick="switchDashTab('posts')">Posts</button>
+                <button class="btn btn-light btn-sm" id="tab-btn-about" onclick="switchDashTab('about')">About</button>
+                <button class="btn btn-light btn-sm" id="tab-btn-contact" onclick="switchDashTab('contact')">Contact</button>
+                <button class="btn btn-light btn-sm" id="tab-btn-settings" onclick="switchDashTab('settings')">Settings</button>
             </div>
 
-            <div id="dash-tab-posts" style="display: flex; flex-direction: column; width: 100%; gap: 1.5rem;">
-                
-                <button class="submit-btn" style="width: fit-content; padding: 0 1.5rem;" onclick="document.getElementById('editor-form-feed').style.display='flex'; this.style.display='none';">+ New Post</button>
+            <div id="dash-tab-posts" class="flex col gap-lg w-full">
+                <button class="btn btn-dark" style="align-self: flex-start;" onclick="document.getElementById('editor-form-feed').style.display='flex'; this.style.display='none';">+ New Post</button>
 
-                <form id="editor-form-feed" onsubmit="handleFeedSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0; background: var(--divider); padding: 1.5rem; border-radius: 1.5rem;">
-                    <div class="form-section-title" style="margin: 0;">Create New Post</div>
-                    <input type="file" id="edit-image-feed" accept="image/*" style="display: none;" onchange="updateFeedFormState()">
-                    <div id="upload-empty-state-feed" class="submit-btn btn-outline" style="width: 100%;" onclick="document.getElementById('edit-image-feed').click()">
-                        + SELECT IMAGE
+                <form id="editor-form-feed" onsubmit="handleFeedSubmit(event)" class="card flex col gap-md hidden">
+                    <div class="t-h2">Create New Post</div>
+                    <input type="file" id="edit-image-feed" accept="image/*" class="hidden" onchange="updateFeedFormState()">
+                    <div id="upload-empty-state-feed" class="btn btn-light w-full" onclick="document.getElementById('edit-image-feed').click()">+ Select Image</div>
+                    <div id="upload-filled-state-feed" class="flex row gap-md hidden">
+                        <img id="upload-preview-img-feed" class="thumb" onclick="document.getElementById('edit-image-feed').click()">
+                        <div class="btn btn-light flex-1" onclick="clearFeedImageSelection(event)">Remove</div>
                     </div>
-                    <div id="upload-filled-state-feed" class="action-row" style="display: none;">
-                        <div class="thumbnail-container" style="width:4rem;height:4rem;" onclick="document.getElementById('edit-image-feed').click()">
-                            <img id="upload-preview-img-feed" class="thumbnail-img" src="" alt="">
-                        </div>
-                        <div class="submit-btn btn-outline" style="flex-grow: 1;" onclick="clearFeedImageSelection(event)">REMOVE</div>
-                    </div>
-                    <div class="action-row" style="padding: 0;">
-                        <button type="submit" id="publish-btn-feed" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>PUBLISH</button>
-                        <div class="submit-btn btn-outline" onclick="document.getElementById('editor-form-feed').style.display='none'; document.querySelector('#dash-tab-posts > button').style.display='flex'; resetFeedForm();">CANCEL</div>
+                    <div class="flex row gap-md mt-sm">
+                        <button type="submit" id="publish-btn-feed" class="btn btn-dark flex-1" disabled>Publish</button>
+                        <div class="btn btn-light" onclick="document.getElementById('editor-form-feed').style.display='none'; document.querySelector('#dash-tab-posts > button').style.display='flex'; resetFeedForm();">Cancel</div>
                     </div>
                 </form>
 
-                <div class="dash-card">
-                    <div class="dash-table-header">
-                        <div class="dash-col-main" style="padding-left: 0.5rem;">POST</div>
-                        <div class="dash-col-date">DATE</div>
-                        <div class="dash-col-actions">ACTIONS</div>
+                <div class="card p-md flex col">
+                    <div class="flex row justify-between border-b pb-sm mb-sm t-meta t-muted">
+                        <div style="flex: 1; padding-left: 0.5rem;">Post</div>
+                        <div style="width: 120px;">Date</div>
+                        <div style="width: 80px; text-align: right;">Actions</div>
                     </div>
-                    <div id="dash-posts-list" style="display: flex; flex-direction: column;">
-                        </div>
+                    <div id="dash-posts-list" class="flex col"></div>
                 </div>
 
-                <button type="button" class="submit-btn btn-danger" style="width: 100%; margin-top: 1rem;" onclick="openDeleteModal('delete_all')">DELETE ALL POSTS</button>
+                <button type="button" class="btn btn-light w-full" onclick="openDeleteModal('delete_all')">Delete All Posts</button>
             </div>
 
-            <div id="dash-tab-about" style="display: none; flex-direction: column; width: 100%;">
-                <div class="dash-card">
-                    <div class="form-section-title">About Page Builder</div>
-                    <form id="editor-form-about" onsubmit="handleAboutSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: 1.5rem; margin: 0;">
-                        
-                        <div>
-                            <span class="form-label">1. Main Cover Image</span>
-                            <input type="file" id="edit-image-about" accept="image/*" style="display: none;" onchange="updateAboutFormState()">
-                            <div id="upload-empty-state-about" class="submit-btn btn-outline" style="width: 100%;" onclick="document.getElementById('edit-image-about').click()">+ SELECT IMAGE</div>
-                            <div id="upload-filled-state-about" class="action-row" style="display: none;">
-                                <div class="thumbnail-container" style="width: 4rem; height: 4rem;" onclick="document.getElementById('edit-image-about').click()"><img id="upload-preview-img-about" class="thumbnail-img" src="" alt=""></div>
-                                <div class="submit-btn btn-outline" style="flex-grow: 1;" onclick="clearAboutImageSelection(event)">REMOVE</div>
-                            </div>
+            <div id="dash-tab-about" class="hidden col w-full">
+                <form id="editor-form-about" onsubmit="handleAboutSubmit(event)" class="card p-xl flex col gap-lg">
+                    <div class="t-h2">About Page Builder</div>
+                    
+                    <div class="flex col gap-sm">
+                        <span class="t-meta t-muted">1. Main Cover Image</span>
+                        <input type="file" id="edit-image-about" accept="image/*" class="hidden" onchange="updateAboutFormState()">
+                        <div id="upload-empty-state-about" class="btn btn-light w-full" onclick="document.getElementById('edit-image-about').click()">+ Select Image</div>
+                        <div id="upload-filled-state-about" class="flex row gap-md hidden">
+                            <img id="upload-preview-img-about" class="thumb" onclick="document.getElementById('edit-image-about').click()">
+                            <div class="btn btn-light flex-1" onclick="clearAboutImageSelection(event)">Remove</div>
                         </div>
+                    </div>
 
-                        <div>
-                            <span class="form-label">2. Story & Approach</span>
-                            <textarea id="about-intro" class="form-input" placeholder="Intro Text (e.g. Hello! I'm Martin...)" style="width: 100%; min-height: 6rem; padding-top: 1rem; padding-bottom: 1rem; resize: none; overflow: hidden; margin-bottom: 1rem;" oninput="autoResizeTextarea(this); updateAboutFormState();"></textarea>
-                            <textarea id="about-approach" class="form-input" placeholder="My Approach details..." style="width: 100%; min-height: 8rem; padding-top: 1rem; padding-bottom: 1rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateAboutFormState();"></textarea>
-                        </div>
+                    <div class="flex col gap-sm">
+                        <span class="t-meta t-muted">2. Story & Approach</span>
+                        <textarea id="about-intro" class="input" placeholder="Intro Text (e.g. Hello! I'm Martin...)" oninput="autoResizeTextarea(this); updateAboutFormState();"></textarea>
+                        <textarea id="about-approach" class="input" placeholder="My Approach details..." oninput="autoResizeTextarea(this); updateAboutFormState();"></textarea>
+                    </div>
 
-                        <div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                <span class="form-label" style="margin:0;">3. Experience</span>
-                                <button type="button" class="submit-btn btn-outline" style="height: 2rem; font-size: 0.75rem; padding: 0 0.75rem;" onclick="addExperienceRow()">+ ADD ROW</button>
-                            </div>
-                            <div id="about-exp-list" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+                    <div class="flex col gap-sm">
+                        <div class="flex row justify-between items-center">
+                            <span class="t-meta t-muted">3. Experience</span>
+                            <button type="button" class="btn btn-light btn-sm" onclick="addExperienceRow()">+ Add Row</button>
                         </div>
+                        <div id="about-exp-list" class="flex col gap-md"></div>
+                    </div>
 
-                        <div>
-                            <span class="form-label">4. Call to Action Box</span>
-                            <input type="text" id="about-cta-title" class="form-input" placeholder="CTA Title (e.g. Let's work together)" style="width: 100%; margin-bottom: 1rem;" oninput="updateAboutFormState()">
-                            <textarea id="about-cta-text" class="form-input" placeholder="CTA Subtext..." style="width: 100%; min-height: 5rem; padding-top: 1rem; padding-bottom: 1rem; resize: none; overflow: hidden; margin-bottom: 1rem;" oninput="autoResizeTextarea(this); updateAboutFormState();"></textarea>
-                            <input type="text" id="about-cta-btn" class="form-input" placeholder="Button Label (e.g. Get in touch)" style="width: 100%;" oninput="updateAboutFormState()">
-                        </div>
+                    <div class="flex col gap-sm">
+                        <span class="t-meta t-muted">4. Call to Action Box</span>
+                        <input type="text" id="about-cta-title" class="input" placeholder="CTA Title" oninput="updateAboutFormState()">
+                        <textarea id="about-cta-text" class="input" placeholder="CTA Subtext" oninput="autoResizeTextarea(this); updateAboutFormState();"></textarea>
+                        <input type="text" id="about-cta-btn" class="input" placeholder="Button Label" oninput="updateAboutFormState()">
+                    </div>
 
-                        <div class="action-row" style="padding: 0; margin-top: 1rem;">
-                            <button type="submit" id="publish-btn-about" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>SAVE CHANGES</button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="flex row gap-md mt-md">
+                        <button type="submit" id="publish-btn-about" class="btn btn-dark flex-1" disabled>Save Changes</button>
+                    </div>
+                </form>
             </div>
 
-            <div id="dash-tab-contact" style="display: none; flex-direction: column; width: 100%;">
-                <div class="dash-card">
-                    <div class="form-section-title">Contact Page Editor</div>
-                    <form id="editor-form-contact" onsubmit="handleContactSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: 1.5rem; margin: 0;">
-                        
-                        <div>
-                            <span class="form-label">Cover Image</span>
-                            <input type="file" id="edit-image-contact" accept="image/*" style="display: none;" onchange="updateContactFormState()">
-                            <div id="upload-empty-state-contact" class="submit-btn btn-outline" style="width: 100%;" onclick="document.getElementById('edit-image-contact').click()">+ SELECT IMAGE</div>
-                            <div id="upload-filled-state-contact" class="action-row" style="display: none;">
-                                <div class="thumbnail-container" style="width: 4rem; height: 4rem;" onclick="document.getElementById('edit-image-contact').click()"><img id="upload-preview-img-contact" class="thumbnail-img" src="" alt=""></div>
-                                <div class="submit-btn btn-outline" style="flex-grow: 1;" onclick="clearContactImageSelection(event)">REMOVE</div>
-                            </div>
+            <div id="dash-tab-contact" class="hidden col w-full">
+                <form id="editor-form-contact" onsubmit="handleContactSubmit(event)" class="card p-xl flex col gap-lg">
+                    <div class="t-h2">Contact Page Editor</div>
+                    
+                    <div class="flex col gap-sm">
+                        <span class="t-meta t-muted">Cover Image</span>
+                        <input type="file" id="edit-image-contact" accept="image/*" class="hidden" onchange="updateContactFormState()">
+                        <div id="upload-empty-state-contact" class="btn btn-light w-full" onclick="document.getElementById('edit-image-contact').click()">+ Select Image</div>
+                        <div id="upload-filled-state-contact" class="flex row gap-md hidden">
+                            <img id="upload-preview-img-contact" class="thumb" onclick="document.getElementById('edit-image-contact').click()">
+                            <div class="btn btn-light flex-1" onclick="clearContactImageSelection(event)">Remove</div>
                         </div>
+                    </div>
 
-                        <div>
-                            <span class="form-label">Contact Details</span>
-                            <input type="text" id="edit-title-contact" class="form-input" placeholder="Title (e.g. Hello)" style="width: 100%; margin-bottom: 1rem;" oninput="updateContactFormState()">
-                            <textarea id="edit-text-contact" class="form-input" placeholder="Text or links..." style="width: 100%; min-height: 8rem; padding-top: 1rem; padding-bottom: 1rem; resize: none; overflow: hidden;" oninput="autoResizeTextarea(this); updateContactFormState();"></textarea>
-                        </div>
+                    <div class="flex col gap-sm">
+                        <span class="t-meta t-muted">Contact Details</span>
+                        <input type="text" id="edit-title-contact" class="input" placeholder="Title (e.g. Hello)" oninput="updateContactFormState()">
+                        <textarea id="edit-text-contact" class="input" placeholder="Text or links..." oninput="autoResizeTextarea(this); updateContactFormState();"></textarea>
+                    </div>
 
-                        <div class="action-row" style="padding: 0; margin-top: 1rem;">
-                            <button type="submit" id="publish-btn-contact" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>SAVE CHANGES</button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="flex row gap-md mt-md">
+                        <button type="submit" id="publish-btn-contact" class="btn btn-dark flex-1" disabled>Save Changes</button>
+                    </div>
+                </form>
             </div>
 
-            <div id="dash-tab-settings" style="display: none; flex-direction: column; width: 100%;">
-                <div class="dash-card">
-                    <div class="form-section-title">Site Settings</div>
-                    <form id="editor-form-settings" onsubmit="handleSettingsSubmit(event)" style="display: flex; flex-direction: column; width: 100%; gap: 1.5rem; margin: 0;">
-                        
-                        <div>
-                            <span class="form-label">Site Title</span>
-                            <input type="text" id="setting-title" class="form-input" placeholder="e.g. martinvojtus.space" style="width: 100%;" value="martinvojtus.space" oninput="updateSettingsFormState()">
-                        </div>
+            <div id="dash-tab-settings" class="hidden col w-full">
+                <form id="editor-form-settings" onsubmit="handleSettingsSubmit(event)" class="card p-xl flex col gap-lg">
+                    <div class="t-h2">Site Settings</div>
+                    
+                    <div class="flex col gap-sm">
+                        <span class="t-meta t-muted">Site Title</span>
+                        <input type="text" id="setting-title" class="input" placeholder="e.g. martinvojtus.space" value="martinvojtus.space" oninput="updateSettingsFormState()">
+                    </div>
 
-                        <div>
-                            <span class="form-label">Profile Image / Avatar</span>
-                            <input type="file" id="setting-image" accept="image/*" style="display: none;" onchange="updateSettingsFormState()">
-                            <div id="upload-empty-state-setting" class="submit-btn btn-outline" style="width: 100%;" onclick="document.getElementById('setting-image').click()">+ UPLOAD AVATAR</div>
-                            <div id="upload-filled-state-setting" class="action-row" style="display: none; align-items: center; justify-content: flex-start;">
-                                <img id="upload-preview-img-setting" src="" alt="" style="width: 4rem; height: 4rem; border-radius: 50%; object-fit: cover; background: var(--divider); cursor: pointer;" onclick="document.getElementById('setting-image').click()">
-                                <button type="button" class="submit-btn btn-outline" style="height: 2.5rem;" onclick="clearSettingImageSelection(event)">REMOVE</button>
-                            </div>
+                    <div class="flex col gap-sm">
+                        <span class="t-meta t-muted">Profile Avatar</span>
+                        <input type="file" id="setting-image" accept="image/*" class="hidden" onchange="updateSettingsFormState()">
+                        <div id="upload-empty-state-setting" class="btn btn-light w-full" onclick="document.getElementById('setting-image').click()">+ Upload Avatar</div>
+                        <div id="upload-filled-state-setting" class="flex row gap-md hidden">
+                            <img id="upload-preview-img-setting" class="thumb radius-full" onclick="document.getElementById('setting-image').click()">
+                            <button type="button" class="btn btn-light" onclick="clearSettingImageSelection(event)">Remove</button>
                         </div>
+                    </div>
 
-                        <div class="action-row" style="padding: 0; margin-top: 1rem;">
-                            <button type="submit" id="publish-btn-settings" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;" disabled>SAVE SETTINGS</button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="flex row gap-md mt-md">
+                        <button type="submit" id="publish-btn-settings" class="btn btn-dark flex-1" disabled>Save Settings</button>
+                    </div>
+                </form>
             </div>
-
         </div>
 
-        <div id="section-feed">
-            <div id="status-container" class="status-feed view-grid"></div>
-            <div class="divider-line"></div>
-            <div class="footer-info">build v7.3.1 • 2026</div>
+        <div id="section-feed" class="max-w flex col gap-lg w-full">
+            <div id="status-container" class="flex col gap-xl w-full"></div>
+            <div class="divider mt-xl"></div>
+            <div class="t-meta t-muted text-center w-full">build v8.0.0 • 2026</div>
         </div>
 
-        <div id="section-about" style="display: none; width: 100%; flex-direction: column;">
-            <div id="about-posts-container" style="display: flex; flex-direction: column; width: 100%;"></div>
-            <div class="divider-line" style="margin-top: 2rem;"></div>
-            <div class="footer-info">build v7.3.1 • 2026</div>
+        <div id="section-about" class="max-w hidden col w-full">
+            <div id="about-posts-container" class="flex col w-full"></div>
+            <div class="divider mt-xl mb-md"></div>
+            <div class="t-meta t-muted text-center w-full">build v8.0.0 • 2026</div>
         </div>
 
-        <div id="section-contact" style="display: none; width: 100%; flex-direction: column;">
-            <div id="contact-posts-container" style="display: flex; flex-direction: column; width: 100%;"></div>
-            <div class="divider-line" style="margin-top: 2rem;"></div>
-            <div class="footer-info">build v7.3.1 • 2026</div>
+        <div id="section-contact" class="max-w hidden col w-full">
+            <div id="contact-posts-container" class="flex col w-full"></div>
+            <div class="divider mt-xl mb-md"></div>
+            <div class="t-meta t-muted text-center w-full">build v8.0.0 • 2026</div>
         </div>
         
-        <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
+        <div id="loading-indicator" class="t-meta t-muted text-center mt-lg hidden w-full">Loading...</div>
     </main>
 
     <div id="delete-modal">
-        <div id="modal-action-zone" class="action-row">
-            <button id="modal-del-btn" class="submit-btn btn-danger" onclick="executeModalDelete()">DELETE</button>
-            <button id="modal-cancel-btn" class="submit-btn btn-tonal" onclick="closeDeleteModal()">CANCEL</button>
-        </div>
-        <div id="modal-loading-zone" class="action-row" style="display: none;">
-            <div class="submit-btn btn-loading">DELETING...</div>
-        </div>
-        <div id="modal-success-zone" class="action-row" style="display: none;">
-            <div class="submit-btn btn-ghost">DELETED</div>
+        <div class="max-w p-md flex col gap-md items-center">
+            <div class="t-h2 bg-bg p-md" style="text-align: center;">Confirm Delete?</div>
+            <div id="modal-action-zone" class="flex row gap-md">
+                <button id="modal-del-btn" class="btn btn-dark" onclick="executeModalDelete()">Delete</button>
+                <button id="modal-cancel-btn" class="btn btn-light" onclick="closeDeleteModal()">Cancel</button>
+            </div>
+            <div id="modal-loading-zone" class="btn btn-light hidden">Deleting...</div>
+            <div id="modal-success-zone" class="btn btn-light hidden">Deleted</div>
         </div>
     </div>
 
@@ -489,105 +340,72 @@
 
         let currentViewMode = localStorage.getItem('mv_view_mode') || 'grid';
         let currentSection = 'feed'; 
-        let currentGridCols = window.innerWidth > 600 ? 3 : 2;
 
         const passInput = document.getElementById('admin-pass');
-        const menuToggle = document.getElementById('menuToggle');
         const navOverlay = document.getElementById('navOverlay');
 
-        if(passInput) {
-            passInput.addEventListener('input', () => { passInput.classList.remove('input-error'); passInput.placeholder = 'Password...'; });
-        }
+        if(passInput) passInput.addEventListener('input', () => { passInput.classList.remove('input-error'); passInput.placeholder = 'Password...'; });
 
-        window.addEventListener('resize', () => {
-            const newCols = window.innerWidth > 600 ? 3 : 2;
-            if (newCols !== currentGridCols) {
-                currentGridCols = newCols;
-                if (currentSection === 'feed' && currentViewMode === 'grid') refreshFeedUI(globalPosts.filter(p => p.author === ''));
-            }
-        });
-
-        function autoResizeTextarea(el) { el.style.height = 'auto'; if(el.value.trim() === '') el.style.height = ''; else el.style.height = el.scrollHeight + 'px'; }
+        function autoResizeTextarea(el) { el.style.height = 'auto'; el.style.height = el.value.trim() === '' ? '' : el.scrollHeight + 'px'; }
 
         // ROUTING
         function hideAllSections() {
-            document.getElementById('section-feed').style.display = 'none';
-            document.getElementById('section-about').style.display = 'none';
-            document.getElementById('section-contact').style.display = 'none';
-            document.getElementById('section-dashboard').style.display = 'none';
+            ['section-feed', 'section-about', 'section-contact', 'section-dashboard'].forEach(id => document.getElementById(id).classList.add('hidden'));
         }
 
-        function showFeed() { currentSection = 'feed'; hideAllSections(); document.getElementById('section-feed').style.display = 'flex'; closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function showAbout() { currentSection = 'about'; hideAllSections(); document.getElementById('section-about').style.display = 'flex'; closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function showContact() { currentSection = 'contact'; hideAllSections(); document.getElementById('section-contact').style.display = 'flex'; closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function showFeed() { currentSection = 'feed'; hideAllSections(); document.getElementById('section-feed').classList.remove('hidden'); closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function showAbout() { currentSection = 'about'; hideAllSections(); document.getElementById('section-about').classList.remove('hidden'); closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function showContact() { currentSection = 'contact'; hideAllSections(); document.getElementById('section-contact').classList.remove('hidden'); closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         
         function showDashboard() {
             if(!secretKey) return;
-            currentSection = 'dashboard';
-            hideAllSections();
-            document.getElementById('section-dashboard').style.display = 'flex';
-            closeMenu();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            currentSection = 'dashboard'; hideAllSections(); document.getElementById('section-dashboard').classList.remove('hidden'); closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' });
             populateDashboard();
         }
 
         function switchDashTab(tabName) {
             ['posts', 'about', 'contact', 'settings'].forEach(t => {
-                document.getElementById(`dash-tab-${t}`).style.display = 'none';
-                document.getElementById(`tab-btn-${t}`).classList.remove('active');
+                document.getElementById(`dash-tab-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).className = 'btn btn-light btn-sm';
             });
-            document.getElementById(`dash-tab-${tabName}`).style.display = 'flex';
-            document.getElementById(`tab-btn-${tabName}`).classList.add('active');
+            document.getElementById(`dash-tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tabName}`).className = 'btn btn-dark btn-sm';
         }
 
-        function toggleMenu(e) { 
-            if (e) e.stopPropagation();
-            const isActive = menuToggle.classList.toggle('active'); 
-            navOverlay.classList.toggle('active'); 
-            menuToggle.innerText = isActive ? 'CLOSE' : 'MENU';
-        }
-        function closeMenu() { menuToggle.classList.remove('active'); navOverlay.classList.remove('active'); menuToggle.innerText = 'MENU'; }
+        function toggleMenu(e) { if (e) e.stopPropagation(); navOverlay.classList.toggle('active'); }
+        function closeMenu() { navOverlay.classList.remove('active'); }
 
         function updateUIVisibility() {
             if (secretKey) {
                 document.body.classList.add('is-logged-in');
-                document.getElementById('login-ui').style.display = 'none';
-                document.getElementById('logout-ui').style.display = 'flex';
-                
-                const dLogin = document.getElementById('desktop-login-btn'); if (dLogin) dLogin.style.display = 'none';
-                const dLogout = document.getElementById('desktop-logout-btn'); if (dLogout) dLogout.style.display = 'block';
+                document.getElementById('login-ui').classList.add('hidden');
+                document.getElementById('logout-ui').style.display = 'block';
+                document.getElementById('desktop-login-btn').classList.add('hidden');
+                document.getElementById('desktop-logout-btn').style.display = 'block';
             } else {
                 document.body.classList.remove('is-logged-in');
-                document.getElementById('login-ui').style.display = 'flex';
+                document.getElementById('login-ui').classList.remove('hidden');
                 document.getElementById('logout-ui').style.display = 'none';
-                
-                const dLogin = document.getElementById('desktop-login-btn'); if (dLogin) dLogin.style.display = 'block';
-                const dLogout = document.getElementById('desktop-logout-btn'); if (dLogout) dLogout.style.display = 'none';
-                
+                document.getElementById('desktop-login-btn').classList.remove('hidden');
+                document.getElementById('desktop-logout-btn').style.display = 'none';
                 if (currentSection === 'dashboard') showFeed();
             }
         }
 
         async function handleLogin(e) {
-            e.preventDefault();
-            const loginBtn = document.getElementById('login-btn'); loginBtn.innerText = 'LOGGING IN...'; loginBtn.classList.add('btn-loading'); 
+            e.preventDefault(); const loginBtn = document.getElementById('login-btn'); loginBtn.innerText = 'LOGGING IN...';
             const tempKey = passInput.value; const rememberMe = document.getElementById('remember-login').checked;
             try {
                 const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': tempKey } });
                 if (res.ok) { 
-                    loginBtn.classList.remove('btn-loading'); loginBtn.classList.add('btn-ghost'); loginBtn.innerText = 'SUCCESS';
-                    secretKey = tempKey; 
+                    loginBtn.innerText = 'SUCCESS'; secretKey = tempKey; 
                     setTimeout(() => {
                         updateUIVisibility(); closeMenu(); fetchStatuses(true); passInput.value = ''; 
                         if (rememberMe) localStorage.setItem('mv_admin_key', secretKey); else localStorage.removeItem('mv_admin_key');
-                        loginBtn.innerText = 'LOGIN'; loginBtn.classList.remove('btn-ghost');
-                        showDashboard();
+                        loginBtn.innerText = 'Login'; showDashboard();
                     }, 1000);
-                } else { 
-                    passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; 
-                    loginBtn.innerText = 'LOGIN'; loginBtn.classList.remove('btn-loading');
-                }
-            } catch (err) { passInput.classList.add('input-error'); loginBtn.innerText = 'LOGIN'; loginBtn.classList.remove('btn-loading'); }
+                } else { passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; loginBtn.innerText = 'Login'; }
+            } catch (err) { passInput.classList.add('input-error'); loginBtn.innerText = 'Login'; }
         }
 
         async function checkRememberedLogin() {
@@ -601,45 +419,30 @@
             } else { updateUIVisibility(); }
         }
 
-        function handleLogout() {
-            secretKey = ""; passInput.value = ''; localStorage.removeItem('mv_admin_key');
-            updateUIVisibility(); closeMenu(); fetchStatuses(true);
-        }
+        function handleLogout() { secretKey = ""; passInput.value = ''; localStorage.removeItem('mv_admin_key'); updateUIVisibility(); closeMenu(); fetchStatuses(true); }
 
-        // CMS DASHBOARD FILLER
+        // DASHBOARD FILLER
         function populateDashboard() {
             if (!secretKey) return;
-            
             const feedPosts = globalPosts.filter(p => p.author === '');
             const listEl = document.getElementById('dash-posts-list');
-            let tableHtml = '';
-            if(feedPosts.length === 0) {
-                tableHtml = `<div class="dash-table-row" style="color: var(--grey-50);">No posts found.</div>`;
-            } else {
-                feedPosts.forEach(p => {
-                    const formattedDate = new Date(p.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-                    const thumb = p.image_url ? `<img src="${p.image_url}" class="dash-row-thumb">` : `<div class="dash-row-thumb"></div>`;
-                    const title = p.id ? `Post #${p.id}` : `Feed Item`;
-                    tableHtml += `
-                    <div class="dash-table-row">
-                        <div class="dash-col-main">
-                            ${thumb}
-                            <div class="dash-row-title">${title}</div>
+            if(feedPosts.length === 0) { listEl.innerHTML = `<div class="py-md t-body t-muted">No posts found.</div>`; } 
+            else {
+                listEl.innerHTML = feedPosts.map(p => `
+                    <div class="flex row items-center justify-between py-md border-b">
+                        <div class="flex row items-center gap-md" style="overflow: hidden;">
+                            ${p.image_url ? `<img src="${p.image_url}" class="thumb">` : `<div class="thumb"></div>`}
+                            <div class="bold truncate">${p.id ? `Post #${p.id}` : `Feed Item`}</div>
                         </div>
-                        <div class="dash-col-date">${formattedDate}</div>
-                        <div class="dash-col-actions">
-                            <button class="action-icon-btn" onclick="openDeleteModal(${p.id})">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                            </button>
+                        <div class="flex row items-center gap-md">
+                            <div class="t-meta t-muted" style="width: 100px;">${new Date(p.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                            <button class="btn btn-light btn-sm" onclick="openDeleteModal(${p.id})">Delete</button>
                         </div>
-                    </div>`;
-                });
+                    </div>`).join('');
             }
-            listEl.innerHTML = tableHtml;
 
             const aboutP = globalPosts.find(p => p.author === 'about');
-            editingAboutPostId = aboutP ? aboutP.id : null;
-            existingAboutImageUrl = aboutP ? aboutP.image_url : null;
+            editingAboutPostId = aboutP ? aboutP.id : null; existingAboutImageUrl = aboutP ? aboutP.image_url : null;
             document.getElementById('about-intro').value = ""; document.getElementById('about-approach').value = "";
             document.getElementById('about-cta-title').value = ""; document.getElementById('about-cta-text').value = ""; document.getElementById('about-cta-btn').value = "";
             document.getElementById('about-exp-list').innerHTML = '';
@@ -648,11 +451,8 @@
                 try { 
                     const data = JSON.parse(aboutP.text);
                     if (data && data.v === 2) {
-                        document.getElementById('about-intro').value = data.intro || "";
-                        document.getElementById('about-approach').value = data.approach || "";
-                        document.getElementById('about-cta-title').value = data.ctaTitle || "";
-                        document.getElementById('about-cta-text').value = data.ctaText || "";
-                        document.getElementById('about-cta-btn').value = data.ctaBtn || "";
+                        document.getElementById('about-intro').value = data.intro || ""; document.getElementById('about-approach').value = data.approach || "";
+                        document.getElementById('about-cta-title').value = data.ctaTitle || ""; document.getElementById('about-cta-text').value = data.ctaText || ""; document.getElementById('about-cta-btn').value = data.ctaBtn || "";
                         if(data.exps) data.exps.forEach(exp => addExperienceRow(exp.title, exp.company, exp.date));
                     } else { document.getElementById('about-approach').value = aboutP.text || ""; }
                 } catch(e) { document.getElementById('about-approach').value = aboutP.text || ""; }
@@ -660,112 +460,62 @@
             updateAboutFormState();
 
             const contP = globalPosts.find(p => p.author === 'contact');
-            editingContactPostId = contP ? contP.id : null;
-            existingContactImageUrl = contP ? contP.image_url : null;
-            document.getElementById('edit-title-contact').value = contP ? (contP.title || "") : "";
-            document.getElementById('edit-text-contact').value = contP ? (contP.text || "") : "";
+            editingContactPostId = contP ? contP.id : null; existingContactImageUrl = contP ? contP.image_url : null;
+            document.getElementById('edit-title-contact').value = contP ? (contP.title || "") : ""; document.getElementById('edit-text-contact').value = contP ? (contP.text || "") : "";
             updateContactFormState();
 
             const setP = globalPosts.find(p => p.author === 'settings');
-            editingSettingsPostId = setP ? setP.id : null;
-            existingSettingsImageUrl = setP ? setP.image_url : null;
-            if(setP) {
-                try {
-                    const data = JSON.parse(setP.text);
-                    document.getElementById('setting-title').value = data.title || "martinvojtus.space";
-                } catch(e) {}
-            }
-            updateSettingsFormState();
-            applySettingsToPublicSite();
+            editingSettingsPostId = setP ? setP.id : null; existingSettingsImageUrl = setP ? setP.image_url : null;
+            if(setP) { try { document.getElementById('setting-title').value = JSON.parse(setP.text).title || "martinvojtus.space"; } catch(e) {} }
+            updateSettingsFormState(); applySettingsToPublicSite();
         }
 
         function applySettingsToPublicSite() {
             const setP = globalPosts.find(p => p.author === 'settings');
             let sTitle = "martinvojtus.space";
             if(setP) { try { const d = JSON.parse(setP.text); if(d.title) sTitle = d.title; } catch(e){} }
-            const logoEl = document.getElementById('public-site-title');
-            if(logoEl) logoEl.innerText = sTitle;
-            document.title = sTitle;
+            document.getElementById('public-site-title').innerText = sTitle; document.title = sTitle;
         }
 
-        // PUBLIC RENDERERS (100% Čisté od edit tlačidiel)
+        // PUBLIC RENDERERS
         function refreshFeedUI(feedPosts) { 
             const container = document.getElementById('status-container');
-            if (feedPosts.length === 0) {
-                container.className = 'status-feed view-feed';
-                container.innerHTML = `<div class="divider-line"></div><div class="submit-btn btn-tonal-disabled" style="width: 100%; cursor: default;">NOTHING HERE YET.</div>`;
-                return;
-            }
-
+            if (feedPosts.length === 0) { container.innerHTML = `<div class="t-body t-muted w-full text-center">Nothing here yet.</div>`; return; }
             if (currentViewMode === 'feed') {
-                container.className = 'status-feed view-feed';
-                let html = `<div class="feed-toggle-wrapper"><button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">GRID VIEW</button></div>`;
-                feedPosts.forEach(post => { html += renderSinglePost(post); });
-                container.innerHTML = html;
+                container.innerHTML = `<div class="flex row justify-center w-full mb-md"><button class="btn btn-light" onclick="toggleViewMode()">Grid View</button></div>` + feedPosts.map(p => renderSinglePost(p)).join('');
             } else {
-                container.className = 'status-feed view-grid';
-                let html = '';
-                
-                if (currentGridCols === 3) {
-                    let leftCol = '<div class="masonry-col col-left">'; let midCol = '<div class="masonry-col col-mid">'; let rightCol = '<div class="masonry-col col-right">';
-                    midCol += `<button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">FEED VIEW</button>`;
-                    feedPosts.forEach((post, index) => {
-                        if (index % 3 === 0) leftCol += renderSinglePost(post);
-                        else if (index % 3 === 1) midCol += renderSinglePost(post);
-                        else rightCol += renderSinglePost(post);
-                    });
-                    html += `<div class="grid-columns-wrapper">${leftCol}</div>${midCol}</div>${rightCol}</div></div>`;
-                } else {
-                    let leftCol = '<div class="masonry-col col-left">'; let rightCol = '<div class="masonry-col col-right">';
-                    rightCol += `<button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">FEED VIEW</button>`;
-                    feedPosts.forEach((post, index) => {
-                        if (index % 2 === 0) leftCol += renderSinglePost(post);
-                        else rightCol += renderSinglePost(post);
-                    });
-                    html += `<div class="grid-columns-wrapper">${leftCol}</div>${rightCol}</div></div>`;
-                }
-                container.innerHTML = html;
+                let leftCol = `<div class="flex col gap-lg flex-1">`; let rightCol = `<div class="flex col gap-lg flex-1"><button class="btn btn-light w-full" onclick="toggleViewMode()">Feed View</button>`;
+                feedPosts.forEach((post, i) => { if (i % 2 === 0) leftCol += renderSinglePost(post, true); else rightCol += renderSinglePost(post, true); });
+                container.innerHTML = `<div class="flex row gap-lg items-start w-full">${leftCol}</div>${rightCol}</div></div>`;
             }
         }
 
-        function renderSinglePost(s) {
-            const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
-            let topRow = `<div class="action-row feed-top-row" style="justify-content: flex-start; padding: 0;"><div class="submit-btn btn-tonal-disabled" style="flex-grow: 0; padding: 0 1rem; cursor: default;">${formattedDate}</div></div>`;
-            const imageHtml = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="status-image" alt="image" loading="lazy" onclick="handleImageClick(${s.id})">` : '';
-            return `<div class="status-card" style="gap: var(--gap-item);"><div class="divider-line feed-divider"></div>${topRow}<div class="status-media-wrapper">${imageHtml}</div></div>`;
+        function renderSinglePost(s, isGrid = false) {
+            const date = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
+            const img = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="img-fluid cursor-pointer" onclick="handleImageClick(${s.id})" loading="lazy">` : '';
+            if (isGrid) return `<div class="flex col w-full">${img}</div>`;
+            return `<div class="flex col gap-md w-full"><div class="divider"></div><div class="t-meta t-muted">${date}</div>${img}</div>`;
         }
 
         function getAboutPostHtml(p) {
             let data = null; try { data = JSON.parse(p.text); } catch(e) {}
-            let contentHtml = '';
-
             if (data && data.v === 2) {
                 let expsHtml = '';
                 if(data.exps && data.exps.length > 0) {
-                    expsHtml += `<div class="about-section-title">Experience</div>`;
-                    data.exps.forEach(exp => { expsHtml += `<div class="about-exp-item"><div class="about-exp-title">${exp.title}</div><div class="about-exp-company">${exp.company}</div><div class="about-exp-badge">${exp.date}</div><div class="about-exp-divider"></div></div>`; });
+                    expsHtml += `<div class="t-h2 mt-xl mb-lg">Experience</div>`;
+                    data.exps.forEach((exp, i) => { expsHtml += `<div class="flex col items-start w-full"><div class="t-h3">${exp.title}</div><div class="t-body t-muted mb-md">${exp.company}</div><div class="badge">${exp.date}</div>${i < data.exps.length -1 ? `<div class="divider my-md" style="margin: 2rem 0;"></div>` : ''}</div>`; });
                 }
-                let ctaHtml = '';
-                if(data.ctaTitle || data.ctaText) ctaHtml = `<div class="about-cta-card"><div class="about-cta-title">${data.ctaTitle}</div><div class="about-cta-text">${data.ctaText}</div><button class="about-cta-btn" onclick="showContact()">${data.ctaBtn || 'Get in touch'}</button></div>`;
-
-                contentHtml = `
-                    <div class="about-page-title">About Me</div>
-                    <div class="about-title-line"></div>
-                    ${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: 1.5rem; margin-bottom: 1.5rem;" loading="lazy">` : ''}
-                    ${data.intro ? `<div class="about-intro-text">${data.intro}</div>` : ''}
-                    ${data.approach ? `<div class="about-section-title">My Approach</div><div class="about-text" style="margin-bottom: 2rem;">${data.approach}</div>` : ''}
-                    ${expsHtml}${ctaHtml}
-                `;
-            } else {
-                contentHtml = `${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2; font-weight: bold;">${p.title}</div>` : ''}${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}`;
+                let ctaHtml = data.ctaTitle ? `<div class="card bg-bg border p-xl flex col gap-md mt-xl w-full"><div class="t-h2">${data.ctaTitle}</div><div class="t-body t-muted mb-md">${data.ctaText}</div><button class="btn btn-dark" onclick="showContact()">${data.ctaBtn || 'Get in touch'}</button></div>` : '';
+                return `<div class="flex col w-full"><div class="t-display mb-sm">About Me</div><div class="mb-xl radius-full" style="width: 4rem; height: 4px; background: var(--fg);"></div>${p.image_url ? `<img src="${p.image_url}" class="img-fluid mb-xl" loading="lazy">` : ''}${data.intro ? `<div class="t-body-lg t-muted mb-xl">${data.intro}</div>` : ''}${data.approach ? `<div class="t-h2 mb-md">My Approach</div><div class="t-body mb-xl text-left">${data.approach}</div>` : ''}${expsHtml}${ctaHtml}</div>`;
             }
-            return `<div style="display: flex; flex-direction: column; width: 100%;"><div class="status-card" style="gap: 0;">${contentHtml}</div></div>`;
+            return `<div class="flex col w-full gap-md">${p.image_url ? `<img src="${p.image_url}" class="img-fluid">` : ''}${p.title ? `<div class="t-h1">${p.title}</div>` : ''}${p.text ? `<div class="t-body text-left">${p.text}</div>` : ''}</div>`;
         }
 
         function getContactPostHtml(p) {
-            return `<div style="display: flex; flex-direction: column; width: 100%;"><div class="status-card" style="gap: var(--gap-item);">${p.image_url ? `<img src="${p.image_url}" style="width: 100%; height: auto; display: block; border-radius: var(--border-radius);" loading="lazy">` : ''}${p.title ? `<div style="font-size: var(--size-large); line-height: 1.2; font-weight: bold;">${p.title}</div>` : ''}${p.text ? `<div class="about-text" style="white-space: pre-wrap;">${p.text}</div>` : ''}</div></div>`;
+            return `<div class="flex col w-full gap-md">${p.image_url ? `<img src="${p.image_url}" class="img-fluid">` : ''}${p.title ? `<div class="t-h1">${p.title}</div>` : ''}${p.text ? `<div class="t-body text-left" style="white-space: pre-wrap;">${p.text}</div>` : ''}</div>`;
         }
 
+        // COMPRESS & FETCH
         function compressImage(file, maxWidth = 1200, quality = 0.8) {
             return new Promise((resolve) => {
                 const reader = new FileReader(); reader.readAsDataURL(file);
@@ -793,75 +543,53 @@
                 currentOffset += newPosts.length; globalPosts = globalPosts.concat(newPosts);
                 
                 const feedPosts = globalPosts.filter(p => p.author === '');
-                const aboutPosts = globalPosts.filter(p => p.author === 'about');
-                const contactPosts = globalPosts.filter(p => p.author === 'contact');
-
                 if (reset) {
                     refreshFeedUI(feedPosts);
-                    document.getElementById('about-posts-container').innerHTML = aboutPosts.map(p => getAboutPostHtml(p)).join('');
-                    document.getElementById('contact-posts-container').innerHTML = contactPosts.map(p => getContactPostHtml(p)).join('');
+                    document.getElementById('about-posts-container').innerHTML = globalPosts.filter(p => p.author === 'about').map(p => getAboutPostHtml(p)).join('');
+                    document.getElementById('contact-posts-container').innerHTML = globalPosts.filter(p => p.author === 'contact').map(p => getContactPostHtml(p)).join('');
                 } else {
-                    const newFeedPosts = newPosts.filter(p => p.author === '');
-                    if (currentViewMode === 'feed') {
-                        document.getElementById('status-container').insertAdjacentHTML('beforeend', newFeedPosts.map(p => renderSinglePost(p)).join(''));
-                    } else {
-                        refreshFeedUI(feedPosts); 
-                    }
+                    if (currentViewMode === 'feed') document.getElementById('status-container').insertAdjacentHTML('beforeend', newPosts.filter(p => p.author === '').map(p => renderSinglePost(p)).join(''));
+                    else refreshFeedUI(feedPosts); 
                 }
-                
-                applySettingsToPublicSite();
-                if(currentSection === 'dashboard') populateDashboard();
-
-            } catch (error) {} finally { 
-                isLoading = false; document.getElementById('loading-indicator').style.display = (hasMorePosts && globalPosts.length > 0) ? 'block' : 'none'; 
-            }
+                applySettingsToPublicSite(); if(currentSection === 'dashboard') populateDashboard();
+            } catch (error) {} finally { isLoading = false; document.getElementById('loading-indicator').classList.toggle('hidden', !(hasMorePosts && globalPosts.length > 0)); }
         }
         window.addEventListener('scroll', () => { if (currentSection === 'feed' && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
+        function handleImageClick(id) { if (currentViewMode === 'grid') { currentViewMode = 'feed'; localStorage.setItem('mv_view_mode', 'feed'); refreshFeedUI(globalPosts.filter(p => p.author === '')); setTimeout(() => document.getElementById(`post-img-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300); } }
 
-        function handleImageClick(id) {
-            if (currentViewMode === 'grid') {
-                currentViewMode = 'feed'; localStorage.setItem('mv_view_mode', 'feed');
-                refreshFeedUI(globalPosts.filter(p => p.author === ''));
-                setTimeout(() => document.getElementById(`post-img-${id}`)?.closest('.status-card').scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
-            }
-        }
-
-        // CMS DASHBOARD FORMS SUBMITS
+        // DASHBOARD FORMS SUBMITS
         function updateFeedFormState() {
             const input = document.getElementById('edit-image-feed'); const hasImage = (input && input.files && input.files.length > 0);
-            document.getElementById('upload-empty-state-feed').style.display = hasImage ? 'none' : 'flex';
-            document.getElementById('upload-filled-state-feed').style.display = hasImage ? 'flex' : 'none';
+            document.getElementById('upload-empty-state-feed').classList.toggle('hidden', hasImage);
+            document.getElementById('upload-filled-state-feed').classList.toggle('hidden', !hasImage);
             if(hasImage) document.getElementById('upload-preview-img-feed').src = URL.createObjectURL(input.files[0]);
-            const pubBtn = document.getElementById('publish-btn-feed');
-            if(hasImage) { pubBtn.disabled = false; pubBtn.className = "submit-btn"; } else { pubBtn.disabled = true; pubBtn.className = "submit-btn btn-tonal-disabled"; }
+            document.getElementById('publish-btn-feed').disabled = !hasImage;
         }
         function clearFeedImageSelection(e) { e.stopPropagation(); document.getElementById('edit-image-feed').value = ""; updateFeedFormState(); }
         function resetFeedForm() { document.getElementById('edit-image-feed').value = ""; updateFeedFormState(); }
         async function handleFeedSubmit(e) {
             e.preventDefault(); const imageFile = document.getElementById('edit-image-feed').files[0]; if (!imageFile) return;
-            const btn = document.getElementById('publish-btn-feed'); btn.innerText = "UPLOADING..."; btn.className = "submit-btn btn-loading";
+            const btn = document.getElementById('publish-btn-feed'); btn.innerText = "UPLOADING..."; btn.disabled = true;
             try {
                 const compressedFile = await compressImage(imageFile); const formData = new FormData(); formData.append("file", compressedFile);
-                const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
-                const finalImageUrl = (await upRes.json()).image_url;
+                const finalImageUrl = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData })).json()).image_url;
                 await fetch(`${API_URL}/posts`, { method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify({ title: "", text: "", image_url: finalImageUrl, show_date: true, author: "" }) });
                 document.getElementById('editor-form-feed').style.display='none'; document.querySelector('#dash-tab-posts > button').style.display='flex'; resetFeedForm(); fetchStatuses(true);
-            } catch (err) { btn.innerText = "PUBLISH"; btn.className = "submit-btn"; }
+            } catch (err) { btn.innerText = "PUBLISH"; btn.disabled = false; }
         }
 
         function addExperienceRow(title = '', company = '', date = '') {
-            const container = document.getElementById('about-exp-list');
-            const row = document.createElement('div'); row.className = 'about-exp-row';
-            row.style.cssText = 'display: flex; flex-direction: column; gap: 0.5rem; padding: 1rem; border: 1px solid var(--divider); border-radius: var(--border-radius); position: relative; background: var(--white);';
-            row.innerHTML = `<button type="button" class="submit-btn btn-danger" style="position: absolute; top: 0.5rem; right: 0.5rem; height: 2rem; min-width: 2rem; padding: 0;" onclick="this.parentElement.remove(); updateAboutFormState();">X</button><input type="text" class="form-input exp-title" placeholder="Job Title..." style="width: calc(100% - 3rem);" value="${title}" oninput="updateAboutFormState()"><input type="text" class="form-input exp-company" placeholder="Company..." style="width: 100%;" value="${company}" oninput="updateAboutFormState()"><input type="text" class="form-input exp-date" placeholder="Date (e.g. 2021 — Present)" style="width: 100%;" value="${date}" oninput="updateAboutFormState()">`;
+            const container = document.getElementById('about-exp-list'); const row = document.createElement('div');
+            row.className = 'card flex col gap-sm relative';
+            row.innerHTML = `<button type="button" class="btn btn-light btn-sm absolute top-right" onclick="this.parentElement.remove(); updateAboutFormState();">Remove</button><input type="text" class="input exp-title" placeholder="Job Title..." value="${title}" oninput="updateAboutFormState()"><input type="text" class="input exp-company" placeholder="Company..." value="${company}" oninput="updateAboutFormState()"><input type="text" class="input exp-date" placeholder="Date (e.g. 2021 — Present)" value="${date}" oninput="updateAboutFormState()">`;
             container.appendChild(row); updateAboutFormState();
         }
         function updateAboutFormState() {
             const input = document.getElementById('edit-image-about'); const hasImage = (input && input.files && input.files.length > 0) || existingAboutImageUrl;
-            document.getElementById('upload-empty-state-about').style.display = hasImage ? 'none' : 'flex';
-            document.getElementById('upload-filled-state-about').style.display = hasImage ? 'flex' : 'none';
+            document.getElementById('upload-empty-state-about').classList.toggle('hidden', hasImage);
+            document.getElementById('upload-filled-state-about').classList.toggle('hidden', !hasImage);
             if(input && input.files && input.files.length > 0) document.getElementById('upload-preview-img-about').src = URL.createObjectURL(input.files[0]); else if(existingAboutImageUrl) document.getElementById('upload-preview-img-about').src = existingAboutImageUrl;
-            document.getElementById('publish-btn-about').disabled = false; document.getElementById('publish-btn-about').className = "submit-btn";
+            document.getElementById('publish-btn-about').disabled = false;
         }
         function clearAboutImageSelection(e) { e.stopPropagation(); document.getElementById('edit-image-about').value = ""; existingAboutImageUrl = null; updateAboutFormState(); }
         async function handleAboutSubmit(e) { 
@@ -870,81 +598,75 @@
             const ctaTitle = document.getElementById('about-cta-title').value.trim(); const ctaText = document.getElementById('about-cta-text').value.trim(); const ctaBtn = document.getElementById('about-cta-btn').value.trim();
             const exps = []; document.querySelectorAll('.about-exp-row').forEach(row => { exps.push({ title: row.querySelector('.exp-title').value.trim(), company: row.querySelector('.exp-company').value.trim(), date: row.querySelector('.exp-date').value.trim() }); });
             const imageFile = document.getElementById('edit-image-about').files[0];
-            const btn = document.getElementById('publish-btn-about'); btn.innerText = "SAVING..."; btn.className = "submit-btn btn-loading";
+            const btn = document.getElementById('publish-btn-about'); btn.innerText = "SAVING..."; btn.disabled = true;
             try {
                 let finalImageUrl = existingAboutImageUrl;
                 if (imageFile) {
                     const compressedFile = await compressImage(imageFile); const formData = new FormData(); formData.append("file", compressedFile);
                     finalImageUrl = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData })).json()).image_url;
                 }
-                const jsonPayload = { v: 2, intro, approach, exps, ctaTitle, ctaText, ctaBtn };
-                const payload = { title: "", text: JSON.stringify(jsonPayload), image_url: finalImageUrl || "", show_date: false, author: "about" };
-                const method = editingAboutPostId ? "PUT" : "POST"; const url = editingAboutPostId ? `${API_URL}/posts/${editingAboutPostId}` : `${API_URL}/posts`;
-                await fetch(url, { method: method, headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify(payload) });
-                fetchStatuses(true); btn.innerText = "SAVE CHANGES"; btn.className = "submit-btn";
-            } catch (err) { btn.innerText = "SAVE CHANGES"; btn.className = "submit-btn"; }
+                const url = editingAboutPostId ? `${API_URL}/posts/${editingAboutPostId}` : `${API_URL}/posts`;
+                await fetch(url, { method: editingAboutPostId ? "PUT" : "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify({ title: "", text: JSON.stringify({ v: 2, intro, approach, exps, ctaTitle, ctaText, ctaBtn }), image_url: finalImageUrl || "", show_date: false, author: "about" }) });
+                fetchStatuses(true); btn.innerText = "SAVE CHANGES"; btn.disabled = false;
+            } catch (err) { btn.innerText = "SAVE CHANGES"; btn.disabled = false; }
         }
 
         function updateContactFormState() {
             const input = document.getElementById('edit-image-contact'); const hasImage = (input && input.files && input.files.length > 0) || existingContactImageUrl;
-            document.getElementById('upload-empty-state-contact').style.display = hasImage ? 'none' : 'flex';
-            document.getElementById('upload-filled-state-contact').style.display = hasImage ? 'flex' : 'none';
+            document.getElementById('upload-empty-state-contact').classList.toggle('hidden', hasImage);
+            document.getElementById('upload-filled-state-contact').classList.toggle('hidden', !hasImage);
             if(input && input.files && input.files.length > 0) document.getElementById('upload-preview-img-contact').src = URL.createObjectURL(input.files[0]); else if(existingContactImageUrl) document.getElementById('upload-preview-img-contact').src = existingContactImageUrl;
-            document.getElementById('publish-btn-contact').disabled = false; document.getElementById('publish-btn-contact').className = "submit-btn";
+            document.getElementById('publish-btn-contact').disabled = false;
         }
         function clearContactImageSelection(e) { e.stopPropagation(); document.getElementById('edit-image-contact').value = ""; existingContactImageUrl = null; updateContactFormState(); }
         async function handleContactSubmit(e) { 
             e.preventDefault(); 
-            const title = document.getElementById('edit-title-contact').value.trim(); const text = document.getElementById('edit-text-contact').value.trim();
-            const imageFile = document.getElementById('edit-image-contact').files[0];
-            const btn = document.getElementById('publish-btn-contact'); btn.innerText = "SAVING..."; btn.className = "submit-btn btn-loading";
+            const title = document.getElementById('edit-title-contact').value.trim(); const text = document.getElementById('edit-text-contact').value.trim(); const imageFile = document.getElementById('edit-image-contact').files[0];
+            const btn = document.getElementById('publish-btn-contact'); btn.innerText = "SAVING..."; btn.disabled = true;
             try {
                 let finalImageUrl = existingContactImageUrl;
                 if (imageFile) {
                     const compressedFile = await compressImage(imageFile); const formData = new FormData(); formData.append("file", compressedFile);
                     finalImageUrl = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData })).json()).image_url;
                 }
-                const payload = { title, text, image_url: finalImageUrl || "", show_date: false, author: "contact" };
-                const method = editingContactPostId ? "PUT" : "POST"; const url = editingContactPostId ? `${API_URL}/posts/${editingContactPostId}` : `${API_URL}/posts`;
-                await fetch(url, { method: method, headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify(payload) });
-                fetchStatuses(true); btn.innerText = "SAVE CHANGES"; btn.className = "submit-btn";
-            } catch (err) { btn.innerText = "SAVE CHANGES"; btn.className = "submit-btn"; }
+                const url = editingContactPostId ? `${API_URL}/posts/${editingContactPostId}` : `${API_URL}/posts`;
+                await fetch(url, { method: editingContactPostId ? "PUT" : "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify({ title, text, image_url: finalImageUrl || "", show_date: false, author: "contact" }) });
+                fetchStatuses(true); btn.innerText = "SAVE CHANGES"; btn.disabled = false;
+            } catch (err) { btn.innerText = "SAVE CHANGES"; btn.disabled = false; }
         }
 
         function updateSettingsFormState() {
             const input = document.getElementById('setting-image'); const hasImage = (input && input.files && input.files.length > 0) || existingSettingsImageUrl;
-            document.getElementById('upload-empty-state-setting').style.display = hasImage ? 'none' : 'flex';
-            document.getElementById('upload-filled-state-setting').style.display = hasImage ? 'flex' : 'none';
+            document.getElementById('upload-empty-state-setting').classList.toggle('hidden', hasImage);
+            document.getElementById('upload-filled-state-setting').classList.toggle('hidden', !hasImage);
             if(input && input.files && input.files.length > 0) document.getElementById('upload-preview-img-setting').src = URL.createObjectURL(input.files[0]); else if(existingSettingsImageUrl) document.getElementById('upload-preview-img-setting').src = existingSettingsImageUrl;
-            document.getElementById('publish-btn-settings').disabled = false; document.getElementById('publish-btn-settings').className = "submit-btn";
+            document.getElementById('publish-btn-settings').disabled = false;
         }
         function clearSettingImageSelection(e) { e.stopPropagation(); document.getElementById('setting-image').value = ""; existingSettingsImageUrl = null; updateSettingsFormState(); }
         async function handleSettingsSubmit(e) {
-            e.preventDefault();
-            const title = document.getElementById('setting-title').value.trim(); const imageFile = document.getElementById('setting-image').files[0];
-            const btn = document.getElementById('publish-btn-settings'); btn.innerText = "SAVING..."; btn.className = "submit-btn btn-loading";
+            e.preventDefault(); const title = document.getElementById('setting-title').value.trim(); const imageFile = document.getElementById('setting-image').files[0];
+            const btn = document.getElementById('publish-btn-settings'); btn.innerText = "SAVING..."; btn.disabled = true;
             try {
                 let finalImageUrl = existingSettingsImageUrl;
                 if (imageFile) {
                     const compressedFile = await compressImage(imageFile); const formData = new FormData(); formData.append("file", compressedFile);
                     finalImageUrl = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData })).json()).image_url;
                 }
-                const jsonPayload = { title }; const payload = { title: "", text: JSON.stringify(jsonPayload), image_url: finalImageUrl || "", show_date: false, author: "settings" };
-                const method = editingSettingsPostId ? "PUT" : "POST"; const url = editingSettingsPostId ? `${API_URL}/posts/${editingSettingsPostId}` : `${API_URL}/posts`;
-                await fetch(url, { method: method, headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify(payload) });
-                fetchStatuses(true); btn.innerText = "SAVE SETTINGS"; btn.className = "submit-btn";
-            } catch (err) { btn.innerText = "SAVE SETTINGS"; btn.className = "submit-btn"; }
+                const url = editingSettingsPostId ? `${API_URL}/posts/${editingSettingsPostId}` : `${API_URL}/posts`;
+                await fetch(url, { method: editingSettingsPostId ? "PUT" : "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify({ title: "", text: JSON.stringify({ title }), image_url: finalImageUrl || "", show_date: false, author: "settings" }) });
+                fetchStatuses(true); btn.innerText = "SAVE SETTINGS"; btn.disabled = false;
+            } catch (err) { btn.innerText = "SAVE SETTINGS"; btn.disabled = false; }
         }
 
-        function openDeleteModal(type) { deleteActionType = type; document.getElementById('delete-modal').style.display = 'flex'; document.getElementById('modal-action-zone').style.display = 'flex'; document.getElementById('modal-loading-zone').style.display = 'none'; document.getElementById('modal-success-zone').style.display = 'none'; }
-        function closeDeleteModal() { document.getElementById('delete-modal').style.display = 'none'; deleteActionType = null; }
+        function openDeleteModal(type) { deleteActionType = type; document.getElementById('delete-modal').classList.remove('hidden'); document.getElementById('delete-modal').classList.add('flex'); document.getElementById('modal-action-zone').classList.remove('hidden'); document.getElementById('modal-loading-zone').classList.add('hidden'); document.getElementById('modal-success-zone').classList.add('hidden'); }
+        function closeDeleteModal() { document.getElementById('delete-modal').classList.add('hidden'); document.getElementById('delete-modal').classList.remove('flex'); deleteActionType = null; }
         async function executeModalDelete() {
-            document.getElementById('modal-action-zone').style.display = 'none'; document.getElementById('modal-loading-zone').style.display = 'flex';
+            document.getElementById('modal-action-zone').classList.add('hidden'); document.getElementById('modal-loading-zone').classList.remove('hidden');
             if (deleteActionType === 'delete_all') {
-                const res = await fetch(`${API_URL}/posts?skip=0&limit=100`); const posts = await res.json();
+                const posts = await (await fetch(`${API_URL}/posts?skip=0&limit=100`)).json();
                 for (const p of posts) { await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); }
             } else { await fetch(`${API_URL}/posts/${deleteActionType}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); }
-            document.getElementById('modal-loading-zone').style.display = 'none'; document.getElementById('modal-success-zone').style.display = 'flex';
+            document.getElementById('modal-loading-zone').classList.add('hidden'); document.getElementById('modal-success-zone').classList.remove('hidden');
             setTimeout(() => { fetchStatuses(true); closeDeleteModal(); }, 1000);
         }
 
