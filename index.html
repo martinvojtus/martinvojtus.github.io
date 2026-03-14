@@ -26,7 +26,8 @@
             .btn-danger { @apply flex items-center justify-center h-12 px-6 rounded-full font-bold text-xs uppercase tracking-widest bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 cursor-pointer whitespace-nowrap; }
             
             .input { @apply w-full px-4 py-3 bg-neutral-50 border border-neutral-200 text-black rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-colors; }
-            .label { @apply text-xs font-bold text-neutral-400 uppercase tracking-widest block mb-2; }
+            .label { @apply text-xs font-bold text-black uppercase tracking-widest block mb-2; }
+            .hint { @apply text-xs text-neutral-400 mb-3 block leading-relaxed; }
             
             .card { @apply flex flex-col gap-6 bg-white border border-gray-200 rounded-2xl p-6 md:p-8 w-full; }
             .editorial-dropcap > div:first-child::first-letter { @apply text-7xl font-bold float-left mr-4 leading-[0.8] mt-2; }
@@ -56,7 +57,7 @@
         
         const DEFAULT_CONFIG = {
             siteTitle: "martinvojtus • space",
-            footerText: "build v1.4.0 • 2026",
+            footerText: "build v1.4.1 • 2026",
             pages: [
                 { id: "grid", title: "Gallery", type: "gallery" },
                 { id: "about", title: "About", type: "profile" },
@@ -75,29 +76,24 @@
             isLoading: true
         };
 
-        // --- CORE STATE ---
         let dragStartIndex = null;
 
         async function init() {
             App.isLoading = true;
             render();
-
             try {
                 const headers = App.token ? { 'x-admin-password': App.token } : {};
                 const res = await fetch(`${API_URL}/posts?skip=0&limit=1000`, { headers });
                 App.posts = await res.json();
-                
                 const configPost = App.posts.find(p => p.author === "_system_config");
                 if (configPost) {
                     App.configPostId = configPost.id;
                     try { App.config = JSON.parse(configPost.text); } catch(e) {}
                 }
                 document.title = App.config.siteTitle;
-
                 if (App.config.pages.length > 0 && !App.config.pages.find(p => p.id === App.route) && App.route !== 'dashboard') {
                     App.route = App.config.pages[0].id;
                 }
-
                 if (App.token) {
                     const authRes = await fetch(`${API_URL}/verify`, { headers: { 'x-admin-password': App.token } });
                     if (!authRes.ok) throw new Error();
@@ -105,12 +101,10 @@
             } catch (e) {
                 App.token = ""; localStorage.removeItem('mv_admin_key');
             }
-
             App.isLoading = false;
             render();
         }
 
-        // --- RENDER ENGINE ---
         function render() {
             const root = document.getElementById('app-root');
             root.innerHTML = `
@@ -133,7 +127,6 @@
             `).join('');
 
             desktopLinks += `<div class="w-px h-4 bg-neutral-200 mx-2"></div>`;
-
             if (App.token) {
                 desktopLinks += `<button onclick="navigate('dashboard')" class="text-sm font-bold tracking-wide transition-colors ${App.route === 'dashboard' ? 'text-black' : 'text-neutral-400 hover:text-black'}">Dashboard</button>`;
                 desktopLinks += `<button onclick="logout()" class="text-sm font-bold tracking-wide text-red-500 hover:text-red-700 transition-colors ml-2">Logout</button>`;
@@ -156,596 +149,202 @@
         }
 
         function renderMobileMenu() {
-            let links = App.config.pages.map(p => `
-                <button onclick="navigate('${p.id}')" class="text-4xl font-bold text-left tracking-tight ${App.route === p.id ? 'text-black' : 'text-neutral-300'}">${p.title}</button>
-            `).join('');
-
+            let links = App.config.pages.map(p => `<button onclick="navigate('${p.id}')" class="text-4xl font-bold text-left tracking-tight ${App.route === p.id ? 'text-black' : 'text-neutral-300'}">${p.title}</button>`).join('');
             links += `<div class="w-full h-px bg-neutral-100 my-6"></div>`;
-
             if (App.token) {
                 links += `<button onclick="navigate('dashboard')" class="text-2xl font-bold text-left tracking-tight ${App.route === 'dashboard' ? 'text-black' : 'text-neutral-400'}">Dashboard</button>`;
                 links += `<button onclick="logout()" class="text-2xl font-bold text-left tracking-tight text-red-500 mt-4">Logout</button>`;
             } else {
                 links += `<button onclick="openLoginModal()" class="text-xl font-bold text-left text-neutral-400 hover:text-black">Admin Login</button>`;
             }
-
-            return `
-            <div class="fixed inset-0 bg-white z-40 flex flex-col px-8 pt-32 pb-12 overflow-y-auto">
-                <div class="flex flex-col gap-6 w-full max-w-5xl mx-auto">${links}</div>
-            </div>
-            `;
+            return `<div class="fixed inset-0 bg-white z-40 flex flex-col px-8 pt-32 pb-12 overflow-y-auto"><div class="flex flex-col gap-6 w-full max-w-5xl mx-auto">${links}</div></div>`;
         }
 
         function renderFooter() {
-            return `
-            <footer class="w-full mt-32 mb-12 flex flex-col items-center gap-6">
-                <div class="w-12 h-px bg-neutral-200"></div>
-                <div class="text-[10px] font-bold text-neutral-400 tracking-widest uppercase text-center">${App.config.footerText}</div>
-            </footer>
-            `;
+            return `<footer class="w-full mt-32 mb-12 flex flex-col items-center gap-6"><div class="w-12 h-px bg-neutral-200"></div><div class="text-[10px] font-bold text-neutral-400 tracking-widest uppercase text-center">${App.config.footerText}</div></footer>`;
         }
 
         function renderMainContent() {
-            if (App.route === 'dashboard') {
-                if (!App.token) { navigate(App.config.pages[0]?.id); return ''; }
-                return renderDashboard();
-            }
-
+            if (App.route === 'dashboard') { if (!App.token) { navigate(App.config.pages[0]?.id); return ''; } return renderDashboard(); }
             const pageConfig = App.config.pages.find(p => p.id === App.route);
-            if (!pageConfig) return `<div class="text-neutral-400 mt-20 text-sm font-bold tracking-widest uppercase">Page not found.</div>`;
-
+            if (!pageConfig) return `<div class="text-neutral-400 mt-20 text-sm font-bold tracking-widest uppercase text-center">Select a page from the menu</div>`;
             if (pageConfig.type === 'gallery') return renderPublicGallery(pageConfig);
             if (pageConfig.type === 'profile') return renderPublicProfile(pageConfig);
             if (pageConfig.type === 'contact') return renderPublicContact(pageConfig);
             if (pageConfig.type === 'article') return renderPublicArticle(pageConfig);
             if (pageConfig.type === 'links') return renderPublicLinks(pageConfig);
-
             return `<div>Unknown page type.</div>`;
         }
 
-        // --- PUBLIC VIEWS ---
+        // --- PUBLIC ---
         function renderPublicGallery(page) {
             const posts = App.posts.filter(p => p.author === page.id).sort((a,b) => new Date(b.at) - new Date(a.at));
             if (posts.length === 0) return `<div class="w-full py-32 text-center text-neutral-300 font-bold text-sm tracking-widest uppercase">No photos uploaded.</div>`;
-
-            const itemsHtml = posts.map(p => `
-                <div class="break-inside-avoid mb-6 relative group cursor-pointer overflow-hidden rounded-xl bg-neutral-50 border border-neutral-100">
-                    <img src="${p.image_url}" class="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-500 hover:scale-[1.03]" loading="lazy">
-                    <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-black tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        ${new Date(p.at).toLocaleDateString('en-US', {month:'short', year:'numeric'})}
-                    </div>
-                </div>
-            `).join('');
-
+            const itemsHtml = posts.map(p => `<div class="break-inside-avoid mb-6 relative group cursor-pointer overflow-hidden rounded-xl bg-neutral-50 border border-neutral-100"><img src="${p.image_url}" class="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-500 hover:scale-[1.03]" loading="lazy"><div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-black tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300">${new Date(p.at).toLocaleDateString('en-US', {month:'short', year:'numeric'})}</div></div>`).join('');
             return `<div class="w-full columns-1 sm:columns-2 lg:columns-3 gap-6 animate-fade-in">${itemsHtml}</div>`;
         }
 
         function renderPublicProfile(page) {
             const post = App.posts.find(p => p.author === page.id);
-            if (!post) return `<div class="text-neutral-400 mt-10 text-sm font-bold tracking-widest uppercase">Content pending.</div>`;
-            
-            let data = {}; try { data = JSON.parse(post?.text || "{}"); } catch(e) {}
-
-            let expsHtml = '';
-            if (data.exps && data.exps.length > 0) {
-                expsHtml = `<div class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-8 mt-16">Experience</div>` + 
-                data.exps.map((e, i) => `
-                    <div class="flex flex-col items-start w-full">
-                        <div class="text-xl font-bold mb-1">${e.title}</div>
-                        <div class="text-neutral-500 mb-2">${e.company}</div>
-                        <div class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-8">${e.date}</div>
-                    </div>
-                `).join('');
-            }
-
-            return `
-            <div class="flex flex-col lg:flex-row gap-12 lg:gap-24 w-full animate-fade-in items-start mt-8">
-                <div class="w-full lg:w-1/3 flex flex-col lg:sticky lg:top-32 h-fit">
-                    ${post?.image_url ? `<img src="${post.image_url}" class="w-48 lg:w-full aspect-square rounded-full lg:rounded-3xl object-cover grayscale mb-8 border border-neutral-100">` : ''}
-                    <h1 class="text-4xl lg:text-5xl font-bold tracking-tight mb-4">${page.title}</h1>
-                    ${data.intro ? `<p class="text-lg text-neutral-500 leading-relaxed font-medium">${data.intro}</p>` : ''}
-                </div>
-                <div class="w-full lg:w-2/3 flex flex-col pt-2">
-                    ${data.text ? `<div><div class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-6">About</div><div class="text-lg leading-relaxed text-black whitespace-pre-wrap">${data.text}</div></div>` : ''}
-                    ${expsHtml}
-                </div>
-            </div>`;
+            let data = { intro: '', text: '', exps: [] }; try { data = JSON.parse(post?.text || "{}"); } catch(e) {}
+            let expsHtml = (data.exps || []).map((e, i) => `<div class="flex flex-col items-start w-full leading-relaxed"><div class="text-xl font-bold mb-1">${e.title}</div><div class="text-neutral-500 mb-2">${e.company}</div><div class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-8">${e.date}</div></div>`).join('');
+            return `<div class="flex flex-col lg:flex-row gap-12 lg:gap-24 w-full animate-fade-in items-start mt-8"><div class="w-full lg:w-1/3 flex flex-col lg:sticky lg:top-32 h-fit">${post?.image_url ? `<img src="${post.image_url}" class="w-48 lg:w-full aspect-square rounded-full lg:rounded-3xl object-cover grayscale mb-8 border border-neutral-100">` : ''}<h1 class="text-4xl lg:text-5xl font-bold tracking-tight mb-4">${page.title}</h1>${data.intro ? `<p class="text-lg text-neutral-500 leading-relaxed font-medium">${data.intro}</p>` : ''}</div><div class="w-full lg:w-2/3 flex flex-col pt-2">${data.text ? `<div><div class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-6">About</div><div class="text-lg leading-relaxed text-black whitespace-pre-wrap">${data.text}</div></div>` : ''}${expsHtml ? `<div class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-8 mt-16">Experience</div>${expsHtml}` : ''}</div></div>`;
         }
 
         function renderPublicContact(page) {
             const post = App.posts.find(p => p.author === page.id);
-            if (!post) return `<div class="text-neutral-400 mt-10 text-sm font-bold tracking-widest uppercase">Content pending.</div>`;
-            
-            return `
-            <div class="flex flex-col md:flex-row w-full gap-12 items-center md:items-start min-h-[60vh] mt-12 animate-fade-in">
-                <div class="w-full md:w-1/2 flex items-center md:pt-10">
-                    ${post?.title ? `<h1 class="text-6xl lg:text-8xl font-bold tracking-tighter leading-none">${post.title}</h1>` : '<h1 class="text-6xl font-bold text-neutral-300">Hello.</h1>'}
-                </div>
-                <div class="w-full md:w-1/2 flex flex-col gap-8 md:pt-12">
-                    ${post?.image_url ? `<img src="${post.image_url}" class="w-24 h-24 rounded-full object-cover border border-neutral-100 grayscale">` : ''}
-                    ${post?.text ? `<div class="text-xl lg:text-2xl text-neutral-500 leading-relaxed whitespace-pre-wrap">${post.text}</div>` : ''}
-                </div>
-            </div>`;
+            return `<div class="flex flex-col md:flex-row w-full gap-12 items-center md:items-start min-h-[50vh] mt-12 animate-fade-in"><div class="w-full md:w-1/2 flex items-center md:pt-10">${post?.title ? `<h1 class="text-6xl lg:text-8xl font-bold tracking-tighter leading-none">${post.title}</h1>` : '<h1 class="text-6xl font-bold text-neutral-300">Hello.</h1>'}</div><div class="w-full md:w-1/2 flex flex-col gap-8 md:pt-12">${post?.image_url ? `<img src="${post.image_url}" class="w-24 h-24 rounded-full object-cover border border-neutral-100 grayscale">` : ''}${post?.text ? `<div class="text-xl lg:text-2xl text-neutral-500 leading-relaxed whitespace-pre-wrap">${post.text}</div>` : ''}</div></div>`;
         }
 
         function renderPublicArticle(page) {
             const post = App.posts.find(p => p.author === page.id);
-            if (!post) return `<div class="text-neutral-400 mt-10 text-sm font-bold tracking-widest uppercase">Content pending.</div>`;
-            
-            return `
-            <article class="flex flex-col w-full max-w-2xl mx-auto animate-fade-in mt-8">
-                ${post?.title ? `<h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-10 leading-tight">${post.title}</h1>` : ''}
-                ${post?.image_url ? `<img src="${post.image_url}" class="w-full h-auto rounded-2xl object-cover border border-neutral-100 mb-12">` : ''}
-                ${post?.text ? `<div class="editorial-dropcap text-lg md:text-xl leading-relaxed text-neutral-800 whitespace-pre-wrap"><div>${post.text}</div></div>` : ''}
-            </article>`;
+            return `<article class="flex flex-col w-full max-w-2xl mx-auto animate-fade-in mt-8">${post?.title ? `<h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-10 leading-tight">${post.title}</h1>` : ''}${post?.image_url ? `<img src="${post.image_url}" class="w-full h-auto rounded-2xl object-cover border border-neutral-100 mb-12">` : ''}${post?.text ? `<div class="editorial-dropcap text-lg md:text-xl leading-relaxed text-neutral-800 whitespace-pre-wrap"><div>${post.text}</div></div>` : ''}</article>`;
         }
 
         function renderPublicLinks(page) {
             const post = App.posts.find(p => p.author === page.id);
-            if (!post) return `<div class="text-neutral-400 mt-10 text-sm font-bold tracking-widest uppercase">Content pending.</div>`;
-            
             let data = { desc: '', links: [] }; try { data = JSON.parse(post?.text || "{}"); } catch(e) {}
-
-            let linksHtml = '';
-            if (data.links && data.links.length > 0) {
-                linksHtml = data.links.map(l => `
-                    <a href="${l.url}" target="_blank" class="flex items-center justify-center w-full h-16 bg-neutral-50 hover:bg-black hover:text-white border border-neutral-200 rounded-full font-bold text-sm tracking-widest uppercase transition-all duration-300 px-6 text-center">
-                        ${l.title}
-                    </a>
-                `).join('');
-            }
-
-            return `
-            <div class="flex flex-col items-center w-full max-w-md mx-auto animate-fade-in mt-12">
-                ${post?.image_url ? `<img src="${post.image_url}" class="w-32 h-32 rounded-full object-cover border border-neutral-100 mb-6 shadow-sm">` : ''}
-                ${post?.title ? `<div class="text-2xl font-bold tracking-tight mb-2">${post.title}</div>` : ''}
-                ${data.desc ? `<p class="text-base text-neutral-500 mb-10 text-center">${data.desc}</p>` : ''}
-                <div class="flex flex-col gap-4 w-full">${linksHtml}</div>
-            </div>`;
+            let linksHtml = (data.links || []).map(l => `<a href="${l.url}" target="_blank" class="flex items-center justify-center w-full h-16 bg-neutral-50 hover:bg-black hover:text-white border border-neutral-200 rounded-full font-bold text-sm tracking-widest uppercase transition-all duration-300 px-6 text-center">${l.title}</a>`).join('');
+            return `<div class="flex flex-col items-center w-full max-w-lg mx-auto animate-fade-in mt-12">${post?.image_url ? `<img src="${post.image_url}" class="w-32 h-32 rounded-full object-cover border border-neutral-200 mb-6">` : ''}${post?.title ? `<div class="text-2xl font-bold tracking-tight mb-2">${post.title}</div>` : ''}${data.desc ? `<p class="text-base text-neutral-500 mb-10 text-center">${data.desc}</p>` : ''}<div class="flex flex-col gap-4 w-full">${linksHtml}</div></div>`;
         }
 
-        // --- DASHBOARD ROUTER ---
-        function renderDashboard() {
-            let checkId = App.dashTab.startsWith('page_') ? App.dashTab.replace('page_', '') : null;
-            if (App.dashTab !== 'settings' && (!checkId || !App.config.pages.find(p => p.id === checkId))) {
-                App.dashTab = 'settings';
-            }
-
-            const tabs = [{ id: 'settings', label: 'Settings' }, ...App.config.pages.map(p => ({ id: `page_${p.id}`, label: `${p.title}` }))];
-            const tabsHtml = tabs.map(t => `<button onclick="App.dashTab = '${t.id}'; render();" class="h-10 px-4 rounded-full font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-colors ${App.dashTab === t.id ? 'bg-black text-white' : 'bg-neutral-50 text-neutral-500 hover:bg-neutral-100 border border-neutral-200'}">${t.label}</button>`).join('');
-
-            let activeContent = '';
-            if (App.dashTab === 'settings') activeContent = renderDashSettings();
-            else if (App.dashTab.startsWith('page_')) {
-                const pageId = App.dashTab.replace('page_', '');
-                const pageConfig = App.config.pages.find(p => p.id === pageId);
-                if (pageConfig) {
-                    if (pageConfig.type === 'gallery') activeContent = renderDashGallery(pageConfig);
-                    if (pageConfig.type === 'profile') activeContent = renderDashProfile(pageConfig);
-                    if (pageConfig.type === 'contact') activeContent = renderDashContact(pageConfig);
-                    if (pageConfig.type === 'article') activeContent = renderDashArticle(pageConfig);
-                    if (pageConfig.type === 'links') activeContent = renderDashLinks(pageConfig);
-                }
-            }
-
-            return `
-            <div class="w-full flex flex-col gap-8 animate-fade-in">
-                <div class="flex flex-col gap-2">
-                    <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
-                </div>
-                
-                <div class="flex gap-2 overflow-x-auto hide-scroll pb-2 w-full border-b border-neutral-100">
-                    ${tabsHtml}
-                </div>
-
-                <div class="w-full flex flex-col gap-8">
-                    ${activeContent}
-                </div>
-            </div>
-            `;
-        }
-
-        // --- DASHBOARD COMPONENTS & D&D ---
-        
-        // D&D Handlers
-        function handleDragStart(e, index) {
-            dragStartIndex = index;
-            e.dataTransfer.effectAllowed = 'move';
-            e.target.classList.add('opacity-50', 'border-dashed', 'border-black');
-        }
-        function handleDragOver(e) {
-            e.preventDefault(); e.dataTransfer.dropEffect = 'move'; return false;
-        }
-        function handleDragEnter(e) {
-            e.preventDefault(); e.currentTarget.classList.add('bg-neutral-100');
-        }
-        function handleDragLeave(e) {
-            e.currentTarget.classList.remove('bg-neutral-100');
-        }
-        function handleDrop(e, dropIndex) {
-            e.stopPropagation(); e.currentTarget.classList.remove('bg-neutral-100');
-            if (dragStartIndex === null || dragStartIndex === dropIndex) return false;
-
-            const draggedItem = App.config.pages.splice(dragStartIndex, 1)[0];
-            App.config.pages.splice(dropIndex, 0, draggedItem);
-            
-            saveGlobalConfig(); // Save instantly
-            return false;
-        }
-        function handleDragEnd(e) {
-            e.target.classList.remove('opacity-50', 'border-dashed', 'border-black');
-            dragStartIndex = null;
-        }
-
-
-        function renderDashSettings() {
-            const pagesList = App.config.pages.map((p, i) => `
-                <div class="flex items-center justify-between p-4 bg-neutral-50 rounded-xl border border-neutral-200 transition-all cursor-move"
-                     draggable="true" 
-                     ondragstart="handleDragStart(event, ${i})" 
-                     ondragover="handleDragOver(event)" 
-                     ondragenter="handleDragEnter(event)" 
-                     ondragleave="handleDragLeave(event)" 
-                     ondrop="handleDrop(event, ${i})" 
-                     ondragend="handleDragEnd(event)">
-                    
-                    <div class="flex items-center gap-4">
-                        <div class="text-neutral-400 opacity-50 hover:opacity-100 transition-opacity">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8h16M4 16h16"></path></svg>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="font-bold">${p.title}</span>
-                            <span class="text-xs text-neutral-400 font-mono mt-1">${p.type} | /${p.id}</span>
-                        </div>
-                    </div>
-                    
-                    <button onclick="removePage(${i})" class="text-red-500 hover:text-red-700 p-2 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
-                </div>
-            `).join('');
-
-            return `
-                <div class="card">
-                    <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Global Configuration</div>
-                    <div><label class="label">Site Title</label><input type="text" id="cfg-title" class="input font-bold" value="${App.config.siteTitle}"></div>
-                    <div><label class="label">Footer Text</label><input type="text" id="cfg-footer" class="input" value="${App.config.footerText}"></div>
-                    <button onclick="saveGlobalConfig()" id="btn-save-cfg" class="btn-dark w-full mt-4">Save Configuration</button>
-                </div>
-
-                <div class="card">
-                    <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Menu Architecture</div>
-                    <span class="text-xs text-neutral-500 mb-2">Drag and drop the items below to reorder your menu. Changes are saved automatically.</span>
-                    <div class="flex flex-col gap-3">${pagesList}</div>
-                    
-                    <div class="flex flex-col md:flex-row gap-4 p-6 bg-neutral-50 rounded-2xl border border-neutral-200 border-dashed mt-4 items-end">
-                        <div class="flex flex-col gap-2 w-full"><label class="label !mb-0">Slug</label><input type="text" id="new-page-id" class="input font-mono !h-10 !py-0" placeholder="e.g. log"></div>
-                        <div class="flex flex-col gap-2 w-full"><label class="label !mb-0">Title</label><input type="text" id="new-page-title" class="input !h-10 !py-0" placeholder="e.g. My Log"></div>
-                        <div class="flex flex-col gap-2 w-full"><label class="label !mb-0">Type</label><select id="new-page-type" class="input !h-10 !py-0 !px-2 bg-white"><option value="gallery">Gallery (Photos)</option><option value="profile">Profile / Resume</option><option value="contact">Contact / Split</option><option value="article">Article / Standard</option><option value="links">Linktree / Buttons</option></select></div>
-                        <button onclick="addPage()" class="btn-dark w-full md:w-auto !h-10 px-6">+ Add</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderDashGallery(page) {
-            const items = App.posts.filter(p => p.author === page.id).sort((a,b) => new Date(b.at) - new Date(a.at));
-            const listHtml = items.map(p => `
-                <div class="flex items-center justify-between p-4 bg-neutral-50 rounded-xl border border-neutral-100">
-                    <div class="flex items-center gap-4"><img src="${p.image_url}" class="w-12 h-12 rounded-lg bg-neutral-200 object-cover"><span class="text-xs font-bold text-neutral-400 tracking-widest uppercase">${new Date(p.at).toLocaleDateString()}</span></div>
-                    <button onclick="confirmDelete(${p.id})" class="text-red-500 hover:text-red-700 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
-                </div>
-            `).join('');
-
-            return `
-                <div class="card">
-                    <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Manage: ${page.title}</div>
-                    <input type="file" id="gal-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${page.id}', null, 'gallery')">
-                    <button id="btn-upload-gal" onclick="document.getElementById('gal-upload').click()" class="h-14 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-sm uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Upload Photo</button>
-                    <div class="flex flex-col gap-3 mt-4">${listHtml.length > 0 ? listHtml : '<div class="text-neutral-400 text-sm">No photos yet.</div>'}</div>
-                </div>
-            `;
-        }
-
-        function renderDashProfile(page) {
-            const post = App.posts.find(p => p.author === page.id);
-            let data = { intro: '', text: '', exps: [] };
-            if(post) { try { data = JSON.parse(post.text); } catch(e){} }
-            window.tempExps = data.exps || [];
-
-            return `
-                <div class="card">
-                    <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${page.title}</div>
-                    <div>
-                        <label class="label">Profile Cover</label>
-                        <input type="file" id="prf-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${page.id}', ${post ? post.id : null}, 'profile')">
-                        ${post && post.image_url ? `
-                        <div class="relative w-max group">
-                            <img src="${post.image_url}" class="w-32 h-32 object-cover rounded-full border border-neutral-200 cursor-pointer hover:opacity-80 transition-opacity" onclick="document.getElementById('prf-img-upload').click()">
-                            <button type="button" onclick="removePageImage(${post.id})" class="absolute top-0 right-0 bg-white border border-gray-200 rounded-full p-1.5 shadow-sm text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-                        </div>
-                        ` : `<button onclick="document.getElementById('prf-img-upload').click()" type="button" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Select Image</button>`}
-                    </div>
-                    <div><label class="label">Intro Short Text</label><textarea id="prf-intro" class="input" rows="2" oninput="autoResizeTextarea(this)">${data.intro || ''}</textarea></div>
-                    <div><label class="label">Main About Text</label><textarea id="prf-text" class="input" rows="6" oninput="autoResizeTextarea(this)">${data.text || ''}</textarea></div>
-                    <div>
-                        <div class="flex justify-between items-center mb-4"><label class="label !mb-0">Experience</label><button type="button" onclick="addExpRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add Row</button></div>
-                        <div id="prf-exp-container" class="flex flex-col gap-3">${window.tempExps.map((e) => buildExpRowHtml(e.title, e.company, e.date)).join('')}</div>
-                    </div>
-                    <button onclick="saveProfileConfig('${page.id}', ${post ? post.id : null}, '${post && post.image_url ? post.image_url : ''}')" id="btn-save-prf" class="btn-dark w-full mt-4">Save Changes</button>
-                </div>
-            `;
-        }
-
-        function renderDashContact(page) {
-            const post = App.posts.find(p => p.author === page.id);
-            return `
-                <div class="card">
-                    <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${page.title}</div>
-                    <div>
-                        <label class="label">Small Image (Optional)</label>
-                        <input type="file" id="cnt-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${page.id}', ${post ? post.id : null}, 'contact')">
-                        ${post && post.image_url ? `
-                        <div class="relative w-max group">
-                            <img src="${post.image_url}" class="w-24 h-24 object-cover rounded-full border border-neutral-200 cursor-pointer hover:opacity-80 transition-opacity" onclick="document.getElementById('cnt-img-upload').click()">
-                            <button type="button" onclick="removePageImage(${post.id})" class="absolute top-0 right-0 bg-white border border-gray-200 rounded-full p-1.5 shadow-sm text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-                        </div>
-                        ` : `<button onclick="document.getElementById('cnt-img-upload').click()" type="button" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Select Image</button>`}
-                    </div>
-                    <div><label class="label">Big Headline</label><input type="text" id="cnt-title" class="input font-bold text-lg" value="${post ? post.title : ''}" placeholder="e.g. Hello."></div>
-                    <div><label class="label">Contact Info / Links</label><textarea id="cnt-text" class="input" rows="6" oninput="autoResizeTextarea(this)">${post ? post.text : ''}</textarea></div>
-                    <button onclick="saveContactConfig('${page.id}', ${post ? post.id : null}, '${post && post.image_url ? post.image_url : ''}')" id="btn-save-cnt" class="btn-dark w-full mt-4">Save Changes</button>
-                </div>
-            `;
-        }
-
-        function renderDashArticle(page) {
-            const post = App.posts.find(p => p.author === page.id);
-            return `
-                <div class="card">
-                    <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${page.title}</div>
-                    <div>
-                        <label class="label">Article Cover</label>
-                        <input type="file" id="art-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${page.id}', ${post ? post.id : null}, 'article')">
-                        ${post && post.image_url ? `
-                        <div class="relative w-full group">
-                            <img src="${post.image_url}" class="w-full h-48 object-cover rounded-xl border border-neutral-200 cursor-pointer hover:opacity-80 transition-opacity" onclick="document.getElementById('art-img-upload').click()">
-                            <button type="button" onclick="removePageImage(${post.id})" class="absolute top-2 right-2 bg-white border border-gray-200 rounded-full p-1.5 shadow-sm text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-                        </div>
-                        ` : `<button onclick="document.getElementById('art-img-upload').click()" type="button" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Select Cover</button>`}
-                    </div>
-                    <div><label class="label">Headline</label><input type="text" id="art-title" class="input font-bold text-lg" value="${post ? post.title : ''}"></div>
-                    <div><label class="label">Article Body</label><textarea id="art-text" class="input" rows="12" oninput="autoResizeTextarea(this)">${post ? post.text : ''}</textarea></div>
-                    <button onclick="saveArticleConfig('${page.id}', ${post ? post.id : null}, '${post && post.image_url ? post.image_url : ''}')" id="btn-save-art" class="btn-dark w-full mt-4">Save Changes</button>
-                </div>
-            `;
-        }
-
-        function renderDashLinks(page) {
-            const post = App.posts.find(p => p.author === page.id);
-            let data = { desc: '', links: [] };
-            if(post) { try { data = JSON.parse(post.text); } catch(e){} }
-            window.tempLinks = data.links || [];
-
-            return `
-                <div class="card">
-                    <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${page.title}</div>
-                    <div>
-                        <label class="label">Avatar Picture</label>
-                        <input type="file" id="lnk-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${page.id}', ${post ? post.id : null}, 'links')">
-                        ${post && post.image_url ? `
-                        <div class="relative w-max group">
-                            <img src="${post.image_url}" class="w-24 h-24 rounded-full object-cover border border-neutral-200 cursor-pointer hover:opacity-80 transition-opacity" onclick="document.getElementById('lnk-img-upload').click()">
-                            <button type="button" onclick="removePageImage(${post.id})" class="absolute top-0 right-0 bg-white border border-gray-200 rounded-full p-1.5 shadow-sm text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-                        </div>
-                        ` : `<button onclick="document.getElementById('lnk-img-upload').click()" type="button" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Select Avatar</button>`}
-                    </div>
-                    <div><label class="label">Name / Title</label><input type="text" id="lnk-title" class="input font-bold" value="${post ? post.title : ''}"></div>
-                    <div><label class="label">Short Bio</label><textarea id="lnk-desc" class="input" rows="2" oninput="autoResizeTextarea(this)">${data.desc || ''}</textarea></div>
-                    
-                    <div>
-                        <div class="flex justify-between items-center mb-4"><label class="label !mb-0">Links</label><button type="button" onclick="addLinkRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add Link</button></div>
-                        <div id="lnk-exp-container" class="flex flex-col gap-3">
-                            ${window.tempLinks.map(l => buildLinkRowHtml(l.title, l.url)).join('')}
-                        </div>
-                    </div>
-
-                    <button onclick="saveLinksConfig('${page.id}', ${post ? post.id : null}, '${post && post.image_url ? post.image_url : ''}')" id="btn-save-lnk" class="btn-dark w-full mt-4">Save Changes</button>
-                </div>
-            `;
-        }
-
-        // --- DASHBOARD ACTIONS & API ---
+        // --- DASHBOARD CORE ---
         function navigate(id) { if(!id) return; App.route = id; App.isMenuOpen = false; render(); window.scrollTo(0,0); }
-        function toggleMenu() { App.isMenuOpen = !App.isMenuOpen; render(); }
-        
-        function openLoginModal() {
-            App.isMenuOpen = false; render();
-            const root = document.getElementById('modal-root');
-            root.innerHTML = `
-                <div class="w-full max-w-sm bg-white border border-neutral-200 rounded-2xl p-8 flex flex-col gap-6 shadow-2xl">
-                    <div class="text-xl font-bold text-center">Admin Access</div>
-                    <form onsubmit="handleLogin(event)" class="flex flex-col gap-4">
-                        <input type="password" id="admin-pass" class="input" placeholder="Password..." oninput="this.classList.remove('input-error')">
-                        <label class="flex items-center gap-3 text-sm text-neutral-600 font-bold cursor-pointer">
-                            <input type="checkbox" id="remember-login" class="w-5 h-5 rounded border-neutral-300 text-black focus:ring-black"> Remember me
-                        </label>
-                        <div class="flex gap-4 mt-4">
-                            <button type="button" class="btn-light flex-1" onclick="closeModalRoot()">Cancel</button>
-                            <button type="submit" id="login-btn" class="btn-dark flex-1">Login</button>
-                        </div>
-                    </form>
-                </div>
-            `;
-            root.classList.remove('hidden'); root.classList.add('flex');
-        }
-
-        function closeModalRoot() { 
-            const root = document.getElementById('modal-root');
-            root.classList.add('hidden'); root.classList.remove('flex'); root.innerHTML = ''; 
-        }
+        function toggleMenu(e) { if(e) e.stopPropagation(); App.isMenuOpen = !App.isMenuOpen; render(); }
+        function closeMenu() { App.isMenuOpen = false; render(); }
 
         async function handleLogin(e) {
-            e.preventDefault(); 
-            const pass = document.getElementById('admin-pass').value; 
-            const btn = document.getElementById('login-btn'); 
-            btn.innerText = 'Verifying...'; btn.disabled = true;
+            e.preventDefault(); const pass = document.getElementById('admin-pass').value;
             try {
                 const res = await fetch(`${API_URL}/verify`, { headers: { 'x-admin-password': pass } });
-                if (res.ok) {
-                    App.token = pass; 
-                    if(document.getElementById('remember-login').checked) localStorage.setItem('mv_admin_key', pass);
-                    closeModalRoot(); 
-                    await init();
-                    navigate('dashboard');
-                } else throw new Error();
-            } catch (err) { 
-                document.getElementById('admin-pass').classList.add('input-error');
-                btn.innerText = 'Login'; btn.disabled = false; 
-            }
+                if (res.ok) { App.token = pass; if(document.getElementById('remember-login').checked) localStorage.setItem('mv_admin_key', pass); closeModal(); await init(); navigate('dashboard'); }
+                else throw new Error();
+            } catch (err) { alert('Invalid password'); }
+        }
+        function logout() { App.token = ""; localStorage.removeItem('mv_admin_key'); init(); navigate(App.config.pages[0]?.id || 'grid'); }
+
+        function renderDashboard() {
+            if (App.dashTab !== 'settings' && !App.config.pages.find(p => p.id === App.dashTab.replace('page_',''))) App.dashTab = 'settings';
+            const tabs = [{ id: 'settings', label: 'Settings' }, ...App.config.pages.map(p => ({ id: `page_${p.id}`, label: p.title }))];
+            const tabsHtml = tabs.map(t => `<button onclick="App.dashTab='${t.id}'; render();" class="h-10 px-4 rounded-full font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-colors ${App.dashTab===t.id ? 'bg-black text-white' : 'bg-neutral-50 text-neutral-500 hover:bg-neutral-100 border border-neutral-200'}">${t.label}</button>`).join('');
+            let content = App.dashTab==='settings' ? renderDashSettings() : renderActivePageEditor();
+            return `<div class="w-full flex flex-col gap-8 animate-fade-in"><h1 class="text-3xl font-bold tracking-tight">Dashboard</h1><div class="flex gap-2 overflow-x-auto hide-scroll pb-2 w-full border-b border-neutral-100">${tabsHtml}</div><div class="w-full flex flex-col gap-8">${content}</div></div>`;
         }
 
-        async function logout() { 
-            App.token = ""; localStorage.removeItem('mv_admin_key'); 
-            await init(); 
-            navigate(App.config.pages[0]?.id || 'grid'); 
+        function renderActivePageEditor() {
+            const pageId = App.dashTab.replace('page_', ''); const page = App.config.pages.find(p => p.id === pageId);
+            if (!page) return '';
+            if (page.type === 'gallery') return renderDashGallery(page);
+            if (page.type === 'profile') return renderDashProfile(page);
+            if (page.type === 'contact') return renderDashContact(page);
+            if (page.type === 'article') return renderDashArticle(page);
+            if (page.type === 'links') return renderDashLinks(page);
         }
 
-        // Global Config Saving
-        async function saveGlobalConfig() {
-            const btn = document.getElementById('btn-save-cfg'); if(btn) { btn.innerText = "SAVING..."; btn.disabled = true; }
-            App.config.siteTitle = document.getElementById('cfg-title').value.trim();
-            App.config.footerText = document.getElementById('cfg-footer').value.trim();
-            
-            const payload = { title: "", text: JSON.stringify(App.config), image_url: "", show_date: false, author: "_system_config" };
-            const method = App.configPostId ? "PUT" : "POST";
-            const url = App.configPostId ? `${API_URL}/posts/${App.configPostId}` : `${API_URL}/posts`;
+        // --- DASHBOARD: SETTINGS + REORDER ---
+        function movePageUp(index) { if (index > 0) { const item = App.config.pages.splice(index, 1)[0]; App.config.pages.splice(index - 1, 0, item); saveGlobalConfig(); } }
+        function movePageDown(index) { if (index < App.config.pages.length - 1) { const item = App.config.pages.splice(index, 1)[0]; App.config.pages.splice(index + 1, 0, item); saveGlobalConfig(); } }
 
-            try { await fetch(url, { method, headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify(payload) }); await init(); } 
-            catch(e) { if(btn) { btn.innerText = "Error. Retry."; btn.disabled = false; } }
+        function renderDashSettings() {
+            const list = App.config.pages.map((p, i) => `
+                <div class="flex items-center justify-between p-4 bg-neutral-50 rounded-xl border border-neutral-200 select-none cursor-default group"
+                     draggable="true" ondragstart="handleDragStart(event, ${i})" ondragover="handleDragOver(event)" ondrop="handleDrop(event, ${i})" ondragend="handleDragEnd(event)">
+                    <div class="flex items-center gap-4">
+                        <div class="flex flex-col gap-1">
+                            <button onclick="movePageUp(${i})" class="text-gray-400 hover:text-black leading-none text-xs">▲</button>
+                            <button onclick="movePageDown(${i})" class="text-gray-400 hover:text-black leading-none text-xs">▼</button>
+                        </div>
+                        <div class="w-px h-6 bg-neutral-200 mx-1"></div>
+                        <div class="flex flex-col"><span class="font-bold text-sm">${p.title}</span><span class="text-[10px] text-neutral-400 font-mono tracking-tight">${p.type} | /${p.id}</span></div>
+                    </div>
+                    <button onclick="removePage(${i})" class="text-red-400 hover:text-red-600 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                </div>`).join('');
+
+            return `<div class="card"><div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Configuration</div><div><label class="label">Site Title</label><input type="text" id="cfg-title" class="input font-bold" value="${App.config.siteTitle}"></div><div><label class="label">Footer Text</label><input type="text" id="cfg-footer" class="input text-xs font-mono" value="${App.config.footerText}"></div><button onclick="saveGlobalConfig()" id="btn-save-cfg" class="btn-dark w-full mt-4">Save Configuration</button></div>
+            <div class="card"><div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Menu Structure</div><span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Drag items or use arrows to reorder</span><div class="flex flex-col gap-3">${list}</div><div class="flex flex-col md:flex-row gap-4 p-4 bg-neutral-50 rounded-xl border border-neutral-200 border-dashed mt-4 items-end"><div class="flex flex-col gap-2 w-full"><label class="label !mb-0">Slug</label><input type="text" id="new-page-id" class="input !h-10 !py-0 font-mono" placeholder="e.g. log"></div><div class="flex flex-col gap-2 w-full"><label class="label !mb-0">Title</label><input type="text" id="new-page-title" class="input !h-10 !py-0" placeholder="e.g. My Log"></div><div class="flex flex-col gap-2 w-full"><label class="label !mb-0">Type</label><select id="new-page-type" class="input !h-10 !py-0 !px-2 bg-white"><option value="gallery">Gallery</option><option value="profile">Profile</option><option value="contact">Contact</option><option value="article">Article</option><option value="links">Links</option></select></div><button onclick="addPage()" class="btn-dark w-full md:w-auto !h-10 px-6">+ Add</button></div></div>`;
         }
 
-        function addPage() {
-            const id = document.getElementById('new-page-id').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
-            const title = document.getElementById('new-page-title').value.trim();
-            const type = document.getElementById('new-page-type').value;
-            if(!id || !title) return alert('Fill ID and Title');
-            if(App.config.pages.find(p => p.id === id) || id === 'dashboard' || id === '_system_config') return alert('Slug must be unique');
-            App.config.pages.push({id, title, type}); saveGlobalConfig();
+        // D&D Handlers
+        function handleDragStart(e, i) { dragStartIndex = i; e.dataTransfer.effectAllowed = 'move'; e.currentTarget.classList.add('opacity-40', 'border-black'); }
+        function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; return false; }
+        function handleDrop(e, dropIndex) { e.stopPropagation(); if (dragStartIndex === null || dragStartIndex === dropIndex) return false; const item = App.config.pages.splice(dragStartIndex, 1)[0]; App.config.pages.splice(dropIndex, 0, item); saveGlobalConfig(); return false; }
+        function handleDragEnd(e) { e.currentTarget.classList.remove('opacity-40', 'border-black'); dragStartIndex = null; }
+
+        // --- EDITORS ---
+        function renderDashGallery(p) {
+            const items = App.posts.filter(x => x.author === p.id).sort((a,b) => new Date(b.at) - new Date(a.at));
+            const list = items.map(x => `<div class="flex items-center justify-between p-4 bg-neutral-50 rounded-xl border border-neutral-100"><div class="flex items-center gap-4"><img src="${x.image_url}" class="w-12 h-12 rounded-lg bg-neutral-200 object-cover"><span class="text-[10px] font-bold text-neutral-400 uppercase">${new Date(x.at).toLocaleDateString()}</span></div><button onclick="confirmDelete(${x.id})" class="text-red-500 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></div>`).join('');
+            return `<div class="card"><div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Manage: ${p.title}</div><input type="file" id="gal-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${p.id}', null, 'gallery')"><button id="btn-upload-gal" onclick="document.getElementById('gal-upload').click()" class="h-14 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-400 font-bold text-xs uppercase tracking-widest hover:bg-neutral-50 transition-colors w-full">+ Upload Photo</button><div class="flex flex-col gap-3 mt-4">${list || '<div class="text-neutral-400 text-sm">Empty.</div>'}</div></div>`;
         }
 
-        async function removePage(index) {
-            if(confirm("Remove this page from menu AND delete all its content from the database?")) {
-                const pageId = App.config.pages[index].id;
-                const postsToDelete = App.posts.filter(p => p.author === pageId);
-                document.body.style.cursor = 'wait';
-                for (let p of postsToDelete) {
-                    await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": App.token } });
-                }
-                App.config.pages.splice(index, 1); 
-                await saveGlobalConfig(); 
-                document.body.style.cursor = 'default';
-            }
+        function renderDashProfile(p) {
+            const post = App.posts.find(x => x.author === p.id); let data = { intro: '', text: '', exps: [] }; try { data = JSON.parse(post.text); } catch(e){}
+            window.tempExps = data.exps || [];
+            return `<div class="card"><div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${p.title}</div><div><label class="label">1. Profile Picture</label><span class="hint">Recommended: Square aspect ratio.</span><input type="file" id="prf-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${p.id}', ${post?post.id:null}, 'profile')">${post && post.image_url ? `<div class="relative w-max group"><img src="${post.image_url}" class="w-32 h-32 object-cover rounded-full border border-neutral-200 cursor-pointer hover:opacity-80" onclick="document.getElementById('prf-img-upload').click()"><button type="button" onclick="removePageImage(${post.id})" class="absolute top-0 right-0 bg-white border border-neutral-200 rounded-full p-1.5 text-red-500 shadow-sm opacity-0 group-hover:opacity-100">X</button></div>` : `<button onclick="document.getElementById('prf-img-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs tracking-widest uppercase w-full">+ Select Image</button>`}</div><div><label class="label">2. Tagline</label><textarea id="prf-intro" class="input" rows="2" oninput="autoResizeTextarea(this)">${data.intro || ''}</textarea></div><div><label class="label">3. Bio</label><textarea id="prf-text" class="input" rows="6" oninput="autoResizeTextarea(this)">${data.text || ''}</textarea></div><div><div class="flex justify-between items-center mb-2"><label class="label !mb-0">4. Timeline</label><button type="button" onclick="addExpRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add</button></div><div id="prf-exp-container" class="flex flex-col gap-3">${window.tempExps.map((e) => buildExpRowHtml(e.title, e.company, e.date)).join('')}</div></div><button onclick="saveProfileConfig('${p.id}', ${post?post.id:null}, '${post?.image_url || ''}')" id="btn-save-prf" class="btn-dark w-full mt-4">Save Changes</button></div>`;
         }
 
-        // Universal Image Compressor & Uploader
-        const compressImage = (f, max=1600, q=0.8) => new Promise(res => { const r=new FileReader(); r.readAsDataURL(f); r.onload=e=>{ const i=new Image(); i.src=e.target.result; i.onload=()=>{ const c=document.createElement('canvas'); let w=i.width, h=i.height; if(w>max){h=Math.round(h*max/w); w=max;} c.width=w; c.height=h; c.getContext('2d').drawImage(i,0,0,w,h); c.toBlob(b=>res(new File([b],f.name.replace(/\.[^/.]+$/,"")+".jpg",{type:'image/jpeg'})),'image/jpeg',q); };};});
+        function renderDashContact(p) {
+            const post = App.posts.find(x => x.author === p.id);
+            return `<div class="card"><div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${p.title}</div><div><label class="label">1. Image</label><input type="file" id="cnt-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${p.id}', ${post?post.id:null}, 'contact')">${post && post.image_url ? `<div class="relative w-max group"><img src="${post.image_url}" class="w-24 h-24 object-cover rounded-full border border-neutral-200 cursor-pointer" onclick="document.getElementById('cnt-img-upload').click()"><button type="button" onclick="removePageImage(${post.id})" class="absolute top-0 right-0 bg-white border rounded-full p-1.5 text-red-500">X</button></div>` : `<button onclick="document.getElementById('cnt-img-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase w-full">+ Select Image</button>`}</div><div><label class="label">2. Headline</label><input type="text" id="cnt-title" class="input font-bold" value="${post?post.title:''}" placeholder="e.g. Hello."></div><div><label class="label">3. Info</label><textarea id="cnt-text" class="input" rows="6" oninput="autoResizeTextarea(this)">${post?post.text:''}</textarea></div><button onclick="saveContactConfig('${p.id}', ${post?post.id:null}, '${post?.image_url || ''}')" id="btn-save-cnt" class="btn-dark w-full mt-4">Save Changes</button></div>`;
+        }
 
-        async function uploadGenericImage(authorSlug, postId, type) {
-            let inputId = type === 'gallery' ? 'gal-upload' : type === 'profile' ? 'prf-img-upload' : type === 'contact' ? 'cnt-img-upload' : type === 'article' ? 'art-img-upload' : 'lnk-img-upload';
-            const file = document.getElementById(inputId).files[0]; if(!file) return;
-            document.body.style.cursor = 'wait';
+        function renderDashArticle(p) {
+            const post = App.posts.find(x => x.author === p.id);
+            return `<div class="card"><div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${p.title}</div><div><label class="label">1. Cover</label><input type="file" id="art-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${p.id}', ${post?post.id:null}, 'article')">${post && post.image_url ? `<div class="relative w-full group"><img src="${post.image_url}" class="w-full h-48 object-cover rounded-xl border cursor-pointer" onclick="document.getElementById('art-img-upload').click()"><button type="button" onclick="removePageImage(${post.id})" class="absolute top-2 right-2 bg-white border rounded-full p-1.5 text-red-500">X</button></div>` : `<button onclick="document.getElementById('art-img-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase w-full">+ Select Cover</button>`}</div><div><label class="label">2. Headline</label><input type="text" id="art-title" class="input font-bold" value="${post?post.title:''}"></div><div><label class="label">3. Body</label><textarea id="art-text" class="input" rows="12" oninput="autoResizeTextarea(this)">${post?post.text:''}</textarea></div><button onclick="saveArticleConfig('${p.id}', ${post?post.id:null}, '${post?.image_url || ''}')" id="btn-save-art" class="btn-dark w-full mt-4">Save Changes</button></div>`;
+        }
+
+        function renderDashLinks(p) {
+            const post = App.posts.find(x => x.author === p.id); let data = { desc: '', links: [] }; try { data = JSON.parse(post.text); } catch(e){}
+            return `<div class="card"><div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${p.title}</div><div><label class="label">1. Avatar</label><input type="file" id="lnk-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${p.id}', ${post?post.id:null}, 'links')">${post && post.image_url ? `<div class="relative w-max group"><img src="${post.image_url}" class="w-24 h-24 rounded-full object-cover border cursor-pointer" onclick="document.getElementById('lnk-img-upload').click()"><button type="button" onclick="removePageImage(${post.id})" class="absolute top-0 right-0 bg-white border rounded-full p-1.5 text-red-500">X</button></div>` : `<button onclick="document.getElementById('lnk-img-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase w-full">+ Avatar</button>`}</div><div><label class="label">2. Name</label><input type="text" id="lnk-title" class="input font-bold" value="${post?post.title:''}"></div><div><label class="label">3. Bio</label><textarea id="lnk-desc" class="input" rows="2" oninput="autoResizeTextarea(this)">${data.desc || ''}</textarea></div><div><div class="flex justify-between items-center mb-2"><label class="label !mb-0">4. Links</label><button type="button" onclick="addLinkRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add</button></div><div id="lnk-exp-container" class="flex flex-col gap-3">${(data.links||[]).map(l => buildLinkRowHtml(l.title, l.url)).join('')}</div></div><button onclick="saveLinksConfig('${p.id}', ${post?post.id:null}, '${post?.image_url || ''}')" id="btn-save-lnk" class="btn-dark w-full mt-4">Save Changes</button></div>`;
+        }
+
+        // API Helpers
+        async function uploadGenericImage(slug, id, type) {
+            let inputId = type==='gallery'?'gal-upload':type==='profile'?'prf-img-upload':type==='contact'?'cnt-img-upload':type==='article'?'art-img-upload':'lnk-img-upload';
+            const f = document.getElementById(inputId).files[0]; if(!f) return;
+            document.body.style.cursor='wait';
             try {
-                const f = new FormData(); f.append("file", await compressImage(file));
-                const img = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": App.token }, body: f })).json()).image_url;
-                
-                if(type === 'gallery') {
-                    await fetch(`${API_URL}/posts`, { method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify({ title: "", text: "", image_url: img, show_date: true, author: authorSlug }) });
-                    await init();
-                } else if(type === 'profile') saveProfileConfig(authorSlug, postId, img);
-                else if(type === 'contact') saveContactConfig(authorSlug, postId, img);
-                else if(type === 'article') saveArticleConfig(authorSlug, postId, img);
-                else if(type === 'links') saveLinksConfig(authorSlug, postId, img);
-            } catch(e) {}
-            document.body.style.cursor = 'default';
+                const fd = new FormData(); fd.append("file", await compressImage(f));
+                const img = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": App.token }, body: fd })).json()).image_url;
+                if(type === 'gallery') { await fetch(`${API_URL}/posts`, { method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify({ title: "", text: "", image_url: img, show_date: true, author: slug }) }); await init(); } 
+                else if(type === 'profile') saveProfileConfig(slug, id, img); else if(type === 'contact') saveContactConfig(slug, id, img); else if(type === 'article') saveArticleConfig(slug, id, img); else if(type === 'links') saveLinksConfig(slug, id, img);
+            } catch(e){}
+            document.body.style.cursor='default';
         }
 
-        async function removePageImage(postId) {
-            if(!confirm('Permanentne zmazať túto fotku?')) return;
-            document.body.style.cursor = 'wait';
-            try {
-                const post = App.posts.find(p => p.id === postId);
-                if(post) {
-                    post.image_url = "";
-                    await fetch(`${API_URL}/posts/${postId}`, { method: "PUT", headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify(post) });
-                    await init();
-                }
-            } catch(e) {}
-            document.body.style.cursor = 'default';
+        async function removePageImage(postId) { if(!confirm('Delete image?')) return; const post = App.posts.find(p=>p.id===postId); if(post){ post.image_url=""; await fetch(`${API_URL}/posts/${postId}`,{method:"PUT",headers:{"Content-Type":"application/json","x-admin-password":App.token},body:JSON.stringify(post)}); await init(); } }
+
+        async function savePageData(slug, id, payload, btnId) {
+            const btn = document.getElementById(btnId); btn.innerText="SAVING..."; btn.disabled=true;
+            const method = id ? "PUT" : "POST"; const url = id ? `${API_URL}/posts/${id}` : `${API_URL}/posts`;
+            try { await fetch(url, { method, headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify(payload) }); await init(); } catch(e){ btn.innerText="Error"; btn.disabled=false; }
         }
 
-        // Form HTML Builders
-        function buildExpRowHtml(t='', c='', d='') {
-            return `<div class="flex flex-col gap-3 p-4 bg-neutral-50 rounded-xl border border-neutral-200 relative exp-row-item"><input type="text" class="input !h-10 !py-2 !bg-white exp-t font-bold" placeholder="Job Title" value="${t}"><input type="text" class="input !h-10 !py-2 !bg-white exp-c" placeholder="Company" value="${c}"><input type="text" class="input !h-10 !py-2 !bg-white exp-d" placeholder="Date" value="${d}"><button type="button" onclick="this.parentElement.remove()" class="absolute top-4 right-4 text-red-500 text-xs font-bold uppercase hover:text-red-700">X</button></div>`;
-        }
+        function saveProfileConfig(s,id,img) { const exps=[]; document.querySelectorAll('.exp-row-item').forEach(el=>{ exps.push({title:el.querySelector('.exp-t').value,company:el.querySelector('.exp-c').value,date:el.querySelector('.exp-d').value}); }); savePageData(s,id,{title:"",text:JSON.stringify({v:2,intro:document.getElementById('prf-intro').value,text:document.getElementById('prf-text').value,exps}),image_url:img,show_date:false,author:s},'btn-save-prf'); }
+        function saveContactConfig(s,id,img) { savePageData(s,id,{title:document.getElementById('cnt-title').value,text:document.getElementById('cnt-text').value,image_url:img,show_date:false,author:s},'btn-save-cnt'); }
+        function saveArticleConfig(s,id,img) { savePageData(s,id,{title:document.getElementById('art-title').value,text:document.getElementById('art-text').value,image_url:img,show_date:false,author:s},'btn-save-art'); }
+        function saveLinksConfig(s,id,img) { const links=[]; document.querySelectorAll('.link-row-item').forEach(el=>{ links.push({title:el.querySelector('.lnk-t').value,url:el.querySelector('.lnk-u').value}); }); savePageData(s,id,{title:document.getElementById('lnk-title').value,text:JSON.stringify({desc:document.getElementById('lnk-desc').value,links}),image_url:img,show_date:false,author:s},'btn-save-lnk'); }
+
+        async function saveGlobalConfig() { const btn=document.getElementById('btn-save-cfg'); if(btn){btn.innerText="SAVING..."; btn.disabled=true;} App.config.siteTitle=document.getElementById('cfg-title').value.trim(); App.config.footerText=document.getElementById('cfg-footer').value.trim(); const method=App.configPostId?"PUT":"POST"; const url=App.configPostId?`${API_URL}/posts/${App.configPostId}`:`${API_URL}/posts`; try{ await fetch(url,{method,headers:{"Content-Type":"application/json","x-admin-password":App.token},body:JSON.stringify({title:"",text:JSON.stringify(App.config),image_url:"",show_date:false,author:"_system_config"})}); await init(); }catch(e){if(btn){btn.innerText="Error"; btn.disabled=false;}} }
+        function addPage() { const id=document.getElementById('new-page-id').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,''); const title=document.getElementById('new-page-title').value.trim(); const type=document.getElementById('new-page-type').value; if(!id||!title) return; if(App.config.pages.find(p=>p.id===id)) return; App.config.pages.push({id,title,type}); saveGlobalConfig(); }
+        async function removePage(i) { if(confirm("Permanently delete page and all data?")){ const pid=App.config.pages[i].id; const del=App.posts.filter(p=>p.author===pid); for(let x of del) await fetch(`${API_URL}/posts/${x.id}`,{method:"DELETE",headers:{"x-admin-password":App.token}}); App.config.pages.splice(i,1); await saveGlobalConfig(); } }
+
+        function buildExpRowHtml(t='',c='',d='') { return `<div class="flex flex-col gap-3 p-4 bg-neutral-50 rounded-xl border border-neutral-200 relative exp-row-item"><input type="text" class="input !h-10 !py-2 !bg-white exp-t font-bold" placeholder="Job Title" value="${t}"><input type="text" class="input !h-10 !py-2 !bg-white exp-c" placeholder="Company" value="${c}"><input type="text" class="input !h-10 !py-2 !bg-white exp-d" placeholder="Date" value="${d}"><button type="button" onclick="this.parentElement.remove()" class="absolute top-4 right-4 text-red-500 font-bold uppercase">X</button></div>`; }
         function addExpRowToDOM() { document.getElementById('prf-exp-container').insertAdjacentHTML('beforeend', buildExpRowHtml()); }
-
-        function buildLinkRowHtml(t='', u='') {
-            return `<div class="flex flex-col gap-3 p-4 bg-neutral-50 rounded-xl border border-neutral-200 relative link-row-item"><input type="text" class="input !h-10 !py-2 !bg-white lnk-t font-bold" placeholder="Button Title" value="${t}"><input type="text" class="input !h-10 !py-2 !bg-white lnk-u" placeholder="https://..." value="${u}"><button type="button" onclick="this.parentElement.remove()" class="absolute top-4 right-4 text-red-500 text-xs font-bold uppercase hover:text-red-700">X</button></div>`;
-        }
+        function buildLinkRowHtml(t='',u='') { return `<div class="flex flex-col gap-3 p-4 bg-neutral-50 rounded-xl border border-neutral-200 relative link-row-item"><input type="text" class="input !h-10 !py-2 !bg-white lnk-t font-bold" placeholder="Title" value="${t}"><input type="text" class="input !h-10 !py-2 !bg-white lnk-u" placeholder="URL" value="${u}"><button type="button" onclick="this.parentElement.remove()" class="absolute top-4 right-4 text-red-500 font-bold uppercase">X</button></div>`; }
         function addLinkRowToDOM() { document.getElementById('lnk-exp-container').insertAdjacentHTML('beforeend', buildLinkRowHtml()); }
 
-        // Data Savers
-        async function savePageData(authorSlug, postId, payload, btnId) {
-            const btn = document.getElementById(btnId); if(btn) { btn.innerText = "SAVING..."; btn.disabled = true; }
-            const method = postId ? "PUT" : "POST"; const url = postId ? `${API_URL}/posts/${postId}` : `${API_URL}/posts`;
-            try { await fetch(url, { method, headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify(payload) }); await init(); } 
-            catch(e) { if(btn){btn.innerText = "Save Changes"; btn.disabled = false;} }
-        }
+        function openLoginModal() { closeMenu(); const r=document.getElementById('modal-root'); r.innerHTML=`<div class="w-full max-w-sm bg-white border rounded-2xl p-8 flex flex-col gap-6 shadow-2xl"><div class="text-xl font-bold text-center">Admin Access</div><form onsubmit="handleLogin(event)" class="flex flex-col gap-4"><input type="password" id="admin-pass" class="input" placeholder="Password..."><label class="flex items-center gap-3 text-sm text-gray-600 font-bold cursor-pointer"><input type="checkbox" id="remember-login" class="w-5 h-5 rounded border-gray-300 text-black focus:ring-black"> Remember me</label><div class="flex gap-4 mt-4"><button type="button" class="btn-light flex-1" onclick="closeModal()">Cancel</button><button type="submit" id="login-btn" class="btn-dark flex-1">Login</button></div></form></div>`; r.classList.remove('hidden'); r.classList.add('flex'); }
+        function closeModal() { document.getElementById('modal-root').classList.add('hidden'); document.getElementById('modal-root').classList.remove('flex'); }
+        function confirmDelete(id) { const r=document.getElementById('modal-root'); r.innerHTML=`<div class="max-w-sm w-full bg-white border rounded-2xl p-8 flex flex-col gap-6 items-center text-center shadow-2xl"><div class="text-2xl font-bold">Delete Item?</div><p class="text-gray-500 text-sm">Cannot be undone.</p><div id="m-actions" class="flex gap-4 w-full mt-2"><button class="btn-light flex-1" onclick="closeModal()">Cancel</button><button class="btn-danger flex-1" onclick="executeDelete(${id})">Delete</button></div><div id="m-loading" class="btn-light w-full hidden border-dashed">Deleting...</div></div>`; r.classList.remove('hidden'); r.classList.add('flex'); }
+        async function executeDelete(id) { document.getElementById('m-actions').classList.add('hidden'); document.getElementById('m-loading').classList.remove('hidden'); document.getElementById('m-loading').classList.add('flex'); try{ await fetch(`${API_URL}/posts/${id}`,{method:"DELETE",headers:{"x-admin-password":App.token}}); await init(); closeModal(); }catch(e){} }
 
-        function saveProfileConfig(authorSlug, postId, imageUrl) {
-            const exps = []; document.querySelectorAll('.exp-row-item').forEach(el => { exps.push({ title: el.querySelector('.exp-t').value, company: el.querySelector('.exp-c').value, date: el.querySelector('.exp-d').value }); });
-            const data = { v: 2, intro: document.getElementById('prf-intro').value, text: document.getElementById('prf-text').value, exps: exps };
-            savePageData(authorSlug, postId, { title: "", text: JSON.stringify(data), image_url: imageUrl || "", show_date: false, author: authorSlug }, 'btn-save-prf');
-        }
+        const compressImage = (f, max=1600, q=0.8) => new Promise(res => { const r=new FileReader(); r.readAsDataURL(f); r.onload=e=>{ const i=new Image(); i.src=e.target.result; i.onload=()=>{ const c=document.createElement('canvas'); let w=i.width, h=i.height; if(w>max){h=Math.round(h*max/w); w=max;} c.width=w; c.height=h; c.getContext('2d').drawImage(i,0,0,w,h); c.toBlob(b=>res(new File([b],f.name.replace(/\.[^/.]+$/,"")+".jpg",{type:'image/jpeg'})),'image/jpeg',q); };};});
+        
+        function autoResizeTextarea(el) { el.style.height = 'auto'; el.style.height = el.value.trim() === '' ? '' : el.scrollHeight + 'px'; }
 
-        function saveContactConfig(authorSlug, postId, imageUrl) {
-            savePageData(authorSlug, postId, { title: document.getElementById('cnt-title').value, text: document.getElementById('cnt-text').value, image_url: imageUrl || "", show_date: false, author: authorSlug }, 'btn-save-cnt');
-        }
-
-        function saveArticleConfig(authorSlug, postId, imageUrl) {
-            savePageData(authorSlug, postId, { title: document.getElementById('art-title').value, text: document.getElementById('art-text').value, image_url: imageUrl || "", show_date: false, author: authorSlug }, 'btn-save-art');
-        }
-
-        function saveLinksConfig(authorSlug, postId, imageUrl) {
-            const links = []; document.querySelectorAll('.link-row-item').forEach(el => { links.push({ title: el.querySelector('.lnk-t').value, url: el.querySelector('.lnk-u').value }); });
-            const data = { desc: document.getElementById('lnk-desc').value, links: links };
-            savePageData(authorSlug, postId, { title: document.getElementById('lnk-title').value, text: JSON.stringify(data), image_url: imageUrl || "", show_date: false, author: authorSlug }, 'btn-save-lnk');
-        }
-
-        // Deletion API
-        let deleteActionId = null;
-        function confirmDelete(id) {
-            deleteActionId = id;
-            const root = document.getElementById('modal-root');
-            root.innerHTML = `
-                <div class="max-w-sm w-full bg-white border border-neutral-200 rounded-2xl p-8 flex flex-col gap-6 items-center text-center shadow-2xl">
-                    <div class="text-2xl font-bold">Delete Item?</div>
-                    <p class="text-neutral-500 text-sm">This cannot be undone.</p>
-                    <div id="m-actions" class="flex gap-4 w-full mt-2">
-                        <button class="btn-light flex-1" onclick="closeModalRoot()">Cancel</button>
-                        <button class="btn-danger flex-1" onclick="executeDelete()">Delete</button>
-                    </div>
-                    <div id="m-loading" class="btn-light w-full hidden border-dashed">Deleting...</div>
-                </div>`;
-            root.classList.remove('hidden'); root.classList.add('flex');
-        }
-
-        async function executeDelete() {
-            document.getElementById('m-actions').classList.add('hidden'); document.getElementById('m-loading').classList.remove('hidden'); document.getElementById('m-loading').classList.add('flex');
-            try { await fetch(`${API_URL}/posts/${deleteActionId}`,{method:"DELETE",headers:{"x-admin-password":App.token}}); await init(); closeModalRoot(); } catch(e){}
-        }
-
-        // Start
         init();
+        document.addEventListener('click', (e) => { if(!document.getElementById('navOverlay').contains(e.target) && !document.getElementById('menuToggle').contains(e.target)) closeMenu(); });
     </script>
 </body>
 </html>
