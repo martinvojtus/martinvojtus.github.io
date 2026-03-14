@@ -84,7 +84,17 @@
         }
 
         .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
-        .header-left svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
+        
+        /* 🛠️ Nové CSS pre textové terminálové logo */
+        .header-left { 
+            display: block; 
+            flex-shrink: 0; 
+            font-family: monospace; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            line-height: 1; 
+        }
+        
         .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; pointer-events: auto; cursor: pointer; }
 
         .menu-toggle { 
@@ -342,9 +352,7 @@
     <header>
         <div class="header-content">
             <div class="logo-link" onclick="showFeed()">
-                <div class="header-left">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="72.35 270 935.31 810" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
-                </div>
+                <div class="header-left">>█</div>
             </div>
             <div class="logo-text" onclick="showFeed()"><span>martinvojtus</span> • space</div>
             
@@ -376,7 +384,7 @@
             </div>
             
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.5 • 2026</div>
+            <div class="footer-info">build v7.1.6 • 2026</div>
         </div>
     </nav>
 
@@ -420,7 +428,7 @@
         <div id="section-feed">
             <div id="status-container" class="status-feed view-grid"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.5 • 2026</div>
+            <div class="footer-info">build v7.1.6 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-about">
@@ -461,7 +469,7 @@
         <div id="section-about" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="about-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.5 • 2026</div>
+            <div class="footer-info">build v7.1.6 • 2026</div>
         </div>
 
         <div id="admin-upload-zone-contact">
@@ -502,7 +510,7 @@
         <div id="section-contact" style="display: none; width: 100%; flex-direction: column; gap: var(--gap-item);">
             <div id="contact-posts-container" style="display: flex; flex-direction: column; gap: 2rem; width: 100%;"></div>
             <div class="divider-line"></div>
-            <div class="footer-info">build v7.1.5 • 2026</div>
+            <div class="footer-info">build v7.1.6 • 2026</div>
         </div>
         
         <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
