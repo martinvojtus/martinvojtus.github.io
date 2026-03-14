@@ -54,7 +54,7 @@
         
         const DEFAULT_CONFIG = {
             siteTitle: "martinvojtus • space",
-            footerText: "build v1.4.3 • 2026",
+            footerText: "build v1.4.4 • 2026",
             pages: [
                 { id: "grid", title: "Gallery", type: "gallery" },
                 { id: "about", title: "About", type: "profile" },
@@ -112,8 +112,8 @@
 
         function renderHeader() {
             const icon = App.isMenuOpen 
-                ? `<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>`
-                : `<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>`;
+                ? `<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>`
+                : `<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>`;
 
             let desktopLinks = App.config.pages.map(p => `<button onclick="navigate('${p.id}')" class="text-sm font-semibold tracking-wide transition-colors ${App.route === p.id ? 'text-black' : 'text-neutral-400 hover:text-black'}">${p.title}</button>`).join('');
             desktopLinks += `<div class="w-px h-4 bg-neutral-200 mx-2"></div>`;
@@ -203,19 +203,39 @@
 
         function renderPublicContact(page) {
             const post = App.posts.find(p => p.author === page.id);
-            return `<div class="flex flex-col md:flex-row w-full gap-12 items-center md:items-start min-h-[50vh] mt-12 animate-fade-in"><div class="w-full md:w-1/2 flex items-center md:pt-10">${post?.title ? `<h1 class="text-6xl lg:text-8xl font-bold tracking-tighter leading-none">${post.title}</h1>` : '<h1 class="text-6xl font-bold text-neutral-300">Hello.</h1>'}</div><div class="w-full md:w-1/2 flex flex-col gap-8 md:pt-12">${post?.image_url ? `<div class="img-container w-full max-w-sm"><img src="${post.image_url}" class="w-full h-auto aspect-[4/5] object-cover grayscale"></div>` : ''}${post?.text ? `<div class="text-xl lg:text-2xl text-neutral-500 leading-relaxed whitespace-pre-wrap">${post.text}</div>` : ''}</div></div>`;
+            let rawText = '';
+            
+            // Bezpecne spracovanie textu pre contact - vyhneme sa JSON formatovaniu 
+            if (post) {
+                 try {
+                     const parsed = JSON.parse(post.text);
+                     rawText = parsed.text || '';
+                 } catch(e) {
+                     rawText = post.text || '';
+                 }
+            }
+            
+            return `
+            <div class="flex flex-col md:flex-row w-full gap-12 animate-fade-in items-start min-h-[50vh] mt-12">
+                <div class="w-full md:w-1/2 flex items-center justify-center md:justify-start md:pt-10">
+                    <h1 class="text-6xl lg:text-8xl font-bold tracking-tighter leading-none">${post ? post.title : 'Hello.'}</h1>
+                </div>
+                <div class="w-full md:w-1/2 flex flex-col gap-10 md:pt-12 leading-relaxed">
+                    <div class="editorial-dropcap text-lg md:text-xl leading-relaxed text-neutral-800 font-medium whitespace-pre-wrap"><div>${rawText}</div></div>
+                </div>
+            </div>`;
         }
 
         function renderPublicArticle(page) {
             const post = App.posts.find(p => p.author === page.id);
-            return `<article class="flex flex-col w-full max-w-2xl mx-auto animate-fade-in mt-8">${post?.title ? `<h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-10 leading-tight">${post.title}</h1>` : ''}${post?.image_url ? `<div class="img-container mb-12"><img src="${post.image_url}" class="w-full h-auto"></div>` : ''}${post?.text ? `<div class="editorial-dropcap text-lg md:text-xl leading-relaxed text-neutral-800 whitespace-pre-wrap"><div>${post.text}</div></div>` : ''}</article>`;
+            return `<article class="flex flex-col w-full max-w-2xl mx-auto animate-fade-in mt-8">${post?.title ? `<h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-10 leading-tight">${post.title}</h1>` : ''}${post?.image_url ? `<img src="${post.image_url}" class="w-full h-auto rounded-2xl object-cover border border-neutral-100 mb-12">` : ''}${post?.text ? `<div class="editorial-dropcap text-lg md:text-xl leading-relaxed text-neutral-800 whitespace-pre-wrap"><div>${post.text}</div></div>` : ''}</article>`;
         }
 
         function renderPublicLinks(page) {
             const post = App.posts.find(p => p.author === page.id);
             let data = { desc: '', links: [] }; try { data = JSON.parse(post?.text || "{}"); } catch(e) {}
             let linksHtml = (data.links || []).map(l => `<a href="${l.url}" target="_blank" class="flex items-center justify-center w-full h-16 bg-neutral-50 hover:bg-black hover:text-white border border-neutral-200 rounded-full font-bold text-sm tracking-widest uppercase transition-all duration-300 px-6 text-center">${l.title}</a>`).join('');
-            return `<div class="flex flex-col items-center w-full max-w-lg mx-auto animate-fade-in mt-12">${post?.image_url ? `<div class="w-32 h-32 img-container !rounded-full mb-6"><img src="${post.image_url}" class="w-full h-full object-cover"></div>` : ''}${post?.title ? `<div class="text-2xl font-bold tracking-tight mb-2">${post.title}</div>` : ''}${data.desc ? `<p class="text-base text-neutral-500 mb-10 text-center">${data.desc}</p>` : ''}<div class="flex flex-col gap-4 w-full">${linksHtml}</div></div>`;
+            return `<div class="flex flex-col items-center w-full max-w-lg mx-auto animate-fade-in mt-12">${post?.image_url ? `<img src="${post.image_url}" class="w-32 h-32 rounded-full object-cover border border-neutral-200 mb-6">` : ''}${post?.title ? `<div class="text-2xl font-bold tracking-tight mb-2">${post.title}</div>` : ''}${data.desc ? `<p class="text-base text-neutral-500 mb-10 text-center">${data.desc}</p>` : ''}<div class="flex flex-col gap-4 w-full">${linksHtml}</div></div>`;
         }
 
         // --- DASHBOARD CORE ---
@@ -290,12 +310,29 @@
         function renderDashProfile(p) {
             const post = App.posts.find(x => x.author === p.id); let data = { intro: '', text: '', exps: [] }; try { data = JSON.parse(post.text); } catch(e){}
             window.tempExps = data.exps || [];
-            return `<div class="card"><div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${p.title}</div><div><label class="label">1. Profile Picture</label><span class="hint">Recommended: Square aspect ratio.</span><input type="file" id="prf-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${p.id}', ${post?post.id:null}, 'profile')">${post && post.image_url ? `<div class="relative w-max group"><img src="${post.image_url}" class="w-32 h-32 object-cover rounded-full border border-neutral-200 cursor-pointer hover:opacity-80" onclick="document.getElementById('prf-img-upload').click()"><button type="button" onclick="removePageImage(${post.id})" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/90 backdrop-blur border border-red-100 rounded-full w-10 h-10 flex items-center justify-center text-red-500 shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-white hover:scale-110"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>` : `<button onclick="document.getElementById('prf-img-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs tracking-widest uppercase w-full">+ Select Image</button>`}</div><div><label class="label">2. Tagline</label><textarea id="prf-intro" class="input" rows="2" oninput="autoResizeTextarea(this)">${data.intro || ''}</textarea></div><div><label class="label">3. Bio</label><textarea id="prf-text" class="input" rows="6" oninput="autoResizeTextarea(this)">${data.text || ''}</textarea></div><div><div class="flex justify-between items-center mb-2"><label class="label !mb-0">4. Timeline</label><button type="button" onclick="addExpRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add</button></div><div id="prf-exp-container" class="flex flex-col gap-3">${window.tempExps.map((e) => buildExpRowHtml(e.title, e.company, e.dateIn || e.date || '', e.dateOut || '')).join('')}</div></div><button onclick="saveProfileConfig('${p.id}', ${post?post.id:null}, '${post?.image_url || ''}')" id="btn-save-prf" class="btn-dark w-full mt-4">Save Changes</button></div>`;
+            return `<div class="card"><div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${p.title}</div><div><label class="label">1. Profile Picture</label><span class="hint">Recommended: Square aspect ratio.</span><input type="file" id="prf-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${p.id}', ${post?post.id:null}, 'profile')">${post && post.image_url ? `<div class="relative w-max group"><img src="${post.image_url}" class="w-32 h-32 object-cover rounded-full border border-neutral-200 cursor-pointer hover:opacity-80" onclick="document.getElementById('prf-img-upload').click()"><button type="button" onclick="removePageImage(${post.id})" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/90 backdrop-blur border border-neutral-200 rounded-full w-10 h-10 flex items-center justify-center text-red-500 shadow-sm opacity-0 group-hover:opacity-100 transition-opacityhover:scale-110">X</button></div>` : `<button onclick="document.getElementById('prf-img-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs tracking-widest uppercase w-full">+ Select Image</button>`}</div><div><label class="label">2. Tagline</label><textarea id="prf-intro" class="input" rows="2" oninput="autoResizeTextarea(this)">${data.intro || ''}</textarea></div><div><label class="label">3. Bio</label><textarea id="prf-text" class="input" rows="6" oninput="autoResizeTextarea(this)">${data.text || ''}</textarea></div><div><div class="flex justify-between items-center mb-2"><label class="label !mb-0">4. Timeline</label><button type="button" onclick="addExpRowToDOM()" class="btn-light !h-8 !px-3 !text-[10px]">+ Add</button></div><div id="prf-exp-container" class="flex flex-col gap-3">${window.tempExps.map((e) => buildExpRowHtml(e.title, e.company, e.dateIn || e.date || '', e.dateOut || '')).join('')}</div></div><button onclick="saveProfileConfig('${p.id}', ${post?post.id:null}, '${post?.image_url || ''}')" id="btn-save-prf" class="btn-dark w-full mt-4">Save Changes</button></div>`;
         }
 
         function renderDashContact(p) {
             const post = App.posts.find(x => x.author === p.id);
-            return `<div class="card"><div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${p.title}</div><div><label class="label">1. Portrait Image</label><span class="hint">A large portrait photo displayed next to your contact info.</span><input type="file" id="cnt-img-upload" accept="image/*" class="hidden" onchange="uploadGenericImage('${p.id}', ${post?post.id:null}, 'contact')">${post && post.image_url ? `<div class="relative w-max group"><img src="${post.image_url}" class="w-32 h-40 object-cover rounded-xl border border-neutral-200 cursor-pointer" onclick="document.getElementById('cnt-img-upload').click()"><button type="button" onclick="removePageImage(${post.id})" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/90 backdrop-blur border border-red-100 rounded-full w-10 h-10 flex items-center justify-center text-red-500 shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-white hover:scale-110"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>` : `<button onclick="document.getElementById('cnt-img-upload').click()" class="h-16 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-xs uppercase w-full">+ Select Image</button>`}</div><div><label class="label">2. Headline</label><input type="text" id="cnt-title" class="input font-bold" value="${post?post.title:''}" placeholder="e.g. Hello."></div><div><label class="label">3. Info</label><textarea id="cnt-text" class="input" rows="6" oninput="autoResizeTextarea(this)">${post?post.text:''}</textarea></div><button onclick="saveContactConfig('${p.id}', ${post?post.id:null}, '${post?.image_url || ''}')" id="btn-save-cnt" class="btn-dark w-full mt-4">Save Changes</button></div>`;
+            let rawText = '';
+            if (post) {
+                try {
+                    const parsed = JSON.parse(post.text);
+                    rawText = parsed.text || '';
+                } catch(e) {
+                    rawText = post.text || '';
+                }
+            }
+
+            return `
+                <div class="card">
+                    <div class="text-xl font-bold tracking-tight border-b border-neutral-100 pb-4">Editor: ${p.title}</div>
+                    <div><label class="label">1. Headline</label><input type="text" id="cnt-title" class="input font-bold" value="${post?post.title:''}" placeholder="e.g. Hello."></div>
+                    <div><label class="label">2. Info</label><textarea id="cnt-text" class="input" rows="6" oninput="autoResizeTextarea(this)">${rawText}</textarea></div>
+                    <button onclick="saveContactConfig('${p.id}', ${post?post.id:null})" id="btn-save-cnt" class="btn-dark w-full mt-4">Save Changes</button>
+                </div>
+            `;
         }
 
         function renderDashArticle(p) {
@@ -310,14 +347,14 @@
 
         // API Helpers
         async function uploadGenericImage(slug, id, type) {
-            let inputId = type==='gallery'?'gal-upload':type==='profile'?'prf-img-upload':type==='contact'?'cnt-img-upload':type==='article'?'art-img-upload':'lnk-img-upload';
+            let inputId = type==='gallery'?'gal-upload':type==='profile'?'prf-img-upload':type==='article'?'art-img-upload':'lnk-img-upload';
             const f = document.getElementById(inputId).files[0]; if(!f) return;
             document.body.style.cursor='wait';
             try {
                 const fd = new FormData(); fd.append("file", await compressImage(f));
                 const img = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": App.token }, body: fd })).json()).image_url;
                 if(type === 'gallery') { await fetch(`${API_URL}/posts`, { method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify({ title: "", text: "", image_url: img, show_date: true, author: slug }) }); await init(); } 
-                else if(type === 'profile') saveProfileConfig(slug, id, img); else if(type === 'contact') saveContactConfig(slug, id, img); else if(type === 'article') saveArticleConfig(slug, id, img); else if(type === 'links') saveLinksConfig(slug, id, img);
+                else if(type === 'profile') saveProfileConfig(slug, id, img); else if(type === 'article') saveArticleConfig(slug, id, img); else if(type === 'links') saveLinksConfig(slug, id, img);
             } catch(e){}
             document.body.style.cursor='default';
         }
@@ -337,7 +374,7 @@
             }); 
             savePageData(s,id,{title:"",text:JSON.stringify({v:2,intro:document.getElementById('prf-intro').value,text:document.getElementById('prf-text').value,exps}),image_url:img,show_date:false,author:s},'btn-save-prf'); 
         }
-        function saveContactConfig(s,id,img) { savePageData(s,id,{title:document.getElementById('cnt-title').value,text:document.getElementById('cnt-text').value,image_url:img,show_date:false,author:s},'btn-save-cnt'); }
+        function saveContactConfig(s,id) { savePageData(s,id,{title:document.getElementById('cnt-title').value,text:JSON.stringify({ text: document.getElementById('cnt-text').value }),show_date:false,author:s},'btn-save-cnt'); }
         function saveArticleConfig(s,id,img) { savePageData(s,id,{title:document.getElementById('art-title').value,text:document.getElementById('art-text').value,image_url:img,show_date:false,author:s},'btn-save-art'); }
         function saveLinksConfig(s,id,img) { const links=[]; document.querySelectorAll('.link-row-item').forEach(el=>{ links.push({title:el.querySelector('.lnk-t').value,url:el.querySelector('.lnk-u').value}); }); savePageData(s,id,{title:document.getElementById('lnk-title').value,text:JSON.stringify({desc:document.getElementById('lnk-desc').value,links}),image_url:img,show_date:false,author:s},'btn-save-lnk'); }
 
