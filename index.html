@@ -3,327 +3,267 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png?v=2">
-    <link rel="shortcut icon" type="image/png" href="favicon.png?v=2">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=2">
-    
     <title>martinvojtus.space</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        /* 1. TOKENS & RESET */
-        :root {
-            --bg: #ffffff;
-            --fg: #000000;
-            --muted: #737373;
-            --border: #e5e5e5;
-            --radius: 0.75rem;
-            --font: 'Plus Jakarta Sans', sans-serif;
-            --content-width: 720px;
-        }
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #0a0a0a;
-                --fg: #ffffff;
-                --muted: #a3a3a3;
-                --border: #262626;
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] }
+                }
             }
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font); -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg); color: var(--fg); line-height: 1.6; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        svg { display: block; flex-shrink: 0; fill: currentColor; }
+    </script>
 
-        /* 2. TYPOGRAPHY (.t-*) */
-        .t-display { font-size: 3rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; }
-        .t-h1 { font-size: 2rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
-        .t-h2 { font-size: 1.5rem; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; }
-        .t-body-lg { font-size: 1.25rem; font-weight: 400; line-height: 1.6; }
-        .t-body { font-size: 1rem; font-weight: 400; }
-        .t-meta { font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-        .t-muted { color: var(--muted); }
-        .bold { font-weight: 700; }
-        .text-left { text-align: left; }
-        .text-center { text-align: center; }
-        .truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* 3. LAYOUT (.flex, .gap, .m, .p) */
-        .flex { display: flex; } .col { flex-direction: column; } .row { flex-direction: row; }
-        .items-center { align-items: center; } .items-start { align-items: flex-start; }
-        .justify-between { justify-content: space-between; } .justify-center { justify-content: center; }
-        
-        .gap-sm { gap: 0.5rem; } .gap-md { gap: 1rem; } .gap-lg { gap: 1.5rem; } .gap-xl { gap: 2.5rem; }
-        
-        .w-full { width: 100%; } .max-w { max-width: var(--content-width); width: 100%; }
-        
-        .mt-sm { margin-top: 0.5rem; } .mt-md { margin-top: 1rem; } .mt-lg { margin-top: 1.5rem; } .mt-xl { margin-top: 3rem; }
-        .mb-xs { margin-bottom: 0.25rem; } .mb-sm { margin-bottom: 0.5rem; } .mb-md { margin-bottom: 1rem; } .mb-lg { margin-bottom: 1.5rem; } .mb-xl { margin-bottom: 2.5rem; }
-        
-        .p-md { padding: 1rem; } .p-lg { padding: 1.5rem; } .p-xl { padding: 2.5rem; }
-        .px-md { padding-left: 1rem; padding-right: 1rem; } .py-md { padding-top: 1rem; padding-bottom: 1rem; }
-        
-        .relative { position: relative; } .absolute { position: absolute; }
-        .top-right { top: 0.5rem; right: 0.5rem; }
-        .hidden { display: none !important; }
-
-        /* 4. COMPONENTS (.btn, .input, .card, etc.) */
-        .btn { height: 3.5rem; padding: 0 1.5rem; border-radius: 2rem; font-weight: 700; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; border: 1px solid transparent; text-decoration: none; transition: opacity 0.2s; outline: none; background: transparent; color: var(--fg); }
-        .btn-sm { height: 2.5rem; padding: 0 1rem; font-size: 0.75rem; border-radius: 1.5rem; }
-        .btn:disabled { opacity: 0.5; pointer-events: none; }
-        .btn-dark { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-        .btn-light { border-color: var(--border); }
-        .btn-light:hover { background: var(--border); }
-        .btn-ghost { border-color: transparent; }
-
-        .input { width: 100%; min-height: 3.5rem; padding: 1rem 1.25rem; border-radius: var(--radius); background: transparent; border: 1px solid var(--border); color: var(--fg); font-size: 1rem; outline: none; line-height: 1.5; }
-        .input::placeholder { color: var(--muted); }
-        .input-error { border-color: var(--fg); }
-        textarea.input { resize: none; overflow: hidden; padding-top: 1.25rem; padding-bottom: 1.25rem; }
-
-        .card { border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg); }
-        .divider { width: 100%; height: 1px; background: var(--border); flex-shrink: 0; }
-        .badge { display: inline-block; padding: 0.25rem 0.75rem; border: 1px solid var(--border); border-radius: 2rem; font-size: 0.875rem; color: var(--muted); }
-
-        .img-fluid { width: 100%; height: auto; display: block; border-radius: var(--radius); }
-        .thumb { width: 4rem; height: 4rem; border-radius: 0.5rem; object-fit: cover; background: var(--border); flex-shrink: 0; }
-        
-        .cursor-pointer { cursor: pointer; }
-
-        /* 5. SPECIFIC STRUCTURES */
-        header { position: fixed; top: 0; left: 0; width: 100%; background: var(--bg); border-bottom: 1px solid var(--border); z-index: 2000; padding: 1rem 0; }
-        main { padding: 6rem 1rem 2rem 1rem; flex-grow: 1; display: flex; flex-direction: column; align-items: center; width: 100%; }
-        
-        .nav-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 1500; padding-top: 6rem; display: none; flex-direction: column; align-items: center; }
-        .nav-overlay.active { display: flex; }
-        
-        .desktop-menu { display: none; }
-        .desktop-divider { width: 1px; height: 1rem; background-color: var(--border); }
-        @media (min-width: 600px) {
-            .desktop-menu { display: flex; gap: 1.5rem; align-items: center; }
-            .menu-toggle, .mobile-only { display: none !important; }
+    <style type="text/tailwindcss">
+        @layer components {
+            .btn { @apply flex items-center justify-center h-12 md:h-14 px-6 rounded-full font-bold text-xs md:text-sm uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap; }
+            .btn-dark { @apply bg-neutral-900 text-white border border-neutral-900 hover:bg-neutral-800; }
+            .btn-light { @apply bg-transparent text-neutral-900 border border-neutral-200 hover:bg-neutral-50; }
+            .btn-danger { @apply bg-red-600 text-white border border-red-600 hover:bg-red-700; }
+            
+            .input { @apply w-full min-h-[3.5rem] px-4 py-3 bg-neutral-50 border border-neutral-200 text-neutral-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all; }
+            .input-error { @apply border-red-600 focus:ring-red-600; }
+            
+            .card { @apply bg-white border border-neutral-200 rounded-2xl p-6 md:p-8 w-full flex flex-col; }
+            
+            .label { @apply text-xs font-bold text-neutral-400 uppercase tracking-widest mb-2 block; }
+            
+            /* Admin elements default hide */
+            .admin-only { @apply hidden !important; }
+            body.is-logged-in .admin-only { @apply flex !important; }
+            body.is-logged-in .desktop-menu .admin-only { @apply block !important; }
         }
-        
-        .admin-only { display: none; }
-        body.is-logged-in .admin-only { display: flex; }
-        body.is-logged-in .desktop-menu .admin-only { display: block; }
 
-        #delete-modal { position: fixed; inset: 0; background: var(--bg); z-index: 3000; display: none; flex-direction: column; justify-content: center; align-items: center; }
+        html { -webkit-tap-highlight-color: transparent; }
+        body { background-color: #ffffff; color: #171717; }
+        
+        /* Custom scrollbar for tabs */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body>
+<body class="flex flex-col items-center min-h-screen font-sans">
 
-    <header>
-        <div class="max-w flex row items-center justify-between px-md m-auto">
-            <div class="flex row items-center gap-sm cursor-pointer" onclick="showFeed()">
-                <svg width="1rem" height="1rem" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z"/></g></svg>
-                <div class="t-body bold truncate" id="public-site-title">martinvojtus.space</div>
+    <header class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md border-b border-neutral-100 z-50">
+        <div class="max-w-3xl mx-auto px-4 py-4 flex justify-between items-center w-full">
+            <div class="flex items-center gap-2 cursor-pointer hover:opacity-70 transition-opacity" onclick="showFeed()">
+                <svg class="w-4 h-4 text-neutral-900" viewBox="72.35 270 935.31 810"><g transform="translate(540, 540)"><path fill="currentColor" d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z"/></g></svg>
+                <div class="font-bold text-sm md:text-base tracking-wide" id="public-site-title">martinvojtus.space</div>
             </div>
             
-            <div class="menu-toggle t-meta" id="menuToggle" onclick="toggleMenu(event)">Menu</div>
+            <div class="md:hidden font-bold text-xs uppercase tracking-widest cursor-pointer text-neutral-500 hover:text-neutral-900 transition-colors" id="menuToggle" onclick="toggleMenu(event)">Menu</div>
 
-            <div class="desktop-menu">
-                <div class="t-body cursor-pointer" onclick="showFeed()">Feed</div>
-                <div class="t-body cursor-pointer" onclick="showAbout()">About</div>
-                <div class="t-body cursor-pointer" onclick="showContact()">Contact</div>
-                <div class="t-body cursor-pointer admin-only" onclick="showDashboard()">Dashboard</div>
-                <div class="desktop-divider"></div>
-                <div class="t-body cursor-pointer" id="desktop-login-btn" onclick="toggleMenu(event)">Login</div>
-                <div class="t-body cursor-pointer admin-only" id="desktop-logout-btn" onclick="handleLogout()" style="display: none;">Logout</div>
+            <div class="desktop-menu hidden md:flex items-center gap-6">
+                <div class="text-sm font-medium cursor-pointer hover:text-neutral-500 transition-colors" onclick="showFeed()">Feed</div>
+                <div class="text-sm font-medium cursor-pointer hover:text-neutral-500 transition-colors" onclick="showAbout()">About</div>
+                <div class="text-sm font-medium cursor-pointer hover:text-neutral-500 transition-colors" onclick="showContact()">Contact</div>
+                <div class="text-sm font-medium cursor-pointer text-neutral-400 hover:text-neutral-900 admin-only transition-colors" onclick="showDashboard()">Dashboard</div>
+                <div class="w-px h-4 bg-neutral-200"></div>
+                <div class="text-sm font-medium cursor-pointer hover:text-neutral-500 transition-colors" id="desktop-login-btn" onclick="toggleMenu(event)">Login</div>
+                <div class="text-sm font-medium cursor-pointer text-red-600 hover:text-red-700 admin-only transition-colors" id="desktop-logout-btn" onclick="handleLogout()" style="display: none;">Logout</div>
             </div>
         </div>
     </header>
 
-    <nav class="nav-overlay" id="navOverlay">
-        <div class="max-w flex col gap-md px-md">
-            <div class="t-h2 cursor-pointer mobile-only" onclick="showFeed()">Feed</div>
-            <div class="t-h2 cursor-pointer mobile-only" onclick="showAbout()">About</div>
-            <div class="t-h2 cursor-pointer mobile-only" onclick="showContact()">Contact</div>
-            <div class="t-h2 cursor-pointer mobile-only admin-only" onclick="showDashboard()">Dashboard</div>
+    <nav class="nav-overlay fixed inset-0 bg-white/95 backdrop-blur-xl z-40 hidden flex-col items-center pt-24 px-4" id="navOverlay">
+        <div class="max-w-md w-full flex flex-col gap-6">
             
-            <div class="divider mt-md mb-md mobile-only"></div>
+            <div class="flex flex-col gap-4 md:hidden">
+                <div class="text-2xl font-bold cursor-pointer" onclick="showFeed()">Feed</div>
+                <div class="text-2xl font-bold cursor-pointer" onclick="showAbout()">About</div>
+                <div class="text-2xl font-bold cursor-pointer" onclick="showContact()">Contact</div>
+                <div class="text-2xl font-bold cursor-pointer text-neutral-500 admin-only" onclick="showDashboard()">Dashboard</div>
+                <div class="w-full h-px bg-neutral-200 my-4"></div>
+            </div>
 
-            <div id="login-ui" class="flex col gap-md w-full">
-                <form id="login-form" onsubmit="handleLogin(event)" class="flex col gap-md w-full">
+            <div id="login-ui" class="w-full flex flex-col gap-4">
+                <div class="text-lg font-bold mb-2">Admin Access</div>
+                <form id="login-form" onsubmit="handleLogin(event)" class="w-full flex flex-col gap-4">
                     <input type="password" id="admin-pass" class="input" placeholder="Password...">
-                    <button type="submit" id="login-btn" class="btn btn-dark w-full">Login</button>
+                    <label class="flex items-center gap-3 cursor-pointer text-sm font-medium text-neutral-600">
+                        <input type="checkbox" id="remember-login" class="w-5 h-5 rounded border-neutral-300 text-neutral-900 focus:ring-neutral-900">
+                        Remember me
+                    </label>
+                    <button type="submit" id="login-btn" class="btn btn-dark w-full mt-2">Login</button>
                 </form>
             </div>
 
-            <div id="logout-ui" class="w-full" style="display: none;">
-                <button onclick="handleLogout()" class="btn btn-light w-full">Logout</button>
+            <div id="logout-ui" class="w-full hidden">
+                <button onclick="handleLogout()" class="btn btn-light w-full border-red-200 text-red-600 hover:bg-red-50">Logout</button>
             </div>
+            
+            <div class="w-full h-px bg-neutral-200 mt-6 mb-4"></div>
+            <div class="text-xs font-bold text-neutral-400 tracking-widest text-center uppercase">build v8.1.0 • 2026</div>
         </div>
     </nav>
 
-    <main>
+    <main class="w-full max-w-3xl mx-auto pt-28 pb-12 px-4 flex flex-col flex-grow items-center">
         
-        <div id="section-dashboard" class="max-w hidden col gap-lg">
-            <div class="flex col gap-sm mb-sm">
-                <div class="t-display">Dashboard</div>
-                <div class="t-body t-muted">Manage your content and site settings.</div>
+        <div id="section-dashboard" class="w-full hidden flex-col gap-8">
+            <div class="flex flex-col gap-2">
+                <h1 class="text-4xl font-bold tracking-tight text-neutral-900">Dashboard</h1>
+                <p class="text-neutral-500 text-lg">Manage your content and site settings.</p>
             </div>
 
-            <div class="flex row gap-sm border-b" style="overflow-x: auto;">
-                <button class="btn btn-dark btn-sm" id="tab-btn-posts" onclick="switchDashTab('posts')">Posts</button>
-                <button class="btn btn-light btn-sm" id="tab-btn-about" onclick="switchDashTab('about')">About</button>
-                <button class="btn btn-light btn-sm" id="tab-btn-contact" onclick="switchDashTab('contact')">Contact</button>
-                <button class="btn btn-light btn-sm" id="tab-btn-settings" onclick="switchDashTab('settings')">Settings</button>
+            <div class="flex gap-2 overflow-x-auto hide-scrollbar border-b border-neutral-200 pb-4">
+                <button class="btn btn-dark !h-10" id="tab-btn-posts" onclick="switchDashTab('posts')">Posts</button>
+                <button class="btn btn-light !h-10" id="tab-btn-about" onclick="switchDashTab('about')">About</button>
+                <button class="btn btn-light !h-10" id="tab-btn-contact" onclick="switchDashTab('contact')">Contact</button>
+                <button class="btn btn-light !h-10" id="tab-btn-settings" onclick="switchDashTab('settings')">Settings</button>
             </div>
 
-            <div id="dash-tab-posts" class="flex col gap-lg w-full">
-                <button class="btn btn-dark" style="align-self: flex-start;" onclick="document.getElementById('editor-form-feed').style.display='flex'; this.style.display='none';">+ New Post</button>
+            <div id="dash-tab-posts" class="flex flex-col w-full gap-8">
+                <button class="btn btn-dark self-start" onclick="showEl('editor-form-feed'); this.classList.add('hidden');">+ New Post</button>
 
-                <form id="editor-form-feed" onsubmit="handleFeedSubmit(event)" class="card flex col gap-md hidden">
-                    <div class="t-h2">Create New Post</div>
+                <form id="editor-form-feed" onsubmit="handleFeedSubmit(event)" class="card hidden bg-neutral-50 border-neutral-200">
+                    <div class="text-2xl font-bold tracking-tight mb-6">Create New Post</div>
+                    
                     <input type="file" id="edit-image-feed" accept="image/*" class="hidden" onchange="updateFeedFormState()">
-                    <div id="upload-empty-state-feed" class="btn btn-light w-full" onclick="document.getElementById('edit-image-feed').click()">+ Select Image</div>
-                    <div id="upload-filled-state-feed" class="flex row gap-md hidden">
-                        <img id="upload-preview-img-feed" class="thumb" onclick="document.getElementById('edit-image-feed').click()">
+                    <div id="upload-empty-state-feed" class="btn btn-light w-full border-dashed border-2 bg-white" onclick="document.getElementById('edit-image-feed').click()">+ Select Image</div>
+                    
+                    <div id="upload-filled-state-feed" class="hidden flex-row gap-4 items-center">
+                        <img id="upload-preview-img-feed" class="w-16 h-16 rounded-xl object-cover bg-neutral-200 cursor-pointer border border-neutral-200" onclick="document.getElementById('edit-image-feed').click()">
                         <div class="btn btn-light flex-1" onclick="clearFeedImageSelection(event)">Remove</div>
                     </div>
-                    <div class="flex row gap-md mt-sm">
+                    
+                    <div class="flex flex-row gap-4 mt-6">
                         <button type="submit" id="publish-btn-feed" class="btn btn-dark flex-1" disabled>Publish</button>
-                        <div class="btn btn-light" onclick="document.getElementById('editor-form-feed').style.display='none'; document.querySelector('#dash-tab-posts > button').style.display='flex'; resetFeedForm();">Cancel</div>
+                        <div class="btn btn-light" onclick="hideEl('editor-form-feed'); document.querySelector('#dash-tab-posts > button').classList.remove('hidden'); resetFeedForm();">Cancel</div>
                     </div>
                 </form>
 
-                <div class="card p-md flex col">
-                    <div class="flex row justify-between border-b pb-sm mb-sm t-meta t-muted">
-                        <div style="flex: 1; padding-left: 0.5rem;">Post</div>
-                        <div style="width: 120px;">Date</div>
-                        <div style="width: 80px; text-align: right;">Actions</div>
+                <div class="card !p-0 overflow-hidden">
+                    <div class="flex flex-row justify-between items-center bg-neutral-50 px-6 py-4 border-b border-neutral-200 text-xs font-bold text-neutral-400 uppercase tracking-widest">
+                        <div class="flex-1">Post</div>
+                        <div class="w-24 text-center">Date</div>
+                        <div class="w-20 text-right">Actions</div>
                     </div>
-                    <div id="dash-posts-list" class="flex col"></div>
+                    <div id="dash-posts-list" class="flex flex-col">
+                        </div>
                 </div>
 
-                <button type="button" class="btn btn-light w-full" onclick="openDeleteModal('delete_all')">Delete All Posts</button>
+                <button type="button" class="btn btn-light text-red-600 border-red-200 hover:bg-red-50 w-full" onclick="openDeleteModal('delete_all')">Delete All Posts</button>
             </div>
 
-            <div id="dash-tab-about" class="hidden col w-full">
-                <form id="editor-form-about" onsubmit="handleAboutSubmit(event)" class="card p-xl flex col gap-lg">
-                    <div class="t-h2">About Page Builder</div>
+            <div id="dash-tab-about" class="hidden flex-col w-full">
+                <form id="editor-form-about" onsubmit="handleAboutSubmit(event)" class="card gap-8">
+                    <div class="text-2xl font-bold tracking-tight">About Page Builder</div>
                     
-                    <div class="flex col gap-sm">
-                        <span class="t-meta t-muted">1. Main Cover Image</span>
+                    <div class="flex flex-col gap-2">
+                        <span class="label">1. Main Cover Image</span>
                         <input type="file" id="edit-image-about" accept="image/*" class="hidden" onchange="updateAboutFormState()">
-                        <div id="upload-empty-state-about" class="btn btn-light w-full" onclick="document.getElementById('edit-image-about').click()">+ Select Image</div>
-                        <div id="upload-filled-state-about" class="flex row gap-md hidden">
-                            <img id="upload-preview-img-about" class="thumb" onclick="document.getElementById('edit-image-about').click()">
+                        <div id="upload-empty-state-about" class="btn btn-light w-full border-dashed border-2" onclick="document.getElementById('edit-image-about').click()">+ Select Image</div>
+                        <div id="upload-filled-state-about" class="hidden flex-row gap-4 items-center">
+                            <img id="upload-preview-img-about" class="w-16 h-16 rounded-xl object-cover bg-neutral-200 cursor-pointer border border-neutral-200" onclick="document.getElementById('edit-image-about').click()">
                             <div class="btn btn-light flex-1" onclick="clearAboutImageSelection(event)">Remove</div>
                         </div>
                     </div>
 
-                    <div class="flex col gap-sm">
-                        <span class="t-meta t-muted">2. Story & Approach</span>
-                        <textarea id="about-intro" class="input" placeholder="Intro Text (e.g. Hello! I'm Martin...)" oninput="autoResizeTextarea(this); updateAboutFormState();"></textarea>
+                    <div class="flex flex-col gap-4">
+                        <span class="label">2. Story & Approach</span>
+                        <textarea id="about-intro" class="input !text-lg" placeholder="Intro Text (e.g. Hello! I'm Martin...)" oninput="autoResizeTextarea(this); updateAboutFormState();"></textarea>
                         <textarea id="about-approach" class="input" placeholder="My Approach details..." oninput="autoResizeTextarea(this); updateAboutFormState();"></textarea>
                     </div>
 
-                    <div class="flex col gap-sm">
-                        <div class="flex row justify-between items-center">
-                            <span class="t-meta t-muted">3. Experience</span>
-                            <button type="button" class="btn btn-light btn-sm" onclick="addExperienceRow()">+ Add Row</button>
+                    <div class="flex flex-col gap-4">
+                        <div class="flex justify-between items-center">
+                            <span class="label !mb-0">3. Experience</span>
+                            <button type="button" class="btn btn-light !h-8 !px-4 !text-xs border-dashed" onclick="addExperienceRow()">+ Add Row</button>
                         </div>
-                        <div id="about-exp-list" class="flex col gap-md"></div>
+                        <div id="about-exp-list" class="flex flex-col gap-4"></div>
                     </div>
 
-                    <div class="flex col gap-sm">
-                        <span class="t-meta t-muted">4. Call to Action Box</span>
-                        <input type="text" id="about-cta-title" class="input" placeholder="CTA Title" oninput="updateAboutFormState()">
-                        <textarea id="about-cta-text" class="input" placeholder="CTA Subtext" oninput="autoResizeTextarea(this); updateAboutFormState();"></textarea>
-                        <input type="text" id="about-cta-btn" class="input" placeholder="Button Label" oninput="updateAboutFormState()">
+                    <div class="flex flex-col gap-4">
+                        <span class="label">4. Call to Action Box</span>
+                        <input type="text" id="about-cta-title" class="input" placeholder="CTA Title (e.g. Let's work together)" oninput="updateAboutFormState()">
+                        <textarea id="about-cta-text" class="input" placeholder="CTA Subtext..." oninput="autoResizeTextarea(this); updateAboutFormState();"></textarea>
+                        <input type="text" id="about-cta-btn" class="input" placeholder="Button Label (e.g. Get in touch)" oninput="updateAboutFormState()">
                     </div>
 
-                    <div class="flex row gap-md mt-md">
+                    <div class="flex flex-row gap-4 mt-4 border-t border-neutral-100 pt-8">
                         <button type="submit" id="publish-btn-about" class="btn btn-dark flex-1" disabled>Save Changes</button>
                     </div>
                 </form>
             </div>
 
-            <div id="dash-tab-contact" class="hidden col w-full">
-                <form id="editor-form-contact" onsubmit="handleContactSubmit(event)" class="card p-xl flex col gap-lg">
-                    <div class="t-h2">Contact Page Editor</div>
+            <div id="dash-tab-contact" class="hidden flex-col w-full">
+                <form id="editor-form-contact" onsubmit="handleContactSubmit(event)" class="card gap-8">
+                    <div class="text-2xl font-bold tracking-tight">Contact Page Editor</div>
                     
-                    <div class="flex col gap-sm">
-                        <span class="t-meta t-muted">Cover Image</span>
+                    <div class="flex flex-col gap-2">
+                        <span class="label">Cover Image</span>
                         <input type="file" id="edit-image-contact" accept="image/*" class="hidden" onchange="updateContactFormState()">
-                        <div id="upload-empty-state-contact" class="btn btn-light w-full" onclick="document.getElementById('edit-image-contact').click()">+ Select Image</div>
-                        <div id="upload-filled-state-contact" class="flex row gap-md hidden">
-                            <img id="upload-preview-img-contact" class="thumb" onclick="document.getElementById('edit-image-contact').click()">
+                        <div id="upload-empty-state-contact" class="btn btn-light w-full border-dashed border-2" onclick="document.getElementById('edit-image-contact').click()">+ Select Image</div>
+                        <div id="upload-filled-state-contact" class="hidden flex-row gap-4 items-center">
+                            <img id="upload-preview-img-contact" class="w-16 h-16 rounded-xl object-cover bg-neutral-200 cursor-pointer border border-neutral-200" onclick="document.getElementById('edit-image-contact').click()">
                             <div class="btn btn-light flex-1" onclick="clearContactImageSelection(event)">Remove</div>
                         </div>
                     </div>
 
-                    <div class="flex col gap-sm">
-                        <span class="t-meta t-muted">Contact Details</span>
-                        <input type="text" id="edit-title-contact" class="input" placeholder="Title (e.g. Hello)" oninput="updateContactFormState()">
+                    <div class="flex flex-col gap-4">
+                        <span class="label">Contact Details</span>
+                        <input type="text" id="edit-title-contact" class="input text-xl font-bold" placeholder="Title (e.g. Hello)" oninput="updateContactFormState()">
                         <textarea id="edit-text-contact" class="input" placeholder="Text or links..." oninput="autoResizeTextarea(this); updateContactFormState();"></textarea>
                     </div>
 
-                    <div class="flex row gap-md mt-md">
+                    <div class="flex flex-row gap-4 mt-4 border-t border-neutral-100 pt-8">
                         <button type="submit" id="publish-btn-contact" class="btn btn-dark flex-1" disabled>Save Changes</button>
                     </div>
                 </form>
             </div>
 
-            <div id="dash-tab-settings" class="hidden col w-full">
-                <form id="editor-form-settings" onsubmit="handleSettingsSubmit(event)" class="card p-xl flex col gap-lg">
-                    <div class="t-h2">Site Settings</div>
+            <div id="dash-tab-settings" class="hidden flex-col w-full">
+                <form id="editor-form-settings" onsubmit="handleSettingsSubmit(event)" class="card gap-8">
+                    <div class="text-2xl font-bold tracking-tight">Site Settings</div>
                     
-                    <div class="flex col gap-sm">
-                        <span class="t-meta t-muted">Site Title</span>
-                        <input type="text" id="setting-title" class="input" placeholder="e.g. martinvojtus.space" value="martinvojtus.space" oninput="updateSettingsFormState()">
+                    <div class="flex flex-col gap-2">
+                        <span class="label">Site Title</span>
+                        <input type="text" id="setting-title" class="input font-bold" placeholder="e.g. martinvojtus.space" value="martinvojtus.space" oninput="updateSettingsFormState()">
                     </div>
 
-                    <div class="flex col gap-sm">
-                        <span class="t-meta t-muted">Profile Avatar</span>
-                        <input type="file" id="setting-image" accept="image/*" class="hidden" onchange="updateSettingsFormState()">
-                        <div id="upload-empty-state-setting" class="btn btn-light w-full" onclick="document.getElementById('setting-image').click()">+ Upload Avatar</div>
-                        <div id="upload-filled-state-setting" class="flex row gap-md hidden">
-                            <img id="upload-preview-img-setting" class="thumb radius-full" onclick="document.getElementById('setting-image').click()">
-                            <button type="button" class="btn btn-light" onclick="clearSettingImageSelection(event)">Remove</button>
-                        </div>
-                    </div>
-
-                    <div class="flex row gap-md mt-md">
+                    <div class="flex flex-col gap-4 mt-4 border-t border-neutral-100 pt-8">
                         <button type="submit" id="publish-btn-settings" class="btn btn-dark flex-1" disabled>Save Settings</button>
                     </div>
                 </form>
             </div>
+
         </div>
 
-        <div id="section-feed" class="max-w flex col gap-lg w-full">
-            <div id="status-container" class="flex col gap-xl w-full"></div>
-            <div class="divider mt-xl"></div>
-            <div class="t-meta t-muted text-center w-full">build v8.0.0 • 2026</div>
+        <div id="section-feed" class="w-full flex flex-col gap-8">
+            <div id="status-container" class="w-full flex flex-col gap-12"></div>
         </div>
 
-        <div id="section-about" class="max-w hidden col w-full">
-            <div id="about-posts-container" class="flex col w-full"></div>
-            <div class="divider mt-xl mb-md"></div>
-            <div class="t-meta t-muted text-center w-full">build v8.0.0 • 2026</div>
+        <div id="section-about" class="w-full hidden flex-col">
+            <div id="about-posts-container" class="w-full flex flex-col"></div>
         </div>
 
-        <div id="section-contact" class="max-w hidden col w-full">
-            <div id="contact-posts-container" class="flex col w-full"></div>
-            <div class="divider mt-xl mb-md"></div>
-            <div class="t-meta t-muted text-center w-full">build v8.0.0 • 2026</div>
+        <div id="section-contact" class="w-full hidden flex-col">
+            <div id="contact-posts-container" class="w-full flex flex-col"></div>
         </div>
         
-        <div id="loading-indicator" class="t-meta t-muted text-center mt-lg hidden w-full">Loading...</div>
+        <div id="loading-indicator" class="label text-center mt-12 hidden w-full">Loading...</div>
+        
+        <footer class="w-full mt-24 mb-8 flex flex-col items-center gap-4">
+            <div class="w-16 h-px bg-neutral-200"></div>
+            <div class="label !mb-0 text-center">v8.1.0 • 2026</div>
+        </footer>
+
     </main>
 
-    <div id="delete-modal">
-        <div class="max-w p-md flex col gap-md items-center">
-            <div class="t-h2 bg-bg p-md" style="text-align: center;">Confirm Delete?</div>
-            <div id="modal-action-zone" class="flex row gap-md">
-                <button id="modal-del-btn" class="btn btn-dark" onclick="executeModalDelete()">Delete</button>
-                <button id="modal-cancel-btn" class="btn btn-light" onclick="closeDeleteModal()">Cancel</button>
+    <div id="delete-modal" class="fixed inset-0 bg-white/95 backdrop-blur-xl z-[3000] hidden flex-col justify-center items-center px-4">
+        <div class="max-w-sm w-full card gap-8 items-center text-center !p-10 shadow-2xl">
+            <div class="text-2xl font-bold text-neutral-900">Are you sure?</div>
+            <p class="text-neutral-500">This action cannot be undone.</p>
+            <div id="modal-action-zone" class="flex flex-col md:flex-row gap-4 w-full mt-4">
+                <button id="modal-cancel-btn" class="btn btn-light flex-1" onclick="closeDeleteModal()">Cancel</button>
+                <button id="modal-del-btn" class="btn btn-danger flex-1" onclick="executeModalDelete()">Delete</button>
             </div>
-            <div id="modal-loading-zone" class="btn btn-light hidden">Deleting...</div>
-            <div id="modal-success-zone" class="btn btn-light hidden">Deleted</div>
+            <div id="modal-loading-zone" class="btn btn-light w-full hidden border-dashed">Deleting...</div>
+            <div id="modal-success-zone" class="btn btn-dark w-full hidden">Deleted</div>
         </div>
     </div>
 
@@ -336,7 +276,7 @@
         
         let editingAboutPostId = null; let existingAboutImageUrl = null;
         let editingContactPostId = null; let existingContactImageUrl = null;
-        let editingSettingsPostId = null; let existingSettingsImageUrl = null;
+        let editingSettingsPostId = null;
 
         let currentViewMode = localStorage.getItem('mv_view_mode') || 'grid';
         let currentSection = 'feed'; 
@@ -344,50 +284,69 @@
         const passInput = document.getElementById('admin-pass');
         const navOverlay = document.getElementById('navOverlay');
 
+        // Helpers
+        function showEl(id) { document.getElementById(id)?.classList.remove('hidden'); document.getElementById(id)?.classList.add('flex'); }
+        function hideEl(id) { document.getElementById(id)?.classList.add('hidden'); document.getElementById(id)?.classList.remove('flex'); }
+        function hideBlock(id) { document.getElementById(id)?.classList.add('hidden'); document.getElementById(id)?.classList.remove('block'); }
+        function showBlock(id) { document.getElementById(id)?.classList.remove('hidden'); document.getElementById(id)?.classList.add('block'); }
+
         if(passInput) passInput.addEventListener('input', () => { passInput.classList.remove('input-error'); passInput.placeholder = 'Password...'; });
 
         function autoResizeTextarea(el) { el.style.height = 'auto'; el.style.height = el.value.trim() === '' ? '' : el.scrollHeight + 'px'; }
 
         // ROUTING
         function hideAllSections() {
-            ['section-feed', 'section-about', 'section-contact', 'section-dashboard'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            ['section-feed', 'section-about', 'section-contact', 'section-dashboard'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+                document.getElementById(id).classList.remove('flex');
+            });
         }
 
-        function showFeed() { currentSection = 'feed'; hideAllSections(); document.getElementById('section-feed').classList.remove('hidden'); closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function showAbout() { currentSection = 'about'; hideAllSections(); document.getElementById('section-about').classList.remove('hidden'); closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function showContact() { currentSection = 'contact'; hideAllSections(); document.getElementById('section-contact').classList.remove('hidden'); closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function showFeed() { currentSection = 'feed'; hideAllSections(); showEl('section-feed'); closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function showAbout() { currentSection = 'about'; hideAllSections(); showEl('section-about'); closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function showContact() { currentSection = 'contact'; hideAllSections(); showEl('section-contact'); closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         
         function showDashboard() {
             if(!secretKey) return;
-            currentSection = 'dashboard'; hideAllSections(); document.getElementById('section-dashboard').classList.remove('hidden'); closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' });
+            currentSection = 'dashboard'; hideAllSections(); showEl('section-dashboard'); closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' });
             populateDashboard();
         }
 
         function switchDashTab(tabName) {
             ['posts', 'about', 'contact', 'settings'].forEach(t => {
                 document.getElementById(`dash-tab-${t}`).classList.add('hidden');
-                document.getElementById(`tab-btn-${t}`).className = 'btn btn-light btn-sm';
+                document.getElementById(`dash-tab-${t}`).classList.remove('flex');
+                document.getElementById(`tab-btn-${t}`).className = 'btn btn-light !h-10';
             });
             document.getElementById(`dash-tab-${tabName}`).classList.remove('hidden');
-            document.getElementById(`tab-btn-${tabName}`).className = 'btn btn-dark btn-sm';
+            document.getElementById(`dash-tab-${tabName}`).classList.add('flex');
+            document.getElementById(`tab-btn-${tabName}`).className = 'btn btn-dark !h-10';
         }
 
-        function toggleMenu(e) { if (e) e.stopPropagation(); navOverlay.classList.toggle('active'); }
-        function closeMenu() { navOverlay.classList.remove('active'); }
+        function toggleMenu(e) { 
+            if (e) e.stopPropagation(); 
+            if (navOverlay.classList.contains('hidden')) {
+                navOverlay.classList.remove('hidden'); navOverlay.classList.add('flex');
+                document.getElementById('menuToggle').innerText = 'Close';
+            } else {
+                navOverlay.classList.add('hidden'); navOverlay.classList.remove('flex');
+                document.getElementById('menuToggle').innerText = 'Menu';
+            }
+        }
+        function closeMenu() { 
+            navOverlay.classList.add('hidden'); navOverlay.classList.remove('flex'); 
+            document.getElementById('menuToggle').innerText = 'Menu';
+        }
 
         function updateUIVisibility() {
             if (secretKey) {
                 document.body.classList.add('is-logged-in');
-                document.getElementById('login-ui').classList.add('hidden');
-                document.getElementById('logout-ui').style.display = 'block';
-                document.getElementById('desktop-login-btn').classList.add('hidden');
-                document.getElementById('desktop-logout-btn').style.display = 'block';
+                hideEl('login-ui'); showEl('logout-ui');
+                hideBlock('desktop-login-btn'); showBlock('desktop-logout-btn');
             } else {
                 document.body.classList.remove('is-logged-in');
-                document.getElementById('login-ui').classList.remove('hidden');
-                document.getElementById('logout-ui').style.display = 'none';
-                document.getElementById('desktop-login-btn').classList.remove('hidden');
-                document.getElementById('desktop-logout-btn').style.display = 'none';
+                showEl('login-ui'); hideEl('logout-ui');
+                showBlock('desktop-login-btn'); hideBlock('desktop-logout-btn');
                 if (currentSection === 'dashboard') showFeed();
             }
         }
@@ -426,17 +385,19 @@
             if (!secretKey) return;
             const feedPosts = globalPosts.filter(p => p.author === '');
             const listEl = document.getElementById('dash-posts-list');
-            if(feedPosts.length === 0) { listEl.innerHTML = `<div class="py-md t-body t-muted">No posts found.</div>`; } 
+            if(feedPosts.length === 0) { listEl.innerHTML = `<div class="px-6 py-8 text-sm text-neutral-500 text-center">No posts found. Create one above.</div>`; } 
             else {
                 listEl.innerHTML = feedPosts.map(p => `
-                    <div class="flex row items-center justify-between py-md border-b">
-                        <div class="flex row items-center gap-md" style="overflow: hidden;">
-                            ${p.image_url ? `<img src="${p.image_url}" class="thumb">` : `<div class="thumb"></div>`}
-                            <div class="bold truncate">${p.id ? `Post #${p.id}` : `Feed Item`}</div>
+                    <div class="flex flex-row items-center justify-between px-6 py-4 border-b border-neutral-100 hover:bg-neutral-50 transition-colors">
+                        <div class="flex flex-row items-center gap-4 flex-1 overflow-hidden pr-4">
+                            ${p.image_url ? `<img src="${p.image_url}" class="w-12 h-12 rounded-lg object-cover bg-neutral-200 flex-shrink-0">` : `<div class="w-12 h-12 rounded-lg bg-neutral-100 flex-shrink-0 border border-neutral-200"></div>`}
+                            <div class="font-bold text-neutral-900 truncate">${p.id ? `Post #${p.id}` : `Feed Item`}</div>
                         </div>
-                        <div class="flex row items-center gap-md">
-                            <div class="t-meta t-muted" style="width: 100px;">${new Date(p.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
-                            <button class="btn btn-light btn-sm" onclick="openDeleteModal(${p.id})">Delete</button>
+                        <div class="w-24 text-sm text-neutral-500 text-center flex-shrink-0">${new Date(p.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                        <div class="w-20 flex justify-end flex-shrink-0">
+                            <button class="p-2 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" onclick="openDeleteModal(${p.id})">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
                         </div>
                     </div>`).join('');
             }
@@ -465,7 +426,7 @@
             updateContactFormState();
 
             const setP = globalPosts.find(p => p.author === 'settings');
-            editingSettingsPostId = setP ? setP.id : null; existingSettingsImageUrl = setP ? setP.image_url : null;
+            editingSettingsPostId = setP ? setP.id : null;
             if(setP) { try { document.getElementById('setting-title').value = JSON.parse(setP.text).title || "martinvojtus.space"; } catch(e) {} }
             updateSettingsFormState(); applySettingsToPublicSite();
         }
@@ -478,23 +439,32 @@
         }
 
         // PUBLIC RENDERERS
+        function toggleViewMode() { const newMode = currentViewMode === 'feed' ? 'grid' : 'feed'; currentViewMode = newMode; localStorage.setItem('mv_view_mode', newMode); refreshFeedUI(globalPosts.filter(p => p.author === '')); }
+
         function refreshFeedUI(feedPosts) { 
             const container = document.getElementById('status-container');
-            if (feedPosts.length === 0) { container.innerHTML = `<div class="t-body t-muted w-full text-center">Nothing here yet.</div>`; return; }
+            if (feedPosts.length === 0) { container.innerHTML = `<div class="text-sm font-bold text-neutral-400 tracking-widest uppercase w-full text-center py-12 border border-dashed border-neutral-200 rounded-2xl">Nothing here yet.</div>`; return; }
             if (currentViewMode === 'feed') {
-                container.innerHTML = `<div class="flex row justify-center w-full mb-md"><button class="btn btn-light" onclick="toggleViewMode()">Grid View</button></div>` + feedPosts.map(p => renderSinglePost(p)).join('');
+                container.innerHTML = `<div class="flex flex-row justify-center w-full mb-4"><button class="btn btn-light" onclick="toggleViewMode()">Grid View</button></div>` + feedPosts.map(p => renderSinglePost(p)).join('');
             } else {
-                let leftCol = `<div class="flex col gap-lg flex-1">`; let rightCol = `<div class="flex col gap-lg flex-1"><button class="btn btn-light w-full" onclick="toggleViewMode()">Feed View</button>`;
+                let leftCol = '<div class="flex flex-col gap-6 flex-1 min-w-0">'; 
+                let rightCol = '<div class="flex flex-col gap-6 flex-1 min-w-0"><button class="btn btn-light w-full mb-2" onclick="toggleViewMode()">Feed View</button>';
                 feedPosts.forEach((post, i) => { if (i % 2 === 0) leftCol += renderSinglePost(post, true); else rightCol += renderSinglePost(post, true); });
-                container.innerHTML = `<div class="flex row gap-lg items-start w-full">${leftCol}</div>${rightCol}</div></div>`;
+                leftCol += '</div>'; rightCol += '</div>';
+                container.innerHTML = `<div class="flex flex-row items-start gap-6 w-full">${leftCol}${rightCol}</div>`;
             }
         }
 
         function renderSinglePost(s, isGrid = false) {
             const date = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
-            const img = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="img-fluid cursor-pointer" onclick="handleImageClick(${s.id})" loading="lazy">` : '';
-            if (isGrid) return `<div class="flex col w-full">${img}</div>`;
-            return `<div class="flex col gap-md w-full"><div class="divider"></div><div class="t-meta t-muted">${date}</div>${img}</div>`;
+            const img = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="w-full h-auto object-cover rounded-[1.5rem] cursor-pointer hover:opacity-95 transition-opacity" loading="lazy" onclick="handleImageClick(${s.id})">` : '';
+            if (isGrid) return `<div class="flex flex-col w-full">${img}</div>`;
+            return `
+            <div class="flex flex-col gap-6 w-full">
+                <div class="w-full h-px bg-neutral-200"></div>
+                <div class="text-xs font-bold text-neutral-400 tracking-widest">${date}</div>
+                ${img}
+            </div>`;
         }
 
         function getAboutPostHtml(p) {
@@ -502,21 +472,42 @@
             if (data && data.v === 2) {
                 let expsHtml = '';
                 if(data.exps && data.exps.length > 0) {
-                    expsHtml += `<div class="t-h2 mt-xl mb-lg">Experience</div>`;
-                    data.exps.forEach((exp, i) => { expsHtml += `<div class="flex col items-start w-full"><div class="t-h3">${exp.title}</div><div class="t-body t-muted mb-md">${exp.company}</div><div class="badge">${exp.date}</div>${i < data.exps.length -1 ? `<div class="divider my-md" style="margin: 2rem 0;"></div>` : ''}</div>`; });
+                    expsHtml += `<div class="text-3xl font-bold tracking-tight mt-16 mb-8">Experience</div>`;
+                    data.exps.forEach((exp, i) => { 
+                        expsHtml += `
+                        <div class="flex flex-col items-start w-full">
+                            <div class="text-xl font-bold text-neutral-900 mb-1">${exp.title}</div>
+                            <div class="text-base text-neutral-500 mb-4">${exp.company}</div>
+                            <div class="px-4 py-1.5 bg-neutral-100 rounded-full text-xs font-bold tracking-wider text-neutral-600 uppercase">${exp.date}</div>
+                            ${i < data.exps.length -1 ? `<div class="w-full h-px bg-neutral-200 my-10"></div>` : ''}
+                        </div>`; 
+                    });
                 }
-                let ctaHtml = data.ctaTitle ? `<div class="card bg-bg border p-xl flex col gap-md mt-xl w-full"><div class="t-h2">${data.ctaTitle}</div><div class="t-body t-muted mb-md">${data.ctaText}</div><button class="btn btn-dark" onclick="showContact()">${data.ctaBtn || 'Get in touch'}</button></div>` : '';
-                return `<div class="flex col w-full"><div class="t-display mb-sm">About Me</div><div class="mb-xl radius-full" style="width: 4rem; height: 4px; background: var(--fg);"></div>${p.image_url ? `<img src="${p.image_url}" class="img-fluid mb-xl" loading="lazy">` : ''}${data.intro ? `<div class="t-body-lg t-muted mb-xl">${data.intro}</div>` : ''}${data.approach ? `<div class="t-h2 mb-md">My Approach</div><div class="t-body mb-xl text-left">${data.approach}</div>` : ''}${expsHtml}${ctaHtml}</div>`;
+                let ctaHtml = data.ctaTitle ? `<div class="bg-neutral-50 border border-neutral-200 rounded-[2rem] p-8 md:p-12 flex flex-col items-start mt-16 w-full"><div class="text-2xl md:text-3xl font-bold tracking-tight mb-4">${data.ctaTitle}</div><div class="text-lg text-neutral-500 mb-8 max-w-xl">${data.ctaText}</div><button class="btn btn-dark" onclick="showContact()">${data.ctaBtn || 'Get in touch'}</button></div>` : '';
+                return `
+                <div class="flex flex-col w-full">
+                    <div class="text-4xl md:text-5xl font-bold tracking-tight mb-6">About Me</div>
+                    <div class="w-16 h-1.5 bg-neutral-900 rounded-full mb-12"></div>
+                    ${p.image_url ? `<img src="${p.image_url}" class="w-full h-auto rounded-[2rem] mb-12 object-cover" loading="lazy">` : ''}
+                    ${data.intro ? `<div class="text-xl md:text-2xl text-neutral-500 leading-relaxed mb-12">${data.intro}</div>` : ''}
+                    ${data.approach ? `<div class="text-3xl font-bold tracking-tight mb-6">My Approach</div><div class="text-base md:text-lg text-neutral-900 leading-relaxed mb-12 max-w-2xl">${data.approach}</div>` : ''}
+                    ${expsHtml}${ctaHtml}
+                </div>`;
             }
-            return `<div class="flex col w-full gap-md">${p.image_url ? `<img src="${p.image_url}" class="img-fluid">` : ''}${p.title ? `<div class="t-h1">${p.title}</div>` : ''}${p.text ? `<div class="t-body text-left">${p.text}</div>` : ''}</div>`;
+            return `<div class="flex flex-col w-full gap-6">${p.image_url ? `<img src="${p.image_url}" class="w-full rounded-[2rem]">` : ''}${p.title ? `<div class="text-4xl font-bold tracking-tight">${p.title}</div>` : ''}${p.text ? `<div class="text-lg leading-relaxed text-neutral-700">${p.text}</div>` : ''}</div>`;
         }
 
         function getContactPostHtml(p) {
-            return `<div class="flex col w-full gap-md">${p.image_url ? `<img src="${p.image_url}" class="img-fluid">` : ''}${p.title ? `<div class="t-h1">${p.title}</div>` : ''}${p.text ? `<div class="t-body text-left" style="white-space: pre-wrap;">${p.text}</div>` : ''}</div>`;
+            return `
+            <div class="flex flex-col w-full gap-8">
+                ${p.image_url ? `<img src="${p.image_url}" class="w-full h-auto rounded-[2rem] object-cover" loading="lazy">` : ''}
+                ${p.title ? `<div class="text-4xl md:text-5xl font-bold tracking-tight">${p.title}</div>` : ''}
+                ${p.text ? `<div class="text-lg md:text-xl text-neutral-500 leading-relaxed whitespace-pre-wrap">${p.text}</div>` : ''}
+            </div>`;
         }
 
         // COMPRESS & FETCH
-        function compressImage(file, maxWidth = 1200, quality = 0.8) {
+        function compressImage(file, maxWidth = 1600, quality = 0.8) {
             return new Promise((resolve) => {
                 const reader = new FileReader(); reader.readAsDataURL(file);
                 reader.onload = event => {
@@ -548,6 +539,7 @@
                     document.getElementById('about-posts-container').innerHTML = globalPosts.filter(p => p.author === 'about').map(p => getAboutPostHtml(p)).join('');
                     document.getElementById('contact-posts-container').innerHTML = globalPosts.filter(p => p.author === 'contact').map(p => getContactPostHtml(p)).join('');
                 } else {
+                    const newFeedPosts = newPosts.filter(p => p.author === '');
                     if (currentViewMode === 'feed') document.getElementById('status-container').insertAdjacentHTML('beforeend', newPosts.filter(p => p.author === '').map(p => renderSinglePost(p)).join(''));
                     else refreshFeedUI(feedPosts); 
                 }
@@ -562,7 +554,12 @@
             const input = document.getElementById('edit-image-feed'); const hasImage = (input && input.files && input.files.length > 0);
             document.getElementById('upload-empty-state-feed').classList.toggle('hidden', hasImage);
             document.getElementById('upload-filled-state-feed').classList.toggle('hidden', !hasImage);
-            if(hasImage) document.getElementById('upload-preview-img-feed').src = URL.createObjectURL(input.files[0]);
+            if(hasImage) {
+                document.getElementById('upload-filled-state-feed').classList.add('flex');
+                document.getElementById('upload-preview-img-feed').src = URL.createObjectURL(input.files[0]);
+            } else {
+                document.getElementById('upload-filled-state-feed').classList.remove('flex');
+            }
             document.getElementById('publish-btn-feed').disabled = !hasImage;
         }
         function clearFeedImageSelection(e) { e.stopPropagation(); document.getElementById('edit-image-feed').value = ""; updateFeedFormState(); }
@@ -574,20 +571,22 @@
                 const compressedFile = await compressImage(imageFile); const formData = new FormData(); formData.append("file", compressedFile);
                 const finalImageUrl = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData })).json()).image_url;
                 await fetch(`${API_URL}/posts`, { method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify({ title: "", text: "", image_url: finalImageUrl, show_date: true, author: "" }) });
-                document.getElementById('editor-form-feed').style.display='none'; document.querySelector('#dash-tab-posts > button').style.display='flex'; resetFeedForm(); fetchStatuses(true);
+                hideEl('editor-form-feed'); document.querySelector('#dash-tab-posts > button').classList.remove('hidden'); resetFeedForm(); fetchStatuses(true);
             } catch (err) { btn.innerText = "PUBLISH"; btn.disabled = false; }
         }
 
         function addExperienceRow(title = '', company = '', date = '') {
             const container = document.getElementById('about-exp-list'); const row = document.createElement('div');
-            row.className = 'card flex col gap-sm relative';
-            row.innerHTML = `<button type="button" class="btn btn-light btn-sm absolute top-right" onclick="this.parentElement.remove(); updateAboutFormState();">Remove</button><input type="text" class="input exp-title" placeholder="Job Title..." value="${title}" oninput="updateAboutFormState()"><input type="text" class="input exp-company" placeholder="Company..." value="${company}" oninput="updateAboutFormState()"><input type="text" class="input exp-date" placeholder="Date (e.g. 2021 — Present)" value="${date}" oninput="updateAboutFormState()">`;
+            row.className = 'flex flex-col gap-4 p-6 border border-neutral-200 rounded-2xl bg-neutral-50 relative';
+            row.innerHTML = `<button type="button" class="btn btn-light !h-8 !px-3 !text-xs absolute top-4 right-4 bg-white" onclick="this.parentElement.remove(); updateAboutFormState();">Remove</button><input type="text" class="input !bg-white mt-8" placeholder="Job Title..." value="${title}" oninput="updateAboutFormState()"><input type="text" class="input !bg-white" placeholder="Company..." value="${company}" oninput="updateAboutFormState()"><input type="text" class="input !bg-white" placeholder="Date (e.g. 2021 — Present)" value="${date}" oninput="updateAboutFormState()">`;
             container.appendChild(row); updateAboutFormState();
         }
         function updateAboutFormState() {
             const input = document.getElementById('edit-image-about'); const hasImage = (input && input.files && input.files.length > 0) || existingAboutImageUrl;
             document.getElementById('upload-empty-state-about').classList.toggle('hidden', hasImage);
             document.getElementById('upload-filled-state-about').classList.toggle('hidden', !hasImage);
+            if(hasImage) document.getElementById('upload-filled-state-about').classList.add('flex'); else document.getElementById('upload-filled-state-about').classList.remove('flex');
+            
             if(input && input.files && input.files.length > 0) document.getElementById('upload-preview-img-about').src = URL.createObjectURL(input.files[0]); else if(existingAboutImageUrl) document.getElementById('upload-preview-img-about').src = existingAboutImageUrl;
             document.getElementById('publish-btn-about').disabled = false;
         }
@@ -596,7 +595,7 @@
             e.preventDefault(); 
             const intro = document.getElementById('about-intro').value.trim(); const approach = document.getElementById('about-approach').value.trim();
             const ctaTitle = document.getElementById('about-cta-title').value.trim(); const ctaText = document.getElementById('about-cta-text').value.trim(); const ctaBtn = document.getElementById('about-cta-btn').value.trim();
-            const exps = []; document.querySelectorAll('.about-exp-row').forEach(row => { exps.push({ title: row.querySelector('.exp-title').value.trim(), company: row.querySelector('.exp-company').value.trim(), date: row.querySelector('.exp-date').value.trim() }); });
+            const exps = []; document.querySelectorAll('#about-exp-list > div').forEach(row => { exps.push({ title: row.querySelectorAll('input')[0].value.trim(), company: row.querySelectorAll('input')[1].value.trim(), date: row.querySelectorAll('input')[2].value.trim() }); });
             const imageFile = document.getElementById('edit-image-about').files[0];
             const btn = document.getElementById('publish-btn-about'); btn.innerText = "SAVING..."; btn.disabled = true;
             try {
@@ -615,6 +614,8 @@
             const input = document.getElementById('edit-image-contact'); const hasImage = (input && input.files && input.files.length > 0) || existingContactImageUrl;
             document.getElementById('upload-empty-state-contact').classList.toggle('hidden', hasImage);
             document.getElementById('upload-filled-state-contact').classList.toggle('hidden', !hasImage);
+            if(hasImage) document.getElementById('upload-filled-state-contact').classList.add('flex'); else document.getElementById('upload-filled-state-contact').classList.remove('flex');
+            
             if(input && input.files && input.files.length > 0) document.getElementById('upload-preview-img-contact').src = URL.createObjectURL(input.files[0]); else if(existingContactImageUrl) document.getElementById('upload-preview-img-contact').src = existingContactImageUrl;
             document.getElementById('publish-btn-contact').disabled = false;
         }
@@ -635,43 +636,38 @@
             } catch (err) { btn.innerText = "SAVE CHANGES"; btn.disabled = false; }
         }
 
-        function updateSettingsFormState() {
-            const input = document.getElementById('setting-image'); const hasImage = (input && input.files && input.files.length > 0) || existingSettingsImageUrl;
-            document.getElementById('upload-empty-state-setting').classList.toggle('hidden', hasImage);
-            document.getElementById('upload-filled-state-setting').classList.toggle('hidden', !hasImage);
-            if(input && input.files && input.files.length > 0) document.getElementById('upload-preview-img-setting').src = URL.createObjectURL(input.files[0]); else if(existingSettingsImageUrl) document.getElementById('upload-preview-img-setting').src = existingSettingsImageUrl;
-            document.getElementById('publish-btn-settings').disabled = false;
-        }
-        function clearSettingImageSelection(e) { e.stopPropagation(); document.getElementById('setting-image').value = ""; existingSettingsImageUrl = null; updateSettingsFormState(); }
+        function updateSettingsFormState() { document.getElementById('publish-btn-settings').disabled = false; }
         async function handleSettingsSubmit(e) {
-            e.preventDefault(); const title = document.getElementById('setting-title').value.trim(); const imageFile = document.getElementById('setting-image').files[0];
+            e.preventDefault(); const title = document.getElementById('setting-title').value.trim();
             const btn = document.getElementById('publish-btn-settings'); btn.innerText = "SAVING..."; btn.disabled = true;
             try {
-                let finalImageUrl = existingSettingsImageUrl;
-                if (imageFile) {
-                    const compressedFile = await compressImage(imageFile); const formData = new FormData(); formData.append("file", compressedFile);
-                    finalImageUrl = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData })).json()).image_url;
-                }
+                const jsonPayload = { title }; 
+                const payload = { title: "", text: JSON.stringify(jsonPayload), image_url: "", show_date: false, author: "settings" };
                 const url = editingSettingsPostId ? `${API_URL}/posts/${editingSettingsPostId}` : `${API_URL}/posts`;
-                await fetch(url, { method: editingSettingsPostId ? "PUT" : "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify({ title: "", text: JSON.stringify({ title }), image_url: finalImageUrl || "", show_date: false, author: "settings" }) });
+                await fetch(url, { method: editingSettingsPostId ? "PUT" : "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey }, body: JSON.stringify(payload) });
                 fetchStatuses(true); btn.innerText = "SAVE SETTINGS"; btn.disabled = false;
             } catch (err) { btn.innerText = "SAVE SETTINGS"; btn.disabled = false; }
         }
 
-        function openDeleteModal(type) { deleteActionType = type; document.getElementById('delete-modal').classList.remove('hidden'); document.getElementById('delete-modal').classList.add('flex'); document.getElementById('modal-action-zone').classList.remove('hidden'); document.getElementById('modal-loading-zone').classList.add('hidden'); document.getElementById('modal-success-zone').classList.add('hidden'); }
-        function closeDeleteModal() { document.getElementById('delete-modal').classList.add('hidden'); document.getElementById('delete-modal').classList.remove('flex'); deleteActionType = null; }
+        function openDeleteModal(type) { deleteActionType = type; const m = document.getElementById('delete-modal'); m.classList.remove('hidden'); m.classList.add('flex'); document.getElementById('modal-action-zone').classList.remove('hidden'); document.getElementById('modal-action-zone').classList.add('flex'); hideEl('modal-loading-zone'); hideEl('modal-success-zone'); }
+        function closeDeleteModal() { const m = document.getElementById('delete-modal'); m.classList.add('hidden'); m.classList.remove('flex'); deleteActionType = null; }
         async function executeModalDelete() {
-            document.getElementById('modal-action-zone').classList.add('hidden'); document.getElementById('modal-loading-zone').classList.remove('hidden');
+            hideEl('modal-action-zone'); showEl('modal-loading-zone');
             if (deleteActionType === 'delete_all') {
                 const posts = await (await fetch(`${API_URL}/posts?skip=0&limit=100`)).json();
                 for (const p of posts) { await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); }
             } else { await fetch(`${API_URL}/posts/${deleteActionType}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); }
-            document.getElementById('modal-loading-zone').classList.add('hidden'); document.getElementById('modal-success-zone').classList.remove('hidden');
+            hideEl('modal-loading-zone'); showEl('modal-success-zone');
             setTimeout(() => { fetchStatuses(true); closeDeleteModal(); }, 1000);
         }
 
         checkRememberedLogin(); fetchStatuses(true);
-        document.addEventListener('click', (e) => { if (!navOverlay.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); });
+        // Menu close listener
+        document.addEventListener('click', (e) => { 
+            if (!navOverlay.contains(e.target) && !document.getElementById('menuToggle').contains(e.target) && !navOverlay.classList.contains('hidden')) {
+                closeMenu();
+            }
+        });
     </script>
 </body>
 </html>
