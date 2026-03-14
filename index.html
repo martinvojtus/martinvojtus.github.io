@@ -54,7 +54,7 @@
         
         const DEFAULT_CONFIG = {
             siteTitle: "martinvojtus • space",
-            footerText: "build v1.5.0 • 2026",
+            footerText: "build v5.0.4 • 2026",
             pages: [
                 { id: "grid", title: "Gallery", type: "gallery" },
                 { id: "about", title: "About", type: "profile" },
@@ -116,8 +116,8 @@
                 : `<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>`;
 
             let desktopLinks = App.config.pages.map(p => `<button onclick="navigate('${p.id}')" class="text-sm font-semibold tracking-wide transition-colors ${App.route === p.id ? 'text-black' : 'text-neutral-400 hover:text-black'}">${p.title}</button>`).join('');
-
             desktopLinks += `<div class="w-px h-4 bg-neutral-200 mx-2"></div>`;
+            
             if (App.token) {
                 desktopLinks += `<button onclick="navigate('dashboard')" class="text-sm font-bold transition-colors ${App.route === 'dashboard' ? 'text-black' : 'text-neutral-400 hover:text-black'}">Dashboard</button>`;
                 desktopLinks += `<button onclick="logout()" class="text-sm font-bold text-red-500 hover:text-red-700 transition-colors ml-2">Logout</button>`;
@@ -172,15 +172,33 @@
             const posts = App.posts.filter(p => p.author === page.id).sort((a,b) => new Date(b.at) - new Date(a.at));
             if (posts.length === 0) return `<div class="w-full py-32 text-center text-neutral-300 font-bold text-sm tracking-widest uppercase">No photos uploaded.</div>`;
             
-            const itemsHtml = posts.map(p => `
-                <div class="img-container mb-6 group cursor-pointer inline-block w-full break-inside-avoid">
+            let col1 = [], col2 = [], col3 = [];
+            const isDesktop = window.innerWidth >= 768;
+            
+            posts.forEach((p, i) => {
+                if (!isDesktop) {
+                    col1.push(p);
+                } else {
+                    if (i % 3 === 0) col1.push(p);
+                    else if (i % 3 === 1) col2.push(p);
+                    else col3.push(p);
+                }
+            });
+
+            const renderCol = (arr) => arr.map(p => `
+                <div class="img-container mb-6 w-full group cursor-pointer">
                     <img src="${p.image_url}" class="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-500 hover:scale-[1.03]" loading="lazy">
                     <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-black uppercase opacity-0 group-hover:opacity-100 transition-opacity">
                         ${new Date(p.at).toLocaleDateString('en-US', {day: 'numeric', month:'short', year:'numeric'})}
                     </div>
                 </div>`).join('');
 
-            return `<div class="w-full columns-1 md:columns-3 gap-6 animate-fade-in">${itemsHtml}</div>`;
+            return `
+            <div class="flex flex-col md:flex-row gap-6 w-full items-start animate-fade-in">
+                <div class="flex flex-col flex-1 w-full">${renderCol(col1)}</div>
+                ${isDesktop && col2.length > 0 ? `<div class="flex flex-col flex-1 w-full">${renderCol(col2)}</div>` : ''}
+                ${isDesktop && col3.length > 0 ? `<div class="flex flex-col flex-1 w-full">${renderCol(col3)}</div>` : ''}
+            </div>`;
         }
 
         function renderPublicProfile(page) {
@@ -189,15 +207,15 @@
             let expsHtml = (data.exps || []).map((e, i) => `<div class="flex flex-col items-start w-full leading-relaxed"><div class="text-xl font-bold mb-1">${e.title}</div><div class="text-neutral-500 mb-2">${e.company}</div><div class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-8">${e.dateIn || e.date || ''} ${e.dateOut ? `— ${e.dateOut}` : ''}</div></div>`).join('');
             
             return `
-            <div class="flex flex-col md:flex-row gap-12 md:gap-16 lg:gap-24 w-full animate-fade-in items-start mt-8">
-                <div class="w-full md:w-1/3 flex flex-col md:sticky md:top-32 h-fit">
+            <div class="flex flex-col md:flex-row w-full gap-12 md:gap-24 animate-fade-in items-start min-h-[50vh] mt-12">
+                <div class="w-full md:w-1/3 flex flex-col md:sticky md:top-32 h-fit pt-4 md:pt-10">
                     ${post?.image_url ? `<img src="${post.image_url}" class="w-48 md:w-full aspect-square rounded-full md:rounded-3xl object-cover grayscale mb-8 border border-neutral-100">` : ''}
                     <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">${page.title}</h1>
                     ${data.intro ? `<p class="text-lg text-neutral-500 leading-relaxed font-medium">${data.intro}</p>` : ''}
                 </div>
-                <div class="w-full md:w-2/3 flex flex-col pt-2">
+                <div class="w-full md:w-2/3 flex flex-col gap-8 md:pt-12 leading-relaxed">
                     ${data.text ? `<div><div class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-6">About</div><div class="text-lg leading-relaxed text-black whitespace-pre-wrap">${data.text}</div></div>` : ''}
-                    ${expsHtml ? `<div class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-8 mt-16">Experience</div>${expsHtml}` : ''}
+                    ${expsHtml ? `<div><div class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-8 mt-10">Experience</div>${expsHtml}</div>` : ''}
                 </div>
             </div>`;
         }
@@ -371,14 +389,14 @@
 
         // API Helpers
         async function uploadGenericImage(slug, id, type) {
-            let inputId = type==='gallery'?'gal-upload':type==='profile'?'prf-img-upload':type==='contact'?'cnt-img-upload':type==='article'?'art-img-upload':'lnk-img-upload';
+            let inputId = type==='gallery'?'gal-upload':type==='profile'?'prf-img-upload':type==='article'?'art-img-upload':'lnk-img-upload';
             const f = document.getElementById(inputId).files[0]; if(!f) return;
             document.body.style.cursor='wait';
             try {
                 const fd = new FormData(); fd.append("file", await compressImage(f));
                 const img = (await (await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": App.token }, body: fd })).json()).image_url;
                 if(type === 'gallery') { await fetch(`${API_URL}/posts`, { method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": App.token }, body: JSON.stringify({ title: "", text: "", image_url: img, show_date: true, author: slug }) }); await init(); } 
-                else if(type === 'profile') saveProfileConfig(slug, id, img); else if(type === 'contact') saveContactConfig(slug, id); else if(type === 'article') saveArticleConfig(slug, id, img); else if(type === 'links') saveLinksConfig(slug, id, img);
+                else if(type === 'profile') saveProfileConfig(slug, id, img); else if(type === 'article') saveArticleConfig(slug, id, img); else if(type === 'links') saveLinksConfig(slug, id, img);
             } catch(e){}
             document.body.style.cursor='default';
         }
@@ -453,6 +471,10 @@
 
         init();
         document.addEventListener('click', (e) => { if(!document.getElementById('navOverlay').contains(e.target) && !document.getElementById('menuToggle').contains(e.target)) closeMenu(); });
+        window.addEventListener('resize', () => {
+            const page = App.config.pages.find(p => p.id === App.route);
+            if (page && page.type === 'gallery') render();
+        });
     </script>
 </body>
 </html>
