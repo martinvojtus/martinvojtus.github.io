@@ -2,923 +2,178 @@
 <html lang="sk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTC Quant Terminal</title>
     
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
 
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png?v=2">
-    <link rel="shortcut icon" type="image/png" href="favicon.png?v=2">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=2">
-    
-    <title>martinvojtus.space</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --black: #000000;
-            --white: #ffffff;
-            --grey-50: rgba(0, 0, 0, 0.5);
-            --divider: rgba(0, 0, 0, 0.1);
-            
-            --glass-rgb: 255, 255, 255; 
-            --content-width: 540px; 
-            --border-radius: 1rem; 
-            --gap-item: 1rem; 
-            --letter-spacing: 0.05em;
-            --glass-opacity: 0.5; 
-            --glass-blur: 1rem;   
-            --size-large: 2.0rem;
-            --size-small: 1.0rem;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --black: #ffffff;       
-                --white: #000000;       
-                --grey-50: rgba(255, 255, 255, 0.5); 
-                --divider: rgba(255, 255, 255, 0.1); 
-                --glass-rgb: 0, 0, 0;   
-            }
-        }
-
-        html { -webkit-text-size-adjust: 100%; }
-        
-        * { 
-            -webkit-tap-highlight-color: transparent; 
-            box-sizing: border-box; 
-            font-weight: 400; 
-            font-family: 'Space Grotesk', sans-serif; 
-            letter-spacing: var(--letter-spacing); 
-            transition: none !important; 
-            animation: none !important;
-        }
-
-        body {
-            margin: 0; padding: 0;
-            background-color: var(--white); color: var(--black);
-            line-height: 1.5; 
-            display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh;
-        }
-
-        .submit-btn, .form-input, .admin-bar-item {
-            line-height: 1;
-        }
-
-        header, .nav-overlay, .status-glass-bar, .status-confirm-overlay, #delete-modal {
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
-        }
-
-        header {
-            position: fixed; top: 0; left: 0; width: 100%; 
-            display: flex; justify-content: center; padding: var(--gap-item) 0; 
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
-            z-index: 2000;
-        }
-
-        .header-content {
-            width: 100%; max-width: var(--content-width);
-            display: flex; justify-content: space-between; align-items: center; padding: 0 var(--gap-item); 
-        }
-
-        .logo-link { display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
-        .header-left svg { width: 1rem; height: 1rem; display: block; flex-shrink: 0; }
-        .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: var(--size-small); white-space: nowrap; margin: 0; pointer-events: none; }
-
-        .menu-toggle { 
-            display: flex; justify-content: center; align-items: center; 
-            cursor: pointer; z-index: 2100; position: relative;
-            font-size: var(--size-small); font-weight: 400; user-select: none;
-            line-height: 1; text-transform: uppercase;
-        }
-
-        .nav-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: auto;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
-            z-index: 1500; 
-            padding: calc(3rem + var(--gap-item)) 0 var(--gap-item) 0; 
-            display: none; flex-direction: column; align-items: center;
-        }
-        .nav-overlay.active { display: flex; }
-        
-        .menu-items { width: 100%; max-width: var(--content-width); display: flex; flex-direction: column; gap: var(--gap-item); padding: 0 var(--gap-item); }
-
-        main {
-            padding: calc(3rem + var(--gap-item)) var(--gap-item) var(--gap-item); 
-            width: 100%; max-width: var(--content-width); 
-            flex-grow: 1; display: flex; flex-direction: column; align-items: center; 
-        }
-
-        #section-feed { display: block; width: 100%; }
-        
-        #login-ui { display: flex; flex-direction: column; gap: var(--gap-item); }
-        #logout-ui { display: none; }
-        
-        #admin-upload-zone { display: none; flex-direction: column; gap: var(--gap-item); width: 100%; margin-bottom: var(--gap-item); }
-
-        .status-feed { 
-            max-width: var(--content-width); width: 100%; margin: 0 auto; 
-        }
-
-        .status-feed.view-feed {
-            display: flex; flex-direction: column; gap: var(--gap-item);
-        }
-        
-        .status-feed.view-grid {
-            display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;
-        }
-        
-        .grid-columns-wrapper {
-            display: flex; flex-direction: row; gap: var(--gap-item); align-items: flex-start; width: 100%;
-        }
-
-        .masonry-col {
-            display: flex; flex-direction: column; gap: var(--gap-item); flex: 1; min-width: 0;
-        }
-
-        .status-feed.view-grid .status-glass-bar,
-        .status-feed.view-grid .status-confirm-overlay {
-            display: none !important;
-        }
-        .status-feed.view-grid .status-media-wrapper {
-            background-color: transparent; 
-        }
-
-        .feed-toggle-wrapper {
-            display: flex; flex-direction: column; align-items: center; width: 100%; gap: var(--gap-item);
-        }
-
-        .divider-line {
-            width: 100%;
-            height: 1px;
-            background-color: var(--divider);
-            flex-shrink: 0;
-        }
-
-        .status-card { display: flex; flex-direction: column; position: relative; }
-
-        .status-media-wrapper {
-            position: relative;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            transform: translateZ(0); 
-            min-height: 3rem;
-            background-color: var(--divider); 
-        }
-
-        .status-glass-bar {
-            height: 3rem; width: 100%;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
-            position: absolute; top: 0; left: 0; right: 0;
-            z-index: 10;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 var(--gap-item);
-        }
-
-        .admin-bar-item { font-size: var(--size-small); color: var(--black); text-transform: uppercase; }
-        .admin-delete-link { cursor: pointer; color: var(--black); text-decoration: none; }
-
-        .status-image { width: 100%; height: auto; display: block; border-radius: var(--border-radius); cursor: pointer; }
-        
-        .loading-text { text-align: center; font-size: var(--size-small); color: var(--grey-50); padding: var(--gap-item) 0; width: 100%; }
-
-        .form-input, .submit-btn { 
-            border-radius: var(--border-radius); 
-            font-size: var(--size-small); padding: 0 var(--gap-item); 
-            outline: none; display: flex; align-items: center; gap: var(--gap-item); 
-            box-shadow: none; -webkit-appearance: none; appearance: none; margin: 0;
-        }
-
-        .form-input { 
-            height: 3rem;
-            background-color: transparent; 
-            color: var(--black);
-            border: 1px solid var(--divider); 
-        }
-        .form-input::placeholder { color: var(--grey-50); } 
-
-        .submit-btn { 
-            height: 3rem;
-            background-color: var(--black); 
-            color: var(--white);
-            border: 1px solid var(--black); 
-            justify-content: center; text-transform: uppercase; cursor: pointer; white-space: nowrap;
-        }
-
-        .btn-tonal {
-            background-color: var(--divider) !important;
-            color: var(--black) !important;
-            border: none !important;
-        }
-
-        .btn-tonal-disabled {
-            background-color: var(--divider) !important;
-            color: var(--grey-50) !important;
-            border: none !important;
-            cursor: default !important;
-            pointer-events: none !important;
-        }
-
-        .btn-danger {
-            background-color: #ff3333 !important;
-            color: #000000 !important;
-            border: none !important;
-        }
-
-        .btn-outline {
-            background-color: transparent; 
-            color: var(--black);
-            border: 1px solid var(--black);
-        }
-
-        .btn-loading {
-            background-color: var(--divider) !important;
-            color: var(--grey-50) !important; 
-            border: none !important;
-            pointer-events: none !important;
-            opacity: 1 !important; 
-        }
-
-        .btn-ghost {
-            background-color: var(--divider) !important; 
-            color: var(--black) !important; 
-            border: none !important;
-            pointer-events: none !important; 
-            opacity: 1 !important; 
-        }
-
-        .input-error { border: 1px solid var(--black) !important; }
-        .input-error span { color: var(--black) !important; }
-
-        .thumbnail-container {
-            width: 3rem;
-            height: 3rem;
-            flex-shrink: 0;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            background-color: var(--divider);
-            cursor: pointer;
-            position: relative;
-            -webkit-mask-image: -webkit-radial-gradient(white, black);
-            mask-image: radial-gradient(white, black);
-        }
-        .thumbnail-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; 
-        }
-
-        .custom-checkbox {
-            appearance: none; width: 1rem; height: 1rem; border: 1px solid var(--black);
-            border-radius: calc(var(--border-radius) / 3); cursor: pointer; display: grid; place-content: center;
-        }
-        .custom-checkbox::before { content: ""; width: 0.25rem; height: 0.5rem; border: solid var(--white); border-width: 0 1px 1px 0; transform: rotate(45deg); opacity: 0; margin-top: -0.125rem; }
-        .custom-checkbox:checked { background-color: var(--black); border-color: var(--black); } 
-        .custom-checkbox:checked::before { opacity: 1; }
-
-        .footer-info { 
-            font-size: var(--size-small); color: var(--grey-50); 
-            text-transform: uppercase; text-align: center; width: 100%; 
-        }
-
-        .status-confirm-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 20;
-            display: none; flex-direction: column; justify-content: center; align-items: center;
-            border-radius: var(--border-radius);
-            background: transparent;
-        }
-        .status-confirm-overlay::before {
-            content: "";
-            position: absolute; inset: 0;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); 
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border-radius: inherit;
-            z-index: -1;
-        }
-
-        #delete-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 3000;
-            display: none; flex-direction: column; justify-content: center; align-items: center;
-            background: transparent;
-        }
-        #delete-modal::before {
-            content: "";
-            position: absolute; inset: 0;
-            background: rgba(var(--glass-rgb), var(--glass-opacity)); 
-            backdrop-filter: blur(var(--glass-blur)); 
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            z-index: -1;
-        }
-
-        .modal-content {
-            width: 100%; max-width: var(--content-width);
-            display: flex; flex-direction: column; gap: var(--gap-item);
-            padding: 0 var(--gap-item);
-        }
-
-        .action-row {
-            display: flex; flex-direction: row; gap: var(--gap-item); justify-content: center;
-            width: 100%; padding: 0;
-        }
+        body { background-color: #0d1117; color: #c9d1d9; font-family: 'Courier New', Courier, monospace; }
+        .neon-text { color: #39ff14; text-shadow: 0 0 8px rgba(57, 255, 20, 0.3); }
+        .card { background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; }
+        .title-accent { color: #58a6ff; font-weight: bold; margin-bottom: 10px; display: block; }
     </style>
 </head>
-<body>
+<body class="p-8">
 
-    <header>
-        <div class="header-content">
-            <div class="logo-link" onclick="window.scrollTo(0,0)">
-                <div class="header-left">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="72.35 270 935.31 810" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(540, 540)"><path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" fill="var(--black)" /></g></svg>
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold neon-text mb-2">⚡ BTC QUANT TERMINAL // WEB_EDITION</h1>
+        <p class="text-gray-400 mb-8">Čistý JavaScript Model | Zdroj dát: Binance Public API</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="card">
+                <span class="title-accent">HLAVNÉ SKÓRE (CBS)</span>
+                <div id="cbs-score" class="text-5xl font-bold neon-text mb-4">Načítavam...</div>
+                <div class="text-sm border-t border-gray-700 pt-4">
+                    <p>🎯 MAKRO DNO (TARGET): <span id="target-dno" class="font-bold text-white">...</span></p>
+                    <p id="status-message" class="mt-2 text-yellow-500 font-bold">Pripájam sa na trh...</p>
                 </div>
             </div>
-            <div class="logo-text"><span>martinvojtus</span> • space</div>
-            
-            <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">MENU</div>
-        </div>
-    </header>
 
-    <nav class="nav-overlay" id="navOverlay">
-        <div class="menu-items">
-            
-            <button type="button" class="submit-btn btn-tonal" style="width: 100%;" onclick="closeMenu(); window.scrollTo({ top: 0, behavior: 'smooth' });">FEED</button>
-            
-            <div class="divider-line"></div>
-
-            <div id="login-ui">
-                <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
-                    <input type="password" id="admin-pass" class="form-input" placeholder="Password..." style="width: 100%;">
-                    <label class="form-input" style="cursor: pointer; justify-content: flex-start; user-select: none; width: 100%;">
-                        <input type="checkbox" id="remember-login" class="custom-checkbox">
-                        <span>Remember me</span>
-                    </label>
-                    <button type="submit" id="login-btn" class="submit-btn btn-tonal" style="width: 100%;">LOGIN</button>
-                </form>
-            </div>
-
-            <div id="logout-ui" style="display: none;">
-                <button onclick="handleLogout()" class="submit-btn btn-tonal" style="width: 100%;">LOGOUT</button>
-            </div>
-            
-            <div class="divider-line"></div>
-            <div class="footer-info">build v6.8.1 • 2026</div>
-        </div>
-    </nav>
-
-    <main>
-        <div id="admin-upload-zone">
-            <div id="editor-collapsed-state" class="submit-btn btn-tonal" style="width: 100%;" onclick="expandEditor()">
-                +
-            </div>
-
-            <form id="editor-form" onsubmit="handleMainSubmit(event)" style="display: none; flex-direction: column; width: 100%; gap: var(--gap-item); margin: 0;">
-                <input type="file" id="edit-image" accept="image/*" style="display: none;" onchange="updateImageUIState()">
+            <div class="card">
+                <span class="title-accent">TECHNICKÝ ROZPIS</span>
+                <p class="mb-2">> HĹBKA PREPADU (SMA): <span id="sma-depth" class="text-white font-bold">...</span></p>
+                <p class="text-xs text-gray-500 mb-4">Vzdialenosť aktuálnej ceny od 200 SMA</p>
                 
-                <div id="upload-empty-state" class="submit-btn btn-tonal" style="width: 100%;" onclick="document.getElementById('edit-image').click()">
-                    + ADD IMAGE
-                </div>
+                <p class="mb-2">> MAKRO RSI (14D): <span id="rsi-val" class="text-white font-bold">...</span></p>
+                <p class="text-xs text-gray-500">Momentum vyčerpania predajcov</p>
+            </div>
 
-                <div id="upload-filled-state" class="action-row" style="display: none;">
-                    <div class="thumbnail-container" onclick="document.getElementById('edit-image').click()">
-                        <img id="upload-preview-img" class="thumbnail-img" src="" alt="">
-                    </div>
-                    <div class="submit-btn btn-tonal" style="flex-grow: 1;" onclick="clearImageSelection(event)">DELETE IMAGE</div>
-                </div>
-
-                <div id="upload-details-zone" style="display: flex; flex-direction: column; gap: var(--gap-item); width: 100%;">
-                    <div id="upload-action-row" class="action-row" style="padding: 0;">
-                        <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
-                        <div class="submit-btn btn-tonal" onclick="collapseEditor()">CANCEL</div>
-                    </div>
-                    <div id="upload-loading-row" class="action-row" style="display: none; padding: 0;">
-                        <div id="upload-loading-btn" class="submit-btn btn-loading" style="flex-grow: 1;">UPLOADING...</div>
-                    </div>
-                    <div id="upload-success-row" class="action-row" style="display: none; padding: 0;">
-                        <div id="upload-success-btn" class="submit-btn btn-ghost" style="flex-grow: 1;">UPLOADED</div>
-                    </div>
-                </div>
-                
-                <button type="button" id="delete-all-btn" class="submit-btn btn-danger" style="width: 100%;" onclick="handleDeleteAllClick()">DELETE ALL POSTS</button>
-            </form>
+            <div class="card">
+                <span class="title-accent">SYSTÉMOVÉ INFO</span>
+                <p class="mb-2">> ZDROJ DÁT: <span class="text-white font-bold">Binance API</span></p>
+                <p class="mb-2">> ČASOVÝ RÁMEC: <span class="text-white font-bold">1000 Dní</span></p>
+                <p class="mt-4 text-xs text-gray-400">Tento model beží na 100% vo vašom prehliadači pomocou Vanilla JavaScriptu. Pre zložitejšie metriky (ETF/Zlato) je nutný Python backend.</p>
+            </div>
         </div>
 
-        <div id="section-feed">
-            <div id="status-container" class="status-feed view-grid"></div>
-            <div id="loading-indicator" class="loading-text" style="display: none;">Loading...</div>
-        </div>
-    </main>
-
-    <div id="delete-modal">
-        <div id="modal-action-zone" class="action-row">
-            <button id="modal-del-btn" class="submit-btn" onclick="executeModalDelete()">DELETE</button>
-            <button id="modal-cancel-btn" class="submit-btn btn-tonal" onclick="closeDeleteModal()">CANCEL</button>
-        </div>
-        <div id="modal-loading-zone" class="action-row" style="display: none;">
-            <div class="submit-btn btn-loading">DELETING...</div>
-        </div>
-        <div id="modal-success-zone" class="action-row" style="display: none;">
-            <div class="submit-btn btn-ghost">DELETED</div>
+        <div class="card">
+            <span class="title-accent mb-4">VIZUÁLNA ANALÝZA // CENA & RSI</span>
+            <div id="plotly-chart" style="width:100%; height:600px;"></div>
         </div>
     </div>
 
     <script>
-        const API_URL = "https://mv-backend-ak8l.onrender.com";
-        let secretKey = ""; let globalPosts = []; 
-        let currentOffset = 0; const postsLimit = 10; let isLoading = false; let hasMorePosts = true;
-        let deleteActionType = null;
-        
-        let currentViewMode = localStorage.getItem('mv_view_mode') || 'grid';
-
-        const passInput = document.getElementById('admin-pass');
-        const menuToggle = document.getElementById('menuToggle');
-        const navOverlay = document.getElementById('navOverlay');
-
-        if(passInput) {
-            passInput.addEventListener('input', () => {
-                passInput.classList.remove('input-error');
-                passInput.placeholder = 'Password...';
-            });
-        }
-
-        function expandEditor() {
-            document.getElementById('editor-collapsed-state').style.display = 'none';
-            document.getElementById('editor-form').style.display = 'flex';
-        }
-
-        function collapseEditor() {
-            document.getElementById('editor-collapsed-state').style.display = 'flex';
-            document.getElementById('editor-form').style.display = 'none';
-            resetEditor(); 
-        }
-
-        function toggleViewMode() {
-            const newMode = currentViewMode === 'feed' ? 'grid' : 'feed';
-            currentViewMode = newMode;
-            localStorage.setItem('mv_view_mode', newMode);
-            refreshFeedUI();
-        }
-
-        function toggleMenu() { 
-            const isActive = menuToggle.classList.toggle('active'); 
-            navOverlay.classList.toggle('active'); 
-            menuToggle.innerText = isActive ? 'CLOSE' : 'MENU';
-        }
-        function closeMenu() { 
-            menuToggle.classList.remove('active'); 
-            navOverlay.classList.remove('active'); 
-            menuToggle.innerText = 'MENU';
-        }
-
-        function updateUIVisibility() {
-            if (secretKey) {
-                document.body.classList.add('is-logged-in');
-                document.getElementById('login-ui').style.display = 'none';
-                document.getElementById('admin-upload-zone').style.display = 'flex';
-                document.getElementById('logout-ui').style.display = 'flex';
-            } else {
-                document.body.classList.remove('is-logged-in');
-                document.getElementById('login-ui').style.display = 'flex';
-                document.getElementById('admin-upload-zone').style.display = 'none';
-                document.getElementById('logout-ui').style.display = 'none';
-                collapseEditor(); 
+        // --- MATEMATICKÉ FUNKCIE (Náhrada za Pandas) ---
+        function calculateSMA(data, window_size) {
+            let sma = new Array(data.length).fill(null);
+            for (let i = window_size - 1; i < data.length; i++) {
+                let sum = 0;
+                for (let j = 0; j < window_size; j++) {
+                    sum += data[i - j];
+                }
+                sma[i] = sum / window_size;
             }
+            return sma;
         }
 
-        async function handleLogin(e) {
-            e.preventDefault();
-            const loginBtn = document.getElementById('login-btn');
-            loginBtn.innerText = 'LOGGING IN...';
-            loginBtn.classList.add('btn-loading'); 
+        function calculateRSI(prices, periods = 14) {
+            let rsi = new Array(prices.length).fill(null);
+            let gains = 0;
+            let losses = 0;
 
-            const tempKey = passInput.value;
-            const rememberMe = document.getElementById('remember-login').checked;
+            for (let i = 1; i <= periods; i++) {
+                let change = prices[i] - prices[i - 1];
+                if (change > 0) gains += change;
+                else losses -= change;
+            }
+
+            let avgGain = gains / periods;
+            let avgLoss = losses / periods;
+
+            for (let i = periods; i < prices.length; i++) {
+                let change = prices[i] - prices[i - 1];
+                let currentGain = change > 0 ? change : 0;
+                let currentLoss = change < 0 ? -change : 0;
+
+                avgGain = ((avgGain * (periods - 1)) + currentGain) / periods;
+                avgLoss = ((avgLoss * (periods - 1)) + currentLoss) / periods;
+
+                if (avgLoss === 0) {
+                    rsi[i] = 100;
+                } else {
+                    let rs = avgGain / avgLoss;
+                    rsi[i] = 100 - (100 / (1 + rs));
+                }
+            }
+            return rsi;
+        }
+
+        // --- HLAVNÁ LOGIKA ---
+        async function runQuantModel() {
             try {
-                const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': tempKey } });
-                if (res.ok) { 
-                    loginBtn.classList.remove('btn-loading');
-                    loginBtn.classList.add('btn-ghost');
-                    loginBtn.innerText = 'SUCCESS';
-                    
-                    secretKey = tempKey; 
-                    setTimeout(() => {
-                        updateUIVisibility();
-                        closeMenu(); 
-                        refreshFeedUI(); 
-                        passInput.value = ''; 
-                        if (rememberMe) { localStorage.setItem('mv_admin_key', secretKey); } else { localStorage.removeItem('mv_admin_key'); }
-                        
-                        loginBtn.innerText = 'LOGIN';
-                        loginBtn.classList.remove('btn-ghost');
-                    }, 1000);
-                } else { 
-                    passInput.classList.add('input-error'); passInput.value = ''; passInput.placeholder = 'Invalid password!'; 
-                    loginBtn.innerText = 'LOGIN'; loginBtn.classList.remove('btn-loading');
-                }
-            } catch (err) { 
-                passInput.classList.add('input-error'); 
-                loginBtn.innerText = 'LOGIN'; loginBtn.classList.remove('btn-loading');
-            }
-        }
+                // 1. Stiahnutie dát z Binance (Posledných 1000 dní)
+                const response = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=1000');
+                const data = await response.json();
 
-        async function checkRememberedLogin() {
-            const savedKey = localStorage.getItem('mv_admin_key');
-            if (savedKey) {
-                try {
-                    const res = await fetch(`${API_URL}/verify`, { method: 'GET', headers: { 'x-admin-password': savedKey } });
-                    if (res.ok) { 
-                        secretKey = savedKey; 
-                        updateUIVisibility();
-                        refreshFeedUI(); 
-                    } 
-                    else { localStorage.removeItem('mv_admin_key'); updateUIVisibility(); }
-                } catch (e) { updateUIVisibility(); }
-            } else {
-                updateUIVisibility();
-            }
-        }
+                const dates = data.map(candle => new Date(candle[0]).toISOString().split('T')[0]);
+                const prices = data.map(candle => parseFloat(candle[4])); // Uzatváracia cena
+                const currentPrice = prices[prices.length - 1];
 
-        function handleLogout() {
-            secretKey = ""; passInput.value = ''; 
-            localStorage.removeItem('mv_admin_key');
-            updateUIVisibility();
-            closeMenu();
-            resetEditor();
-            document.getElementById('editor-collapsed-state').style.display = 'flex';
-            document.getElementById('editor-form').style.display = 'none';
-            refreshFeedUI();
-        }
+                // 2. Výpočty (200 SMA a RSI)
+                const sma200 = calculateSMA(prices, 200);
+                const rsi = calculateRSI(prices, 14);
 
-        function refreshFeedUI() { 
-            const container = document.getElementById('status-container');
-            const deleteAllBtn = document.getElementById('delete-all-btn');
+                const currentSMA = sma200[sma200.length - 1];
+                const currentRSI = rsi[rsi.length - 1];
 
-            if (deleteAllBtn) {
-                if (globalPosts.length === 0) {
-                    deleteAllBtn.disabled = true;
-                    deleteAllBtn.className = "submit-btn btn-tonal-disabled";
-                } else {
-                    deleteAllBtn.disabled = false;
-                    deleteAllBtn.className = "submit-btn btn-danger";
-                }
-            }
-            
-            if (globalPosts.length === 0) {
-                container.className = 'status-feed view-feed';
-                if (secretKey) {
-                    container.innerHTML = ``;
-                } else {
-                    container.innerHTML = `
-                        <div class="divider-line"></div>
-                        <div class="submit-btn btn-tonal-disabled" style="width: 100%; cursor: default;">
-                            NOTHING HERE YET.
-                        </div>
-                    `;
-                }
-                return;
-            }
+                // 3. Výpočet skóre (Zjednodušený CBS pre JS verziu)
+                const distanceSMA = ((currentPrice - currentSMA) / currentSMA) * 100;
+                let depthScore = ((0 - distanceSMA) / (0 - (-40))) * 100;
+                depthScore = Math.max(0, Math.min(100, depthScore)); // Orezanie medzi 0-100
 
-            if (currentViewMode === 'feed') {
-                container.className = 'status-feed view-feed';
-                let html = `
-                    <div class="feed-toggle-wrapper">
-                        ${secretKey ? '<div class="divider-line"></div>' : ''}
-                        <button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">GRID VIEW</button>
-                    </div>
-                `;
-                globalPosts.forEach(post => { html += renderSinglePost(post); });
-                container.innerHTML = html;
-            } else {
-                container.className = 'status-feed view-grid';
-                let html = secretKey ? '<div class="divider-line"></div>' : '';
-                
-                let leftCol = '<div class="masonry-col col-left">';
-                let rightCol = '<div class="masonry-col col-right">';
+                let rsiScore = ((60 - currentRSI) / (60 - 30)) * 100;
+                rsiScore = Math.max(0, Math.min(100, rsiScore));
 
-                rightCol += `<button class="submit-btn btn-tonal" style="width: 100%; flex-shrink: 0;" onclick="toggleViewMode()">FEED VIEW</button>`;
+                const cbsScore = (0.60 * depthScore) + (0.40 * rsiScore);
+                const targetBottom = currentSMA * 0.60;
 
-                globalPosts.forEach((post, index) => {
-                    if (index % 2 === 0) leftCol += renderSinglePost(post);
-                    else rightCol += renderSinglePost(post);
-                });
+                // 4. Aktualizácia používateľského rozhrania (UI)
+                document.getElementById('cbs-score').innerText = cbsScore.toFixed(1) + ' %';
+                document.getElementById('target-dno').innerText = '$' + targetBottom.toFixed(0);
+                document.getElementById('sma-depth').innerText = distanceSMA.toFixed(1) + ' %';
+                document.getElementById('rsi-val').innerText = currentRSI.toFixed(1);
 
-                leftCol += '</div>';
-                rightCol += '</div>';
+                const statusEl = document.getElementById('status-message');
+                if (cbsScore >= 80) { statusEl.innerText = "🚨 EXTRÉMNA KAPITULÁCIA: Generačné dno."; statusEl.style.color = "#ff4444"; }
+                else if (cbsScore >= 70) { statusEl.innerText = "🟠 HLBOKÝ MEDVEDÍ TRH: Zóna ťažkej akumulácie."; statusEl.style.color = "#ffbb33"; }
+                else if (cbsScore >= 40) { statusEl.innerText = "🟡 PRECHODNÁ FÁZA: Mid-cycle."; statusEl.style.color = "#ffbb33"; }
+                else { statusEl.innerText = "🟢 TRH JE PREHRIATY: Distribúcia."; statusEl.style.color = "#00C851"; }
 
-                html += `<div class="grid-columns-wrapper">${leftCol}${rightCol}</div>`;
-                container.innerHTML = html;
-            }
-        }
+                // 5. Vykreslenie Plotly Grafu
+                const tracePrice = { x: dates, y: prices, mode: 'lines', name: 'Cena BTC', line: {color: '#1f77b4'} };
+                const traceSMA = { x: dates, y: sma200, mode: 'lines', name: '200 SMA', line: {color: 'gray', dash: 'dot'} };
+                const traceTarget = { x: dates, y: sma200.map(val => val ? val * 0.6 : null), mode: 'lines', name: 'Target Dno', line: {color: '#2ca02c', dash: 'dash'} };
 
-        function compressImage(file, maxWidth = 1200, quality = 0.8) {
-            return new Promise((resolve) => {
-                const reader = new FileReader(); 
-                reader.readAsDataURL(file);
-                reader.onload = event => {
-                    const img = new Image(); 
-                    img.src = event.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let w = img.width, h = img.height;
-                        if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
-                        canvas.width = w; canvas.height = h;
-                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                        const newName = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
-                        canvas.toBlob(blob => { 
-                            resolve(new File([blob], newName, { type: 'image/jpeg', lastModified: Date.now() })); 
-                        }, 'image/jpeg', quality);
-                    };
+                const traceRSI = { x: dates, y: rsi, mode: 'lines', name: '14D RSI', yaxis: 'y2', line: {color: '#ff7f0e'} };
+
+                const layout = {
+                    plot_bgcolor: '#0d1117',
+                    paper_bgcolor: '#0d1117',
+                    font: { color: '#c9d1d9', family: 'Courier New' },
+                    margin: { l: 40, r: 40, t: 30, b: 30 },
+                    hovermode: 'x unified',
+                    showlegend: true,
+                    legend: { orientation: "h", y: 1.1 },
+                    yaxis: { title: 'Cena USD (Log)', type: 'log', gridcolor: '#21262d' },
+                    yaxis2: { title: 'RSI', domain: [0, 0.3], gridcolor: '#21262d' },
+                    xaxis: { gridcolor: '#21262d' }
                 };
-            });
-        }
-
-        async function fetchStatuses(reset = false) {
-            if (reset) { currentOffset = 0; hasMorePosts = true; globalPosts = []; document.getElementById('status-container').innerHTML = ''; }
-            if (isLoading || !hasMorePosts) return;
-            isLoading = true;
-            try {
-                const response = await fetch(`${API_URL}/posts?skip=${currentOffset}&limit=${postsLimit}`);
-                const newPosts = await response.json();
-                if (newPosts.length < postsLimit) hasMorePosts = false;
-                currentOffset += newPosts.length; globalPosts = globalPosts.concat(newPosts);
                 
-                if (reset) {
-                    refreshFeedUI();
-                } else {
-                    if (currentViewMode === 'feed') {
-                        let html = '';
-                        newPosts.forEach(p => html += renderSinglePost(p));
-                        document.getElementById('status-container').insertAdjacentHTML('beforeend', html);
-                    } else {
-                        const leftCol = document.querySelector('.col-left');
-                        const rightCol = document.querySelector('.col-right');
-                        let currentCount = globalPosts.length - newPosts.length;
-                        newPosts.forEach((post, i) => {
-                            const postHtml = renderSinglePost(post);
-                            if ((currentCount + i) % 2 === 0) {
-                                if (leftCol) leftCol.insertAdjacentHTML('beforeend', postHtml);
-                            } else {
-                                if (rightCol) rightCol.insertAdjacentHTML('beforeend', postHtml);
-                            }
-                        });
-                    }
-                }
-            } catch (error) {} finally { 
-                isLoading = false; 
-                document.getElementById('loading-indicator').style.display = (hasMorePosts && globalPosts.length > 0) ? 'block' : 'none'; 
+                // Prekrytie grafov (Cena hore 70%, RSI dole 30%)
+                layout.yaxis.domain = [0.35, 1];
+
+                Plotly.newPlot('plotly-chart', [tracePrice, traceSMA, traceTarget, traceRSI], layout);
+
+            } catch (error) {
+                console.error("Chyba pri sťahovaní dát:", error);
+                document.getElementById('status-message').innerText = "❌ Chyba siete. Skontrolujte pripojenie.";
             }
         }
 
-        window.addEventListener('scroll', () => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) fetchStatuses(); });
-
-        function toggleGlassBar(imgElement, id) {
-            if (currentViewMode === 'grid') {
-                currentViewMode = 'feed';
-                localStorage.setItem('mv_view_mode', 'feed');
-                refreshFeedUI();
-                
-                const scrollIt = (behavior) => {
-                    const targetImg = document.getElementById(`post-img-${id}`);
-                    if (targetImg) {
-                        targetImg.closest('.status-card').scrollIntoView({ behavior: behavior, block: 'center' });
-                    }
-                };
-
-                setTimeout(() => scrollIt('auto'), 50);
-                setTimeout(() => scrollIt('auto'), 300);
-                setTimeout(() => scrollIt('smooth'), 600);
-                
-                return;
-            }
-
-            const bars = imgElement.parentElement.querySelectorAll('.status-glass-bar');
-            if (bars.length > 0) {
-                const isHidden = bars[0].style.display === 'none';
-                if (isHidden) {
-                    bars.forEach(b => b.style.display = 'flex');
-                    clearTimeout(imgElement.glassTimer);
-                } else {
-                    bars.forEach(b => b.style.display = 'none');
-                    clearTimeout(imgElement.glassTimer); 
-                    imgElement.glassTimer = setTimeout(() => {
-                        bars.forEach(b => b.style.display = 'flex');
-                    }, 5000);
-                }
-            }
-        }
-
-        function renderSinglePost(s) {
-            const formattedDate = new Date(s.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
-            
-            let barHtmlTop = `
-            <div class="status-glass-bar">
-                ${secretKey ? `<span class="admin-bar-item" style="color: var(--grey-50);">#${s.id}</span>` : '<div></div>'}
-                <span class="admin-bar-item" style="position: absolute; left: 50%; transform: translateX(-50%); color: var(--grey-50);">${formattedDate}</span>
-                ${secretKey ? `<span onclick="handleDeleteFeed(${s.id})" class="admin-bar-item admin-delete-link">DELETE</span>` : '<div></div>'}
-            </div>`;
-
-            const imageHtml = s.image_url ? `<img src="${s.image_url}" id="post-img-${s.id}" class="status-image" alt="image" loading="lazy" onclick="toggleGlassBar(this, ${s.id})">` : '';
-            
-            let mediaHtml = '';
-            if (imageHtml) {
-                mediaHtml = `
-                <div class="status-media-wrapper">
-                    ${barHtmlTop}
-                    ${imageHtml}
-                    ${secretKey ? `
-                    <div id="confirm-overlay-${s.id}" class="status-confirm-overlay">
-                        <div id="confirm-actions-${s.id}" class="action-row" style="padding: 0 var(--gap-item);">
-                            <button class="submit-btn" onclick="executeFeedDelete(${s.id})">DELETE</button>
-                            <button class="submit-btn btn-tonal" onclick="closeFeedDelete(${s.id})">CANCEL</button>
-                        </div>
-                        <div id="confirm-loading-${s.id}" class="action-row" style="display: none; padding: 0 var(--gap-item);">
-                            <div class="submit-btn btn-loading">DELETING...</div>
-                        </div>
-                        <div id="confirm-success-${s.id}" class="action-row" style="display: none; padding: 0 var(--gap-item);">
-                            <div class="submit-btn btn-ghost">DELETED</div>
-                        </div>
-                    </div>
-                    ` : ''}
-                </div>`;
-            }
-
-            return `<div class="status-card">${mediaHtml}</div>`;
-        }
-
-        function resetEditor() {
-            document.getElementById('edit-image').value = ""; 
-            
-            document.getElementById('upload-action-row').style.display = 'flex';
-            document.getElementById('upload-loading-row').style.display = 'none';
-            document.getElementById('upload-success-row').style.display = 'none';
-            
-            document.getElementById('upload-action-row').innerHTML = `
-                <button type="submit" id="publish-btn" class="submit-btn btn-tonal-disabled" style="flex-grow: 1;">UPLOAD</button>
-                <div class="submit-btn btn-tonal" onclick="collapseEditor()">CANCEL</div>
-            `;
-            
-            updateImageUIState(); 
-        }
-
-        function updateImageUIState() {
-            const input = document.getElementById('edit-image');
-            const emptyState = document.getElementById('upload-empty-state');
-            const filledState = document.getElementById('upload-filled-state');
-            const thumbnail = document.getElementById('upload-preview-img');
-            const pubBtn = document.getElementById('publish-btn');
-            const detailsZone = document.getElementById('upload-details-zone');
-
-            const hasImage = (input && input.files && input.files.length > 0);
-
-            if (hasImage) {
-                if(thumbnail) thumbnail.src = URL.createObjectURL(input.files[0]);
-                
-                if(emptyState) emptyState.style.display = 'none';
-                if(filledState) filledState.style.display = 'flex';
-            } else {
-                if(thumbnail) thumbnail.src = "";
-                
-                if(emptyState) emptyState.style.display = 'flex';
-                if(filledState) filledState.style.display = 'none';
-            }
-
-            if (pubBtn) {
-                if (hasImage) {
-                    pubBtn.disabled = false;
-                    pubBtn.className = "submit-btn btn-tonal";
-                } else {
-                    pubBtn.disabled = true;
-                    pubBtn.className = "submit-btn btn-tonal-disabled";
-                }
-            }
-        }
-
-        function clearImageSelection(e) {
-            e.stopPropagation();
-            document.getElementById('edit-image').value = ""; 
-            updateImageUIState();
-        }
-
-        function handleDeleteFeed(id) {
-            const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
-            const bars = card.querySelectorAll('.status-glass-bar');
-            bars.forEach(b => b.style.display = 'none');
-            
-            document.getElementById(`confirm-overlay-${id}`).style.display = 'flex';
-            document.getElementById(`confirm-actions-${id}`).style.display = 'flex';
-            document.getElementById(`confirm-loading-${id}`).style.display = 'none';
-            document.getElementById(`confirm-success-${id}`).style.display = 'none';
-        }
-
-        function closeFeedDelete(id) {
-            document.getElementById(`confirm-overlay-${id}`).style.display = 'none';
-            const card = document.getElementById(`confirm-overlay-${id}`).closest('.status-card');
-            const bars = card.querySelectorAll('.status-glass-bar');
-            bars.forEach(b => b.style.display = 'flex');
-        }
-
-        async function executeFeedDelete(id) {
-            document.getElementById(`confirm-actions-${id}`).style.display = 'none';
-            document.getElementById(`confirm-loading-${id}`).style.display = 'flex';
-            
-            await fetch(`${API_URL}/posts/${id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } });
-            
-            document.getElementById(`confirm-loading-${id}`).style.display = 'none';
-            document.getElementById(`confirm-success-${id}`).style.display = 'flex';
-            
-            setTimeout(() => {
-                fetchStatuses(true);
-            }, 1000);
-        }
-
-        function openDeleteModal(type) {
-            deleteActionType = type;
-            document.getElementById('delete-modal').style.display = 'flex';
-            document.getElementById('modal-action-zone').style.display = 'flex';
-            document.getElementById('modal-loading-zone').style.display = 'none';
-            document.getElementById('modal-success-zone').style.display = 'none';
-        }
-
-        function closeDeleteModal() {
-            document.getElementById('delete-modal').style.display = 'none';
-            deleteActionType = null;
-        }
-
-        async function executeModalDelete() {
-            if (deleteActionType === 'delete_all') {
-                document.getElementById('modal-action-zone').style.display = 'none';
-                document.getElementById('modal-loading-zone').style.display = 'flex';
-
-                const res = await fetch(`${API_URL}/posts?skip=0&limit=100`);
-                const posts = await res.json();
-                for (const p of posts) { 
-                    await fetch(`${API_URL}/posts/${p.id}`, { method: "DELETE", headers: { "x-admin-password": secretKey } }); 
-                }
-                
-                document.getElementById('modal-loading-zone').style.display = 'none';
-                document.getElementById('modal-success-zone').style.display = 'flex';
-                
-                setTimeout(() => {
-                    fetchStatuses(true);
-                    closeDeleteModal();
-                    collapseEditor();
-                }, 1000);
-            }
-        }
-
-        function handleDeleteAllClick() {
-            openDeleteModal('delete_all');
-        }
-
-        async function handleMainSubmit(e) { 
-            e.preventDefault(); 
-            const imageFile = document.getElementById('edit-image').files[0];
-            
-            if (!imageFile) { return; }
-            
-            document.getElementById('upload-action-row').style.display = 'none';
-            document.getElementById('upload-loading-row').style.display = 'flex';
-            
-            try {
-                const compressedFile = await compressImage(imageFile);
-                const formData = new FormData(); formData.append("file", compressedFile);
-                
-                const upRes = await fetch(`${API_URL}/upload-image`, { method: "POST", headers: { "x-admin-password": secretKey }, body: formData });
-                if (!upRes.ok) throw new Error("Upload failed");
-                const upData = await upRes.json();
-                const finalImageUrl = upData.image_url;
-
-                const payload = { title: "", text: "", image_url: finalImageUrl, show_date: true, author: "" };
-                
-                const res = await fetch(`${API_URL}/posts`, {
-                    method: "POST", headers: { "Content-Type": "application/json", "x-admin-password": secretKey },
-                    body: JSON.stringify(payload)
-                });
-                
-                if (res.ok) { 
-                    fetchStatuses(true); 
-                    document.getElementById('upload-loading-row').style.display = 'none';
-                    document.getElementById('upload-success-row').style.display = 'flex';
-                    setTimeout(() => { 
-                        collapseEditor(); 
-                    }, 1000);
-                } else { 
-                    resetEditor(); 
-                }
-            } catch (err) {
-                console.error(err);
-                resetEditor();
-            }
-        }
-
-        checkRememberedLogin();
-        fetchStatuses(true);
-        document.addEventListener('click', (e) => { if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target) && navOverlay.classList.contains('active')) closeMenu(); });
+        // Spustenie modelu po načítaní stránky
+        window.onload = runQuantModel;
     </script>
 </body>
 </html>
