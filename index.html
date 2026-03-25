@@ -62,10 +62,10 @@ async function analyze() {
     const colorClass = data.change > 0 ? "text-green-500" : (data.change < 0 ? "text-red-500" : "text-neutral-400");
     const sign = data.change > 0 ? "+" : "";
     
-    // Cena striktne na 2 desatinné miesta s čiarkami
+    // Cena na 2 desatinné miesta s čiarkami
     const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    // 1. Box pre Cenu
+    // 1. Box pre Cenu (Hlavička)
     let finalHTML = `
       <div class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md">
         <div class="text-neutral-400 text-sm font-bold uppercase tracking-widest mb-1">${data.name} (${data.ticker})</div>
@@ -76,19 +76,27 @@ async function analyze() {
       </div>
     `;
 
-    // 2. Rozsekanie textu od AI na jednotlivé sekcie a vytvorenie boxov
-    // Splitujeme text na základe ** (ktoré obaľujú nadpisy)
+    // 2. Rozsekanie textu a generovanie boxov
     const parts = data.analysis.split('**');
     
     for (let i = 1; i < parts.length; i += 2) {
       if (parts[i] && parts[i + 1]) {
         const title = parts[i].trim();
-        // Očistenie prebytočných pomlčiek, ak by ich AI náhodou aj tak použila namiesto emojis
+        // Očistenie pomlčiek a prevod nových riadkov na <br> s medzerou pre lepšiu čitateľnosť
         let content = parts[i + 1].trim().replace(/^- /gm, '').replace(/\n/g, '<br><br>');
 
+        // Špeciálny štýl pre VERDICT
+        let boxStyle = "bg-neutral-900 border-neutral-800";
+        let titleStyle = "text-purple-400";
+        
+        if (title.toUpperCase().includes("VERDICT")) {
+            boxStyle = "bg-purple-900/10 border-purple-700/50"; // Jemne fialový podmaz pre Verdikt
+            titleStyle = "text-purple-300 font-black uppercase tracking-wider";
+        }
+
         finalHTML += `
-          <div class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md">
-            <h2 class="text-purple-400 text-lg font-bold mb-3">${title}</h2>
+          <div class="${boxStyle} p-5 rounded-2xl border shadow-md">
+            <h2 class="${titleStyle} text-lg font-bold mb-3">${title}</h2>
             <div class="text-neutral-300 text-sm leading-relaxed">${content}</div>
           </div>
         `;
