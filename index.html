@@ -30,7 +30,7 @@ async function analyze() {
   const url = document.getElementById("url").value;
   const mode = document.getElementById("mode").value;
 
-  const res = await fetch("YOUR_RENDER_URL/analyze", {
+  const res = await fetch("https://mv-backend-ak8l.onrender.com", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({url, mode})
