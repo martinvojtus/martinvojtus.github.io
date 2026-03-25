@@ -1,24 +1,121 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>AI Video Analyzer</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Video Analyzer</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #0f0f10;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  max-width: 700px;
+  width: 100%;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 30px;
+}
+
+.card {
+  background: #1a1a1c;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.3);
+}
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+  background: #2a2a2d;
+  color: white;
+  font-size: 14px;
+}
+
+button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.output {
+  margin-top: 20px;
+  background: #1a1a1c;
+  padding: 20px;
+  border-radius: 16px;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.loading {
+  text-align: center;
+  margin-top: 15px;
+  opacity: 0.7;
+}
+
+@media (min-width: 768px) {
+  body {
+    align-items: center;
+    height: 100vh;
+  }
+}
+</style>
 </head>
 
 <body>
 
-<h2>🎥 AI Video Analyzer</h2>
+<div class="container">
 
-<input id="url" placeholder="Paste YouTube link" style="width:100%" />
+<h1>🎥 AI Video Analyzer</h1>
+
+<div class="card">
+
+<input id="url" placeholder="Paste YouTube link..." />
 
 <select id="mode">
-  <option value="business">Business</option>
-  <option value="coding">Coding</option>
-  <option value="self">Self</option>
+  <option value="business">💰 Business</option>
+  <option value="coding">💻 Coding</option>
+  <option value="self">🧠 Self Improvement</option>
 </select>
 
-<button onclick="analyze()">Analyze</button>
+<button id="btn" onclick="analyze()">Analyze</button>
 
-<pre id="output"></pre>
+<div id="loading" class="loading"></div>
+
+</div>
+
+<div id="output" class="output"></div>
+
+</div>
 
 <script>
 async function analyze() {
@@ -26,17 +123,35 @@ async function analyze() {
   const url = document.getElementById("url").value;
   const mode = document.getElementById("mode").value;
 
-  const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ url, mode })
-  });
+  const btn = document.getElementById("btn");
+  const loading = document.getElementById("loading");
+  const output = document.getElementById("output");
 
-  const data = await res.json();
+  if (!url) return alert("Paste link");
 
-  document.getElementById("output").innerText = data.analysis;
+  btn.disabled = true;
+  loading.innerText = "Analyzing video...";
+  output.innerText = "";
+
+  try {
+    const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ url, mode })
+    });
+
+    const data = await res.json();
+
+    output.innerText = data.analysis;
+
+  } catch (err) {
+    output.innerText = "Error: " + err;
+  }
+
+  btn.disabled = false;
+  loading.innerText = "";
 }
 </script>
 
