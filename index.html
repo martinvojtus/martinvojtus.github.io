@@ -22,7 +22,7 @@
   Analyze Macro Cycle
 </button>
 
-<div id="spinner" class="hidden text-center text-purple-400 font-medium mt-6">Analyzing market data...</div>
+<div id="spinner" class="hidden text-center text-purple-400 font-medium mt-6">Analyzing macro metrics & cycles...</div>
 
 <div id="divider" class="hidden border-b border-neutral-800 my-6"></div>
 
@@ -63,16 +63,12 @@ async function analyze() {
     let rawAnalysis = data.analysis;
     let phaseText = "ANALYZING...";
     
-    // Extrahovanie Fázy (BULL / BEAR / ACCUMULATION)
-    if (rawAnalysis.startsWith("PHASE:")) {
-      const firstLineBreak = rawAnalysis.indexOf('\n');
-      if (firstLineBreak !== -1) {
-        phaseText = rawAnalysis.substring(6, firstLineBreak).trim();
-        rawAnalysis = rawAnalysis.substring(firstLineBreak).trim();
-      } else {
-        phaseText = rawAnalysis.substring(6).trim();
-        rawAnalysis = "";
-      }
+    // INTELIGENTNÝ REGEX: Nájde text "PHASE: niečo" kdekoľvek na začiatku a vysekne to von.
+    let phaseMatch = rawAnalysis.match(/PHASE:\s*([a-zA-Z\s]+)/i);
+    if (phaseMatch) {
+        phaseText = phaseMatch[1].trim().toUpperCase();
+        // Zmaže nájdenú frázu z hlavného textu, aby nerobila vizuálny bordel dole
+        rawAnalysis = rawAnalysis.replace(phaseMatch[0], '').trim(); 
     }
 
     // Badge farba podľa fázy
@@ -83,14 +79,16 @@ async function analyze() {
         phaseBadgeColor = "bg-red-900/30 border-red-700/50 text-red-400";
     } else if (phaseText.includes("ACCUMULATION")) {
         phaseBadgeColor = "bg-blue-900/30 border-blue-700/50 text-blue-400";
+    } else if (phaseText.includes("DISTRIBUTION")) {
+        phaseBadgeColor = "bg-orange-900/30 border-orange-700/50 text-orange-400";
     }
 
-    // HLAVNÝ BOX
+    // HLAVNÝ BOX S GRAFOM
     let finalHTML = `
       <div class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md">
         <div class="flex justify-between items-start mb-2">
             <div class="text-neutral-400 text-sm font-bold uppercase tracking-widest">${data.name} (${data.ticker})</div>
-            <div class="${phaseBadgeColor} text-xs font-bold px-3 py-1 rounded-lg border uppercase text-right leading-tight">${phaseText}</div>
+            <div class="${phaseBadgeColor} text-xs font-bold px-3 py-1 rounded-lg border uppercase text-right leading-tight max-w-[50%]">${phaseText}</div>
         </div>
         <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-4">
           <span class="text-4xl sm:text-5xl font-bold tracking-tight">$${formattedPrice}</span>
@@ -108,10 +106,9 @@ async function analyze() {
     for (let i = 1; i < parts.length; i += 2) {
       if (parts[i] && parts[i + 1]) {
         const title = parts[i].trim();
-        // Zabezpečenie, že text sa zobrazí ako pekné odrážky, odstránenie zbytočných medzier
+        // Čistenie textu od nechcených pomlčiek a zabezpečenie odriadkovania
         let content = parts[i + 1].trim().replace(/^- /gm, '').replace(/\n/g, '<br><br>');
-        // Redukcia príliš veľkých medzier
-        content = content.replace(/(<br>\s*){3,}/g, '<br><br>');
+        content = content.replace(/(<br>\s*){3,}/g, '<br><br>'); // Odstráni obrovské medzery
 
         let boxStyle = "bg-neutral-900 border-neutral-800";
         let titleStyle = "text-purple-400";
@@ -122,7 +119,7 @@ async function analyze() {
             titleStyle = "text-blue-400 font-black uppercase tracking-wider";
         }
         
-        // Verdikt -> Farebný podľa toho, čo v ňom je
+        // Verdikt -> Zelený / Červený podľa obsahu
         if (title.toUpperCase().includes("VERDICT")) {
             if (content.toUpperCase().includes("BUY") || content.toUpperCase().includes("DCA") || phaseText.toUpperCase().includes("BULL")) {
                 boxStyle = "bg-green-900/10 border-green-800/50";
