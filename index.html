@@ -3,6 +3,7 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body class="bg-black text-white flex justify-center min-h-screen items-start pt-10 font-sans pb-10">
@@ -26,7 +27,7 @@
   Analyze Market
 </button>
 
-<div id="spinner" class="hidden text-center text-purple-500 font-medium mt-6">Scanning market data...</div>
+<div id="spinner" class="hidden text-center text-purple-500 font-medium mt-6">Fetching data & calculating RSI...</div>
 
 <div id="divider" class="hidden border-b border-neutral-800 my-6"></div>
 
@@ -36,6 +37,8 @@
 </div>
 
 <script>
+let priceChartInstance = null; // Premenná pre uchovanie grafu
+
 async function analyze() {
   const coin = document.getElementById("coin").value;
   const timeframe = document.getElementById("timeframe").value;
@@ -61,36 +64,53 @@ async function analyze() {
 
     const colorClass = data.change > 0 ? "text-green-500" : (data.change < 0 ? "text-red-500" : "text-neutral-400");
     const sign = data.change > 0 ? "+" : "";
-    
-    // Cena na 2 desatinné miesta s čiarkami
     const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    // 1. Box pre Cenu (Hlavička)
+    // 1. Vytiahnutie "Fázy" (PHASE) z AI textu
+    let rawAnalysis = data.analysis;
+    let phaseText = "Determining Phase...";
+    
+    if (rawAnalysis.startsWith("PHASE:")) {
+      const firstLineBreak = rawAnalysis.indexOf('\n');
+      if (firstLineBreak !== -1) {
+        phaseText = rawAnalysis.substring(6, firstLineBreak).trim();
+        rawAnalysis = rawAnalysis.substring(firstLineBreak).trim(); // Odstrihneme Fázu z hlavného textu
+      } else {
+        phaseText = rawAnalysis.substring(6).trim();
+        rawAnalysis = "";
+      }
+    }
+
+    // 2. Hlavný box: Názov, Fáza, Cena, Zmena a GRAF
     let finalHTML = `
       <div class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md">
-        <div class="text-neutral-400 text-sm font-bold uppercase tracking-widest mb-1">${data.name} (${data.ticker})</div>
-        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <div class="flex justify-between items-start mb-2">
+            <div class="text-neutral-400 text-sm font-bold uppercase tracking-widest">${data.name} (${data.ticker})</div>
+            <div class="text-purple-300 text-xs font-bold bg-purple-900/30 px-3 py-1 rounded-lg border border-purple-700/50 uppercase text-right leading-tight max-w-[50%]">${phaseText}</div>
+        </div>
+        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-4">
           <span class="text-4xl sm:text-5xl font-bold tracking-tight">$${formattedPrice}</span>
           <span class="${colorClass} text-xl font-semibold">${sign}${data.change.toFixed(2)}%</span>
+        </div>
+        
+        <div class="w-full h-40 relative border-t border-neutral-800 pt-3">
+          <canvas id="priceChart"></canvas>
         </div>
       </div>
     `;
 
-    // 2. Rozsekanie textu a generovanie boxov
-    const parts = data.analysis.split('**');
-    
+    // 3. Rozsekanie zvyšku analýzy na samostatné boxy
+    const parts = rawAnalysis.split('**');
     for (let i = 1; i < parts.length; i += 2) {
       if (parts[i] && parts[i + 1]) {
         const title = parts[i].trim();
-        // Očistenie pomlčiek a prevod nových riadkov na <br> s medzerou pre lepšiu čitateľnosť
         let content = parts[i + 1].trim().replace(/^- /gm, '').replace(/\n/g, '<br><br>');
 
-        // Špeciálny štýl pre VERDICT
         let boxStyle = "bg-neutral-900 border-neutral-800";
         let titleStyle = "text-purple-400";
         
         if (title.toUpperCase().includes("VERDICT")) {
-            boxStyle = "bg-purple-900/10 border-purple-700/50"; // Jemne fialový podmaz pre Verdikt
+            boxStyle = "bg-purple-900/10 border-purple-700/50";
             titleStyle = "text-purple-300 font-black uppercase tracking-wider";
         }
 
@@ -105,10 +125,48 @@ async function analyze() {
 
     output.innerHTML = finalHTML;
     
+    // 4. Vykreslenie grafu (ak máme dáta)
+    if (data.chart_dates.length > 0 && data.chart_prices.length > 0) {
+        if (priceChartInstance) { priceChartInstance.destroy(); } // Zmažeme starý graf ak existuje
+        
+        const ctx = document.getElementById('priceChart').getContext('2d');
+        
+        // Farba grafu podľa toho, či cena celkovo stúpla alebo klesla
+        const firstPrice = data.chart_prices[0];
+        const lastPrice = data.chart_prices[data.chart_prices.length - 1];
+        const chartColor = lastPrice >= firstPrice ? '#22c55e' : '#ef4444'; // zelená alebo červená
+
+        priceChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.chart_dates,
+                datasets: [{
+                    label: 'Price',
+                    data: data.chart_prices,
+                    borderColor: chartColor,
+                    borderWidth: 2,
+                    tension: 0.2, // jemne zaoblené čiary
+                    pointRadius: 0, // skryjeme body pre čistejší vzhľad
+                    pointHitRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }, // skryť legendu
+                scales: {
+                    x: { display: false }, // skryť spodnú os, aby bol graf čistý
+                    y: { display: false, min: Math.min(...data.chart_prices) * 0.99, max: Math.max(...data.chart_prices) * 1.01 } // skryť ľavú os
+                },
+                layout: { padding: 0 }
+            }
+        });
+    }
+
   } catch (error) {
     output.innerHTML = `
       <div class="bg-neutral-900 p-5 rounded-2xl border border-red-900">
-        <span class="text-red-500 font-bold block text-center">❌ Connection Error. Backend might be waking up, try again in 10 seconds.</span>
+        <span class="text-red-500 font-bold block text-center">❌ Connection Error. Backend might be waking up...</span>
       </div>`;
   }
 
