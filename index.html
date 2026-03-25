@@ -3,8 +3,20 @@
 <head>
   <title>AI Video Analyzer</title>
   <style>
-    body { font-family: Arial; max-width: 800px; margin: auto; }
-    textarea { width: 100%; height: 300px; }
+    body {
+      font-family: Arial;
+      max-width: 800px;
+      margin: auto;
+    }
+    textarea {
+      width: 100%;
+      height: 300px;
+    }
+    input, select, button {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px;
+    }
   </style>
 </head>
 
@@ -12,12 +24,12 @@
 
 <h2>🎥 AI Video Analyzer</h2>
 
-<input id="url" placeholder="Paste YouTube link" style="width:100%" />
+<input id="url" placeholder="Paste YouTube link" />
 
 <select id="mode">
   <option value="business">💰 Business</option>
   <option value="coding">💻 Coding</option>
-  <option value="self">🧠 Self</option>
+  <option value="self">🧠 Self Improvement</option>
 </select>
 
 <button onclick="analyze()">Analyze</button>
@@ -27,17 +39,22 @@
 
 <script>
 async function analyze() {
+
   const url = document.getElementById("url").value;
   const mode = document.getElementById("mode").value;
 
-  const res = await fetch("https://mv-backend-ak8l.onrender.com", {
+  const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({url, mode})
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ url, mode })
   });
 
   const data = await res.json();
-  document.getElementById("output").value = data.analysis;
+
+  document.getElementById("output").value =
+    "TITLE: " + data.title + "\n\n" + data.analysis;
 }
 </script>
 
