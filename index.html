@@ -3,13 +3,9 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
-<style>
-  /* Zlepšenie čitateľnosti AI textu */
-  .analysis-text b, .analysis-text strong { color: #a855f7; display: block; margin-top: 15px; font-size: 1.1em; }
-</style>
 </head>
 
-<body class="bg-black text-white flex justify-center">
+<body class="bg-black text-white flex justify-center min-h-screen items-start pt-10">
 
 <div class="w-full max-w-xl p-5 space-y-4">
 
@@ -30,9 +26,9 @@
   Analyze Market
 </button>
 
-<div id="spinner" class="hidden text-center text-purple-400 animate-pulse font-medium">Scanning blockchain data...</div>
+<div id="spinner" class="hidden text-center text-purple-400 animate-pulse font-medium mt-6">Scanning market data...</div>
 
-<div id="output" class="hidden bg-neutral-900 p-6 rounded-3xl border border-neutral-800 shadow-2xl">
+<div id="output" class="hidden bg-neutral-900 p-6 rounded-3xl border border-neutral-800 shadow-2xl mt-4">
   </div>
 
 </div>
@@ -59,26 +55,36 @@ async function analyze() {
 
     const data = await res.json();
 
-    const colorClass = data.change > 0 ? "text-green-400" : (data.change < 0 ? "text-red-400" : "text-gray-400");
+    const colorClass = data.change > 0 ? "text-green-400" : (data.change < 0 ? "text-red-400" : "text-neutral-400");
     const sign = data.change > 0 ? "+" : "";
     
-    // Formátovanie ceny na 2 desatinné miesta s oddelením tisícok
+    // Cena na 2 desatinné miesta s čiarkami (napr. 70,674.80)
     const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    // Vyčistenie Markdownu do čistého Tailwind HTML (žiadne ** ani pomlčky)
+    let styledAnalysis = data.analysis
+      .replace(/\n/g, '<br>') // Zalom riadky
+      .replace(/\*\*(.*?)\*\*/g, '<span class="block text-purple-400 text-[1.1rem] font-bold mt-6 mb-2">$1</span>') // Tučné nadpisy na fialovo
+      .replace(/<br>- /g, '<br><span class="text-purple-500 mr-2 font-bold">•</span>') // Odrážky v texte
+      .replace(/^- /g, '<span class="text-purple-500 mr-2 font-bold">•</span>'); // Prvá odrážka (ak by ňou začínal)
+      
+    // Odstránime horný margin pri úplne prvom nadpise, nech to sedí pekne pri čiare
+    styledAnalysis = styledAnalysis.replace('mt-6', 'mt-0');
 
     output.innerHTML = `
       <div class="border-b border-neutral-800 pb-5 mb-5">
-        <div class="text-neutral-500 text-sm font-bold uppercase tracking-widest mb-1">${data.name}</div>
-        <div class="flex items-baseline gap-3">
-          <span class="text-5xl font-black tracking-tighter">$${formattedPrice}</span>
+        <div class="text-neutral-500 text-sm font-bold uppercase tracking-widest mb-1">${data.name} (${data.ticker})</div>
+        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <span class="text-4xl sm:text-5xl font-black tracking-tighter">$${formattedPrice}</span>
           <span class="${colorClass} text-xl font-bold">${sign}${data.change}%</span>
         </div>
       </div>
-      <div class="analysis-text text-neutral-300 text-sm leading-relaxed">
-        ${data.analysis.replace(/\n/g, '<br>')}
+      <div class="text-neutral-300 text-sm leading-relaxed">
+        ${styledAnalysis}
       </div>
     `;
   } catch (error) {
-    output.innerHTML = `<span class="text-red-500 font-bold text-center block">❌ Connection Error. Backend might be waking up...</span>`;
+    output.innerHTML = `<span class="text-red-500 font-bold block text-center">❌ Connection Error. Backend might be waking up, try again in 10 seconds.</span>`;
   }
 
   spinner.classList.add("hidden");
