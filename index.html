@@ -27,7 +27,7 @@
   Analyze Market
 </button>
 
-<div id="spinner" class="hidden text-center text-purple-500 font-medium mt-6">Fetching data & calculating RSI...</div>
+<div id="spinner" class="hidden text-center text-purple-500 font-medium mt-6">Analyzing market data...</div>
 
 <div id="divider" class="hidden border-b border-neutral-800 my-6"></div>
 
@@ -37,7 +37,7 @@
 </div>
 
 <script>
-let priceChartInstance = null; // Premenná pre uchovanie grafu
+let priceChartInstance = null;
 
 async function analyze() {
   const coin = document.getElementById("coin").value;
@@ -66,27 +66,27 @@ async function analyze() {
     const sign = data.change > 0 ? "+" : "";
     const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    // 1. Vytiahnutie "Fázy" (PHASE) z AI textu
+    // Extrahovanie presnej fázy
     let rawAnalysis = data.analysis;
-    let phaseText = "Determining Phase...";
+    let phaseText = "ANALYZING...";
     
     if (rawAnalysis.startsWith("PHASE:")) {
       const firstLineBreak = rawAnalysis.indexOf('\n');
       if (firstLineBreak !== -1) {
         phaseText = rawAnalysis.substring(6, firstLineBreak).trim();
-        rawAnalysis = rawAnalysis.substring(firstLineBreak).trim(); // Odstrihneme Fázu z hlavného textu
+        rawAnalysis = rawAnalysis.substring(firstLineBreak).trim();
       } else {
         phaseText = rawAnalysis.substring(6).trim();
         rawAnalysis = "";
       }
     }
 
-    // 2. Hlavný box: Názov, Fáza, Cena, Zmena a GRAF
+    // HLAVNÝ BOX (Cena, Fáza, Graf)
     let finalHTML = `
       <div class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md">
         <div class="flex justify-between items-start mb-2">
             <div class="text-neutral-400 text-sm font-bold uppercase tracking-widest">${data.name} (${data.ticker})</div>
-            <div class="text-purple-300 text-xs font-bold bg-purple-900/30 px-3 py-1 rounded-lg border border-purple-700/50 uppercase text-right leading-tight max-w-[50%]">${phaseText}</div>
+            <div class="text-purple-300 text-xs font-bold bg-purple-900/30 px-3 py-1 rounded-lg border border-purple-700/50 uppercase text-right leading-tight">${phaseText}</div>
         </div>
         <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-4">
           <span class="text-4xl sm:text-5xl font-bold tracking-tight">$${formattedPrice}</span>
@@ -99,7 +99,7 @@ async function analyze() {
       </div>
     `;
 
-    // 3. Rozsekanie zvyšku analýzy na samostatné boxy
+    // OSTATNÉ BOXY A VERDIKT
     const parts = rawAnalysis.split('**');
     for (let i = 1; i < parts.length; i += 2) {
       if (parts[i] && parts[i + 1]) {
@@ -109,9 +109,18 @@ async function analyze() {
         let boxStyle = "bg-neutral-900 border-neutral-800";
         let titleStyle = "text-purple-400";
         
+        // Farbenie boxu VERDICT podľa toho, či obsahuje slovo LONG alebo SHORT
         if (title.toUpperCase().includes("VERDICT")) {
-            boxStyle = "bg-purple-900/10 border-purple-700/50";
-            titleStyle = "text-purple-300 font-black uppercase tracking-wider";
+            if (content.toUpperCase().includes("LONG") || phaseText.toUpperCase().includes("LONG") || content.toUpperCase().includes("BULL")) {
+                boxStyle = "bg-green-900/10 border-green-600/50";
+                titleStyle = "text-green-400 font-black uppercase tracking-wider";
+            } else if (content.toUpperCase().includes("SHORT") || phaseText.toUpperCase().includes("SHORT") || content.toUpperCase().includes("BEAR")) {
+                boxStyle = "bg-red-900/10 border-red-600/50";
+                titleStyle = "text-red-400 font-black uppercase tracking-wider";
+            } else {
+                boxStyle = "bg-purple-900/10 border-purple-700/50";
+                titleStyle = "text-purple-300 font-black uppercase tracking-wider";
+            }
         }
 
         finalHTML += `
@@ -125,16 +134,14 @@ async function analyze() {
 
     output.innerHTML = finalHTML;
     
-    // 4. Vykreslenie grafu (ak máme dáta)
+    // VYKRESLENIE GRAFU
     if (data.chart_dates.length > 0 && data.chart_prices.length > 0) {
-        if (priceChartInstance) { priceChartInstance.destroy(); } // Zmažeme starý graf ak existuje
+        if (priceChartInstance) { priceChartInstance.destroy(); }
         
         const ctx = document.getElementById('priceChart').getContext('2d');
-        
-        // Farba grafu podľa toho, či cena celkovo stúpla alebo klesla
         const firstPrice = data.chart_prices[0];
         const lastPrice = data.chart_prices[data.chart_prices.length - 1];
-        const chartColor = lastPrice >= firstPrice ? '#22c55e' : '#ef4444'; // zelená alebo červená
+        const chartColor = lastPrice >= firstPrice ? '#22c55e' : '#ef4444';
 
         priceChartInstance = new Chart(ctx, {
             type: 'line',
@@ -145,18 +152,28 @@ async function analyze() {
                     data: data.chart_prices,
                     borderColor: chartColor,
                     borderWidth: 2,
-                    tension: 0.2, // jemne zaoblené čiary
-                    pointRadius: 0, // skryjeme body pre čistejší vzhľad
+                    tension: 0.2,
+                    pointRadius: 0,
                     pointHitRadius: 10
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } }, // skryť legendu
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: {
+                        displayColors: false, // <-- TOTO odstráni ten farebný štvorček v grafe!
+                        callbacks: {
+                            label: function(context) {
+                                return 'Price: $' + context.parsed.y.toLocaleString('en-US', {minimumFractionDigits: 2});
+                            }
+                        }
+                    }
+                },
                 scales: {
-                    x: { display: false }, // skryť spodnú os, aby bol graf čistý
-                    y: { display: false, min: Math.min(...data.chart_prices) * 0.99, max: Math.max(...data.chart_prices) * 1.01 } // skryť ľavú os
+                    x: { display: false },
+                    y: { display: false, min: Math.min(...data.chart_prices) * 0.95, max: Math.max(...data.chart_prices) * 1.05 }
                 },
                 layout: { padding: 0 }
             }
