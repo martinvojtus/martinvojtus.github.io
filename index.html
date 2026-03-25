@@ -22,7 +22,7 @@
   Analyze Macro Cycle
 </button>
 
-<div id="spinner" class="hidden text-center text-purple-400 font-medium mt-6">Analyzing macro metrics & cycles...</div>
+<div id="spinner" class="hidden text-center text-purple-400 font-medium mt-6 h-6"></div>
 
 <div id="divider" class="hidden border-b border-neutral-800 my-6"></div>
 
@@ -33,6 +33,7 @@
 
 <script>
 let priceChartInstance = null;
+let spinnerInterval = null;
 
 async function analyze() {
   const coin = document.getElementById("coin").value;
@@ -41,11 +42,30 @@ async function analyze() {
   const divider = document.getElementById("divider");
   const btn = document.getElementById("btn");
 
-  spinner.classList.remove("hidden");
+  // Reset UI pred novou analýzou
   output.classList.add("hidden");
   divider.classList.add("hidden");
   btn.disabled = true;
   btn.classList.add("opacity-50");
+  
+  // Zapnutie dynamického spinnera
+  spinner.classList.remove("hidden");
+  const loadingMessages = [
+      "Downloading historical market data...",
+      "Calculating RSI & Moving Averages...",
+      "Identifying historical 4-year cycles...",
+      "Comparing current data to previous bear/bull markets...",
+      "AI is analyzing institutional Farside data...",
+      "Generating final macro verdict..."
+  ];
+  let msgIndex = 0;
+  spinner.innerText = loadingMessages[0];
+  
+  spinnerInterval = setInterval(() => {
+      msgIndex++;
+      if (msgIndex >= loadingMessages.length) msgIndex = loadingMessages.length - 1; // Zastane na poslednej správe
+      spinner.innerText = loadingMessages[msgIndex];
+  }, 1800); // Zmení text každých 1.8 sekundy
 
   try {
     const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
@@ -55,6 +75,10 @@ async function analyze() {
     });
 
     const data = await res.json();
+    
+    // Vypnutie spinnera po prijatí dát
+    clearInterval(spinnerInterval);
+    spinner.classList.add("hidden");
 
     const colorClass = data.change > 0 ? "text-green-500" : (data.change < 0 ? "text-red-500" : "text-neutral-400");
     const sign = data.change > 0 ? "+" : "";
@@ -63,15 +87,13 @@ async function analyze() {
     let rawAnalysis = data.analysis;
     let phaseText = "ANALYZING...";
     
-    // INTELIGENTNÝ REGEX: Nájde text "PHASE: niečo" kdekoľvek na začiatku a vysekne to von.
+    // INTELIGENTNÝ REGEX: Nájde text "PHASE: niečo" a vysekne to von.
     let phaseMatch = rawAnalysis.match(/PHASE:\s*([a-zA-Z\s]+)/i);
     if (phaseMatch) {
         phaseText = phaseMatch[1].trim().toUpperCase();
-        // Zmaže nájdenú frázu z hlavného textu, aby nerobila vizuálny bordel dole
         rawAnalysis = rawAnalysis.replace(phaseMatch[0], '').trim(); 
     }
 
-    // Badge farba podľa fázy
     let phaseBadgeColor = "bg-purple-900/30 border-purple-700/50 text-purple-300";
     if (phaseText.includes("BULL")) {
         phaseBadgeColor = "bg-green-900/30 border-green-700/50 text-green-400";
@@ -83,7 +105,6 @@ async function analyze() {
         phaseBadgeColor = "bg-orange-900/30 border-orange-700/50 text-orange-400";
     }
 
-    // HLAVNÝ BOX S GRAFOM
     let finalHTML = `
       <div class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md">
         <div class="flex justify-between items-start mb-2">
@@ -101,25 +122,21 @@ async function analyze() {
       </div>
     `;
 
-    // SPRACOVANIE ZVYŠNÝCH PILIEROV
     const parts = rawAnalysis.split('**');
     for (let i = 1; i < parts.length; i += 2) {
       if (parts[i] && parts[i + 1]) {
         const title = parts[i].trim();
-        // Čistenie textu od nechcených pomlčiek a zabezpečenie odriadkovania
         let content = parts[i + 1].trim().replace(/^- /gm, '').replace(/\n/g, '<br><br>');
-        content = content.replace(/(<br>\s*){3,}/g, '<br><br>'); // Odstráni obrovské medzery
+        content = content.replace(/(<br>\s*){3,}/g, '<br><br>'); 
 
         let boxStyle = "bg-neutral-900 border-neutral-800";
         let titleStyle = "text-purple-400";
         
-        // Target -> Modrý box
         if (title.toUpperCase().includes("TARGET")) {
             boxStyle = "bg-blue-900/10 border-blue-800/50";
             titleStyle = "text-blue-400 font-black uppercase tracking-wider";
         }
         
-        // Verdikt -> Zelený / Červený podľa obsahu
         if (title.toUpperCase().includes("VERDICT")) {
             if (content.toUpperCase().includes("BUY") || content.toUpperCase().includes("DCA") || phaseText.toUpperCase().includes("BULL")) {
                 boxStyle = "bg-green-900/10 border-green-800/50";
@@ -143,8 +160,9 @@ async function analyze() {
     }
 
     output.innerHTML = finalHTML;
+    divider.classList.remove("hidden");
+    output.classList.remove("hidden");
     
-    // VYKRESLENIE GRAFU
     if (data.chart_dates.length > 0 && data.chart_prices.length > 0) {
         if (priceChartInstance) { priceChartInstance.destroy(); }
         
@@ -191,15 +209,15 @@ async function analyze() {
     }
 
   } catch (error) {
+    clearInterval(spinnerInterval);
+    spinner.classList.add("hidden");
+    output.classList.remove("hidden");
     output.innerHTML = `
       <div class="bg-neutral-900 p-5 rounded-2xl border border-red-900/50">
         <span class="text-red-500 font-bold block text-center">❌ Connection Error. Wait a moment and try again.</span>
       </div>`;
   }
 
-  spinner.classList.add("hidden");
-  output.classList.remove("hidden");
-  divider.classList.remove("hidden");
   btn.disabled = false;
   btn.classList.remove("opacity-50");
 }
