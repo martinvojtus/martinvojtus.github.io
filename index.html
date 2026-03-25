@@ -12,21 +12,21 @@
 <h1 class="text-2xl text-center font-bold">📈 AI Crypto Analyst</h1>
 
 <select id="coin" class="w-full h-12 bg-neutral-800 rounded-xl px-3">
-  <option value="bitcoin">BTC</option>
-  <option value="ethereum">ETH</option>
-  <option value="solana">SOL</option>
+  <option value="BTC">BTC</option>
+  <option value="ETH">ETH</option>
+  <option value="SOL">SOL</option>
 </select>
 
 <select id="timeframe" class="w-full h-12 bg-neutral-800 rounded-xl px-3">
-  <option value="short-term">Short-term</option>
-  <option value="long-term">Long-term</option>
+  <option value="Short-term">Short-term</option>
+  <option value="Long-term">Long-term</option>
 </select>
 
-<button onclick="analyze()" class="w-full h-12 bg-purple-600 rounded-xl">
+<button onclick="analyze()" class="w-full h-12 bg-purple-600 rounded-xl hover:bg-purple-500 transition">
 Analyze
 </button>
 
-<div id="spinner" class="hidden text-center">Loading...</div>
+<div id="spinner" class="hidden text-center text-purple-400">Loading...</div>
 
 <div id="output" class="hidden bg-neutral-900 p-4 rounded-xl whitespace-pre-wrap"></div>
 
@@ -43,17 +43,22 @@ async function analyze() {
 
   spinner.classList.remove("hidden");
   output.classList.add("hidden");
+  output.innerText = ""; // Vyčistenie predchádzajúceho výsledku
 
-  const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ coin, timeframe })
-  });
+  try {
+    const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ coin, timeframe })
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  output.innerText =
-    `Price: $${data.price}\n24h: ${data.change}%\n\n${data.analysis}`;
+    output.innerText =
+      `Price: $${data.price}\n24h: ${data.change}%\n\n${data.analysis}`;
+  } catch (error) {
+    output.innerText = `❌ Error connecting to backend: ${error.message}`;
+  }
 
   spinner.classList.add("hidden");
   output.classList.remove("hidden");
