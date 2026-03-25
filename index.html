@@ -43,7 +43,7 @@ async function analyze() {
 
   spinner.classList.remove("hidden");
   output.classList.add("hidden");
-  output.innerText = ""; // Vyčistenie predchádzajúceho výsledku
+  output.innerHTML = ""; // Vyčistenie predchádzajúceho výsledku, zmena na HTML
 
   try {
     const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
@@ -54,8 +54,24 @@ async function analyze() {
 
     const data = await res.json();
 
-    output.innerText =
-      `Price: $${data.price}\n24h: ${data.change}%\n\n${data.analysis}`;
+    // Logika pre farebné percentá
+    let changeHtml;
+    if (data.change > 0) {
+      changeHtml = `<span class="text-green-500 font-bold">+${data.change}%</span>`;
+    } else if (data.change < 0) {
+      changeHtml = `<span class="text-red-500 font-bold">${data.change}%</span>`;
+    } else {
+      changeHtml = `<span class="text-neutral-400">0%</span>`;
+    }
+
+    // Nové zobrazenie na začiatku: Veľká cena, pod ňou farebné percento
+    output.innerHTML = `
+      <div class="flex items-end gap-3 mb-4">
+        <span class="text-5xl font-extrabold">$${data.price}</span>
+        <div class="pb-1">${changeHtml}</div>
+      </div>
+      ${data.analysis}
+    `;
   } catch (error) {
     output.innerText = `❌ Error connecting to backend: ${error.message}`;
   }
