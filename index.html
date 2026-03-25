@@ -2,139 +2,71 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
 <title>AI Video Analyzer</title>
 
-<style>
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #0f0f10;
-  color: #fff;
-  display: flex;
-  justify-content: center;
-}
+<script src="https://cdn.tailwindcss.com"></script>
 
-.container {
-  max-width: 700px;
-  width: 100%;
-  padding: 20px;
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 25px;
-}
-
-.card {
-  background: #1a1a1c;
-  padding: 20px;
-  border-radius: 16px;
-}
-
-.input-group {
-  display: flex;
-  gap: 10px;
-}
-
-input {
-  flex: 1;
-  height: 48px;
-  padding: 0 12px;
-  border-radius: 10px;
-  border: none;
-  background: #2a2a2d;
-  color: white;
-}
-
-.paste-btn {
-  height: 48px;
-  padding: 0 16px;
-  border-radius: 10px;
-  border: none;
-  background: #2a2a2d;
-  color: #aaa;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-select {
-  width: 100%;
-  height: 48px;
-  margin-top: 10px;
-  padding: 0 12px;
-  border-radius: 10px;
-  border: none;
-  background: #2a2a2d;
-  color: white;
-}
-
-button {
-  width: 100%;
-  margin-top: 15px;
-  height: 48px;
-  border-radius: 10px;
-  border: none;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.spinner {
-  display: none;
-  margin: 20px auto;
-  width: 30px;
-  height: 30px;
-  border: 3px solid #444;
-  border-top: 3px solid #7c3aed;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  100% { transform: rotate(360deg); }
-}
-
-.output {
-  margin-top: 20px;
-  background: #1a1a1c;
-  padding: 20px;
-  border-radius: 16px;
-  white-space: pre-wrap;
-  display: none;
-}
-
-</style>
 </head>
 
-<body>
+<body class="bg-neutral-950 text-white flex justify-center">
 
-<div class="container">
+<div class="w-full max-w-xl p-5">
 
-<h1>🎥 AI Video Analyzer</h1>
+<h1 class="text-center text-3xl font-semibold mb-6">
+🎥 AI Video Analyzer
+</h1>
 
-<div class="card">
+<div class="bg-neutral-900 p-5 rounded-2xl shadow-lg space-y-3">
 
-<div class="input-group">
-  <input id="url" placeholder="Paste YouTube link..." />
-  <button class="paste-btn" onclick="paste()">Paste</button>
+<!-- INPUT + PASTE -->
+<div class="flex gap-2">
+  <input
+    id="url"
+    placeholder="Paste YouTube link..."
+    class="flex-1 h-12 px-3 rounded-xl bg-neutral-800 text-sm outline-none"
+  />
+
+  <button
+    onclick="paste()"
+    class="h-12 px-4 rounded-xl bg-neutral-800 text-sm text-gray-300"
+  >
+    Paste
+  </button>
 </div>
 
-<select id="mode">
+<!-- SELECT -->
+<select
+  id="mode"
+  class="w-full h-12 px-3 rounded-xl bg-neutral-800 text-sm outline-none"
+>
   <option value="business">💰 Business</option>
   <option value="coding">💻 Coding</option>
   <option value="self">🧠 Self</option>
 </select>
 
-<button id="btn" onclick="analyze()">Analyze</button>
+<!-- BUTTON -->
+<button
+  id="btn"
+  onclick="analyze()"
+  class="w-full h-12 rounded-xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600"
+>
+  Analyze
+</button>
 
-<div id="spinner" class="spinner"></div>
+<!-- SPINNER -->
+<div id="spinner" class="hidden flex justify-center py-3">
+  <div class="w-6 h-6 border-2 border-neutral-700 border-t-purple-500 rounded-full animate-spin"></div>
+</div>
 
 </div>
 
-<div id="output" class="output"></div>
+<!-- OUTPUT -->
+<div
+  id="output"
+  class="hidden mt-4 bg-neutral-900 p-5 rounded-2xl whitespace-pre-wrap text-sm leading-relaxed"
+></div>
 
 </div>
 
@@ -144,7 +76,7 @@ async function paste() {
     const text = await navigator.clipboard.readText();
     document.getElementById("url").value = text;
   } catch {
-    alert("Clipboard not allowed");
+    alert("Clipboard blocked");
   }
 }
 
@@ -160,8 +92,8 @@ async function analyze() {
   if (!url) return alert("Paste link");
 
   btn.disabled = true;
-  spinner.style.display = "block";
-  output.style.display = "none";
+  spinner.classList.remove("hidden");
+  output.classList.add("hidden");
 
   try {
     const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
@@ -177,18 +109,18 @@ async function analyze() {
     let text = data.analysis;
 
     if (text.includes("No transcript available")) {
-      text = "⚠️ This video has no transcript.\n\n👉 Next step: enable AI audio transcription (coming soon).";
+      text = "⚠️ No transcript found.\n\n👉 Audio AI coming soon.";
     }
 
     output.innerText = text;
-    output.style.display = "block";
+    output.classList.remove("hidden");
 
   } catch (err) {
     output.innerText = "Error: " + err;
-    output.style.display = "block";
+    output.classList.remove("hidden");
   }
 
-  spinner.style.display = "none";
+  spinner.classList.add("hidden");
   btn.disabled = false;
 }
 </script>
