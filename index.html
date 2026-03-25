@@ -8,30 +8,26 @@
 
 <body class="bg-black text-white flex justify-center min-h-screen items-start pt-10 font-sans pb-10">
 
-<div class="w-full max-w-xl p-5 space-y-4">
+<div class="w-full max-w-xl p-5 space-y-5">
 
-<h1 class="text-2xl text-center font-bold mb-6 tracking-wide">AI Crypto Analyst</h1>
+<h1 class="text-3xl text-center font-extrabold mb-2 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500">Macro Crypto Analyst</h1>
+<p class="text-center text-neutral-500 text-sm mb-6 font-medium tracking-widest uppercase">Institutional Cycle Data</p>
 
-<select id="coin" class="w-full h-14 bg-neutral-900 border border-neutral-800 rounded-xl px-4 outline-none focus:border-purple-600 transition appearance-none">
+<select id="coin" class="w-full h-14 bg-neutral-900 border border-neutral-800 rounded-xl px-4 outline-none focus:border-purple-600 transition appearance-none text-lg font-semibold shadow-inner">
   <option value="BTC">Bitcoin (BTC)</option>
   <option value="ETH">Ethereum (ETH)</option>
   <option value="SOL">Solana (SOL)</option>
 </select>
 
-<select id="timeframe" class="w-full h-14 bg-neutral-900 border border-neutral-800 rounded-xl px-4 outline-none focus:border-purple-600 transition appearance-none">
-  <option value="Short-term">Short-term (Daily/Weekly)</option>
-  <option value="Long-term">Long-term (Cycle/Macro)</option>
-</select>
-
-<button onclick="analyze()" id="btn" class="w-full h-14 bg-purple-700 rounded-xl font-bold text-lg hover:bg-purple-600 transition active:scale-95 shadow-lg">
-  Analyze Market
+<button onclick="analyze()" id="btn" class="w-full h-14 bg-gradient-to-r from-purple-700 to-purple-600 rounded-xl font-bold text-lg hover:from-purple-600 hover:to-purple-500 transition active:scale-95 shadow-lg shadow-purple-900/20">
+  Analyze Macro Cycle
 </button>
 
-<div id="spinner" class="hidden text-center text-purple-500 font-medium mt-6">Analyzing market data...</div>
+<div id="spinner" class="hidden text-center text-purple-500 font-medium mt-6 animate-pulse">Calculating Weekly Metrics & Whale Data...</div>
 
 <div id="divider" class="hidden border-b border-neutral-800 my-6"></div>
 
-<div id="output" class="hidden flex flex-col gap-4">
+<div id="output" class="hidden flex flex-col gap-5">
   </div>
 
 </div>
@@ -41,7 +37,6 @@ let priceChartInstance = null;
 
 async function analyze() {
   const coin = document.getElementById("coin").value;
-  const timeframe = document.getElementById("timeframe").value;
   const spinner = document.getElementById("spinner");
   const output = document.getElementById("output");
   const divider = document.getElementById("divider");
@@ -57,7 +52,7 @@ async function analyze() {
     const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ coin, timeframe })
+      body: JSON.stringify({ coin: coin }) // Odošle už len coin
     });
 
     const data = await res.json();
@@ -69,7 +64,7 @@ async function analyze() {
     let rawAnalysis = data.analysis;
     let phaseText = "ANALYZING...";
     
-    // Extrahovanie Fázy (napr. BULL MARKET alebo LONG PHASE)
+    // Extrahovanie Fázy (BULL / BEAR / ACCUMULATION)
     if (rawAnalysis.startsWith("PHASE:")) {
       const firstLineBreak = rawAnalysis.indexOf('\n');
       if (firstLineBreak !== -1) {
@@ -81,33 +76,35 @@ async function analyze() {
       }
     }
 
-    // Farebný štítok Fázy hore pri cene
+    // Badge farba podľa fázy
     let phaseBadgeColor = "bg-purple-900/30 border-purple-700/50 text-purple-300";
-    if (phaseText.includes("BULL") || phaseText.includes("LONG")) {
+    if (phaseText.includes("BULL")) {
         phaseBadgeColor = "bg-green-900/30 border-green-700/50 text-green-400";
-    } else if (phaseText.includes("BEAR") || phaseText.includes("SHORT")) {
+    } else if (phaseText.includes("BEAR")) {
         phaseBadgeColor = "bg-red-900/30 border-red-700/50 text-red-400";
+    } else if (phaseText.includes("ACCUMULATION")) {
+        phaseBadgeColor = "bg-blue-900/30 border-blue-700/50 text-blue-400";
     }
 
-    // HLAVNÝ BOX
+    // HLAVNÝ BOX (Teraz s pekným gradientom pre cenu)
     let finalHTML = `
-      <div class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md">
-        <div class="flex justify-between items-start mb-2">
-            <div class="text-neutral-400 text-sm font-bold uppercase tracking-widest">${data.name} (${data.ticker})</div>
-            <div class="${phaseBadgeColor} text-xs font-bold px-3 py-1 rounded-lg border uppercase text-right leading-tight">${phaseText}</div>
+      <div class="bg-neutral-900 p-6 rounded-3xl border border-neutral-800 shadow-xl relative overflow-hidden">
+        <div class="flex justify-between items-start mb-3">
+            <div class="text-neutral-400 text-xs font-bold uppercase tracking-widest">${data.name} (${data.ticker})</div>
+            <div class="${phaseBadgeColor} text-xs font-bold px-3 py-1 rounded-md border uppercase text-right tracking-wider">${phaseText}</div>
         </div>
-        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-4">
-          <span class="text-4xl sm:text-5xl font-bold tracking-tight">$${formattedPrice}</span>
-          <span class="${colorClass} text-xl font-semibold">${sign}${data.change.toFixed(2)}%</span>
+        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-5">
+          <span class="text-5xl sm:text-6xl font-black tracking-tighter text-white">$${formattedPrice}</span>
+          <span class="${colorClass} text-2xl font-bold">${sign}${data.change.toFixed(2)}%</span>
         </div>
         
-        <div class="w-full h-40 relative border-t border-neutral-800 pt-3">
+        <div class="w-full h-44 relative border-t border-neutral-800 pt-4">
           <canvas id="priceChart"></canvas>
         </div>
       </div>
     `;
 
-    // OSTATNÉ BOXY (Cykly, Targets, Verdikt)
+    // SPRACOVANIE ZVYŠNÝCH PILIEROV
     const parts = rawAnalysis.split('**');
     for (let i = 1; i < parts.length; i += 2) {
       if (parts[i] && parts[i + 1]) {
@@ -117,30 +114,30 @@ async function analyze() {
         let boxStyle = "bg-neutral-900 border-neutral-800";
         let titleStyle = "text-purple-400";
         
-        // 1. Špeciálny štýl pre CYCLE TARGETS (Predpokladaný Top/Bottom) -> Modrý
+        // Target -> Modrý box
         if (title.toUpperCase().includes("TARGET")) {
-            boxStyle = "bg-blue-900/10 border-blue-700/50";
+            boxStyle = "bg-blue-900/10 border-blue-800/50";
             titleStyle = "text-blue-400 font-black uppercase tracking-wider";
         }
         
-        // 2. Špeciálny štýl pre VERDICT -> Zelený / Červený / Fialový
+        // Verdikt -> Farebný podľa toho, čo v ňom je
         if (title.toUpperCase().includes("VERDICT")) {
-            if (content.toUpperCase().includes("LONG") || phaseText.toUpperCase().includes("LONG") || content.toUpperCase().includes("BULL") || content.toUpperCase().includes("DCA")) {
-                boxStyle = "bg-green-900/10 border-green-600/50";
+            if (content.toUpperCase().includes("BUY") || content.toUpperCase().includes("DCA") || phaseText.toUpperCase().includes("BULL")) {
+                boxStyle = "bg-green-900/10 border-green-800/50 shadow-[0_0_15px_rgba(34,197,94,0.1)]";
                 titleStyle = "text-green-400 font-black uppercase tracking-wider";
-            } else if (content.toUpperCase().includes("SHORT") || phaseText.toUpperCase().includes("SHORT") || content.toUpperCase().includes("BEAR") || content.toUpperCase().includes("SELL")) {
-                boxStyle = "bg-red-900/10 border-red-600/50";
+            } else if (content.toUpperCase().includes("SELL") || phaseText.toUpperCase().includes("BEAR")) {
+                boxStyle = "bg-red-900/10 border-red-800/50 shadow-[0_0_15px_rgba(239,68,68,0.1)]";
                 titleStyle = "text-red-400 font-black uppercase tracking-wider";
             } else {
-                boxStyle = "bg-purple-900/10 border-purple-700/50";
+                boxStyle = "bg-purple-900/10 border-purple-800/50";
                 titleStyle = "text-purple-300 font-black uppercase tracking-wider";
             }
         }
 
         finalHTML += `
-          <div class="${boxStyle} p-5 rounded-2xl border shadow-md">
-            <h2 class="${titleStyle} text-lg font-bold mb-3">${title}</h2>
-            <div class="text-neutral-300 text-sm leading-relaxed">${content}</div>
+          <div class="${boxStyle} p-6 rounded-3xl border shadow-lg">
+            <h2 class="${titleStyle} text-[1.1rem] font-bold mb-4">${title}</h2>
+            <div class="text-neutral-300 text-[0.95rem] leading-relaxed space-y-2">${content}</div>
           </div>
         `;
       }
@@ -165,7 +162,7 @@ async function analyze() {
                     label: 'Price',
                     data: data.chart_prices,
                     borderColor: chartColor,
-                    borderWidth: 2,
+                    borderWidth: 2.5, // Trošku hrubšia čiara pre prémiový vzhľad
                     tension: 0.2,
                     pointRadius: 0,
                     pointHitRadius: 10
@@ -177,10 +174,14 @@ async function analyze() {
                 plugins: { 
                     legend: { display: false },
                     tooltip: {
-                        displayColors: false, // Odstráni farebný štvorček tooltipu
+                        displayColors: false,
+                        backgroundColor: '#171717',
+                        titleColor: '#a3a3a3',
+                        bodyFont: { size: 14, weight: 'bold' },
+                        padding: 10,
                         callbacks: {
                             label: function(context) {
-                                return 'Price: $' + context.parsed.y.toLocaleString('en-US', {minimumFractionDigits: 2});
+                                return '$' + context.parsed.y.toLocaleString('en-US', {minimumFractionDigits: 2});
                             }
                         }
                     }
@@ -196,8 +197,8 @@ async function analyze() {
 
   } catch (error) {
     output.innerHTML = `
-      <div class="bg-neutral-900 p-5 rounded-2xl border border-red-900">
-        <span class="text-red-500 font-bold block text-center">❌ Connection Error. Backend might be waking up...</span>
+      <div class="bg-neutral-900 p-6 rounded-3xl border border-red-900/50">
+        <span class="text-red-500 font-bold block text-center">❌ Connection Error. Wait 10s and try again.</span>
       </div>`;
   }
 
