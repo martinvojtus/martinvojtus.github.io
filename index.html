@@ -2,40 +2,23 @@
 <html>
 <head>
   <title>AI Video Analyzer</title>
-  <style>
-    body {
-      font-family: Arial;
-      max-width: 800px;
-      margin: auto;
-    }
-    textarea {
-      width: 100%;
-      height: 300px;
-    }
-    input, select, button {
-      margin-top: 10px;
-      width: 100%;
-      padding: 10px;
-    }
-  </style>
 </head>
 
 <body>
 
 <h2>🎥 AI Video Analyzer</h2>
 
-<input id="url" placeholder="Paste YouTube link" />
+<input id="url" placeholder="Paste YouTube link" style="width:100%" />
 
 <select id="mode">
-  <option value="business">💰 Business</option>
-  <option value="coding">💻 Coding</option>
-  <option value="self">🧠 Self Improvement</option>
+  <option value="business">Business</option>
+  <option value="coding">Coding</option>
+  <option value="self">Self</option>
 </select>
 
 <button onclick="analyze()">Analyze</button>
 
-<h3>Output:</h3>
-<textarea id="output"></textarea>
+<pre id="output"></pre>
 
 <script>
 async function analyze() {
@@ -53,8 +36,7 @@ async function analyze() {
 
   const data = await res.json();
 
-  document.getElementById("output").value =
-    "TITLE: " + data.title + "\n\n" + data.analysis;
+  document.getElementById("output").innerText = data.analysis;
 }
 </script>
 
