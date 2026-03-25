@@ -1,122 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-<title>AI Video Analyzer</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
-
 </head>
 
-<body class="bg-neutral-950 text-white flex justify-center">
+<body class="bg-black text-white flex justify-center">
 
-<div class="w-full max-w-xl p-5">
+<div class="w-full max-w-xl p-5 space-y-4">
 
-<h1 class="text-center text-3xl font-semibold mb-6">
-🎥 AI Video Analyzer
-</h1>
+<h1 class="text-2xl text-center font-bold">📈 AI Crypto Analyst</h1>
 
-<div class="bg-neutral-900 p-5 rounded-2xl shadow-lg space-y-3">
-
-<div class="flex gap-2">
-  <input
-    id="url"
-    placeholder="Paste YouTube link..."
-    class="flex-1 h-12 px-3 rounded-xl bg-neutral-800 text-sm outline-none"
-  />
-
-  <button
-    onclick="paste()"
-    class="h-12 px-4 rounded-xl bg-neutral-800 text-sm text-gray-300"
-  >
-    Paste
-  </button>
-</div>
-
-<select
-  id="mode"
-  class="w-full h-12 px-3 rounded-xl bg-neutral-800 text-sm outline-none"
->
-  <option value="business">💰 Business</option>
-  <option value="coding">💻 Coding</option>
-  <option value="self">🧠 Self</option>
+<select id="coin" class="w-full h-12 bg-neutral-800 rounded-xl px-3">
+  <option value="bitcoin">BTC</option>
+  <option value="ethereum">ETH</option>
+  <option value="solana">SOL</option>
 </select>
 
-<button
-  id="btn"
-  onclick="analyze()"
-  class="w-full h-12 rounded-xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600"
->
-  Analyze
+<select id="timeframe" class="w-full h-12 bg-neutral-800 rounded-xl px-3">
+  <option value="short-term">Short-term</option>
+  <option value="long-term">Long-term</option>
+</select>
+
+<button onclick="analyze()" class="w-full h-12 bg-purple-600 rounded-xl">
+Analyze
 </button>
 
-<div id="spinner" class="hidden flex justify-center py-3">
-  <div class="w-6 h-6 border-2 border-neutral-700 border-t-purple-500 rounded-full animate-spin"></div>
-</div>
+<div id="spinner" class="hidden text-center">Loading...</div>
 
-</div>
-
-<div
-  id="output"
-  class="hidden mt-4 bg-neutral-900 p-5 rounded-2xl whitespace-pre-wrap text-sm leading-relaxed"
-></div>
+<div id="output" class="hidden bg-neutral-900 p-4 rounded-xl whitespace-pre-wrap"></div>
 
 </div>
 
 <script>
-async function paste() {
-  try {
-    const text = await navigator.clipboard.readText();
-    document.getElementById("url").value = text;
-  } catch {
-    alert("Clipboard blocked");
-  }
-}
-
 async function analyze() {
 
-  const url = document.getElementById("url").value;
-  const mode = document.getElementById("mode").value;
+  const coin = document.getElementById("coin").value;
+  const timeframe = document.getElementById("timeframe").value;
 
-  const btn = document.getElementById("btn");
   const spinner = document.getElementById("spinner");
   const output = document.getElementById("output");
 
-  if (!url) return alert("Paste link");
-
-  btn.disabled = true;
   spinner.classList.remove("hidden");
   output.classList.add("hidden");
 
-  try {
-    const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ url, mode })
-    });
+  const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ coin, timeframe })
+  });
 
-    const data = await res.json();
+  const data = await res.json();
 
-    let text = data.analysis;
-
-    if (text.toLowerCase().includes("no transcript")) {
-      text = "⚠️ This video has no accessible transcript.\n\n👉 Next step: enable AI audio transcription.";
-    }
-
-    output.innerText = text;
-    output.classList.remove("hidden");
-
-  } catch (err) {
-    output.innerText = "Error: " + err;
-    output.classList.remove("hidden");
-  }
+  output.innerText =
+    `Price: $${data.price}\n24h: ${data.change}%\n\n${data.analysis}`;
 
   spinner.classList.add("hidden");
-  btn.disabled = false;
+  output.classList.remove("hidden");
 }
 </script>
 
