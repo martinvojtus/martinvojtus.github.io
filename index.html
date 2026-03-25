@@ -5,7 +5,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-black text-white flex justify-center min-h-screen items-start pt-10 font-sans">
+<body class="bg-black text-white flex justify-center min-h-screen items-start pt-10 font-sans pb-10">
 
 <div class="w-full max-w-xl p-5 space-y-4">
 
@@ -28,7 +28,9 @@
 
 <div id="spinner" class="hidden text-center text-purple-500 font-medium mt-6">Scanning market data...</div>
 
-<div id="output" class="hidden bg-neutral-900 p-6 rounded-2xl border border-neutral-800 mt-4">
+<div id="divider" class="hidden border-b border-neutral-800 my-6"></div>
+
+<div id="output" class="hidden flex flex-col gap-4">
   </div>
 
 </div>
@@ -39,10 +41,12 @@ async function analyze() {
   const timeframe = document.getElementById("timeframe").value;
   const spinner = document.getElementById("spinner");
   const output = document.getElementById("output");
+  const divider = document.getElementById("divider");
   const btn = document.getElementById("btn");
 
   spinner.classList.remove("hidden");
   output.classList.add("hidden");
+  divider.classList.add("hidden");
   btn.disabled = true;
   btn.classList.add("opacity-50");
 
@@ -61,37 +65,48 @@ async function analyze() {
     // Cena striktne na 2 desatinné miesta s čiarkami
     const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    // Prepis AI odpovede na striktný Tailwind (oddeľovače + nadpisy + odrážky)
-    let styledAnalysis = data.analysis
-      .replace(/\*\*(.*?)\*\*/g, (match, title, offset) => {
-        // Pridá oddeľovač (hr) pred každý nadpis okrem úplne prvého
-        const divider = offset > 0 ? '<div class="border-b border-neutral-800 my-5"></div>' : '';
-        return `${divider}<div class="text-purple-400 text-lg font-bold mb-3">${title}</div>`;
-      })
-      .replace(/- /g, '<span class="text-purple-600 mr-2 font-black">•</span>')
-      .replace(/\n/g, '<br>');
-
-    // Odstránenie prebytočných <br> hneď za nadpismi (aby tam nebola zbytočná medzera)
-    styledAnalysis = styledAnalysis.replace(/<\/div><br>/g, '</div>');
-
-    output.innerHTML = `
-      <div class="border-b border-neutral-800 pb-5 mb-5">
+    // 1. Box pre Cenu
+    let finalHTML = `
+      <div class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md">
         <div class="text-neutral-400 text-sm font-bold uppercase tracking-widest mb-1">${data.name} (${data.ticker})</div>
         <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
           <span class="text-4xl sm:text-5xl font-bold tracking-tight">$${formattedPrice}</span>
           <span class="${colorClass} text-xl font-semibold">${sign}${data.change.toFixed(2)}%</span>
         </div>
       </div>
-      <div class="text-neutral-300 text-sm leading-relaxed">
-        ${styledAnalysis}
-      </div>
     `;
+
+    // 2. Rozsekanie textu od AI na jednotlivé sekcie a vytvorenie boxov
+    // Splitujeme text na základe ** (ktoré obaľujú nadpisy)
+    const parts = data.analysis.split('**');
+    
+    for (let i = 1; i < parts.length; i += 2) {
+      if (parts[i] && parts[i + 1]) {
+        const title = parts[i].trim();
+        // Očistenie prebytočných pomlčiek, ak by ich AI náhodou aj tak použila namiesto emojis
+        let content = parts[i + 1].trim().replace(/^- /gm, '').replace(/\n/g, '<br><br>');
+
+        finalHTML += `
+          <div class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md">
+            <h2 class="text-purple-400 text-lg font-bold mb-3">${title}</h2>
+            <div class="text-neutral-300 text-sm leading-relaxed">${content}</div>
+          </div>
+        `;
+      }
+    }
+
+    output.innerHTML = finalHTML;
+    
   } catch (error) {
-    output.innerHTML = `<span class="text-red-500 font-bold block text-center">❌ Connection Error. Backend might be waking up, try again in 10 seconds.</span>`;
+    output.innerHTML = `
+      <div class="bg-neutral-900 p-5 rounded-2xl border border-red-900">
+        <span class="text-red-500 font-bold block text-center">❌ Connection Error. Backend might be waking up, try again in 10 seconds.</span>
+      </div>`;
   }
 
   spinner.classList.add("hidden");
   output.classList.remove("hidden");
+  divider.classList.remove("hidden");
   btn.disabled = false;
   btn.classList.remove("opacity-50");
 }
