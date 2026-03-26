@@ -28,7 +28,7 @@
 <div id="divider" class="hidden border-b border-neutral-800 my-6"></div>
 
 <div id="output" class="hidden flex flex-col gap-4">
-  </div>
+</div>
 
 </div>
 
@@ -51,9 +51,9 @@ async function analyze() {
   
   const loadingMessages = [
       "Fetching ₿/XAU prices...",
-      "Mapping cycle fractals...",
-      "Calculating 200W MA...",
-      "AI is analyzing flows...",
+      "Calculating Support & Resistance...",
+      "Estimating Cycle Targets...",
+      "AI is mapping macro fractals...",
       "Generating report..."
   ];
   let msgIndex = 0;
@@ -187,7 +187,6 @@ async function analyze() {
                     tension: 0.2,
                     pointRadius: 0,
                     pointHitRadius: 10
-                    // Odstránená výplň grafu (fill parameter)
                 }]
             },
             options: {
