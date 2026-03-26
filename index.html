@@ -42,7 +42,7 @@ async function analyze() {
   const divider = document.getElementById("divider");
   const btn = document.getElementById("btn");
 
-  // Reset UI pred novou analýzou
+  // Reset UI
   output.classList.add("hidden");
   divider.classList.add("hidden");
   btn.disabled = true;
@@ -51,8 +51,8 @@ async function analyze() {
   // Zapnutie dynamického spinnera
   spinner.classList.remove("hidden");
   const loadingMessages = [
-      "Downloading historical market data...",
-      "Calculating RSI & Moving Averages...",
+      "Downloading complete macro history...",
+      "Calculating Weekly RSI & Moving Averages...",
       "Identifying historical 4-year cycles...",
       "Comparing current data to previous bear/bull markets...",
       "AI is analyzing institutional Farside data...",
@@ -61,11 +61,12 @@ async function analyze() {
   let msgIndex = 0;
   spinner.innerText = loadingMessages[0];
   
+  // Mení text každých 1.8 sekundy
   spinnerInterval = setInterval(() => {
       msgIndex++;
-      if (msgIndex >= loadingMessages.length) msgIndex = loadingMessages.length - 1; // Zastane na poslednej správe
+      if (msgIndex >= loadingMessages.length) msgIndex = loadingMessages.length - 1;
       spinner.innerText = loadingMessages[msgIndex];
-  }, 1800); // Zmení text každých 1.8 sekundy
+  }, 1800); 
 
   try {
     const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
@@ -132,11 +133,13 @@ async function analyze() {
         let boxStyle = "bg-neutral-900 border-neutral-800";
         let titleStyle = "text-purple-400";
         
+        // Target -> Modrý box
         if (title.toUpperCase().includes("TARGET")) {
             boxStyle = "bg-blue-900/10 border-blue-800/50";
             titleStyle = "text-blue-400 font-black uppercase tracking-wider";
         }
         
+        // Verdikt -> Farebný podľa toho, čo v ňom je
         if (title.toUpperCase().includes("VERDICT")) {
             if (content.toUpperCase().includes("BUY") || content.toUpperCase().includes("DCA") || phaseText.toUpperCase().includes("BULL")) {
                 boxStyle = "bg-green-900/10 border-green-800/50";
@@ -214,7 +217,7 @@ async function analyze() {
     output.classList.remove("hidden");
     output.innerHTML = `
       <div class="bg-neutral-900 p-5 rounded-2xl border border-red-900/50">
-        <span class="text-red-500 font-bold block text-center">❌ Connection Error. Wait a moment and try again.</span>
+        <span class="text-red-500 font-bold block text-center">❌ Connection Error. Backend might be waking up or API limit reached. Try again in a few seconds.</span>
       </div>`;
   }
 
