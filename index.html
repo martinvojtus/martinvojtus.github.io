@@ -4,16 +4,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  /* Vlastná oranžová farba Bitcoin #F7931A */
+  .bg-orange-btc { background-color: #F7931A; }
+  .text-orange-btc { color: #F7931A; }
+  .border-orange-btc { border-color: #F7931A; }
+</style>
 </head>
 
 <body class="bg-black text-white flex justify-center min-h-screen items-start pt-10 font-sans pb-10">
 
 <div class="w-full max-w-xl p-5 space-y-4">
 
-<h1 class="text-3xl text-center font-extrabold mb-8 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-500">Bitcoin Macro Analyst</h1>
+<h1 class="text-3xl text-center font-extrabold mb-8 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-btc">
+  <span class="text-4xl text-orange-btc">₿</span>itcoin Macro Analyst
+</h1>
 
-<button onclick="analyze()" id="btn" class="w-full h-14 bg-orange-600 rounded-xl font-bold text-lg hover:bg-orange-500 transition active:scale-95 shadow-lg shadow-orange-900/20 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-black">
-  Analyze BTC Macro Cycle
+<button onclick="analyze()" id="btn" class="w-full h-14 bg-orange-btc rounded-xl font-bold text-lg hover:bg-orange-500 transition active:scale-95 shadow-lg shadow-orange-900/20 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-black">
+  Analyze Macro Cycle
 </button>
 
 <div id="spinner" class="hidden text-center text-orange-400 font-medium mt-6 h-6 text-sm"></div>
@@ -44,11 +52,11 @@ async function analyze() {
   
   // Oranžové správy
   const loadingMessages = [
-      "Fetching BTC price history...",
+      "Fetching ₿/XAU prices...",
       "Mapping cycle fractals...",
-      "Cross-referencing Gold (XAU)...",
-      "Analyzing ETF flows...",
-      "Generating AI verdict..."
+      "Calculating 200W MA...",
+      "AI is analyzing flows...",
+      "Generating report..."
   ];
   let msgIndex = 0;
   spinner.innerText = loadingMessages[0];
@@ -69,7 +77,8 @@ async function analyze() {
     clearInterval(spinnerInterval);
     spinner.classList.add("hidden");
 
-    const colorClass = data.change > 0 ? "text-green-500" : (data.change < 0 ? "text-red-500" : "text-neutral-400");
+    // Cena a zmena - oranžová téma
+    const colorClass = data.change > 0 ? "text-orange-300" : (data.change < 0 ? "text-red-500" : "text-neutral-400");
     const sign = data.change > 0 ? "+" : "";
     const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -82,18 +91,19 @@ async function analyze() {
         rawAnalysis = rawAnalysis.replace(phaseMatch[0], '').trim(); 
     }
 
-    // Badge farba podľa fázy (Oranžová téma)
-    let phaseBadgeColor = "bg-orange-900/30 border-orange-700/50 text-orange-300"; // Default (Accumulation/Distribution)
+    // Badge farba podľa fázy (Oranžová/Zelená/Červená)
+    let phaseBadgeColor = "bg-orange-900/30 border-orange-700/50 text-orange-300"; // Accumulation/Distribution
     if (phaseText.includes("BULL")) {
-        phaseBadgeColor = "bg-green-900/30 border-green-700/50 text-green-400";
+        phaseBadgeColor = "bg-orange-btc/20 border-orange-btc/50 text-orange-btc"; // Bull zjednotený do oranžovej
     } else if (phaseText.includes("BEAR")) {
-        phaseBadgeColor = "bg-red-900/30 border-red-700/50 text-red-400";
+        phaseBadgeColor = "bg-red-900/30 border-red-700/50 text-red-400"; // Bear ostáva červený pre varovanie
     }
 
     const score = data.cycle_score || 0;
-    let scoreColor = "bg-green-500";
-    if (score > 40 && score <= 70) scoreColor = "bg-yellow-500";
-    if (score > 70) scoreColor = "bg-red-500";
+    // Score Bar: Nízke skóre (Dno) = Tmavooranžová, Vysoké = Jasnooranžová
+    let scoreColor = "bg-orange-900"; 
+    if (score > 30 && score <= 70) scoreColor = "bg-orange-btc";
+    if (score > 70) scoreColor = "bg-orange-300";
 
     let finalHTML = `
       <div class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md">
@@ -109,7 +119,7 @@ async function analyze() {
         <div class="mb-5">
             <div class="flex justify-between text-xs text-neutral-400 font-bold uppercase tracking-wider mb-1">
                 <span>Cycle Bottom</span>
-                <span>Score: ${score}%</span>
+                <span class="text-orange-300">Score: ${score}%</span>
                 <span>Cycle Top</span>
             </div>
             <div class="w-full bg-neutral-800 h-2 rounded-full overflow-hidden">
@@ -134,16 +144,17 @@ async function analyze() {
         let titleStyle = "text-orange-400"; // Oranžové nadpisy
         
         if (title.toUpperCase().includes("TARGET")) {
-            boxStyle = "bg-orange-900/10 border-orange-800/50"; // Oranžový target box
+            boxStyle = "bg-orange-900/10 border-orange-800/50";
             titleStyle = "text-orange-300 font-black uppercase tracking-wider";
         }
         
+        // Farbenie boxu Verdikt (Stále oranžová téma)
         if (title.toUpperCase().includes("VERDICT")) {
             if (content.toUpperCase().includes("BUY") || content.toUpperCase().includes("DCA") || phaseText.toUpperCase().includes("BULL") || phaseText.toUpperCase().includes("ACCUMULATION")) {
-                boxStyle = "bg-green-900/10 border-green-800/50";
-                titleStyle = "text-green-400 font-black uppercase tracking-wider";
+                boxStyle = "bg-orange-900/20 border-orange-500/50"; // Buy/DCA = Svetlejšia oranžová
+                titleStyle = "text-orange-btc font-black uppercase tracking-wider";
             } else if (content.toUpperCase().includes("SELL") || phaseText.toUpperCase().includes("BEAR") || content.toUpperCase().includes("DISTRIBUTION")) {
-                boxStyle = "bg-red-900/10 border-red-800/50";
+                boxStyle = "bg-red-900/10 border-red-800/50"; // Sell ostáva červený pre varovanie
                 titleStyle = "text-red-400 font-black uppercase tracking-wider";
             } else {
                 boxStyle = "bg-orange-900/10 border-orange-800/50";
@@ -168,24 +179,26 @@ async function analyze() {
         if (priceChartInstance) { priceChartInstance.destroy(); }
         
         const ctx = document.getElementById('priceChart').getContext('2d');
-        const firstPrice = data.chart_prices[0];
-        const lastPrice = data.chart_prices[data.chart_prices.length - 1];
         
-        // Graf zostáva zelený/červený podľa zisku/straty v zobrazenom období
-        const chartColor = lastPrice >= firstPrice ? '#22c55e' : '#ef4444';
+        // Graf je teraz oranžový
+        const chartColor = '#F7931A'; 
 
         priceChartInstance = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: data.chart_dates,
                 datasets: [{
-                    label: 'Price',
+                    label: '₿ Price',
                     data: data.chart_prices,
                     borderColor: chartColor,
                     borderWidth: 2,
                     tension: 0.2,
                     pointRadius: 0,
-                    pointHitRadius: 10
+                    pointHitRadius: 10,
+                    fill: {
+                        target: 'origin',
+                        above: 'rgba(247, 147, 26, 0.05)' // Jemná oranzová výplň pod grafom
+                    }
                 }]
             },
             options: {
