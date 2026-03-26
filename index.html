@@ -175,13 +175,13 @@ async function analyze() {
             <div class="${phaseBadgeColor} text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-md border uppercase tracking-wide">${displayPhaseText}</div>
         </div>
         
-        <div class="flex justify-between items-end mb-8">
-            <div>
-                <div class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">$${formattedPrice}</div>
-                <div class="${colorClass} text-sm font-semibold mt-1">${sign}${data.change.toFixed(2)}%</div>
+        <div class="flex justify-between items-end mb-8 whitespace-nowrap">
+            <div class="truncate">
+                <div class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">$${formattedPrice}</div>
+                <div class="${colorClass} text-xs sm:text-sm font-semibold mt-1">${sign}${data.change.toFixed(2)}%</div>
             </div>
-            <div class="text-right pb-1">
-                <div class="text-4xl font-black ${scoreTextColor}">${score}%</div>
+            <div class="text-right pl-3 shrink-0 pb-1">
+                <div class="text-2xl sm:text-4xl font-black ${scoreTextColor}">${score}%</div>
                 <div class="text-[10px] text-neutral-500 uppercase font-bold tracking-widest mt-1">${i18n[currentLang].score}</div>
             </div>
         </div>
@@ -215,7 +215,7 @@ async function analyze() {
       </div>
     `;
 
-    // Parsovanie AI odpovede - Moduly s piliermi
+    // Parsovanie AI odpovede
     const parts = rawAnalysis.split('**');
     for (let i = 1; i < parts.length; i += 2) {
       if (parts[i] && parts[i + 1]) {
@@ -226,11 +226,10 @@ async function analyze() {
         let titleStyle = "text-white"; 
         
         let c = content.toUpperCase();
-        // Zvýraznenie DCA Verdiktu na základe obsahu textu
         if (title.toUpperCase().includes("VERDICT") || title.toUpperCase().includes("VERDIKT") || title.toUpperCase().includes("STRATÉGIA") || title.toUpperCase().includes("STRATEGY")) {
-            if (c.includes("BUY") || c.includes("KÚPIŤ") || c.includes("NÁKUP") || c.includes("ACCUMULATE") || c.includes("AKUMULÁCIA")) {
+            if (c.includes("BUY") || c.includes("KÚPIŤ") || c.includes("NÁKUP") || c.includes("ACCUMULATE") || c.includes("AKUMULÁCIA") || score <= 40) {
                 boxStyle = "bg-green-900/10 border-green-800/30"; titleStyle = "text-green-500";
-            } else if (c.includes("SELL") || c.includes("PREDAŤ") || c.includes("PREDAJ") || c.includes("DISTRIBUTION")) {
+            } else if (c.includes("SELL") || c.includes("PREDAŤ") || c.includes("PREDAJ") || c.includes("DISTRIBUTION") || score >= 70) {
                 boxStyle = "bg-red-900/10 border-red-800/30"; titleStyle = "text-red-500";
             } else {
                 boxStyle = "bg-orange-900/10 border-orange-800/30"; titleStyle = "text-[#F7931A]";
