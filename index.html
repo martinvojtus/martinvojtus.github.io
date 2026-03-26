@@ -22,12 +22,12 @@
   Analyze Macro Cycle
 </button>
 
-<div id="spinner" class="hidden text-center text-purple-400 font-medium mt-6 h-6"></div>
+<div id="spinner" class="hidden text-center text-purple-400 font-medium mt-6 h-6 text-sm"></div>
 
 <div id="divider" class="hidden border-b border-neutral-800 my-6"></div>
 
 <div id="output" class="hidden flex flex-col gap-4">
-  </div>
+</div>
 
 </div>
 
@@ -42,26 +42,24 @@ async function analyze() {
   const divider = document.getElementById("divider");
   const btn = document.getElementById("btn");
 
-  // Reset UI
   output.classList.add("hidden");
   divider.classList.add("hidden");
   btn.disabled = true;
   btn.classList.add("opacity-50");
   
-  // Zapnutie dynamického spinnera
   spinner.classList.remove("hidden");
+  
+  // Extra krátke, profi texty
   const loadingMessages = [
-      "Downloading complete macro history...",
-      "Calculating Weekly RSI & Moving Averages...",
-      "Identifying historical 4-year cycles...",
-      "Comparing current data to previous bear/bull markets...",
-      "AI is analyzing institutional Farside data...",
-      "Generating final macro verdict..."
+      "Fetching price history...",
+      "Mapping cycle fractals...",
+      "Cross-referencing Gold (XAU)...",
+      "Analyzing institutional flows...",
+      "Generating AI verdict..."
   ];
   let msgIndex = 0;
   spinner.innerText = loadingMessages[0];
   
-  // Mení text každých 1.8 sekundy
   spinnerInterval = setInterval(() => {
       msgIndex++;
       if (msgIndex >= loadingMessages.length) msgIndex = loadingMessages.length - 1;
@@ -77,7 +75,6 @@ async function analyze() {
 
     const data = await res.json();
     
-    // Vypnutie spinnera po prijatí dát
     clearInterval(spinnerInterval);
     spinner.classList.add("hidden");
 
@@ -88,7 +85,6 @@ async function analyze() {
     let rawAnalysis = data.analysis;
     let phaseText = "ANALYZING...";
     
-    // INTELIGENTNÝ REGEX: Nájde text "PHASE: niečo" a vysekne to von.
     let phaseMatch = rawAnalysis.match(/PHASE:\s*([a-zA-Z\s]+)/i);
     if (phaseMatch) {
         phaseText = phaseMatch[1].trim().toUpperCase();
@@ -106,15 +102,31 @@ async function analyze() {
         phaseBadgeColor = "bg-orange-900/30 border-orange-700/50 text-orange-400";
     }
 
+    const score = data.cycle_score || 0;
+    let scoreColor = "bg-green-500";
+    if (score > 40 && score <= 70) scoreColor = "bg-yellow-500";
+    if (score > 70) scoreColor = "bg-red-500";
+
     let finalHTML = `
       <div class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md">
         <div class="flex justify-between items-start mb-2">
             <div class="text-neutral-400 text-sm font-bold uppercase tracking-widest">${data.name} (${data.ticker})</div>
             <div class="${phaseBadgeColor} text-xs font-bold px-3 py-1 rounded-lg border uppercase text-right leading-tight max-w-[50%]">${phaseText}</div>
         </div>
-        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-4">
+        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-5">
           <span class="text-4xl sm:text-5xl font-bold tracking-tight">$${formattedPrice}</span>
           <span class="${colorClass} text-xl font-semibold">${sign}${data.change.toFixed(2)}%</span>
+        </div>
+        
+        <div class="mb-5">
+            <div class="flex justify-between text-xs text-neutral-400 font-bold uppercase tracking-wider mb-1">
+                <span>Cycle Bottom</span>
+                <span>Score: ${score}%</span>
+                <span>Cycle Top</span>
+            </div>
+            <div class="w-full bg-neutral-800 h-2 rounded-full overflow-hidden">
+                <div class="h-full ${scoreColor} transition-all duration-1000" style="width: ${score}%"></div>
+            </div>
         </div>
         
         <div class="w-full h-40 relative border-t border-neutral-800 pt-3">
@@ -133,18 +145,16 @@ async function analyze() {
         let boxStyle = "bg-neutral-900 border-neutral-800";
         let titleStyle = "text-purple-400";
         
-        // Target -> Modrý box
         if (title.toUpperCase().includes("TARGET")) {
             boxStyle = "bg-blue-900/10 border-blue-800/50";
             titleStyle = "text-blue-400 font-black uppercase tracking-wider";
         }
         
-        // Verdikt -> Farebný podľa toho, čo v ňom je
         if (title.toUpperCase().includes("VERDICT")) {
             if (content.toUpperCase().includes("BUY") || content.toUpperCase().includes("DCA") || phaseText.toUpperCase().includes("BULL")) {
                 boxStyle = "bg-green-900/10 border-green-800/50";
                 titleStyle = "text-green-400 font-black uppercase tracking-wider";
-            } else if (content.toUpperCase().includes("SELL") || phaseText.toUpperCase().includes("BEAR")) {
+            } else if (content.toUpperCase().includes("SELL") || phaseText.toUpperCase().includes("BEAR") || content.toUpperCase().includes("DISTRIBUTION")) {
                 boxStyle = "bg-red-900/10 border-red-800/50";
                 titleStyle = "text-red-400 font-black uppercase tracking-wider";
             } else {
@@ -217,7 +227,7 @@ async function analyze() {
     output.classList.remove("hidden");
     output.innerHTML = `
       <div class="bg-neutral-900 p-5 rounded-2xl border border-red-900/50">
-        <span class="text-red-500 font-bold block text-center">❌ Connection Error. Backend might be waking up or API limit reached. Try again in a few seconds.</span>
+        <span class="text-red-500 font-bold block text-center">❌ Connection Error. Backend API limit reached. Try again in a few seconds.</span>
       </div>`;
   }
 
