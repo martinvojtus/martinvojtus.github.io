@@ -12,22 +12,22 @@
 
     <header class="flex justify-between items-center w-full mb-6">
         <h1 id="main-title" class="text-xl sm:text-2xl font-extrabold tracking-wide text-[#F7931A] flex items-center gap-2">
-            <span class="text-3xl">₿</span> CBS Terminal v1.9
+            <span class="text-3xl">₿</span> Macro Quant
         </h1>
         <div class="bg-neutral-900 rounded-lg p-1 border border-neutral-800 flex gap-1 shrink-0">
-            <button id="lang-en" onclick="setLang('EN')" class="px-2 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition">EN</button>
-            <button id="lang-sk" onclick="setLang('SK')" class="px-2 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition">SK</button>
+            <button id="lang-en" onclick="setLang('EN')" class="px-3 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition">EN</button>
+            <button id="lang-sk" onclick="setLang('SK')" class="px-3 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition">SK</button>
         </div>
     </header>
 
     <button onclick="analyze()" id="btn" class="w-full h-14 bg-[#F7931A] rounded-xl text-black font-bold text-lg hover:bg-orange-500 transition active:scale-95 shadow-lg shadow-orange-900/20">
-      Analyze Macro Cycle
+      Analyze Cycle
     </button>
 
     <div id="spinner" class="hidden text-center text-[#F7931A] font-medium mt-6 h-6 text-sm"></div>
     <div id="divider" class="hidden border-b border-neutral-800 my-6"></div>
 
-    <div id="output" class="hidden flex flex-col gap-4">
+    <div id="output" class="hidden flex flex-col gap-5">
         </div>
 
 </div>
@@ -42,21 +42,21 @@ let currentLang = 'EN';
 
 const i18n = {
     EN: {
-        title: '<span class="text-3xl">₿</span> CBS Terminal v1.9',
-        btn: 'Analyze Macro Cycle',
-        loading: ["Calculating Fractals...", "Evaluating Indicators...", "Scoring Market Phase...", "Generating AI Verdict..."],
-        bottom: "Cycle Bottom",
-        top: "Cycle Top",
-        score: "Score",
+        title: '<span class="text-3xl">₿</span> Macro Quant',
+        btn: 'Analyze Cycle',
+        loading: ["Extracting On-Chain Metrics...", "Calculating Cycle Score...", "Evaluating Institutional Data...", "Generating AI Brief..."],
+        bottom: "0% (BUY ZONE)",
+        top: "100% (SELL ZONE)",
+        score: "Cycle Score",
         error: "❌ Connection Error. Backend waking up. Try again in 10s."
     },
     SK: {
-        title: '<span class="text-3xl">₿</span> CBS Terminál v1.9',
-        btn: 'Analyzovať Makro Cyklus',
-        loading: ["Počítam fraktály...", "Vyhodnocujem indikátory...", "Skórujem fázu trhu...", "Generujem AI verdikt..."],
-        bottom: "Dno Cyklu",
-        top: "Vrchol Cyklu",
-        score: "Skóre",
+        title: '<span class="text-3xl">₿</span> Makro Quant',
+        btn: 'Analyzovať Cyklus',
+        loading: ["Získavam historické dáta...", "Počítam skóre cyklu...", "Vyhodnocujem metriky...", "Generujem AI brief..."],
+        bottom: "0% (NÁKUP)",
+        top: "100% (PREDAJ)",
+        score: "Skóre Cyklu",
         error: "❌ Chyba pripojenia. Backend sa prebúdza. Skúste znova o 10s."
     }
 };
@@ -65,11 +65,11 @@ function setLang(lang) {
     currentLang = lang;
     
     if (lang === 'EN') {
-        document.getElementById('lang-en').className = "px-2 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition";
-        document.getElementById('lang-sk').className = "px-2 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition";
+        document.getElementById('lang-en').className = "px-3 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition";
+        document.getElementById('lang-sk').className = "px-3 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition";
     } else {
-        document.getElementById('lang-sk').className = "px-2 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition";
-        document.getElementById('lang-en').className = "px-2 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition";
+        document.getElementById('lang-sk').className = "px-3 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition";
+        document.getElementById('lang-en').className = "px-3 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition";
     }
     
     document.getElementById('main-title').innerHTML = i18n[lang].title;
@@ -80,7 +80,6 @@ function setLang(lang) {
     }
 }
 
-// Skrytie tooltipov
 function hideTooltips() {
     [priceChartInstance, rsiChartInstance, scoreChartInstance].forEach(chart => {
         if (chart) { chart.tooltip.setActiveElements([], {x:0,y:0}); chart.update(); }
@@ -126,8 +125,6 @@ async function analyze() {
     const colorClass = data.change > 0 ? "text-green-500" : (data.change < 0 ? "text-red-500" : "text-neutral-400");
     const sign = data.change > 0 ? "+" : "";
     const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const formattedSupport = Number(data.support_8w).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const formattedTarget = Number(data.target_dno).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     let rawAnalysis = data.analysis;
     let phaseTextInternal = data.phase || "BULL MARKET"; 
@@ -138,107 +135,103 @@ async function analyze() {
         rawAnalysis = rawAnalysis.replace(phaseMatch[0], '').trim(); 
     }
 
+    // Preklad Fázy
     let displayPhaseText = phaseTextInternal;
     if (currentLang === 'SK') {
-        if (phaseTextInternal.includes("BULL MARKET")) displayPhaseText = "BÝČÍ TRH";
-        else if (phaseTextInternal.includes("BEAR MARKET")) displayPhaseText = "MEDVEDÍ TRH";
-        else if (phaseTextInternal.includes("ACCUMULATION")) displayPhaseText = "AKUMULÁCIA";
-        else if (phaseTextInternal.includes("DISTRIBUTION")) displayPhaseText = "DISTRIBÚCIA";
+        if (phaseTextInternal.includes("BOTTOM") || phaseTextInternal.includes("ACCUMULATION")) displayPhaseText = "DNO / AKUMULÁCIA";
+        else if (phaseTextInternal.includes("TOP") || phaseTextInternal.includes("DISTRIBUTION")) displayPhaseText = "VRCHOL / DISTRIBÚCIA";
+        else if (phaseTextInternal.includes("LATE")) displayPhaseText = "POKROČILÝ BÝČÍ TRH";
+        else displayPhaseText = "SKORÝ BÝČÍ TRH";
     }
 
-    let phaseBadgeColor = "bg-neutral-800 text-neutral-300 border-neutral-700"; 
-    if (phaseTextInternal.includes("BULL")) phaseBadgeColor = "bg-green-900/20 text-green-400 border-green-800/30"; 
-    else if (phaseTextInternal.includes("BEAR")) phaseBadgeColor = "bg-red-900/20 text-red-400 border-red-800/30"; 
-    else if (phaseTextInternal.includes("ACCUMULATION")) phaseBadgeColor = "bg-amber-950/40 text-amber-500 border-amber-900/50"; 
-    else if (phaseTextInternal.includes("DISTRIBUTION")) phaseBadgeColor = "bg-orange-900/20 text-[#F7931A] border-[#F7931A]/30"; 
-
     const score = data.cycle_score || 0;
-    const scoreColor = "bg-[#F7931A]"; 
+    
+    // Logika farieb podľa skóre (0 = Zelená, 100 = Červená)
+    let scoreColor = "bg-[#F7931A]";
+    let phaseBadgeColor = "bg-orange-900/20 text-[#F7931A] border-[#F7931A]/30";
+    
+    if (score <= 25) {
+        scoreColor = "bg-green-500";
+        phaseBadgeColor = "bg-green-900/20 text-green-400 border-green-800/30";
+    } else if (score >= 75) {
+        scoreColor = "bg-red-500";
+        phaseBadgeColor = "bg-red-900/20 text-red-400 border-red-800/30";
+    }
 
     let finalHTML = `
-      <div class="grid grid-cols-2 gap-3 mb-2">
-          <div class="bg-neutral-900 p-3 rounded-xl border border-neutral-800 shadow-md">
-              <div class="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">Support 8W</div>
-              <div class="text-white font-bold text-base sm:text-lg">$${formattedSupport}</div>
-          </div>
-          <div class="bg-neutral-900 p-3 rounded-xl border border-neutral-800 shadow-md">
-              <div class="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">Target Bottom</div>
-              <div class="text-red-400 font-bold text-base sm:text-lg">$${formattedTarget}</div>
-          </div>
-      </div>
-
-      <div class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md">
+      <div class="bg-neutral-900 p-6 rounded-3xl border border-neutral-800 shadow-xl">
         
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex justify-between items-center mb-6">
             <div class="text-neutral-500 text-xs font-bold uppercase tracking-widest">${data.name} (${data.ticker})</div>
-            <div class="${phaseBadgeColor} text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-md border uppercase text-right tracking-wide">${displayPhaseText}</div>
+            <div class="${phaseBadgeColor} text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-md border uppercase tracking-wide">${displayPhaseText}</div>
         </div>
         
-        <div class="flex justify-between items-end mb-6">
+        <div class="flex justify-between items-end mb-8">
             <div>
-                <div class="text-4xl sm:text-5xl font-bold tracking-tight text-white">$${formattedPrice}</div>
+                <div class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">$${formattedPrice}</div>
                 <div class="${colorClass} text-sm font-semibold mt-1">${sign}${data.change.toFixed(2)}%</div>
             </div>
             <div class="text-right pb-1">
-                <div class="text-[#F7931A] text-2xl font-black">${score}%</div>
-                <div class="text-[10px] text-neutral-500 uppercase font-bold tracking-wide">Score</div>
+                <div class="text-3xl font-black ${score <= 25 ? 'text-green-500' : (score >= 75 ? 'text-red-500' : 'text-[#F7931A]')}">${score}%</div>
+                <div class="text-[10px] text-neutral-500 uppercase font-bold tracking-widest mt-1">${i18n[currentLang].score}</div>
             </div>
         </div>
         
-        <div class="mb-6">
-            <div class="flex justify-between text-xs text-neutral-500 font-bold uppercase tracking-wider mb-2">
+        <div class="mb-8">
+            <div class="flex justify-between text-[10px] text-neutral-500 font-bold uppercase tracking-widest mb-3">
                 <span>${i18n[currentLang].bottom}</span>
-                <span class="text-[#F7931A]">${i18n[currentLang].score}: ${score}%</span>
                 <span>${i18n[currentLang].top}</span>
             </div>
-            <div class="w-full bg-neutral-800 h-2 rounded-full overflow-hidden">
+            <div class="w-full bg-neutral-800 h-3 rounded-full overflow-hidden">
                 <div class="h-full ${scoreColor} transition-all duration-1000 ease-out" style="width: ${score}%"></div>
             </div>
         </div>
         
         <div class="space-y-6">
-            <div style="height: 220px; position: relative; border-top: 1px solid #262626; padding-top: 2rem;">
-                <div style="position: absolute; top: 12px; left: 0; font-size: 0.75rem; color: #a3a3a3; font-weight: bold;">Price, 50W & 200W MA</div>
+            <div style="height: 220px; position: relative; border-top: 1px solid #262626; padding-top: 2.5rem;">
+                <div style="position: absolute; top: 16px; left: 0; font-size: 0.75rem; color: #a3a3a3; font-weight: bold; text-transform: uppercase;">Price & MAs (50W, 200W)</div>
                 <canvas id="priceChart"></canvas>
             </div>
             
-            <div style="height: 140px; position: relative; border-top: 1px solid #262626; padding-top: 2rem;">
-                <div style="position: absolute; top: 12px; left: 0; font-size: 0.75rem; color: #a3a3a3; font-weight: bold;">Weekly RSI (14)</div>
+            <div style="height: 140px; position: relative; border-top: 1px solid #262626; padding-top: 2.5rem;">
+                <div style="position: absolute; top: 16px; left: 0; font-size: 0.75rem; color: #a3a3a3; font-weight: bold; text-transform: uppercase;">Weekly RSI</div>
                 <canvas id="rsiChart"></canvas>
             </div>
             
-            <div style="height: 140px; position: relative; border-top: 1px solid #262626; padding-top: 2rem;">
-                <div style="position: absolute; top: 12px; left: 0; font-size: 0.75rem; color: #a3a3a3; font-weight: bold;">Market Cycle Score (0-100%)</div>
+            <div style="height: 140px; position: relative; border-top: 1px solid #262626; padding-top: 2.5rem;">
+                <div style="position: absolute; top: 16px; left: 0; font-size: 0.75rem; color: #a3a3a3; font-weight: bold; text-transform: uppercase;">Cycle Score (0-100%)</div>
                 <canvas id="scoreChart"></canvas>
             </div>
         </div>
       </div>
     `;
 
-    // AI Bloky
+    // Parsovanie AI odpovede - ČISTÝ DIZAJN
     const parts = rawAnalysis.split('**');
     for (let i = 1; i < parts.length; i += 2) {
       if (parts[i] && parts[i + 1]) {
         const title = parts[i].trim();
-        let content = parts[i + 1].trim().replace(/^- /gm, '').replace(/\n/g, '<br><br>');
-        content = content.replace(/(<br>\s*){3,}/g, '<br><br>'); 
+        // Zabezpečenie, že text sa vykreslí ako krásne odrážky
+        let content = parts[i + 1].trim().replace(/\n/g, '<br>');
 
         let boxStyle = "bg-neutral-900 border-neutral-800";
-        let titleStyle = "text-[#F7931A]"; 
+        let titleStyle = "text-white"; 
         
         let c = content.toUpperCase();
         if (title.toUpperCase().includes("VERDICT") || title.toUpperCase().includes("VERDIKT")) {
-            if (c.includes("BUY") || c.includes("KÚPIŤ")) {
-                boxStyle = "bg-green-900/10 border-green-800/30"; titleStyle = "text-green-500 font-black uppercase";
-            } else if (c.includes("SELL") || c.includes("PREDAŤ")) {
-                boxStyle = "bg-red-900/10 border-red-800/30"; titleStyle = "text-red-500 font-black uppercase";
+            if (c.includes("BUY") || c.includes("KÚPIŤ") || c.includes("NÁKUP")) {
+                boxStyle = "bg-green-900/10 border-green-800/30"; titleStyle = "text-green-500";
+            } else if (c.includes("SELL") || c.includes("PREDAŤ") || c.includes("PREDAJ")) {
+                boxStyle = "bg-red-900/10 border-red-800/30"; titleStyle = "text-red-500";
+            } else {
+                boxStyle = "bg-orange-900/10 border-orange-800/30"; titleStyle = "text-[#F7931A]";
             }
         }
 
         finalHTML += `
-          <div class="${boxStyle} p-5 rounded-2xl border shadow-md">
-            <h2 class="${titleStyle} text-sm font-bold mb-3 uppercase tracking-wider">${title}</h2>
-            <div class="text-neutral-300 text-sm leading-relaxed">${content}</div>
+          <div class="${boxStyle} p-6 rounded-3xl border shadow-xl">
+            <h2 class="${titleStyle} text-sm font-bold mb-4 uppercase tracking-widest">${title}</h2>
+            <div class="text-neutral-300 text-sm leading-loose">${content}</div>
           </div>
         `;
       }
@@ -255,7 +248,7 @@ async function analyze() {
         
         const commonOptions = {
             responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { displayColors: false, backgroundColor: '#1a1a1a', borderColor: '#333', borderWidth: 1 } },
+            plugins: { legend: { display: false }, tooltip: { displayColors: false, backgroundColor: '#1a1a1a', borderColor: '#333', borderWidth: 1, padding: 10 } },
             scales: { x: { display: false }, y: { display: false } }, layout: { padding: 0 },
             interaction: { mode: 'index', intersect: false }
         };
@@ -266,7 +259,7 @@ async function analyze() {
             data: {
                 labels: data.chart_dates,
                 datasets: [
-                    { label: 'Price', data: data.chart_prices, borderColor: '#F7931A', borderWidth: 2, pointRadius: 0 },
+                    { label: 'Price', data: data.chart_prices, borderColor: '#ffffff', borderWidth: 2, pointRadius: 0 },
                     { label: '50W MA', data: data.chart_ma50, borderColor: '#06b6d4', borderWidth: 1, pointRadius: 0 },
                     { label: '200W MA', data: data.chart_ma200, borderColor: '#a855f7', borderWidth: 1, pointRadius: 0 }
                 ]
@@ -280,12 +273,12 @@ async function analyze() {
             data: {
                 labels: data.chart_dates,
                 datasets: [
-                    { label: 'RSI', data: data.chart_rsi, borderColor: '#F7931A', borderWidth: 1.5, pointRadius: 0 },
-                    { label: 'Overbought', data: new Array(data.chart_dates.length).fill(70), borderColor: '#ef4444', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 },
-                    { label: 'Oversold', data: new Array(data.chart_dates.length).fill(30), borderColor: '#22c55e', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 }
+                    { label: 'RSI', data: data.chart_rsi, borderColor: '#06b6d4', borderWidth: 1.5, pointRadius: 0 },
+                    { label: 'Overbought (85)', data: new Array(data.chart_dates.length).fill(85), borderColor: '#ef4444', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 },
+                    { label: 'Oversold (35)', data: new Array(data.chart_dates.length).fill(35), borderColor: '#22c55e', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 }
                 ]
             },
-            options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } }
+            options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, min: 20, max: 100 } } }
         });
 
         if (scoreChartInstance) scoreChartInstance.destroy();
@@ -294,7 +287,7 @@ async function analyze() {
             data: {
                 labels: data.chart_dates,
                 datasets: [
-                    { label: 'Cycle Score %', data: data.chart_score, borderColor: '#F7931A', backgroundColor: 'rgba(247, 147, 26, 0.1)', fill: true, borderWidth: 1.5, tension: 0.2, pointRadius: 0 }
+                    { label: 'Cycle Score %', data: data.chart_score, borderColor: '#F7931A', backgroundColor: 'rgba(247, 147, 26, 0.1)', fill: true, borderWidth: 1.5, tension: 0.3, pointRadius: 0 }
                 ]
             },
             options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } }
