@@ -80,7 +80,7 @@ function setLang(lang) {
     }
 }
 
-// Skrytie tooltipov pri kliknuti mimo
+// Skrytie tooltipov
 function hideTooltips() {
     [priceChartInstance, rsiChartInstance, scoreChartInstance].forEach(chart => {
         if (chart) { chart.tooltip.setActiveElements([], {x:0,y:0}); chart.update(); }
@@ -118,7 +118,6 @@ async function analyze() {
     });
 
     const data = await res.json();
-    
     clearInterval(spinnerInterval);
     spinner.classList.add("hidden");
 
@@ -148,20 +147,26 @@ async function analyze() {
     }
 
     let phaseBadgeColor = "bg-neutral-800 text-neutral-300 border-neutral-700"; 
-    if (phaseTextInternal.includes("BULL")) {
-        phaseBadgeColor = "bg-green-900/20 text-green-400 border-green-800/30"; 
-    } else if (phaseTextInternal.includes("BEAR")) {
-        phaseBadgeColor = "bg-red-900/20 text-red-400 border-red-800/30"; 
-    } else if (phaseTextInternal.includes("ACCUMULATION")) {
-        phaseBadgeColor = "bg-amber-950/40 text-amber-500 border-amber-900/50"; 
-    } else if (phaseTextInternal.includes("DISTRIBUTION")) {
-        phaseBadgeColor = "bg-orange-900/20 text-[#F7931A] border-[#F7931A]/30"; 
-    }
+    if (phaseTextInternal.includes("BULL")) phaseBadgeColor = "bg-green-900/20 text-green-400 border-green-800/30"; 
+    else if (phaseTextInternal.includes("BEAR")) phaseBadgeColor = "bg-red-900/20 text-red-400 border-red-800/30"; 
+    else if (phaseTextInternal.includes("ACCUMULATION")) phaseBadgeColor = "bg-amber-950/40 text-amber-500 border-amber-900/50"; 
+    else if (phaseTextInternal.includes("DISTRIBUTION")) phaseBadgeColor = "bg-orange-900/20 text-[#F7931A] border-[#F7931A]/30"; 
 
     const score = data.cycle_score || 0;
     const scoreColor = "bg-[#F7931A]"; 
 
     let finalHTML = `
+      <div class="grid grid-cols-2 gap-3 mb-2">
+          <div class="bg-neutral-900 p-3 rounded-xl border border-neutral-800 shadow-md">
+              <div class="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">Support 8W</div>
+              <div class="text-white font-bold text-base sm:text-lg">$${formattedSupport}</div>
+          </div>
+          <div class="bg-neutral-900 p-3 rounded-xl border border-neutral-800 shadow-md">
+              <div class="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">Target Bottom</div>
+              <div class="text-red-400 font-bold text-base sm:text-lg">$${formattedTarget}</div>
+          </div>
+      </div>
+
       <div class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md">
         
         <div class="flex justify-between items-center mb-4">
@@ -169,53 +174,37 @@ async function analyze() {
             <div class="${phaseBadgeColor} text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-md border uppercase text-right tracking-wide">${displayPhaseText}</div>
         </div>
         
-        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-6">
-          <span class="text-4xl sm:text-5xl font-bold tracking-tight text-white">$${formattedPrice}</span>
-          <span class="${colorClass} text-xl font-semibold">${sign}${data.change.toFixed(2)}%</span>
-        </div>
-        
-        <div class="mb-6">
-            <div class="flex justify-between text-xs text-neutral-500 font-bold uppercase tracking-wider mb-2">
-                <span>${i18n[currentLang].bottom}</span>
-                <span class="text-[#F7931A]">${i18n[currentLang].score}: ${score}%</span>
-                <span>${i18n[currentLang].top}</span>
+        <div class="flex justify-between items-end mb-6">
+            <div>
+                <div class="text-4xl sm:text-5xl font-bold tracking-tight text-white">$${formattedPrice}</div>
+                <div class="${colorClass} text-sm font-semibold mt-1">${sign}${data.change.toFixed(2)}%</div>
             </div>
-            <div class="w-full bg-neutral-800 h-2 rounded-full overflow-hidden">
-                <div class="h-full ${scoreColor} transition-all duration-1000 ease-out" style="width: ${score}%"></div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3 mb-6">
-            <div class="bg-black/50 p-3 rounded-xl border border-neutral-800/50">
-                <div class="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">Support 8W</div>
-                <div class="text-white font-bold text-sm sm:text-base">$${formattedSupport}</div>
-            </div>
-            <div class="bg-black/50 p-3 rounded-xl border border-neutral-800/50">
-                <div class="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">Target Bottom</div>
-                <div class="text-red-400 font-bold text-sm sm:text-base">$${formattedTarget}</div>
+            <div class="text-right pb-1">
+                <div class="text-[#F7931A] text-2xl font-black">${score}%</div>
+                <div class="text-[10px] text-neutral-500 uppercase font-bold tracking-wide">Score</div>
             </div>
         </div>
         
         <div class="space-y-6">
-            <div class="w-full h-48 relative border-t border-neutral-800 pt-8">
-                <div class="text-xs text-neutral-400 font-bold mb-1 absolute top-3 left-0 z-10">Price, 50W & 200W MA</div>
+            <div style="height: 220px; position: relative; border-top: 1px solid #262626; padding-top: 2rem;">
+                <div style="position: absolute; top: 12px; left: 0; font-size: 0.75rem; color: #a3a3a3; font-weight: bold;">Price, 50W & 200W MA</div>
                 <canvas id="priceChart"></canvas>
             </div>
             
-            <div class="w-full h-32 relative border-t border-neutral-800 pt-8">
-                <div class="text-xs text-neutral-400 font-bold mb-1 absolute top-3 left-0 z-10">Weekly RSI (14)</div>
+            <div style="height: 140px; position: relative; border-top: 1px solid #262626; padding-top: 2rem;">
+                <div style="position: absolute; top: 12px; left: 0; font-size: 0.75rem; color: #a3a3a3; font-weight: bold;">Weekly RSI (14)</div>
                 <canvas id="rsiChart"></canvas>
             </div>
             
-            <div class="w-full h-32 relative border-t border-neutral-800 pt-8">
-                <div class="text-xs text-neutral-400 font-bold mb-1 absolute top-3 left-0 z-10">Market Cycle Score (0-100%)</div>
+            <div style="height: 140px; position: relative; border-top: 1px solid #262626; padding-top: 2rem;">
+                <div style="position: absolute; top: 12px; left: 0; font-size: 0.75rem; color: #a3a3a3; font-weight: bold;">Market Cycle Score (0-100%)</div>
                 <canvas id="scoreChart"></canvas>
             </div>
         </div>
       </div>
     `;
 
-    // Parsovanie AI odpovede
+    // AI Bloky
     const parts = rawAnalysis.split('**');
     for (let i = 1; i < parts.length; i += 2) {
       if (parts[i] && parts[i + 1]) {
