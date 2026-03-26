@@ -3,55 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBS Terminal v1.9</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
-<body class="bg-black text-white flex justify-center min-h-screen items-start pt-6 font-sans pb-10">
+<body class="bg-black text-white flex justify-center min-h-screen pt-6 pb-10">
 
 <div class="w-full max-w-xl p-5 space-y-4">
-
-    <header class="flex justify-between items-center w-full mb-6">
-        <h1 id="main-title" class="text-xl sm:text-2xl font-extrabold tracking-wide text-[#F7931A] flex items-center gap-2">
+    <header class="flex justify-between items-center mb-6">
+        <h1 class="text-xl font-extrabold text-[#F7931A] flex items-center gap-2">
             <span class="text-3xl">₿</span> CBS TERMINAL v1.9
         </h1>
-        <div class="bg-neutral-900 rounded-lg p-1 border border-neutral-800 flex gap-1">
-            <button onclick="setLang('EN')" id="lang-en" class="px-2 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition">EN</button>
-            <button onclick="setLang('SK')" id="lang-sk" class="px-2 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition">SK</button>
+        <div class="bg-neutral-900 rounded-lg p-1 flex gap-1 border border-neutral-800">
+            <button onclick="setLang('EN')" id="l-en" class="px-2 py-1 rounded bg-[#F7931A] text-black font-bold text-xs">EN</button>
+            <button onclick="setLang('SK')" id="l-sk" class="px-2 py-1 rounded text-neutral-400 font-bold text-xs">SK</button>
         </div>
     </header>
 
-    <button onclick="analyze()" id="btn" class="w-full h-14 bg-[#F7931A] rounded-xl text-black font-bold text-lg hover:bg-orange-500 transition active:scale-95 shadow-lg shadow-orange-900/20">
+    <button onclick="analyze()" id="btn" class="w-full h-14 bg-[#F7931A] rounded-xl text-black font-bold text-lg hover:bg-orange-500 transition active:scale-95">
       Analyze Macro Cycle
     </button>
 
-    <div id="spinner" class="hidden text-center text-[#F7931A] font-medium mt-6 h-6 text-sm"></div>
+    <div id="spinner" class="hidden text-center text-[#F7931A] mt-6 text-sm">Analyzing market signals...</div>
 
-    <div id="output" class="hidden flex flex-col gap-4">
-        <div id="dashboard" class="grid grid-cols-2 gap-3 mb-2">
+    <div id="output" class="hidden space-y-4">
+        <div id="dashboard" class="grid grid-cols-2 gap-3"></div>
+        <div class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800">
+            <div id="price-area" class="mb-4"></div>
+            <div class="space-y-6">
+                <canvas id="pChart" class="h-48"></canvas>
+                <canvas id="rChart" class="h-32"></canvas>
             </div>
-
-        <div id="main-card" class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md">
-            </div>
-
-        <div id="analysis-content" class="space-y-4"></div>
+        </div>
+        <div id="ai-area" class="space-y-4"></div>
     </div>
-
 </div>
 
 <script>
-let priceChart = null, rsiChart = null, scoreChart = null;
+let pChart = null, rChart = null;
 let currentLang = 'EN';
 
 async function analyze() {
-    const btn = document.getElementById("btn");
-    const spinner = document.getElementById("spinner");
-    const output = document.getElementById("output");
-
-    btn.disabled = true;
-    spinner.classList.remove("hidden");
-    spinner.innerText = "Analyzing CBS Macro Signals...";
-    output.classList.add("hidden");
+    const btn = document.getElementById("btn"), spinner = document.getElementById("spinner"), output = document.getElementById("output");
+    btn.disabled = true; spinner.classList.remove("hidden"); output.classList.add("hidden");
 
     try {
         const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
@@ -61,97 +55,62 @@ async function analyze() {
         });
         const data = await res.json();
         
-        spinner.classList.add("hidden");
-        output.classList.remove("hidden");
+        spinner.classList.add("hidden"); output.classList.remove("hidden");
 
-        // 1. Naplnenie dashboardu
         document.getElementById("dashboard").innerHTML = `
-            <div class="bg-neutral-900 p-4 rounded-xl border border-neutral-800">
-                <div class="text-[10px] text-neutral-500 uppercase font-bold">Local Support</div>
-                <div class="text-lg font-bold text-white">$${data.support_8w.toLocaleString()}</div>
+            <div class="bg-neutral-900 p-3 rounded-xl border border-neutral-800">
+                <div class="text-[10px] text-neutral-500 uppercase">Support 8W</div>
+                <div class="text-white font-bold">$${data.support_8w.toLocaleString()}</div>
             </div>
-            <div class="bg-neutral-900 p-4 rounded-xl border border-neutral-800">
-                <div class="text-[10px] text-neutral-500 uppercase font-bold">ETF Absorb.</div>
-                <div class="text-lg font-bold ${data.etf_ratio > 1.5 ? 'text-green-500' : 'text-white'}">${data.etf_ratio}x</div>
-            </div>
-            <div class="bg-neutral-900 p-4 rounded-xl border border-neutral-800">
-                <div class="text-[10px] text-neutral-500 uppercase font-bold">Macro Target</div>
-                <div class="text-lg font-bold text-red-500">$${data.target_dno.toLocaleString()}</div>
-            </div>
-            <div class="bg-neutral-900 p-4 rounded-xl border border-neutral-800">
-                <div class="text-[10px] text-neutral-500 uppercase font-bold">1W Divergence</div>
-                <div class="text-lg font-bold ${data.div_status ? 'text-green-500' : 'text-neutral-400'}">${data.div_status ? 'ACTIVE' : 'NONE'}</div>
+            <div class="bg-neutral-900 p-3 rounded-xl border border-neutral-800">
+                <div class="text-[10px] text-neutral-500 uppercase">Target Bottom</div>
+                <div class="text-red-500 font-bold">$${data.target_dno.toLocaleString()}</div>
             </div>
         `;
 
-        // 2. Hlavná karta
-        document.getElementById("main-card").innerHTML = `
-            <div class="flex justify-between items-center mb-6">
+        document.getElementById("price-area").innerHTML = `
+            <div class="flex justify-between items-center">
                 <div>
-                    <div class="text-4xl sm:text-5xl font-bold tracking-tight text-white">$${data.price.toLocaleString(undefined, {minimumFractionDigits:2})}</div>
-                    <div class="${data.change > 0 ? 'text-green-500' : 'text-red-500'} font-bold">${data.change > 0 ? '+' : ''}${data.change}%</div>
+                    <div class="text-4xl font-bold">$${data.price.toLocaleString()}</div>
+                    <div class="${data.change > 0 ? 'text-green-500' : 'text-red-500'} font-bold">${data.change}%</div>
                 </div>
                 <div class="text-right">
                     <div class="text-[#F7931A] text-2xl font-black">${data.cbs_now}%</div>
-                    <div class="text-[10px] text-neutral-500 font-bold uppercase">CBS Score</div>
+                    <div class="text-[10px] text-neutral-500 uppercase">Score</div>
                 </div>
-            </div>
-            <div class="space-y-6">
-                <canvas id="pChart" class="h-48 border-t border-neutral-800 pt-4"></canvas>
-                <canvas id="rChart" class="h-32 border-t border-neutral-800 pt-4"></canvas>
-                <canvas id="sChart" class="h-32 border-t border-neutral-800 pt-4"></canvas>
             </div>
         `;
 
-        // 3. AI Analýza
-        renderAI(data.analysis);
-
-        // 4. Grafy
         renderCharts(data);
-
+        renderAI(data.analysis);
     } catch (e) {
-        spinner.innerText = "❌ Error connecting to Terminal.";
+        spinner.innerText = "❌ Connection Error. Backend might be waking up.";
     }
     btn.disabled = false;
 }
 
-function renderAI(text) {
-    const container = document.getElementById("analysis-content");
-    container.innerHTML = "";
-    const parts = text.split('**');
-    for (let i = 1; i < parts.length; i += 2) {
-        const div = document.createElement("div");
-        div.className = "bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md";
-        div.innerHTML = `<h2 class="text-[#F7931A] text-sm font-bold mb-3 uppercase">${parts[i]}</h2><div class="text-neutral-300 text-sm leading-relaxed">${parts[i+1].replace(/\n/g, '<br>')}</div>`;
-        container.appendChild(div);
-    }
-}
-
 function renderCharts(data) {
-    const opts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } }, interaction: { mode: 'index', intersect: false }, pointRadius: 0 };
-    
-    if (priceChart) priceChart.destroy();
-    priceChart = new Chart(document.getElementById('pChart'), {
+    const opts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } }, pointRadius: 0 };
+    if (pChart) pChart.destroy();
+    pChart = new Chart(document.getElementById('pChart'), {
         type: 'line',
         data: { labels: data.chart_dates, datasets: [
-            { label: 'Price', data: data.chart_prices, borderColor: '#F7931A', borderWidth: 2 },
-            { label: '200 SMA', data: data.chart_ma200, borderColor: '#737373', borderWidth: 1, borderDash: [5,5] }
+            { data: data.chart_prices, borderColor: '#F7931A', borderWidth: 2 },
+            { data: data.chart_ma200, borderColor: '#737373', borderWidth: 1, borderDash: [5,5] }
         ]},
-        options: { ...opts, scales: { x: { display: false }, y: { display: false, type: 'logarithmic' } } }
+        options: { ...opts, scales: { y: { type: 'logarithmic', display: false } } }
     });
+}
 
-    if (rsiChart) rsiChart.destroy();
-    rsiChart = new Chart(document.getElementById('rChart'), {
-        type: 'line',
-        data: { labels: data.chart_dates, datasets: [{ label: '1W RSI', data: data.chart_rsi, borderColor: '#06b6d4', borderWidth: 1.5 }] },
-        options: { ...opts, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } }
-    });
-
-    if (scoreChart) scoreChart.destroy();
-    scoreChart = new Chart(document.getElementById('sChart'), {
-        type: 'line',
-        data: { labels: data.chart_dates, datasets: [{ label: 'CBS Score', data: data.chart_score, borderColor: '#F7931A', backgroundColor: 'rgba(247, 147, 26, 0.1)', fill: true, borderWidth: 1.5 }] },
-        options: { ...opts, scales: { x: { display: false }, y: { display: false, min: 0, max: 105 } } }
+function renderAI(text) {
+    const area = document.getElementById("ai-area"); area.innerHTML = "";
+    text.split('**').forEach((part, i) => {
+        if (i % 2 === 1) {
+            const div = document.createElement("div");
+            div.className = "bg-neutral-900 p-5 rounded-2xl border border-neutral-800";
+            div.innerHTML = `<h2 class="text-[#F7931A] text-xs font-bold uppercase mb-2">${part}</h2><div class="text-sm text-neutral-300">${text.split('**')[i+1]}</div>`;
+            area.appendChild(div);
+        }
     });
 }
 
