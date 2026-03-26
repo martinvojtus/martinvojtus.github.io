@@ -12,7 +12,7 @@
 
 <h1 class="text-3xl text-center font-extrabold mb-8 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-500">Bitcoin Macro Analyst</h1>
 
-<button onclick="analyze()" id="btn" class="w-full h-14 bg-orange-600 rounded-xl font-bold text-lg hover:bg-orange-500 transition active:scale-95 shadow-lg shadow-orange-900/20">
+<button onclick="analyze()" id="btn" class="w-full h-14 bg-orange-600 rounded-xl font-bold text-lg hover:bg-orange-500 transition active:scale-95 shadow-lg shadow-orange-900/20 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-black">
   Analyze BTC Macro Cycle
 </button>
 
@@ -42,7 +42,7 @@ async function analyze() {
   
   spinner.classList.remove("hidden");
   
-  // Extra krátke, profi texty
+  // Oranžové správy
   const loadingMessages = [
       "Fetching BTC price history...",
       "Mapping cycle fractals...",
@@ -60,7 +60,6 @@ async function analyze() {
   }, 1800); 
 
   try {
-    // Backend už neočakáva JSON s mincou, analyzuje len BTC
     const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
       method: "POST"
     });
@@ -83,15 +82,12 @@ async function analyze() {
         rawAnalysis = rawAnalysis.replace(phaseMatch[0], '').trim(); 
     }
 
-    let phaseBadgeColor = "bg-purple-900/30 border-purple-700/50 text-purple-300";
+    // Badge farba podľa fázy (Oranžová téma)
+    let phaseBadgeColor = "bg-orange-900/30 border-orange-700/50 text-orange-300"; // Default (Accumulation/Distribution)
     if (phaseText.includes("BULL")) {
         phaseBadgeColor = "bg-green-900/30 border-green-700/50 text-green-400";
     } else if (phaseText.includes("BEAR")) {
         phaseBadgeColor = "bg-red-900/30 border-red-700/50 text-red-400";
-    } else if (phaseText.includes("ACCUMULATION")) {
-        phaseBadgeColor = "bg-blue-900/30 border-blue-700/50 text-blue-400";
-    } else if (phaseText.includes("DISTRIBUTION")) {
-        phaseBadgeColor = "bg-orange-900/30 border-orange-700/50 text-orange-400";
     }
 
     const score = data.cycle_score || 0;
@@ -106,7 +102,7 @@ async function analyze() {
             <div class="${phaseBadgeColor} text-xs font-bold px-3 py-1 rounded-lg border uppercase text-right leading-tight max-w-[50%]">${phaseText}</div>
         </div>
         <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-5">
-          <span class="text-4xl sm:text-5xl font-bold tracking-tight">$${formattedPrice}</span>
+          <span class="text-4xl sm:text-5xl font-bold tracking-tight text-white">$${formattedPrice}</span>
           <span class="${colorClass} text-xl font-semibold">${sign}${data.change.toFixed(2)}%</span>
         </div>
         
@@ -135,23 +131,23 @@ async function analyze() {
         content = content.replace(/(<br>\s*){3,}/g, '<br><br>'); 
 
         let boxStyle = "bg-neutral-900 border-neutral-800";
-        let titleStyle = "text-purple-400";
+        let titleStyle = "text-orange-400"; // Oranžové nadpisy
         
         if (title.toUpperCase().includes("TARGET")) {
-            boxStyle = "bg-blue-900/10 border-blue-800/50";
-            titleStyle = "text-blue-400 font-black uppercase tracking-wider";
+            boxStyle = "bg-orange-900/10 border-orange-800/50"; // Oranžový target box
+            titleStyle = "text-orange-300 font-black uppercase tracking-wider";
         }
         
         if (title.toUpperCase().includes("VERDICT")) {
-            if (content.toUpperCase().includes("BUY") || content.toUpperCase().includes("DCA") || phaseText.toUpperCase().includes("BULL")) {
+            if (content.toUpperCase().includes("BUY") || content.toUpperCase().includes("DCA") || phaseText.toUpperCase().includes("BULL") || phaseText.toUpperCase().includes("ACCUMULATION")) {
                 boxStyle = "bg-green-900/10 border-green-800/50";
                 titleStyle = "text-green-400 font-black uppercase tracking-wider";
             } else if (content.toUpperCase().includes("SELL") || phaseText.toUpperCase().includes("BEAR") || content.toUpperCase().includes("DISTRIBUTION")) {
                 boxStyle = "bg-red-900/10 border-red-800/50";
                 titleStyle = "text-red-400 font-black uppercase tracking-wider";
             } else {
-                boxStyle = "bg-purple-900/10 border-purple-800/50";
-                titleStyle = "text-purple-300 font-black uppercase tracking-wider";
+                boxStyle = "bg-orange-900/10 border-orange-800/50";
+                titleStyle = "text-orange-300 font-black uppercase tracking-wider";
             }
         }
 
@@ -175,7 +171,7 @@ async function analyze() {
         const firstPrice = data.chart_prices[0];
         const lastPrice = data.chart_prices[data.chart_prices.length - 1];
         
-        // Vzhľadom na to, že ide o Bitcoin, použijeme typickú oranžovú (#f7931a) alebo ponecháme profit/loss farbu
+        // Graf zostáva zelený/červený podľa zisku/straty v zobrazenom období
         const chartColor = lastPrice >= firstPrice ? '#22c55e' : '#ef4444';
 
         priceChartInstance = new Chart(ctx, {
@@ -199,6 +195,11 @@ async function analyze() {
                     legend: { display: false },
                     tooltip: {
                         displayColors: false,
+                        backgroundColor: '#1a1a1a',
+                        borderColor: '#333',
+                        borderWidth: 1,
+                        titleColor: '#888',
+                        bodyColor: '#fff',
                         callbacks: {
                             label: function(context) {
                                 return 'Price: $' + context.parsed.y.toLocaleString('en-US', {minimumFractionDigits: 2});
@@ -221,7 +222,7 @@ async function analyze() {
     output.classList.remove("hidden");
     output.innerHTML = `
       <div class="bg-neutral-900 p-5 rounded-2xl border border-red-900/50">
-        <span class="text-red-500 font-bold block text-center">❌ Connection Error. Try again in a few seconds.</span>
+        <span class="text-red-500 font-bold block text-center">❌ Connection Error. Backend might be waking up or API limit reached. Try again in 10s.</span>
       </div>`;
   }
 
