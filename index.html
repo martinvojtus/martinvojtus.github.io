@@ -50,11 +50,11 @@ async function analyze() {
   spinner.classList.remove("hidden");
   
   const loadingMessages = [
-      "Fetching ₿/XAU prices...",
-      "Calculating Support & Resistance...",
-      "Estimating Cycle Targets...",
-      "AI is mapping macro fractals...",
-      "Generating report..."
+      "Calculating 4-Year Fractals...",
+      "Mapping Gaussian Channels...",
+      "Evaluating ETF & Farside Flows...",
+      "Scoring Current Market Phase...",
+      "Generating AI Verdict..."
   ];
   let msgIndex = 0;
   spinner.innerText = loadingMessages[0];
@@ -80,19 +80,26 @@ async function analyze() {
     const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     let rawAnalysis = data.analysis;
-    let phaseText = "ANALYZING...";
+    let phaseText = data.phase || "ANALYZING..."; // Fáza prichádza priamo z Pythonu
     
-    let phaseMatch = rawAnalysis.match(/PHASE:\s*([a-zA-Z\s]+)/i);
+    let phaseMatch = rawAnalysis.match(/PHASE:\s*(.*)/i);
     if (phaseMatch) {
         phaseText = phaseMatch[1].trim().toUpperCase();
         rawAnalysis = rawAnalysis.replace(phaseMatch[0], '').trim(); 
     }
 
-    let phaseBadgeColor = "bg-orange-900/30 border-orange-700/50 text-orange-300"; 
+    // Nádherné, mäkké farby pre fázy (žiadne ostré biele okraje)
+    let phaseBadgeColor = "bg-neutral-800 text-neutral-300 border-neutral-700"; 
+    
     if (phaseText.includes("BULL")) {
-        phaseBadgeColor = "bg-orange-btc/20 border-orange-btc/50 text-orange-btc"; 
+        phaseBadgeColor = "bg-green-900/20 text-green-400 border-green-800/30"; 
     } else if (phaseText.includes("BEAR")) {
-        phaseBadgeColor = "bg-red-900/30 border-red-700/50 text-red-400"; 
+        phaseBadgeColor = "bg-red-900/20 text-red-400 border-red-800/30"; 
+    } else if (phaseText.includes("ACCUMULATION") || phaseText.includes("EARLY")) {
+        // Jemná hnedo-oranžová pre akumuláciu
+        phaseBadgeColor = "bg-amber-900/20 text-amber-500 border-amber-800/30"; 
+    } else if (phaseText.includes("DISTRIBUTION")) {
+        phaseBadgeColor = "bg-orange-900/20 text-orange-400 border-orange-800/30"; 
     }
 
     const score = data.cycle_score || 0;
@@ -102,27 +109,27 @@ async function analyze() {
 
     let finalHTML = `
       <div class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md">
-        <div class="flex justify-between items-start mb-2">
-            <div class="text-neutral-400 text-sm font-bold uppercase tracking-widest">${data.name} (${data.ticker})</div>
-            <div class="${phaseBadgeColor} text-xs font-bold px-3 py-1 rounded-lg border uppercase text-right leading-tight max-w-[50%]">${phaseText}</div>
+        <div class="flex justify-between items-center mb-4">
+            <div class="text-neutral-500 text-xs font-bold uppercase tracking-widest">${data.name} (${data.ticker})</div>
+            <div class="${phaseBadgeColor} text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-md border uppercase text-right tracking-wide">${phaseText}</div>
         </div>
-        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-5">
+        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-6">
           <span class="text-4xl sm:text-5xl font-bold tracking-tight text-white">$${formattedPrice}</span>
           <span class="${colorClass} text-xl font-semibold">${sign}${data.change.toFixed(2)}%</span>
         </div>
         
         <div class="mb-5">
-            <div class="flex justify-between text-xs text-neutral-400 font-bold uppercase tracking-wider mb-1">
+            <div class="flex justify-between text-xs text-neutral-500 font-bold uppercase tracking-wider mb-2">
                 <span>Cycle Bottom</span>
-                <span class="text-orange-300">Score: ${score}%</span>
+                <span class="text-orange-400">Score: ${score}%</span>
                 <span>Cycle Top</span>
             </div>
             <div class="w-full bg-neutral-800 h-2 rounded-full overflow-hidden">
-                <div class="h-full ${scoreColor} transition-all duration-1000" style="width: ${score}%"></div>
+                <div class="h-full ${scoreColor} transition-all duration-1000 ease-out" style="width: ${score}%"></div>
             </div>
         </div>
         
-        <div class="w-full h-40 relative border-t border-neutral-800 pt-3">
+        <div class="w-full h-40 relative border-t border-neutral-800 pt-4">
           <canvas id="priceChart"></canvas>
         </div>
       </div>
@@ -139,26 +146,26 @@ async function analyze() {
         let titleStyle = "text-orange-400"; 
         
         if (title.toUpperCase().includes("TARGET")) {
-            boxStyle = "bg-orange-900/10 border-orange-800/50";
+            boxStyle = "bg-orange-900/10 border-orange-800/30";
             titleStyle = "text-orange-300 font-black uppercase tracking-wider";
         }
         
         if (title.toUpperCase().includes("VERDICT")) {
             if (content.toUpperCase().includes("BUY") || content.toUpperCase().includes("DCA") || phaseText.toUpperCase().includes("BULL") || phaseText.toUpperCase().includes("ACCUMULATION")) {
-                boxStyle = "bg-orange-900/20 border-orange-500/50"; 
+                boxStyle = "bg-orange-900/20 border-orange-500/30"; 
                 titleStyle = "text-orange-btc font-black uppercase tracking-wider";
             } else if (content.toUpperCase().includes("SELL") || phaseText.toUpperCase().includes("BEAR") || content.toUpperCase().includes("DISTRIBUTION")) {
-                boxStyle = "bg-red-900/10 border-red-800/50"; 
+                boxStyle = "bg-red-900/10 border-red-800/30"; 
                 titleStyle = "text-red-400 font-black uppercase tracking-wider";
             } else {
-                boxStyle = "bg-orange-900/10 border-orange-800/50";
+                boxStyle = "bg-orange-900/10 border-orange-800/30";
                 titleStyle = "text-orange-300 font-black uppercase tracking-wider";
             }
         }
 
         finalHTML += `
           <div class="${boxStyle} p-5 rounded-2xl border shadow-md">
-            <h2 class="${titleStyle} text-lg font-bold mb-3">${title}</h2>
+            <h2 class="${titleStyle} text-sm sm:text-base font-bold mb-3">${title}</h2>
             <div class="text-neutral-300 text-sm leading-relaxed">${content}</div>
           </div>
         `;
@@ -223,7 +230,7 @@ async function analyze() {
     output.classList.remove("hidden");
     output.innerHTML = `
       <div class="bg-neutral-900 p-5 rounded-2xl border border-red-900/50">
-        <span class="text-red-500 font-bold block text-center">❌ Connection Error. Backend waking up or resolving API IPs. Try again in 10s.</span>
+        <span class="text-red-500 font-bold block text-center">❌ Connection Error. Backend waking up. Try again in 10s.</span>
       </div>`;
   }
 
