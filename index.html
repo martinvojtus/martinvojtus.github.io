@@ -185,6 +185,17 @@ async function analyze() {
             </div>
         </div>
         
+        <div class="mb-6">
+            <div class="flex justify-between text-xs text-neutral-500 font-bold uppercase tracking-wider mb-2">
+                <span>${i18n[currentLang].bottom}</span>
+                <span class="text-[#F7931A]">${i18n[currentLang].score}: ${score}%</span>
+                <span>${i18n[currentLang].top}</span>
+            </div>
+            <div class="w-full bg-neutral-800 h-2 rounded-full overflow-hidden">
+                <div class="h-full ${scoreColor} transition-all duration-1000 ease-out" style="width: ${score}%"></div>
+            </div>
+        </div>
+        
         <div class="space-y-6">
             <div style="height: 220px; position: relative; border-top: 1px solid #262626; padding-top: 2rem;">
                 <div style="position: absolute; top: 12px; left: 0; font-size: 0.75rem; color: #a3a3a3; font-weight: bold;">Price, 50W & 200W MA</div>
