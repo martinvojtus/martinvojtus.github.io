@@ -1,28 +1,281 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Macro Analyst</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="bg-black text-white flex justify-center min-h-screen items-start pt-6 font-sans pb-10">
+
+<div class="w-full max-w-xl p-5 space-y-4">
+
+    <header class="flex justify-between items-center w-full mb-6">
+        <h1 id="main-title" class="text-xl sm:text-2xl font-extrabold tracking-wide text-[#F7931A] flex items-center gap-2">
+            <span class="text-3xl">₿</span> Macro Analyst
+        </h1>
+        <div class="bg-neutral-900 rounded-lg p-1 border border-neutral-800 flex gap-1 shrink-0">
+            <button id="lang-en" onclick="setLang('EN')" class="px-2 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition">EN</button>
+            <button id="lang-sk" onclick="setLang('SK')" class="px-2 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition">SK</button>
+        </div>
+    </header>
+
+    <button onclick="analyze()" id="btn" class="w-full h-14 bg-[#F7931A] rounded-xl text-black font-bold text-lg hover:bg-orange-500 transition active:scale-95 shadow-lg shadow-orange-900/20">
+      Analyze Macro Cycle
+    </button>
+
+    <div id="spinner" class="hidden text-center text-[#F7931A] font-medium mt-6 h-6 text-sm"></div>
+
+    <div id="divider" class="hidden border-b border-neutral-800 my-6"></div>
+
+    <div id="output" class="hidden flex flex-col gap-4">
+        </div>
+
+</div>
+
 <script>
-// ... (setLang, setTouch tktiež zostávajú)
+let priceChartInstance = null;
+let rsiChartInstance = null;
+let scoreChartInstance = null;
+
+let spinnerInterval = null;
+let currentLang = 'EN';
+
+// Slovník pre UI
+const i18n = {
+    EN: {
+        title: '<span class="text-3xl">₿</span> Macro Analyst',
+        btn: 'Analyze Macro Cycle',
+        loading: ["Calculating 4-Year Fractals...", "Analyzing Weekly MAs...", "Estimating Cycle Targets...", "Generating Institutional Brief..."],
+        bottom: "Cycle Bottom",
+        top: "Cycle Top",
+        score: "Cycle Score",
+        error: "❌ Connection Error. Backend waking up. Try again in 10s."
+    },
+    SK: {
+        title: '<span class="text-3xl">₿</span> Makro Analytik',
+        btn: 'Analyzovať Makro Cyklus',
+        loading: ["Počítam 4-ročné fraktály...", "Analyzujem týždňové MA...", "Odhadujem ciele cyklu...", "Generujem inštitucionálny brief..."],
+        bottom: "Dno Cyklu",
+        top: "Vrchol Cyklu",
+        score: "Skóre Cyklu",
+        error: "❌ Chyba pripojenia. Backend sa prebúdza. Skúste znova o 10s."
+    }
+};
+
+// Prepínanie jazyka
+function setLang(lang) {
+    currentLang = lang;
+    const isEN = lang === 'EN';
+    
+    document.getElementById('lang-en').className = isEN ? "px-2 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition" : "px-2 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition";
+    document.getElementById('lang-sk').className = !isEN ? "px-2 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition" : "px-2 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition";
+    
+    document.getElementById('main-title').innerHTML = i18n[lang].title;
+    document.getElementById('btn').innerText = i18n[lang].btn;
+    
+    if (!document.getElementById('output').classList.contains('hidden')) {
+        analyze();
+    }
+}
+
+// Skrytie tooltipov pri kliknutí mimo grafu
+function hideTooltips() {
+    const charts = [priceChartInstance, rsiChartInstance, scoreChartInstance];
+    charts.forEach(chart => {
+        if (chart) {
+            chart.tooltip.setActiveElements([], {x: 0, y: 0});
+            chart.update();
+        }
+    });
+}
+
+document.addEventListener('touchstart', (e) => e.target.tagName !== 'CANVAS' && hideTooltips());
+document.addEventListener('click', (e) => e.target.tagName !== 'CANVAS' && hideTooltips());
 
 async function analyze() {
-  // ... (fetch logika zostáva rovnaká)
+  const spinner = document.getElementById("spinner");
+  const output = document.getElementById("output");
+  const divider = document.getElementById("divider");
+  const btn = document.getElementById("btn");
 
-  // UPRAVENÉ VYKRESLENIE GRAFU V PRICECHART:
-  if (priceChartInstance) priceChartInstance.destroy();
-  priceChartInstance = new Chart(document.getElementById('priceChart').getContext('2d'), {
-      type: 'line',
-      data: {
-          labels: data.chart_dates,
-          datasets: [
-              { label: 'Price', data: data.chart_prices, borderColor: '#F7931A', borderWidth: 2, pointRadius: 0 },
-              { label: '50W MA', data: data.chart_ma50, borderColor: '#06b6d4', borderWidth: 1, pointRadius: 0 },
-              { label: '200W MA', data: data.chart_ma200, borderColor: '#a855f7', borderWidth: 1, pointRadius: 0 }
-          ]
-      },
-      options: { 
-          responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: { x: { display: false }, y: { display: false, type: 'logarithmic' } } 
+  output.classList.add("hidden");
+  divider.classList.add("hidden");
+  btn.disabled = true;
+  btn.classList.add("opacity-50");
+  
+  spinner.classList.remove("hidden");
+  let msgIndex = 0;
+  spinner.innerText = i18n[currentLang].loading[0];
+  
+  spinnerInterval = setInterval(() => {
+      msgIndex = (msgIndex + 1) % i18n[currentLang].loading.length;
+      spinner.innerText = i18n[currentLang].loading[msgIndex];
+  }, 1800); 
+
+  try {
+    const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ language: currentLang }) 
+    });
+
+    const data = await res.json();
+    clearInterval(spinnerInterval);
+    spinner.classList.add("hidden");
+
+    const colorClass = data.change > 0 ? "text-green-500" : (data.change < 0 ? "text-red-500" : "text-neutral-400");
+    const sign = data.change > 0 ? "+" : "";
+    const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    let rawAnalysis = data.analysis;
+    let phaseTextInternal = data.phase || "BULL MARKET";
+    
+    // Extrakcia PHASE z AI textu pre zobrazenie badge
+    let phaseMatch = rawAnalysis.match(/PHASE:\s*(.*)/i);
+    if (phaseMatch) {
+        phaseTextInternal = phaseMatch[1].trim().toUpperCase();
+        rawAnalysis = rawAnalysis.replace(phaseMatch[0], '').trim(); 
+    }
+
+    // Preklad Badge
+    let displayPhase = phaseTextInternal;
+    if (currentLang === 'SK') {
+        if (phaseTextInternal.includes("BULL")) displayPhase = "BÝČÍ TRH";
+        else if (phaseTextInternal.includes("BEAR")) displayPhase = "MEDVEDÍ TRH";
+        else if (phaseTextInternal.includes("ACCUMULATION")) displayPhase = "AKUMULÁCIA";
+        else if (phaseTextInternal.includes("DISTRIBUTION")) displayPhase = "DISTRIBÚCIA";
+    }
+
+    // Badge Style (Jemná oranžovo-hnedá pre Accumulation, atď.)
+    let badgeStyle = "bg-neutral-800 text-neutral-300 border-neutral-700";
+    if (phaseTextInternal.includes("BULL")) badgeStyle = "bg-green-900/20 text-green-400 border-green-800/30";
+    if (phaseTextInternal.includes("BEAR")) badgeStyle = "bg-red-900/20 text-red-400 border-red-800/30";
+    if (phaseTextInternal.includes("ACCUMULATION")) badgeStyle = "bg-amber-950/40 text-amber-500 border-amber-900/50";
+    if (phaseTextInternal.includes("DISTRIBUTION")) badgeStyle = "bg-orange-900/20 text-[#F7931A] border-[#F7931A]/30";
+
+    const score = data.cycle_score || 0;
+
+    let finalHTML = `
+      <div class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md">
+        <div class="flex justify-between items-center mb-4">
+            <div class="text-neutral-500 text-xs font-bold uppercase tracking-widest">${data.name} (${data.ticker})</div>
+            <div class="${badgeStyle} text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-md border uppercase text-right tracking-wide">${displayPhase}</div>
+        </div>
+        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-6">
+          <span class="text-4xl sm:text-5xl font-bold tracking-tight text-white">$${formattedPrice}</span>
+          <span class="${colorClass} text-xl font-semibold">${sign}${data.change.toFixed(2)}%</span>
+        </div>
+        
+        <div class="mb-5">
+            <div class="flex justify-between text-xs text-neutral-500 font-bold uppercase tracking-wider mb-2">
+                <span>${i18n[currentLang].bottom}</span>
+                <span class="text-[#F7931A]">${i18n[currentLang].score}: ${score}%</span>
+                <span>${i18n[currentLang].top}</span>
+            </div>
+            <div class="w-full bg-neutral-800 h-2 rounded-full overflow-hidden">
+                <div class="h-full bg-[#F7931A] transition-all duration-1000 ease-out" style="width: ${score}%"></div>
+            </div>
+        </div>
+        
+        <div class="space-y-6">
+            <div class="w-full h-48 relative border-t border-neutral-800 pt-8">
+                <div class="text-xs text-neutral-400 font-bold mb-1 absolute top-3 left-0 z-10">Price & Weekly MAs</div>
+                <canvas id="priceChart"></canvas>
+            </div>
+            <div class="w-full h-32 relative border-t border-neutral-800 pt-8">
+                <div class="text-xs text-neutral-400 font-bold mb-1 absolute top-3 left-0 z-10">Weekly RSI (14)</div>
+                <canvas id="rsiChart"></canvas>
+            </div>
+            <div class="w-full h-32 relative border-t border-neutral-800 pt-8">
+                <div class="text-xs text-neutral-400 font-bold mb-1 absolute top-3 left-0 z-10">Market Cycle Score</div>
+                <canvas id="scoreChart"></canvas>
+            </div>
+        </div>
+      </div>
+    `;
+
+    // Spracovanie AI textu do blokov
+    const parts = rawAnalysis.split('**');
+    for (let i = 1; i < parts.length; i += 2) {
+      if (parts[i] && parts[i + 1]) {
+        const title = parts[i].trim();
+        let content = parts[i + 1].trim().replace(/^- /gm, '').replace(/\n/g, '<br><br>');
+        let boxStyle = "bg-neutral-900 border-neutral-800";
+        let titleStyle = "text-[#F7931A]";
+        
+        if (content.toUpperCase().includes("BUY") || content.toUpperCase().includes("KÚPIŤ")) {
+            boxStyle = "bg-green-900/10 border-green-800/30"; titleStyle = "text-green-500 font-bold";
+        } else if (content.toUpperCase().includes("SELL") || content.toUpperCase().includes("PREDAŤ")) {
+            boxStyle = "bg-red-900/10 border-red-800/30"; titleStyle = "text-red-500 font-bold";
+        }
+
+        finalHTML += `
+          <div class="${boxStyle} p-5 rounded-2xl border shadow-md">
+            <h2 class="${titleStyle} text-sm font-bold mb-3 uppercase tracking-wider">${title}</h2>
+            <div class="text-neutral-300 text-sm leading-relaxed">${content}</div>
+          </div>
+        `;
       }
-  });
+    }
 
-  // RSI a Score grafy zostávajú ako predtým...
+    output.innerHTML = finalHTML;
+    divider.classList.remove("hidden");
+    output.classList.remove("hidden");
+    
+    // Grafy
+    Chart.defaults.color = '#737373';
+    Chart.defaults.font.size = 10;
+    const opts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } }, interaction: { mode: 'index', intersect: false }};
+
+    if (priceChartInstance) priceChartInstance.destroy();
+    priceChartInstance = new Chart(document.getElementById('priceChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: data.chart_dates,
+            datasets: [
+                { label: 'Price', data: data.chart_prices, borderColor: '#F7931A', borderWidth: 2, pointRadius: 0 },
+                { label: '50W MA', data: data.chart_ma50, borderColor: '#06b6d4', borderWidth: 1, pointRadius: 0 },
+                { label: '200W MA', data: data.chart_ma200, borderColor: '#a855f7', borderWidth: 1, pointRadius: 0 }
+            ]
+        },
+        options: { ...opts, scales: { x: { display: false }, y: { display: false, type: 'logarithmic' } } }
+    });
+
+    if (rsiChartInstance) rsiChartInstance.destroy();
+    rsiChartInstance = new Chart(document.getElementById('rsiChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: data.chart_dates,
+            datasets: [
+                { label: 'RSI', data: data.chart_rsi, borderColor: '#F7931A', borderWidth: 1.5, pointRadius: 0 },
+                { label: 'O/B', data: new Array(data.chart_dates.length).fill(70), borderColor: '#ef4444', borderWidth: 0.5, borderDash: [5,5], pointRadius: 0 },
+                { label: 'O/S', data: new Array(data.chart_dates.length).fill(30), borderColor: '#22c55e', borderWidth: 0.5, borderDash: [5,5], pointRadius: 0 }
+            ]
+        },
+        options: { ...opts, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } }
+    });
+
+    if (scoreChartInstance) scoreChartInstance.destroy();
+    scoreChartInstance = new Chart(document.getElementById('scoreChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: data.chart_dates,
+            datasets: [{ label: 'Score', data: data.chart_score, borderColor: '#F7931A', backgroundColor: 'rgba(247, 147, 26, 0.05)', fill: true, borderWidth: 1.5, pointRadius: 0 }]
+        },
+        options: { ...opts, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } }
+    });
+
+  } catch (e) {
+    clearInterval(spinnerInterval);
+    spinner.classList.add("hidden");
+    output.classList.remove("hidden");
+    output.innerHTML = `<div class="bg-neutral-900 p-5 rounded-2xl border border-red-900/50 text-red-500 font-bold text-center">${i18n[currentLang].error}</div>`;
+  }
+  btn.disabled = false; btn.classList.remove("opacity-50");
 }
 </script>
+</body>
+</html>
