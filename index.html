@@ -1,36 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-  .bg-orange-btc { background-color: #F7931A; }
-  .text-orange-btc { color: #F7931A; }
-  .border-orange-btc { border-color: #F7931A; }
-</style>
 </head>
 
-<body class="bg-black text-white flex justify-center min-h-screen items-start pt-10 font-sans pb-10">
+<body class="bg-black text-white flex justify-center min-h-screen items-start pt-6 font-sans pb-10">
 
 <div class="w-full max-w-xl p-5 space-y-4">
 
-<div class="flex justify-end w-full mb-2">
-    <div class="bg-neutral-900 rounded-lg p-1 border border-neutral-800 flex gap-1">
-        <button id="lang-en" onclick="setLang('EN')" class="px-3 py-1 rounded-md bg-orange-btc text-black font-bold text-xs transition">EN</button>
-        <button id="lang-sk" onclick="setLang('SK')" class="px-3 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition">SK</button>
+<header class="flex justify-between items-center w-full mb-6">
+    <h1 id="main-title" class="text-xl sm:text-2xl font-extrabold tracking-wide text-[#F7931A] flex items-center gap-2">
+        <span class="text-3xl">₿</span> Macro Analyst
+    </h1>
+    <div class="bg-neutral-900 rounded-lg p-1 border border-neutral-800 flex gap-1 shrink-0">
+        <button id="lang-en" onclick="setLang('EN')" class="px-2 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition">EN</button>
+        <button id="lang-sk" onclick="setLang('SK')" class="px-2 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition">SK</button>
     </div>
-</div>
+</header>
 
-<h1 id="main-title" class="text-3xl text-center font-extrabold mb-8 tracking-wide text-orange-btc">
-  <span class="text-4xl">₿</span>itcoin Macro Analyst
-</h1>
-
-<button onclick="analyze()" id="btn" class="w-full h-14 bg-orange-btc rounded-xl font-bold text-lg hover:bg-orange-500 transition active:scale-95 shadow-lg shadow-orange-900/20 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-black">
+<button onclick="analyze()" id="btn" class="w-full h-14 bg-[#F7931A] rounded-xl text-black font-bold text-lg hover:bg-orange-500 transition active:scale-95 shadow-lg shadow-orange-900/20">
   Analyze Macro Cycle
 </button>
 
-<div id="spinner" class="hidden text-center text-orange-400 font-medium mt-6 h-6 text-sm"></div>
+<div id="spinner" class="hidden text-center text-[#F7931A] font-medium mt-6 h-6 text-sm"></div>
 
 <div id="divider" class="hidden border-b border-neutral-800 my-6"></div>
 
@@ -41,13 +35,16 @@
 
 <script>
 let priceChartInstance = null;
+let gaussChartInstance = null;
+let rsiChartInstance = null;
+let scoreChartInstance = null;
+
 let spinnerInterval = null;
 let currentLang = 'EN';
 
-// Jazykový slovník pre UI
 const i18n = {
     EN: {
-        title: '<span class="text-4xl">₿</span>itcoin Macro Analyst',
+        title: '<span class="text-3xl">₿</span> Macro Analyst',
         btn: 'Analyze Macro Cycle',
         loading: ["Calculating 4-Year Fractals...", "Mapping Gaussian Channels...", "Evaluating ETF Flows...", "Scoring Current Market Phase...", "Generating AI Verdict..."],
         bottom: "Cycle Bottom",
@@ -56,7 +53,7 @@ const i18n = {
         error: "❌ Connection Error. Backend waking up. Try again in 10s."
     },
     SK: {
-        title: '<span class="text-4xl">₿</span>itcoin Makro Analytik',
+        title: '<span class="text-3xl">₿</span> Makro Analytik',
         btn: 'Analyzovať Makro Cyklus',
         loading: ["Počítam 4-ročné fraktály...", "Mapujem Gaussove kanály...", "Vyhodnocujem ETF toky...", "Skórujem fázu trhu...", "Generujem AI verdikt..."],
         bottom: "Dno Cyklu",
@@ -69,20 +66,17 @@ const i18n = {
 function setLang(lang) {
     currentLang = lang;
     
-    // Prepínanie UI farieb tlačidiel
     if (lang === 'EN') {
-        document.getElementById('lang-en').className = "px-3 py-1 rounded-md bg-orange-btc text-black font-bold text-xs transition";
-        document.getElementById('lang-sk').className = "px-3 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition";
+        document.getElementById('lang-en').className = "px-2 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition";
+        document.getElementById('lang-sk').className = "px-2 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition";
     } else {
-        document.getElementById('lang-sk').className = "px-3 py-1 rounded-md bg-orange-btc text-black font-bold text-xs transition";
-        document.getElementById('lang-en').className = "px-3 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition";
+        document.getElementById('lang-sk').className = "px-2 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition";
+        document.getElementById('lang-en').className = "px-2 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition";
     }
     
-    // Zmena textov
     document.getElementById('main-title').innerHTML = i18n[lang].title;
     document.getElementById('btn').innerText = i18n[lang].btn;
     
-    // Ak je zobrazený výstup, schovaj ho, kým sa nespraví nová analýza v danom jazyku
     if (!document.getElementById('output').classList.contains('hidden')) {
         analyze();
     }
@@ -115,7 +109,7 @@ async function analyze() {
     const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ language: currentLang }) // Posielame jazyk do backendu
+      body: JSON.stringify({ language: currentLang }) 
     });
 
     const data = await res.json();
@@ -123,21 +117,19 @@ async function analyze() {
     clearInterval(spinnerInterval);
     spinner.classList.add("hidden");
 
-    const colorClass = data.change > 0 ? "text-orange-300" : (data.change < 0 ? "text-red-500" : "text-neutral-400");
+    const colorClass = data.change > 0 ? "text-green-500" : (data.change < 0 ? "text-red-500" : "text-neutral-400");
     const sign = data.change > 0 ? "+" : "";
     const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     let rawAnalysis = data.analysis;
     let phaseTextInternal = data.phase || "ANALYZING..."; 
     
-    // Extrakcia Phase (vždy po anglicky od AI pre logiku)
     let phaseMatch = rawAnalysis.match(/PHASE:\s*(.*)/i);
     if (phaseMatch) {
         phaseTextInternal = phaseMatch[1].trim().toUpperCase();
         rawAnalysis = rawAnalysis.replace(phaseMatch[0], '').trim(); 
     }
 
-    // Preklad zobrazeného Badge, ak sme v SK
     let displayPhaseText = phaseTextInternal;
     if (currentLang === 'SK') {
         if (phaseTextInternal.includes("BULL MARKET")) displayPhaseText = "BÝČÍ TRH";
@@ -154,13 +146,11 @@ async function analyze() {
     } else if (phaseTextInternal.includes("ACCUMULATION") || phaseTextInternal.includes("EARLY")) {
         phaseBadgeColor = "bg-amber-900/20 text-amber-500 border-amber-800/30"; 
     } else if (phaseTextInternal.includes("DISTRIBUTION")) {
-        phaseBadgeColor = "bg-orange-900/20 text-orange-400 border-orange-800/30"; 
+        phaseBadgeColor = "bg-orange-900/20 text-[#F7931A] border-[#F7931A]/30"; 
     }
 
     const score = data.cycle_score || 0;
-    let scoreColor = "bg-orange-900"; 
-    if (score > 30 && score <= 70) scoreColor = "bg-orange-btc";
-    if (score > 70) scoreColor = "bg-orange-300";
+    let scoreColor = "bg-[#F7931A]"; 
 
     let finalHTML = `
       <div class="bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-md">
@@ -176,7 +166,7 @@ async function analyze() {
         <div class="mb-5">
             <div class="flex justify-between text-xs text-neutral-500 font-bold uppercase tracking-wider mb-2">
                 <span>${i18n[currentLang].bottom}</span>
-                <span class="text-orange-400">${i18n[currentLang].score}: ${score}%</span>
+                <span class="text-[#F7931A]">${i18n[currentLang].score}: ${score}%</span>
                 <span>${i18n[currentLang].top}</span>
             </div>
             <div class="w-full bg-neutral-800 h-2 rounded-full overflow-hidden">
@@ -184,8 +174,26 @@ async function analyze() {
             </div>
         </div>
         
-        <div class="w-full h-40 relative border-t border-neutral-800 pt-4">
-          <canvas id="priceChart"></canvas>
+        <div class="space-y-6">
+            <div class="w-full h-48 relative border-t border-neutral-800 pt-4">
+                <div class="text-xs text-neutral-500 mb-1 absolute top-4 left-0 z-10">Price, MAs & Levels</div>
+                <canvas id="priceChart"></canvas>
+            </div>
+            
+            <div class="w-full h-32 relative border-t border-neutral-800 pt-4">
+                <div class="text-xs text-neutral-500 mb-1 absolute top-4 left-0 z-10">Gaussian Channel</div>
+                <canvas id="gaussChart"></canvas>
+            </div>
+            
+            <div class="w-full h-32 relative border-t border-neutral-800 pt-4">
+                <div class="text-xs text-neutral-500 mb-1 absolute top-4 left-0 z-10">Weekly RSI (14)</div>
+                <canvas id="rsiChart"></canvas>
+            </div>
+            
+            <div class="w-full h-32 relative border-t border-neutral-800 pt-4">
+                <div class="text-xs text-neutral-500 mb-1 absolute top-4 left-0 z-10">Market Cycle Score (0-100%)</div>
+                <canvas id="scoreChart"></canvas>
+            </div>
         </div>
       </div>
     `;
@@ -198,27 +206,26 @@ async function analyze() {
         content = content.replace(/(<br>\s*){3,}/g, '<br><br>'); 
 
         let boxStyle = "bg-neutral-900 border-neutral-800";
-        let titleStyle = "text-orange-400"; 
+        let titleStyle = "text-[#F7931A]"; 
         
-        // Akceptujeme EN aj SK nadpisy
         let t = title.toUpperCase();
         let c = content.toUpperCase();
 
         if (t.includes("TARGET") || t.includes("CIELE")) {
-            boxStyle = "bg-orange-900/10 border-orange-800/30";
-            titleStyle = "text-orange-300 font-black uppercase tracking-wider";
+            boxStyle = "bg-[#F7931A]/10 border-[#F7931A]/30";
+            titleStyle = "text-[#F7931A] font-black uppercase tracking-wider";
         }
         
         if (t.includes("VERDICT") || t.includes("VERDIKT")) {
             if (c.includes("BUY") || c.includes("KÚPIŤ") || c.includes("DCA") || phaseTextInternal.includes("BULL") || phaseTextInternal.includes("ACCUMULATION")) {
-                boxStyle = "bg-orange-900/20 border-orange-500/30"; 
-                titleStyle = "text-orange-btc font-black uppercase tracking-wider";
+                boxStyle = "bg-green-900/10 border-green-800/30"; 
+                titleStyle = "text-green-500 font-black uppercase tracking-wider";
             } else if (c.includes("SELL") || c.includes("PREDAŤ") || phaseTextInternal.includes("BEAR") || phaseTextInternal.includes("DISTRIBUTION")) {
                 boxStyle = "bg-red-900/10 border-red-800/30"; 
-                titleStyle = "text-red-400 font-black uppercase tracking-wider";
+                titleStyle = "text-red-500 font-black uppercase tracking-wider";
             } else {
-                boxStyle = "bg-orange-900/10 border-orange-800/30";
-                titleStyle = "text-orange-300 font-black uppercase tracking-wider";
+                boxStyle = "bg-[#F7931A]/10 border-[#F7931A]/30";
+                titleStyle = "text-[#F7931A] font-black uppercase tracking-wider";
             }
         }
 
@@ -235,51 +242,82 @@ async function analyze() {
     divider.classList.remove("hidden");
     output.classList.remove("hidden");
     
+    // Vykreslenie všetkých grafov
     if (data.chart_dates.length > 0 && data.chart_prices.length > 0) {
-        if (priceChartInstance) { priceChartInstance.destroy(); }
         
-        const ctx = document.getElementById('priceChart').getContext('2d');
-        const chartColor = '#F7931A'; 
+        Chart.defaults.color = '#737373';
+        Chart.defaults.font.size = 10;
+        
+        const commonOptions = {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { displayColors: false, backgroundColor: '#1a1a1a', borderColor: '#333', borderWidth: 1 } },
+            scales: { x: { display: false }, y: { display: false } }, layout: { padding: 0 },
+            interaction: { mode: 'index', intersect: false }
+        };
 
-        priceChartInstance = new Chart(ctx, {
+        // 1. Price Chart (Cena, MA50, MA200, ATH, Bottom)
+        if (priceChartInstance) priceChartInstance.destroy();
+        const bottomLine = new Array(data.chart_dates.length).fill(data.macro_bottom_est);
+        const athLine = new Array(data.chart_dates.length).fill(data.ath);
+        
+        priceChartInstance = new Chart(document.getElementById('priceChart').getContext('2d'), {
             type: 'line',
             data: {
                 labels: data.chart_dates,
-                datasets: [{
-                    label: '₿ Price',
-                    data: data.chart_prices,
-                    borderColor: chartColor,
-                    borderWidth: 2,
-                    tension: 0.2,
-                    pointRadius: 0,
-                    pointHitRadius: 10
-                }]
+                datasets: [
+                    { label: 'Price', data: data.chart_prices, borderColor: '#F7931A', borderWidth: 2, tension: 0.1, pointRadius: 0 },
+                    { label: '50W MA', data: data.chart_ma50, borderColor: '#06b6d4', borderWidth: 1, tension: 0.1, pointRadius: 0 },
+                    { label: '200W MA', data: data.chart_ma200, borderColor: '#a855f7', borderWidth: 1, tension: 0.1, pointRadius: 0 },
+                    { label: 'ATH', data: athLine, borderColor: '#22c55e', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 },
+                    { label: 'Macro Bottom', data: bottomLine, borderColor: '#ef4444', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 }
+                ]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { 
-                    legend: { display: false },
-                    tooltip: {
-                        displayColors: false,
-                        backgroundColor: '#1a1a1a',
-                        borderColor: '#333',
-                        borderWidth: 1,
-                        titleColor: '#888',
-                        bodyColor: '#fff',
-                        callbacks: {
-                            label: function(context) {
-                                return 'Price: $' + context.parsed.y.toLocaleString('en-US', {minimumFractionDigits: 2});
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: { display: false },
-                    y: { display: false, min: Math.min(...data.chart_prices) * 0.95, max: Math.max(...data.chart_prices) * 1.05 }
-                },
-                layout: { padding: 0 }
-            }
+            options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, type: 'logarithmic' } } } // Logaritmická škála pre dlhodobú históriu
+        });
+
+        // 2. Gaussian Channel Chart
+        if (gaussChartInstance) gaussChartInstance.destroy();
+        gaussChartInstance = new Chart(document.getElementById('gaussChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: data.chart_dates,
+                datasets: [
+                    { label: 'Price', data: data.chart_prices, borderColor: '#ffffff', borderWidth: 1, tension: 0.1, pointRadius: 0 },
+                    { label: 'Gauss Top', data: data.chart_gauss_top, borderColor: '#22c55e', borderWidth: 1, tension: 0.1, pointRadius: 0 },
+                    { label: 'Gauss Bot', data: data.chart_gauss_bot, borderColor: '#ef4444', borderWidth: 1, tension: 0.1, pointRadius: 0 }
+                ]
+            },
+            options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, type: 'logarithmic' } } }
+        });
+
+        // 3. RSI Chart
+        if (rsiChartInstance) rsiChartInstance.destroy();
+        const rsi70 = new Array(data.chart_dates.length).fill(70);
+        const rsi30 = new Array(data.chart_dates.length).fill(30);
+        rsiChartInstance = new Chart(document.getElementById('rsiChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: data.chart_dates,
+                datasets: [
+                    { label: 'RSI', data: data.chart_rsi, borderColor: '#F7931A', borderWidth: 1.5, tension: 0.1, pointRadius: 0 },
+                    { label: 'Overbought', data: rsi70, borderColor: '#ef4444', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 },
+                    { label: 'Oversold', data: rsi30, borderColor: '#22c55e', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 }
+                ]
+            },
+            options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } }
+        });
+
+        // 4. Cycle Score Chart
+        if (scoreChartInstance) scoreChartInstance.destroy();
+        scoreChartInstance = new Chart(document.getElementById('scoreChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: data.chart_dates,
+                datasets: [
+                    { label: 'Cycle Score %', data: data.chart_score, borderColor: '#F7931A', backgroundColor: 'rgba(247, 147, 26, 0.1)', fill: true, borderWidth: 1.5, tension: 0.2, pointRadius: 0 }
+                ]
+            },
+            options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } }
         });
     }
 
