@@ -55,7 +55,7 @@ const i18n = {
     SK: {
         title: '<span class="text-3xl">₿</span> Makro Analytik',
         btn: 'Analyzovať Makro Cyklus',
-        loading: ["Počítam 4-ročné fraktály...", "Mapujem Gaussove kanály...", "Vyhodnocujem ETF toky...", "Skórujem fázu trhu...", "Generujem AI verdikt..."],
+        loading: ["Počítam 4-ročné fraktály...", "Mapujem Gaussove kanály...", "Vyhodnocujem makro dáta...", "Skórujem fázu trhu...", "Generujem AI verdikt..."],
         bottom: "Dno Cyklu",
         top: "Vrchol Cyklu",
         score: "Skóre",
@@ -81,6 +81,30 @@ function setLang(lang) {
         analyze();
     }
 }
+
+// Funkcia na vymazanie tooltípu pri kliknutí/ťuknutí mimo grafu
+document.addEventListener('touchstart', function(e) {
+    if (e.target.tagName !== 'CANVAS') {
+        const charts = [priceChartInstance, gaussChartInstance, rsiChartInstance, scoreChartInstance];
+        charts.forEach(chart => {
+            if (chart) {
+                chart.tooltip.setActiveElements([], {x:0,y:0});
+                chart.update();
+            }
+        });
+    }
+});
+document.addEventListener('click', function(e) {
+    if (e.target.tagName !== 'CANVAS') {
+        const charts = [priceChartInstance, gaussChartInstance, rsiChartInstance, scoreChartInstance];
+        charts.forEach(chart => {
+            if (chart) {
+                chart.tooltip.setActiveElements([], {x:0,y:0});
+                chart.update();
+            }
+        });
+    }
+});
 
 async function analyze() {
   const spinner = document.getElementById("spinner");
@@ -144,7 +168,7 @@ async function analyze() {
     } else if (phaseTextInternal.includes("BEAR")) {
         phaseBadgeColor = "bg-red-900/20 text-red-400 border-red-800/30"; 
     } else if (phaseTextInternal.includes("ACCUMULATION") || phaseTextInternal.includes("EARLY")) {
-        phaseBadgeColor = "bg-amber-900/20 text-amber-500 border-amber-800/30"; 
+        phaseBadgeColor = "bg-amber-950/40 text-amber-500 border-amber-900/50"; 
     } else if (phaseTextInternal.includes("DISTRIBUTION")) {
         phaseBadgeColor = "bg-orange-900/20 text-[#F7931A] border-[#F7931A]/30"; 
     }
@@ -175,23 +199,23 @@ async function analyze() {
         </div>
         
         <div class="space-y-6">
-            <div class="w-full h-48 relative border-t border-neutral-800 pt-4">
-                <div class="text-xs text-neutral-500 mb-1 absolute top-4 left-0 z-10">Price, MAs & Levels</div>
+            <div class="w-full h-48 relative border-t border-neutral-800 pt-8">
+                <div class="text-xs text-neutral-400 font-bold mb-1 absolute top-3 left-0 z-10">Price, MAs & Levels</div>
                 <canvas id="priceChart"></canvas>
             </div>
             
-            <div class="w-full h-32 relative border-t border-neutral-800 pt-4">
-                <div class="text-xs text-neutral-500 mb-1 absolute top-4 left-0 z-10">Gaussian Channel</div>
+            <div class="w-full h-32 relative border-t border-neutral-800 pt-8">
+                <div class="text-xs text-neutral-400 font-bold mb-1 absolute top-3 left-0 z-10">Gaussian Channel</div>
                 <canvas id="gaussChart"></canvas>
             </div>
             
-            <div class="w-full h-32 relative border-t border-neutral-800 pt-4">
-                <div class="text-xs text-neutral-500 mb-1 absolute top-4 left-0 z-10">Weekly RSI (14)</div>
+            <div class="w-full h-32 relative border-t border-neutral-800 pt-8">
+                <div class="text-xs text-neutral-400 font-bold mb-1 absolute top-3 left-0 z-10">Weekly RSI (14)</div>
                 <canvas id="rsiChart"></canvas>
             </div>
             
-            <div class="w-full h-32 relative border-t border-neutral-800 pt-4">
-                <div class="text-xs text-neutral-500 mb-1 absolute top-4 left-0 z-10">Market Cycle Score (0-100%)</div>
+            <div class="w-full h-32 relative border-t border-neutral-800 pt-8">
+                <div class="text-xs text-neutral-400 font-bold mb-1 absolute top-3 left-0 z-10">Market Cycle Score (0-100%)</div>
                 <canvas id="scoreChart"></canvas>
             </div>
         </div>
@@ -242,9 +266,7 @@ async function analyze() {
     divider.classList.remove("hidden");
     output.classList.remove("hidden");
     
-    // Vykreslenie všetkých grafov
     if (data.chart_dates.length > 0 && data.chart_prices.length > 0) {
-        
         Chart.defaults.color = '#737373';
         Chart.defaults.font.size = 10;
         
@@ -255,7 +277,6 @@ async function analyze() {
             interaction: { mode: 'index', intersect: false }
         };
 
-        // 1. Price Chart (Cena, MA50, MA200, ATH, Bottom)
         if (priceChartInstance) priceChartInstance.destroy();
         const bottomLine = new Array(data.chart_dates.length).fill(data.macro_bottom_est);
         const athLine = new Array(data.chart_dates.length).fill(data.ath);
@@ -272,10 +293,9 @@ async function analyze() {
                     { label: 'Macro Bottom', data: bottomLine, borderColor: '#ef4444', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 }
                 ]
             },
-            options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, type: 'logarithmic' } } } // Logaritmická škála pre dlhodobú históriu
+            options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, type: 'logarithmic' } } }
         });
 
-        // 2. Gaussian Channel Chart
         if (gaussChartInstance) gaussChartInstance.destroy();
         gaussChartInstance = new Chart(document.getElementById('gaussChart').getContext('2d'), {
             type: 'line',
@@ -290,7 +310,6 @@ async function analyze() {
             options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, type: 'logarithmic' } } }
         });
 
-        // 3. RSI Chart
         if (rsiChartInstance) rsiChartInstance.destroy();
         const rsi70 = new Array(data.chart_dates.length).fill(70);
         const rsi30 = new Array(data.chart_dates.length).fill(30);
@@ -307,7 +326,6 @@ async function analyze() {
             options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } }
         });
 
-        // 4. Cycle Score Chart
         if (scoreChartInstance) scoreChartInstance.destroy();
         scoreChartInstance = new Chart(document.getElementById('scoreChart').getContext('2d'), {
             type: 'line',
