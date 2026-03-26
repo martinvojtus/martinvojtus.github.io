@@ -35,7 +35,6 @@
 
 <script>
 let priceChartInstance = null;
-let gaussChartInstance = null;
 let rsiChartInstance = null;
 let scoreChartInstance = null;
 
@@ -46,7 +45,7 @@ const i18n = {
     EN: {
         title: '<span class="text-3xl">₿</span> Macro Analyst',
         btn: 'Analyze Macro Cycle',
-        loading: ["Calculating 4-Year Fractals...", "Mapping Gaussian Channels...", "Evaluating ETF Flows...", "Scoring Current Market Phase...", "Generating AI Verdict..."],
+        loading: ["Calculating 4-Year Fractals...", "Evaluating Indicators...", "Scoring Market Phase...", "Generating AI Verdict..."],
         bottom: "Cycle Bottom",
         top: "Cycle Top",
         score: "Score",
@@ -55,7 +54,7 @@ const i18n = {
     SK: {
         title: '<span class="text-3xl">₿</span> Makro Analytik',
         btn: 'Analyzovať Makro Cyklus',
-        loading: ["Počítam 4-ročné fraktály...", "Mapujem Gaussove kanály...", "Vyhodnocujem makro dáta...", "Skórujem fázu trhu...", "Generujem AI verdikt..."],
+        loading: ["Počítam 4-ročné fraktály...", "Vyhodnocujem indikátory...", "Skórujem fázu trhu...", "Generujem AI verdikt..."],
         bottom: "Dno Cyklu",
         top: "Vrchol Cyklu",
         score: "Skóre",
@@ -82,10 +81,9 @@ function setLang(lang) {
     }
 }
 
-// Funkcia na vymazanie tooltípu pri kliknutí/ťuknutí mimo grafu
 document.addEventListener('touchstart', function(e) {
     if (e.target.tagName !== 'CANVAS') {
-        const charts = [priceChartInstance, gaussChartInstance, rsiChartInstance, scoreChartInstance];
+        const charts = [priceChartInstance, rsiChartInstance, scoreChartInstance];
         charts.forEach(chart => {
             if (chart) {
                 chart.tooltip.setActiveElements([], {x:0,y:0});
@@ -96,7 +94,7 @@ document.addEventListener('touchstart', function(e) {
 });
 document.addEventListener('click', function(e) {
     if (e.target.tagName !== 'CANVAS') {
-        const charts = [priceChartInstance, gaussChartInstance, rsiChartInstance, scoreChartInstance];
+        const charts = [priceChartInstance, rsiChartInstance, scoreChartInstance];
         charts.forEach(chart => {
             if (chart) {
                 chart.tooltip.setActiveElements([], {x:0,y:0});
@@ -157,8 +155,8 @@ async function analyze() {
     let displayPhaseText = phaseTextInternal;
     if (currentLang === 'SK') {
         if (phaseTextInternal.includes("BULL MARKET")) displayPhaseText = "BÝČÍ TRH";
-        else if (phaseTextInternal.includes("BEAR MARKET")) displayPhaseText = "MEDVEDÍ TRH (KAPITULÁCIA)";
-        else if (phaseTextInternal.includes("ACCUMULATION")) displayPhaseText = "AKUMULÁCIA / ZAČIATOK PÁDU";
+        else if (phaseTextInternal.includes("BEAR MARKET")) displayPhaseText = "MEDVEDÍ TRH";
+        else if (phaseTextInternal.includes("ACCUMULATION") || phaseTextInternal.includes("START")) displayPhaseText = "ŠTART BÝČIEHO TRHU / AKUMULÁCIA";
         else if (phaseTextInternal.includes("DISTRIBUTION")) displayPhaseText = "DISTRIBÚCIA (VAROVANIE)";
     }
 
@@ -167,7 +165,7 @@ async function analyze() {
         phaseBadgeColor = "bg-green-900/20 text-green-400 border-green-800/30"; 
     } else if (phaseTextInternal.includes("BEAR")) {
         phaseBadgeColor = "bg-red-900/20 text-red-400 border-red-800/30"; 
-    } else if (phaseTextInternal.includes("ACCUMULATION") || phaseTextInternal.includes("EARLY")) {
+    } else if (phaseTextInternal.includes("ACCUMULATION") || phaseTextInternal.includes("START")) {
         phaseBadgeColor = "bg-amber-950/40 text-amber-500 border-amber-900/50"; 
     } else if (phaseTextInternal.includes("DISTRIBUTION")) {
         phaseBadgeColor = "bg-orange-900/20 text-[#F7931A] border-[#F7931A]/30"; 
@@ -200,13 +198,8 @@ async function analyze() {
         
         <div class="space-y-6">
             <div class="w-full h-48 relative border-t border-neutral-800 pt-8">
-                <div class="text-xs text-neutral-400 font-bold mb-1 absolute top-3 left-0 z-10">Price, MAs & Levels</div>
+                <div class="text-xs text-neutral-400 font-bold mb-1 absolute top-3 left-0 z-10">Price (Clean)</div>
                 <canvas id="priceChart"></canvas>
-            </div>
-            
-            <div class="w-full h-32 relative border-t border-neutral-800 pt-8">
-                <div class="text-xs text-neutral-400 font-bold mb-1 absolute top-3 left-0 z-10">Gaussian Channel</div>
-                <canvas id="gaussChart"></canvas>
             </div>
             
             <div class="w-full h-32 relative border-t border-neutral-800 pt-8">
@@ -278,33 +271,12 @@ async function analyze() {
         };
 
         if (priceChartInstance) priceChartInstance.destroy();
-        const bottomLine = new Array(data.chart_dates.length).fill(data.macro_bottom_est);
-        const athLine = new Array(data.chart_dates.length).fill(data.ath);
-        
         priceChartInstance = new Chart(document.getElementById('priceChart').getContext('2d'), {
             type: 'line',
             data: {
                 labels: data.chart_dates,
                 datasets: [
-                    { label: 'Price', data: data.chart_prices, borderColor: '#F7931A', borderWidth: 2, tension: 0.1, pointRadius: 0 },
-                    { label: '50W MA', data: data.chart_ma50, borderColor: '#06b6d4', borderWidth: 1, tension: 0.1, pointRadius: 0 },
-                    { label: '200W MA', data: data.chart_ma200, borderColor: '#a855f7', borderWidth: 1, tension: 0.1, pointRadius: 0 },
-                    { label: 'ATH', data: athLine, borderColor: '#22c55e', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 },
-                    { label: 'Macro Bottom', data: bottomLine, borderColor: '#ef4444', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 }
-                ]
-            },
-            options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, type: 'logarithmic' } } }
-        });
-
-        if (gaussChartInstance) gaussChartInstance.destroy();
-        gaussChartInstance = new Chart(document.getElementById('gaussChart').getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: data.chart_dates,
-                datasets: [
-                    { label: 'Price', data: data.chart_prices, borderColor: '#ffffff', borderWidth: 1, tension: 0.1, pointRadius: 0 },
-                    { label: 'Gauss Top', data: data.chart_gauss_top, borderColor: '#22c55e', borderWidth: 1, tension: 0.1, pointRadius: 0 },
-                    { label: 'Gauss Bot', data: data.chart_gauss_bot, borderColor: '#ef4444', borderWidth: 1, tension: 0.1, pointRadius: 0 }
+                    { label: 'Price', data: data.chart_prices, borderColor: '#F7931A', borderWidth: 2, tension: 0.1, pointRadius: 0 }
                 ]
             },
             options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, type: 'logarithmic' } } }
