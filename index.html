@@ -10,24 +10,18 @@
 
 <div class="w-full max-w-xl p-5 space-y-4">
 
-<h1 class="text-2xl text-center font-bold mb-6 tracking-wide">AI Crypto Analyst</h1>
+<h1 class="text-3xl text-center font-extrabold mb-8 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-500">Bitcoin Macro Analyst</h1>
 
-<select id="coin" class="w-full h-14 bg-neutral-900 border border-neutral-800 rounded-xl px-4 outline-none focus:border-purple-600 transition appearance-none">
-  <option value="BTC">Bitcoin (BTC)</option>
-  <option value="ETH">Ethereum (ETH)</option>
-  <option value="SOL">Solana (SOL)</option>
-</select>
-
-<button onclick="analyze()" id="btn" class="w-full h-14 bg-purple-600 rounded-xl font-bold text-lg hover:bg-purple-500 transition active:scale-95">
-  Analyze Macro Cycle
+<button onclick="analyze()" id="btn" class="w-full h-14 bg-orange-600 rounded-xl font-bold text-lg hover:bg-orange-500 transition active:scale-95 shadow-lg shadow-orange-900/20">
+  Analyze BTC Macro Cycle
 </button>
 
-<div id="spinner" class="hidden text-center text-purple-400 font-medium mt-6 h-6 text-sm"></div>
+<div id="spinner" class="hidden text-center text-orange-400 font-medium mt-6 h-6 text-sm"></div>
 
 <div id="divider" class="hidden border-b border-neutral-800 my-6"></div>
 
 <div id="output" class="hidden flex flex-col gap-4">
-</div>
+  </div>
 
 </div>
 
@@ -36,7 +30,6 @@ let priceChartInstance = null;
 let spinnerInterval = null;
 
 async function analyze() {
-  const coin = document.getElementById("coin").value;
   const spinner = document.getElementById("spinner");
   const output = document.getElementById("output");
   const divider = document.getElementById("divider");
@@ -51,10 +44,10 @@ async function analyze() {
   
   // Extra krátke, profi texty
   const loadingMessages = [
-      "Fetching price history...",
+      "Fetching BTC price history...",
       "Mapping cycle fractals...",
       "Cross-referencing Gold (XAU)...",
-      "Analyzing institutional flows...",
+      "Analyzing ETF flows...",
       "Generating AI verdict..."
   ];
   let msgIndex = 0;
@@ -67,10 +60,9 @@ async function analyze() {
   }, 1800); 
 
   try {
+    // Backend už neočakáva JSON s mincou, analyzuje len BTC
     const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ coin: coin })
+      method: "POST"
     });
 
     const data = await res.json();
@@ -182,6 +174,8 @@ async function analyze() {
         const ctx = document.getElementById('priceChart').getContext('2d');
         const firstPrice = data.chart_prices[0];
         const lastPrice = data.chart_prices[data.chart_prices.length - 1];
+        
+        // Vzhľadom na to, že ide o Bitcoin, použijeme typickú oranžovú (#f7931a) alebo ponecháme profit/loss farbu
         const chartColor = lastPrice >= firstPrice ? '#22c55e' : '#ef4444';
 
         priceChartInstance = new Chart(ctx, {
@@ -227,7 +221,7 @@ async function analyze() {
     output.classList.remove("hidden");
     output.innerHTML = `
       <div class="bg-neutral-900 p-5 rounded-2xl border border-red-900/50">
-        <span class="text-red-500 font-bold block text-center">❌ Connection Error. Backend API limit reached. Try again in a few seconds.</span>
+        <span class="text-red-500 font-bold block text-center">❌ Connection Error. Try again in a few seconds.</span>
       </div>`;
   }
 
