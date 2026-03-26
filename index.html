@@ -34,36 +34,6 @@
 </div>
 
 <script>
-// ... (setLang, setTouch tktiež zostávajú)
-
-async function analyze() {
-  // ... (fetch logika zostáva rovnaká)
-
-  // UPRAVENÉ VYKRESLENIE GRAFU V PRICECHART:
-  if (priceChartInstance) priceChartInstance.destroy();
-  priceChartInstance = new Chart(document.getElementById('priceChart').getContext('2d'), {
-      type: 'line',
-      data: {
-          labels: data.chart_dates,
-          datasets: [
-              { label: 'Price', data: data.chart_prices, borderColor: '#F7931A', borderWidth: 2, pointRadius: 0 },
-              { label: '50W MA', data: data.chart_ma50, borderColor: '#06b6d4', borderWidth: 1, pointRadius: 0 },
-              { label: '200W MA', data: data.chart_ma200, borderColor: '#a855f7', borderWidth: 1, pointRadius: 0 }
-          ]
-      },
-      options: { 
-          responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: { x: { display: false }, y: { display: false, type: 'logarithmic' } } 
-      }
-  });
-
-  // RSI a Score grafy zostávajú ako predtým...
-}
-</script>
-
-
-<script>
 let priceChartInstance = null;
 let rsiChartInstance = null;
 let scoreChartInstance = null;
