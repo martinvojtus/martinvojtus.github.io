@@ -11,8 +11,8 @@
 <div class="w-full max-w-xl p-5 space-y-4">
 
     <header class="flex justify-between items-center w-full mb-6">
-        <h1 id="main-title" class="text-xl sm:text-2xl font-extrabold tracking-wide text-[#F7931A] flex items-center gap-2 whitespace-nowrap">
-            <span class="text-3xl">₿</span> V-ndx <span class="text-sm text-neutral-500 font-bold ml-1">(btc char)</span>
+        <h1 id="main-title" class="text-xl sm:text-2xl font-extrabold tracking-wide text-white flex items-center gap-2 whitespace-nowrap">
+            V-ndx <span class="text-[#F7931A]">₿</span>
         </h1>
         <div class="bg-neutral-900 rounded-lg p-1 border border-neutral-800 flex gap-1 shrink-0">
             <button id="lang-en" onclick="setLang('EN')" class="px-3 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition">EN</button>
@@ -20,7 +20,7 @@
         </div>
     </header>
 
-    <button onclick="analyze()" id="btn" class="w-full h-14 bg-[#F7931A] rounded-xl text-black font-bold text-lg hover:bg-orange-500 transition active:scale-95 shadow-lg shadow-orange-900/20">
+    <button onclick="analyze()" id="btn" class="w-full h-14 bg-[#F7931A] rounded-xl text-black font-bold text-lg hover:bg-orange-500 transition active:scale-95 shadow-[0_0_15px_rgba(247,147,26,0.2)]">
       Analyze Cycle
     </button>
 
@@ -30,6 +30,8 @@
     <div id="divider" class="hidden border-b border-neutral-800 my-6"></div>
 
     <div id="output" class="hidden flex flex-col gap-5"></div>
+
+    <footer id="footer" class="hidden text-center text-[10px] text-neutral-600 font-medium mt-10 border-t border-neutral-800 pt-6 uppercase tracking-widest"></footer>
 
 </div>
 
@@ -45,18 +47,20 @@ const i18n = {
     EN: {
         btn: 'Analyze Cycle',
         loading: ["Extracting On-Chain Metrics...", "Calculating Regression...", "Evaluating Algorithms...", "Generating Strategy..."],
-        bottom: "0% (BUY)",
-        top: "100% (SELL)",
         score: "Score",
-        error: "❌ Connection Error. Backend waking up. Try again in 15s."
+        error: "❌ Connection Error. Backend waking up. Try again in 15s.",
+        legAcc: "HEAVY ACC.",
+        legHold: "HODL",
+        legDist: "DIST."
     },
     SK: {
         btn: 'Analyzovať Cyklus',
         loading: ["Získavam historické dáta...", "Počítam regresné priemery...", "Vyhodnocujem algoritmy...", "Generujem stratégiu..."],
-        bottom: "0% (NÁKUP)",
-        top: "100% (PREDAJ)",
         score: "Skóre",
-        error: "❌ Chyba pripojenia. Backend sa prebúdza. Skúste znova o 15s."
+        error: "❌ Chyba pripojenia. Backend sa prebúdza. Skúste znova o 15s.",
+        legAcc: "AKUMULÁCIA",
+        legHold: "HODL",
+        legDist: "DISTRIBÚCIA"
     }
 };
 
@@ -72,13 +76,9 @@ function setLang(lang) {
     }
     
     document.getElementById('btn').innerText = i18n[lang].btn;
-    
-    if (!document.getElementById('output').classList.contains('hidden')) {
-        analyze();
-    }
+    if (!document.getElementById('output').classList.contains('hidden')) analyze();
 }
 
-// Skrytie tooltipov na touch zariadeniach
 function hideTooltips() {
     [priceChartInstance, rsiChartInstance, scoreChartInstance].forEach(chart => {
         if (chart) { chart.tooltip.setActiveElements([], {x:0,y:0}); chart.update(); }
@@ -93,10 +93,12 @@ async function analyze() {
   const divider = document.getElementById("divider");
   const btn = document.getElementById("btn");
   const errorBox = document.getElementById("error-box");
+  const footer = document.getElementById("footer");
 
   output.classList.add("hidden");
   divider.classList.add("hidden");
   errorBox.classList.add("hidden");
+  footer.classList.add("hidden");
   btn.disabled = true;
   btn.classList.add("opacity-50");
   
@@ -129,27 +131,9 @@ async function analyze() {
     const sign = data.change > 0 ? "+" : "";
     const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    let rawAnalysis = data.analysis;
-    let phaseTextInternal = data.phase || "BULL MARKET"; 
-    
-    let phaseMatch = rawAnalysis.match(/PHASE:\s*(.*)/i);
-    if (phaseMatch) {
-        phaseTextInternal = phaseMatch[1].trim().toUpperCase();
-        rawAnalysis = rawAnalysis.replace(phaseMatch[0], '').trim(); 
-    }
-
-    // Preklad Fázy
-    let displayPhaseText = phaseTextInternal;
-    if (currentLang === 'SK') {
-        if (phaseTextInternal.includes("BOTTOM") || phaseTextInternal.includes("ACCUMULATION")) displayPhaseText = "DNO / AKUMULÁCIA";
-        else if (phaseTextInternal.includes("TOP") || phaseTextInternal.includes("DISTRIBUTION")) displayPhaseText = "VRCHOL / DISTRIBÚCIA";
-        else if (phaseTextInternal.includes("LATE")) displayPhaseText = "POKROČILÝ BÝČÍ TRH";
-        else displayPhaseText = "SKORÝ BÝČÍ TRH";
-    }
-
     const score = data.cycle_score || 0;
     
-    // Logika farieb podľa skóre (0-20 = Zelená, 75-100 = Červená)
+    // Farby podľa logiky
     let scoreColor = "bg-[#F7931A]";
     let scoreTextColor = "text-[#F7931A]";
     let phaseBadgeColor = "bg-orange-900/20 text-[#F7931A] border-[#F7931A]/30";
@@ -169,13 +153,15 @@ async function analyze() {
         
         <div class="flex justify-between items-center mb-6">
             <div class="text-neutral-500 text-xs font-bold uppercase tracking-widest">${data.name} (${data.ticker})</div>
-            <div class="${phaseBadgeColor} text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-md border uppercase tracking-wide">${displayPhaseText}</div>
+            <div class="${phaseBadgeColor} text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-md border uppercase tracking-wide">${data.phase}</div>
         </div>
         
         <div class="flex justify-between items-center mb-8 whitespace-nowrap">
             <div>
                 <div class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">$${formattedPrice}</div>
-                <div class="${colorClass} text-xs sm:text-sm font-semibold mt-1">${sign}${data.change.toFixed(2)}%</div>
+                <div class="${colorClass} text-xs sm:text-sm font-semibold mt-1 flex items-center gap-1">
+                    ${sign}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wider ml-1">24H</span>
+                </div>
             </div>
             <div class="text-right">
                 <div class="text-3xl sm:text-4xl font-black ${scoreTextColor}">${score}%</div>
@@ -184,12 +170,13 @@ async function analyze() {
         </div>
         
         <div class="mb-8">
-            <div class="flex justify-between text-[10px] text-neutral-500 font-bold uppercase tracking-widest mb-3">
-                <span>${i18n[currentLang].bottom}</span>
-                <span>${i18n[currentLang].top}</span>
-            </div>
-            <div class="w-full bg-neutral-800 h-3 rounded-full overflow-hidden">
+            <div class="w-full bg-neutral-800 h-2.5 rounded-full overflow-hidden mb-2">
                 <div class="h-full ${scoreColor} transition-all duration-1000 ease-out" style="width: ${score}%"></div>
+            </div>
+            <div class="flex justify-between text-[8px] sm:text-[9px] text-neutral-500 font-bold tracking-wider px-1">
+                <div class="flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>0-20% (${i18n[currentLang].legAcc})</div>
+                <div class="flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-[#F7931A]"></div>21-70% (${i18n[currentLang].legHold})</div>
+                <div class="flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-red-500"></div>71-100% (${i18n[currentLang].legDist})</div>
             </div>
         </div>
         
@@ -198,12 +185,10 @@ async function analyze() {
                 <div style="position: absolute; top: 16px; left: 0; font-size: 0.75rem; color: #a3a3a3; font-weight: bold; text-transform: uppercase;">Price & MAs (50W, 200W)</div>
                 <canvas id="priceChart"></canvas>
             </div>
-            
             <div style="height: 140px; position: relative; border-top: 1px solid #262626; padding-top: 2.5rem;">
                 <div style="position: absolute; top: 16px; left: 0; font-size: 0.75rem; color: #a3a3a3; font-weight: bold; text-transform: uppercase;">Weekly RSI (14)</div>
                 <canvas id="rsiChart"></canvas>
             </div>
-            
             <div style="height: 140px; position: relative; border-top: 1px solid #262626; padding-top: 2.5rem;">
                 <div style="position: absolute; top: 16px; left: 0; font-size: 0.75rem; color: #a3a3a3; font-weight: bold; text-transform: uppercase;">Cycle Score (0-100%)</div>
                 <canvas id="scoreChart"></canvas>
@@ -212,8 +197,8 @@ async function analyze() {
       </div>
     `;
 
-    // Parsovanie textu od algoritmu
-    const parts = rawAnalysis.split('**');
+    // Parsovanie algoritmickej odpovede
+    const parts = data.analysis.split('**');
     for (let i = 1; i < parts.length; i += 2) {
       if (parts[i] && parts[i + 1]) {
         const title = parts[i].trim();
@@ -222,19 +207,20 @@ async function analyze() {
         let boxStyle = "bg-neutral-900 border-neutral-800";
         let titleStyle = "text-white"; 
         
-        let c = content.toUpperCase();
-        if (title.toUpperCase().includes("VERDICT") || title.toUpperCase().includes("VERDIKT") || title.toUpperCase().includes("STRATÉGIA") || title.toUpperCase().includes("STRATEGY")) {
-            if (c.includes("BUY") || c.includes("KÚPIŤ") || c.includes("NÁKUP") || c.includes("ACCUMULATE") || c.includes("AKUMULÁCIA") || score <= 20) {
-                boxStyle = "bg-green-900/10 border-green-800/30"; titleStyle = "text-green-500";
-            } else if (c.includes("SELL") || c.includes("PREDAŤ") || c.includes("PREDAJ") || c.includes("DISTRIBUTION") || score >= 75) {
-                boxStyle = "bg-red-900/10 border-red-800/30"; titleStyle = "text-red-500";
+        // Zvýraznenie Verdiktu s glow efektom
+        let c = title.toUpperCase();
+        if (c.includes("VERDICT") || c.includes("VERDIKT") || c.includes("STRATÉGIA") || c.includes("STRATEGY")) {
+            if (score <= 20) {
+                boxStyle = "bg-green-900/10 border-green-500/50 shadow-[0_0_20px_rgba(34,197,94,0.15)]"; titleStyle = "text-green-500";
+            } else if (score >= 75) {
+                boxStyle = "bg-red-900/10 border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.15)]"; titleStyle = "text-red-500";
             } else {
-                boxStyle = "bg-orange-900/10 border-orange-800/30"; titleStyle = "text-[#F7931A]";
+                boxStyle = "bg-orange-900/10 border-[#F7931A]/50 shadow-[0_0_20px_rgba(247,147,26,0.15)]"; titleStyle = "text-[#F7931A]";
             }
         }
 
         finalHTML += `
-          <div class="${boxStyle} p-6 rounded-3xl border shadow-xl">
+          <div class="${boxStyle} p-6 rounded-3xl border transition-all duration-500">
             <h2 class="${titleStyle} text-sm font-bold mb-4 uppercase tracking-widest">${title}</h2>
             <div class="text-neutral-300 text-sm leading-loose">${content}</div>
           </div>
@@ -246,7 +232,11 @@ async function analyze() {
     divider.classList.remove("hidden");
     output.classList.remove("hidden");
     
-    // Vykreslenie ZAOBlených a TENŠÍCH grafov
+    // Zobrazenie pätičky s rokom
+    footer.innerHTML = `Created by Martin Vojtuš &copy; ${new Date().getFullYear()} <br> Build v1.0.0`;
+    footer.classList.remove("hidden");
+    
+    // Vykreslenie grafov s tenkými a hladkými krivkami
     if (data.chart_dates.length > 0 && data.chart_prices.length > 0) {
         Chart.defaults.color = '#737373';
         Chart.defaults.font.size = 10;
@@ -264,9 +254,9 @@ async function analyze() {
             data: {
                 labels: data.chart_dates,
                 datasets: [
-                    { label: 'Price', data: data.chart_prices, borderColor: '#ffffff', borderWidth: 1.5, tension: 0.4, pointRadius: 0 },
-                    { label: '50W MA', data: data.chart_ma50, borderColor: '#06b6d4', borderWidth: 1, tension: 0.4, pointRadius: 0 },
-                    { label: '200W MA', data: data.chart_ma200, borderColor: '#a855f7', borderWidth: 1, tension: 0.4, pointRadius: 0 }
+                    { label: 'Price', data: data.chart_prices, borderColor: '#ffffff', borderWidth: 1.2, tension: 0.5, pointRadius: 0 },
+                    { label: '50W MA', data: data.chart_ma50, borderColor: '#06b6d4', borderWidth: 0.8, tension: 0.5, pointRadius: 0 },
+                    { label: '200W MA', data: data.chart_ma200, borderColor: '#a855f7', borderWidth: 0.8, tension: 0.5, pointRadius: 0 }
                 ]
             },
             options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, type: 'logarithmic' } } }
@@ -278,9 +268,9 @@ async function analyze() {
             data: {
                 labels: data.chart_dates,
                 datasets: [
-                    { label: 'RSI', data: data.chart_rsi, borderColor: '#06b6d4', borderWidth: 1.5, tension: 0.4, pointRadius: 0 },
-                    { label: 'O/B (85)', data: new Array(data.chart_dates.length).fill(85), borderColor: '#ef4444', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 },
-                    { label: 'O/S (35)', data: new Array(data.chart_dates.length).fill(35), borderColor: '#22c55e', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 }
+                    { label: 'RSI', data: data.chart_rsi, borderColor: '#06b6d4', borderWidth: 1.2, tension: 0.5, pointRadius: 0 },
+                    { label: 'O/B', data: new Array(data.chart_dates.length).fill(85), borderColor: '#ef4444', borderWidth: 0.8, borderDash: [5, 5], pointRadius: 0 },
+                    { label: 'O/S', data: new Array(data.chart_dates.length).fill(40), borderColor: '#22c55e', borderWidth: 0.8, borderDash: [5, 5], pointRadius: 0 }
                 ]
             },
             options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, min: 20, max: 100 } } }
@@ -292,7 +282,7 @@ async function analyze() {
             data: {
                 labels: data.chart_dates,
                 datasets: [
-                    { label: 'Cycle Score %', data: data.chart_score, borderColor: '#F7931A', backgroundColor: 'rgba(247, 147, 26, 0.1)', fill: true, borderWidth: 1.5, tension: 0.4, pointRadius: 0 }
+                    { label: 'Cycle Score', data: data.chart_score, borderColor: '#F7931A', backgroundColor: 'rgba(247, 147, 26, 0.1)', fill: true, borderWidth: 1.2, tension: 0.5, pointRadius: 0 }
                 ]
             },
             options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } }
