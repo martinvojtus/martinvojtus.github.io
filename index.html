@@ -89,7 +89,7 @@ function hideTooltips() {
 document.addEventListener('touchstart', e => { if (e.target.tagName !== 'CANVAS') hideTooltips(); });
 document.addEventListener('click', e => { if (e.target.tagName !== 'CANVAS') hideTooltips(); });
 
-// Vylepšený zameriavač (Hodnoty priamo vnútri na hrane grafu, len pri dotyku)
+// Vylepšený zameriavač (Hodnoty vycentrované mimo mriežky, žiadne prekrývanie)
 const crosshairPlugin = {
   id: 'crosshair',
   afterDraw: chart => {
@@ -120,17 +120,18 @@ const crosshairPlugin = {
       ctx.strokeStyle = 'rgba(255,255,255,0.15)';
       ctx.stroke();
 
-      // Štítok na X osi (Dátum) ukotvený dole
+      // Štítok na X osi (Dátum) ukotvený dole MIMO grafu
       let xLabel = chart.data.labels[activePoint.index];
       if (xLabel) {
           ctx.fillStyle = '#171717'; 
           ctx.font = 'bold 9px sans-serif';
           let textWidth = ctx.measureText(xLabel).width;
-          let boxY = yAxis.bottom - 18; 
+          let boxY = yAxis.bottom + 4; // Kreslíme pod mriežku
           let boxX = x - (textWidth + 16)/2;
-          // Zabezpečenie proti orezaniu vľavo/vpravo
-          if (boxX < xAxis.left) boxX = xAxis.left;
-          if (boxX + textWidth + 16 > xAxis.right) boxX = xAxis.right - textWidth - 16;
+          
+          // Ochrana aby text nevyšiel mimo celého canvasu (plátna)
+          if (boxX < 0) boxX = 0;
+          if (boxX + textWidth + 16 > chart.width) boxX = chart.width - textWidth - 16;
           
           ctx.fillRect(boxX, boxY, textWidth + 16, 18);
           ctx.strokeStyle = '#525252';
@@ -141,7 +142,7 @@ const crosshairPlugin = {
           ctx.fillText(xLabel, boxX + (textWidth + 16)/2, boxY + 9);
       }
 
-      // Štítok na Y osi (Hodnota) ukotvený vpravo
+      // Štítok na Y osi (Hodnota) ukotvený vpravo MIMO grafu
       let val = activePoint.element.$context.parsed.y;
       let yLabel = val.toFixed(1);
       if (chart.canvas.id === 'priceChart') {
@@ -153,7 +154,7 @@ const crosshairPlugin = {
       ctx.fillStyle = '#171717';
       ctx.font = 'bold 9px sans-serif';
       let yTextWidth = ctx.measureText(yLabel).width;
-      let yBoxX = xAxis.right - yTextWidth - 16; // Posunuté dnu pred orezaním
+      let yBoxX = xAxis.right + 4; // Kreslíme vpravo od mriežky
       
       ctx.fillRect(yBoxX, y - 9, yTextWidth + 16, 18);
       ctx.strokeStyle = '#525252';
@@ -193,10 +194,12 @@ async function analyze() {
   const divider = document.getElementById("divider");
   const btn = document.getElementById("btn");
   const errorBox = document.getElementById("error-box");
+  const footer = document.getElementById("footer");
 
   output.classList.add("hidden");
   divider.classList.add("hidden");
   errorBox.classList.add("hidden");
+  footer.classList.add("hidden");
   btn.disabled = true;
   btn.classList.add("opacity-50");
   
@@ -320,6 +323,7 @@ async function analyze() {
     output.innerHTML = finalHTML;
     divider.classList.remove("hidden");
     output.classList.remove("hidden");
+    footer.classList.remove("hidden");
     
     // LIMIT DÁT NA POSLEDNÝCH 1000 DNÍ (cca 143 týždňov)
     const limit = -143;
@@ -337,21 +341,21 @@ async function analyze() {
         
         const commonOptions = {
             responsive: true, maintainAspectRatio: false,
-            // PLNE VYPNUTÝ natívny tooltip (šedý box)
+            // Natívny šedý tooltip je úplne vypnutý
             plugins: { 
                 legend: { display: false }, 
-                tooltip: false 
+                tooltip: { enabled: false } 
             },
-            // ZMAZANÝ padding - grafy sú maximalizované na doraz
-            layout: { padding: 0 },
+            // Pridávame presný padding doprava (pre cenu) a dole (pre dátum), 
+            // aby sa náš vlastný zameriavač mal kde bezpečne vykresliť
+            layout: { padding: { left: 0, right: 45, top: 10, bottom: 25 } },
             interaction: { mode: 'index', intersect: false }
         };
 
         const xAxisConfig = {
             display: true,
             grid: { display: false, drawBorder: false },
-            // ZMAZANÉ defaultné osi, ukážu sa len pri kliknutí
-            ticks: { display: false } 
+            ticks: { display: false } // Vypnuté statické osi
         };
 
         if (priceChartInstance) priceChartInstance.destroy();
@@ -372,7 +376,6 @@ async function analyze() {
                     y: { 
                         display: true, position: 'right', type: 'logarithmic', 
                         grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false, tickLength: 0 },
-                        // ZMAZANÉ defaultné osi
                         ticks: { display: false } 
                     } 
                 } 
@@ -385,7 +388,6 @@ async function analyze() {
             data: {
                 labels: chartDates,
                 datasets: [
-                    // Hranice posunuté na 70 a 30
                     { label: 'RSI', data: chartRsi, borderColor: '#8b5cf6', borderWidth: 1.0, tension: 0.6, pointRadius: 0, fill: { target: {value: 70}, above: 'rgba(34, 197, 94, 0.4)', below: 'transparent' } },
                     { label: 'RSI Drop', data: chartRsi, borderColor: 'transparent', borderWidth: 0, tension: 0.6, pointRadius: 0, fill: { target: {value: 30}, below: 'rgba(239, 68, 68, 0.4)', above: 'transparent' } },
                     { label: 'RSI SMA', data: chartRsiSma, borderColor: '#eab308', borderWidth: 1.0, tension: 0.6, pointRadius: 0 },
