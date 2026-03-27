@@ -26,7 +26,7 @@
     </header>
 
     <button onclick="analyze()" id="btn" class="w-full h-14 bg-[#F7931A] rounded-xl text-black font-black text-lg hover:bg-orange-500 transition active:scale-95 shadow-[0_0_20px_rgba(247,147,26,0.2)] tracking-wide">
-      ANALYZE V₿<span class="text-[#22c55e]">$</span>X
+      ANALYZE
     </button>
 
     <div id="spinner" class="hidden text-center text-[#F7931A] font-bold mt-6 h-6 text-xs tracking-widest uppercase"></div>
@@ -49,7 +49,7 @@ let currentLang = 'EN';
 
 const i18n = {
     EN: {
-        btn: 'ANALYZE V₿<span class="text-[#22c55e]">$</span>X',
+        btn: 'ANALYZE',
         loading: ["Accessing Liquidity...", "Calculating Log-Reg...", "Mapping Cycles...", "Generating Strategy..."],
         score: "Score",
         error: "❌ Connection Error. Backend waking up. Try again in 15s.",
@@ -58,7 +58,7 @@ const i18n = {
         legDist: "EXIT ZONE (DCA OUT)"
     },
     SK: {
-        btn: 'ANALÝZA V₿<span class="text-[#22c55e]">$</span>X',
+        btn: 'ANALÝZA',
         loading: ["Získavam dáta...", "Počítam regresiu...", "Mapujem cykly...", "Generujem stratégiu..."],
         score: "Skóre",
         error: "❌ Chyba pripojenia. Backend sa prebúdza. Skúste znova o 15s.",
@@ -72,7 +72,7 @@ function setLang(lang) {
     currentLang = lang;
     document.getElementById('lang-en').className = lang === 'EN' ? "px-3 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition" : "px-3 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition";
     document.getElementById('lang-sk').className = lang === 'SK' ? "px-3 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition" : "px-3 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition";
-    document.getElementById('btn').innerHTML = i18n[lang].btn;
+    document.getElementById('btn').innerText = i18n[lang].btn;
     if (!document.getElementById('output').classList.contains('hidden')) analyze();
 }
 
@@ -84,27 +84,77 @@ function hideTooltips() {
 document.addEventListener('touchstart', e => { if (e.target.tagName !== 'CANVAS') hideTooltips(); });
 document.addEventListener('click', e => { if (e.target.tagName !== 'CANVAS') hideTooltips(); });
 
-// Vlastný plugin pre Crosshair
+// Vylepšený plugin pre TradingView Crosshair so štítkami na osiach
 const crosshairPlugin = {
   id: 'crosshair',
   afterDraw: chart => {
     if (chart.tooltip?._active?.length) {
-      let x = chart.tooltip._active[0].element.x;
+      let activePoint = chart.tooltip._active[0];
+      let x = activePoint.element.x;
+      let y = activePoint.element.y;
       let yAxis = chart.scales.y;
+      let xAxis = chart.scales.x;
       let ctx = chart.ctx;
+      
       ctx.save();
+      
+      // Vertikálna čiara
       ctx.beginPath();
       ctx.moveTo(x, yAxis.top);
       ctx.lineTo(x, yAxis.bottom);
       ctx.lineWidth = 1;
       ctx.strokeStyle = 'rgba(255,255,255,0.15)';
       ctx.stroke();
+
+      // Horizontálna čiara
+      ctx.beginPath();
+      ctx.moveTo(xAxis.left, y);
+      ctx.lineTo(xAxis.right, y);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.stroke();
+
+      // Štítok na X osi (Dátum)
+      let xLabel = chart.data.labels[activePoint.index];
+      if (xLabel) {
+          ctx.fillStyle = '#171717'; // bg-neutral-900
+          let textWidth = ctx.measureText(xLabel).width;
+          ctx.fillRect(x - (textWidth + 16)/2, yAxis.bottom, textWidth + 16, 18);
+          ctx.strokeStyle = '#525252';
+          ctx.strokeRect(x - (textWidth + 16)/2, yAxis.bottom, textWidth + 16, 18);
+          ctx.fillStyle = '#a3a3a3';
+          ctx.font = 'bold 9px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(xLabel, x, yAxis.bottom + 9);
+      }
+
+      // Štítok na Y osi (Hodnota)
+      let val = activePoint.element.$context.parsed.y;
+      let yLabel = val.toFixed(1);
+      if (chart.canvas.id === 'priceChart') {
+          yLabel = '$' + (val/1000).toFixed(1) + 'k';
+      } else if (chart.canvas.id === 'scoreChart') {
+          yLabel = val.toFixed(0) + '%';
+      }
+
+      ctx.fillStyle = '#171717';
+      ctx.font = 'bold 9px sans-serif';
+      let yTextWidth = ctx.measureText(yLabel).width;
+      ctx.fillRect(xAxis.right, y - 9, yTextWidth + 16, 18);
+      ctx.strokeStyle = '#525252';
+      ctx.strokeRect(xAxis.right, y - 9, yTextWidth + 16, 18);
+      ctx.fillStyle = '#a3a3a3';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(yLabel, xAxis.right + (yTextWidth + 16)/2, y);
+
       ctx.restore();
     }
   }
 };
 
-// Vlastný plugin pre fialové pozadie v RSI (TradingView štýl)
+// Vlastný plugin pre fialové pozadie v RSI (TradingView štýl, posunuté na 70 a 30)
 const rsiBackgroundPlugin = {
     id: 'rsiBackground',
     beforeDraw: (chart) => {
@@ -112,11 +162,11 @@ const rsiBackgroundPlugin = {
         const ctx = chart.ctx;
         const yAxis = chart.scales.y;
         const xAxis = chart.scales.x;
-        const y85 = yAxis.getPixelForValue(85);
-        const y40 = yAxis.getPixelForValue(40);
+        const y70 = yAxis.getPixelForValue(70);
+        const y30 = yAxis.getPixelForValue(30);
         ctx.save();
         ctx.fillStyle = 'rgba(139, 92, 246, 0.06)'; // Jemná fialová výplň
-        ctx.fillRect(xAxis.left, y85, xAxis.right - xAxis.left, y40 - y85);
+        ctx.fillRect(xAxis.left, y70, xAxis.right - xAxis.left, y30 - y70);
         ctx.restore();
     }
 };
@@ -169,11 +219,9 @@ async function analyze() {
 
     const score = data.cycle_score || 0;
     
-    // Čistá neónová zelená (#22c55e) zladená naprieč aplikáciou
     let scoreColor = score <= 20 ? "bg-green-500" : (score >= 75 ? "bg-red-500" : "bg-[#F7931A]");
     let scoreTextColor = score <= 20 ? "text-green-500" : (score >= 75 ? "text-red-500" : "text-[#F7931A]");
     
-    // Temnejšie pozadie pre tag (#030a05) blízke čiernej a čistý neónový rámik (#22c55e)
     let phaseBadgeColor = score <= 20 ? "bg-[#030a05] text-[#22c55e] border border-[#22c55e]/60 shadow-[0_0_15px_rgba(34,197,94,0.25)]" : (score >= 75 ? "bg-red-900/30 text-red-400 border border-red-500/60 shadow-[0_0_15px_rgba(239,68,68,0.25)]" : "bg-orange-900/30 text-[#F7931A] border border-[#F7931A]/60 shadow-[0_0_15px_rgba(247,147,26,0.25)]");
 
     let finalHTML = `
@@ -240,7 +288,6 @@ async function analyze() {
         let c = title.toUpperCase();
         if (c.includes("VERDICT") || c.includes("VERDIKT") || c.includes("STRATÉGIA") || c.includes("STRATEGY")) {
             if (score <= 20) {
-                // Temnejšie pozadie (#030a05) blízke čiernej a čistá neónová zelená
                 boxStyle = "bg-[#030a05] border-[#22c55e]/60 shadow-[0_0_25px_rgba(34,197,94,0.25)] p-6 rounded-3xl border transition-all duration-500"; titleStyle = "text-[#22c55e]";
             } else if (score >= 75) {
                 boxStyle = "bg-red-900/30 border-red-500/60 shadow-[0_0_25px_rgba(239,68,68,0.25)] p-6 rounded-3xl border transition-all duration-500"; titleStyle = "text-red-400";
@@ -337,11 +384,11 @@ async function analyze() {
             data: {
                 labels: chartDates,
                 datasets: [
-                    { label: 'RSI', data: chartRsi, borderColor: '#8b5cf6', borderWidth: 1.0, tension: 0.6, pointRadius: 0, fill: { target: {value: 85}, above: 'rgba(34, 197, 94, 0.4)', below: 'transparent' } },
-                    { label: 'RSI Drop', data: chartRsi, borderColor: 'transparent', borderWidth: 0, tension: 0.6, pointRadius: 0, fill: { target: {value: 40}, below: 'rgba(239, 68, 68, 0.4)', above: 'transparent' } },
+                    { label: 'RSI', data: chartRsi, borderColor: '#8b5cf6', borderWidth: 1.0, tension: 0.6, pointRadius: 0, fill: { target: {value: 70}, above: 'rgba(34, 197, 94, 0.4)', below: 'transparent' } },
+                    { label: 'RSI Drop', data: chartRsi, borderColor: 'transparent', borderWidth: 0, tension: 0.6, pointRadius: 0, fill: { target: {value: 30}, below: 'rgba(239, 68, 68, 0.4)', above: 'transparent' } },
                     { label: 'RSI SMA', data: chartRsiSma, borderColor: '#eab308', borderWidth: 1.0, tension: 0.6, pointRadius: 0 },
-                    { label: 'Overbought', data: new Array(chartDates.length).fill(85), borderColor: '#525252', borderWidth: 0.6, borderDash: [5, 5], pointRadius: 0 },
-                    { label: 'Oversold', data: new Array(chartDates.length).fill(40), borderColor: '#525252', borderWidth: 0.6, borderDash: [5, 5], pointRadius: 0 }
+                    { label: 'Overbought', data: new Array(chartDates.length).fill(70), borderColor: '#525252', borderWidth: 0.6, borderDash: [5, 5], pointRadius: 0 },
+                    { label: 'Oversold', data: new Array(chartDates.length).fill(30), borderColor: '#525252', borderWidth: 0.6, borderDash: [5, 5], pointRadius: 0 }
                 ]
             },
             options: { 
