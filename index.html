@@ -20,8 +20,11 @@
                 <button id="lang-sk" onclick="setLang('SK')" class="px-3 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition">SK</button>
             </div>
         </div>
-        <div class="w-full">
-            <p class="text-[10px] text-neutral-500 font-bold tracking-[0.2em] uppercase">Value Bitcoin Dollar Index</p>
+        <div class="flex justify-between w-full text-[9px] text-neutral-500 font-bold tracking-widest uppercase mt-2">
+            <span>Value</span>
+            <span>Bitcoin</span>
+            <span>Dollar</span>
+            <span>Index</span>
         </div>
     </header>
 
@@ -35,7 +38,7 @@
 
     <div id="output" class="hidden flex flex-col gap-6"></div>
 
-    <footer id="footer" class="hidden text-center text-[9px] text-neutral-600 font-bold mt-12 border-t border-neutral-900 pt-6 tracking-[0.25em] whitespace-nowrap uppercase"></footer>
+    <footer id="footer" class="hidden text-center text-[9px] text-neutral-500 font-bold mt-12 border-t border-neutral-900 pt-6 tracking-[0.25em] whitespace-nowrap uppercase"></footer>
 
 </div>
 
@@ -84,6 +87,7 @@ function hideTooltips() {
 document.addEventListener('touchstart', e => { if (e.target.tagName !== 'CANVAS') hideTooltips(); });
 document.addEventListener('click', e => { if (e.target.tagName !== 'CANVAS') hideTooltips(); });
 
+// Vlastný plugin pre Crosshair
 const crosshairPlugin = {
   id: 'crosshair',
   afterDraw: chart => {
@@ -102,7 +106,25 @@ const crosshairPlugin = {
     }
   }
 };
-Chart.register(crosshairPlugin);
+
+// Vlastný plugin pre fialové pozadie v RSI (TradingView štýl)
+const rsiBackgroundPlugin = {
+    id: 'rsiBackground',
+    beforeDraw: (chart) => {
+        if (chart.canvas.id !== 'rsiChart') return;
+        const ctx = chart.ctx;
+        const yAxis = chart.scales.y;
+        const xAxis = chart.scales.x;
+        const y85 = yAxis.getPixelForValue(85);
+        const y40 = yAxis.getPixelForValue(40);
+        ctx.save();
+        ctx.fillStyle = 'rgba(139, 92, 246, 0.06)'; // Jemná fialová výplň
+        ctx.fillRect(xAxis.left, y85, xAxis.right - xAxis.left, y40 - y85);
+        ctx.restore();
+    }
+};
+
+Chart.register(crosshairPlugin, rsiBackgroundPlugin);
 
 async function analyze() {
   const spinner = document.getElementById("spinner");
@@ -150,17 +172,19 @@ async function analyze() {
 
     const score = data.cycle_score || 0;
     
-    // Čistá neónová zelená
+    // Čistá neónová zelená (#22c55e) zladená naprieč aplikáciou
     let scoreColor = score <= 20 ? "bg-green-500" : (score >= 75 ? "bg-red-500" : "bg-[#F7931A]");
     let scoreTextColor = score <= 20 ? "text-green-500" : (score >= 75 ? "text-red-500" : "text-[#F7931A]");
-    let phaseBadgeColor = score <= 20 ? "bg-green-900/20 text-green-400 border-green-800/30" : (score >= 75 ? "bg-red-900/20 text-red-400 border-red-800/30" : "bg-orange-900/20 text-[#F7931A] border-[#F7931A]/30");
+    
+    // Badge farba presne kopíruje vzhľad spodného verdiktu
+    let phaseBadgeColor = score <= 20 ? "bg-green-900/20 text-green-400 border border-green-500/60 shadow-[0_0_15px_rgba(34,197,94,0.3)]" : (score >= 75 ? "bg-red-900/30 text-red-400 border border-red-500/60 shadow-[0_0_15px_rgba(239,68,68,0.25)]" : "bg-orange-900/30 text-[#F7931A] border border-[#F7931A]/60 shadow-[0_0_15px_rgba(247,147,26,0.25)]");
 
     let finalHTML = `
       <div class="bg-neutral-900 p-6 rounded-3xl border border-neutral-800 shadow-2xl">
         
         <div class="flex justify-between items-center mb-6">
-            <div class="text-neutral-500 text-[10px] font-bold uppercase tracking-[0.15em]">Bitcoin (BTC)</div>
-            <div class="${phaseBadgeColor} text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-md border uppercase tracking-wide">${data.phase}</div>
+            <div class="text-neutral-500 text-[10px] font-bold uppercase tracking-[0.15em]">${data.name} (${data.ticker})</div>
+            <div class="${phaseBadgeColor} text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-md uppercase tracking-wide">${data.phase}</div>
         </div>
         
         <div class="flex justify-between items-center mb-8 whitespace-nowrap">
@@ -176,7 +200,7 @@ async function analyze() {
             </div>
         </div>
         
-        <div class="mb-8">
+        <div>
             <div class="w-full bg-neutral-800 h-2 rounded-full overflow-hidden mb-3">
                 <div class="h-full ${scoreColor} transition-all duration-1000 ease-out" style="width: ${score}%"></div>
             </div>
@@ -186,13 +210,13 @@ async function analyze() {
                 <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-red-500 shrink-0"></div><span>75% - 100% &bull; ${i18n[currentLang].legDist}</span></div>
             </div>
         </div>
+      </div>
 
-        <div class="bg-[#1c120a] border border-[#F7931A]/40 rounded-2xl p-4 shadow-[0_0_20px_rgba(247,147,26,0.2)] relative mt-8">
-            <div style="position: absolute; top: 16px; left: 16px; font-size: 0.65rem; color: #F7931A; font-bold; text-transform: uppercase; letter-spacing: 0.1em;">V₿$X Cycle Score (0-100%)</div>
-            <div style="height: 180px; padding-top: 1.5rem;">
-                <canvas id="scoreChart"></canvas>
-            </div>
-        </div>
+      <div class="bg-[#1c120a] border border-[#F7931A]/40 rounded-3xl p-6 shadow-[0_0_20px_rgba(247,147,26,0.15)] relative">
+          <div style="position: absolute; top: 16px; left: 16px; font-size: 0.65rem; color: #F7931A; font-bold; text-transform: uppercase; letter-spacing: 0.1em;">V₿$X Cycle Score (0-100%)</div>
+          <div style="height: 180px; padding-top: 1.5rem;">
+              <canvas id="scoreChart"></canvas>
+          </div>
       </div>
 
       <div class="bg-neutral-900 p-6 rounded-3xl border border-neutral-800 shadow-xl space-y-8">
@@ -207,7 +231,6 @@ async function analyze() {
       </div>
     `;
 
-    // Analytické boxy
     const parts = data.analysis.split('**');
     for (let i = 1; i < parts.length; i += 2) {
       if (parts[i] && parts[i + 1]) {
@@ -220,7 +243,6 @@ async function analyze() {
         let c = title.toUpperCase();
         if (c.includes("VERDICT") || c.includes("VERDIKT") || c.includes("STRATÉGIA") || c.includes("STRATEGY")) {
             if (score <= 20) {
-                // Čistá neónovo zelená žiara
                 boxStyle = "bg-green-900/20 border-green-500/60 shadow-[0_0_25px_rgba(34,197,94,0.3)] p-6 rounded-3xl border transition-all duration-500"; titleStyle = "text-green-400";
             } else if (score >= 75) {
                 boxStyle = "bg-red-900/30 border-red-500/60 shadow-[0_0_25px_rgba(239,68,68,0.25)] p-6 rounded-3xl border transition-all duration-500"; titleStyle = "text-red-400";
@@ -242,10 +264,10 @@ async function analyze() {
     divider.classList.remove("hidden");
     output.classList.remove("hidden");
     
-    footer.innerHTML = `MARTIN VOJTUŠ &copy; 2026 &bull; V₿$X v1.0.0`;
+    footer.innerHTML = `MARTIN VOJTUŠ &copy; 2026 &bull; BUILD V1.0.0`;
     footer.classList.remove("hidden");
     
-    // LIMIT DÁT: Zobrazíme len posledných ~1000 dní (cca 143 týždňov)
+    // LIMIT DÁT NA POSLEDNÝCH 1000 DNÍ (cca 143 týždňov) PRE KRAJŠÍ GRAF
     const limit = -143;
     const chartDates = data.chart_dates.slice(limit);
     const chartPrices = data.chart_prices.slice(limit);
@@ -293,10 +315,10 @@ async function analyze() {
             data: {
                 labels: chartDates,
                 datasets: [
-                    // Zjemnené a zaoblené krivky (tension: 0.5)
-                    { label: 'Price ($)', data: chartPrices, borderColor: '#ffffff', borderWidth: 1.0, tension: 0.5, pointRadius: 0 },
-                    { label: '50W MA', data: chartMa50, borderColor: '#06b6d4', borderWidth: 0.6, tension: 0.5, pointRadius: 0 },
-                    { label: '200W MA', data: chartMa200, borderColor: '#a855f7', borderWidth: 0.6, tension: 0.5, pointRadius: 0 }
+                    // Zvýšený tension na 0.6 pre hladšie čiary
+                    { label: 'Price ($)', data: chartPrices, borderColor: '#ffffff', borderWidth: 1.0, tension: 0.6, pointRadius: 0 },
+                    { label: '50W MA', data: chartMa50, borderColor: '#06b6d4', borderWidth: 0.6, tension: 0.6, pointRadius: 0 },
+                    { label: '200W MA', data: chartMa200, borderColor: '#a855f7', borderWidth: 0.6, tension: 0.6, pointRadius: 0 }
                 ]
             },
             options: { 
@@ -312,21 +334,17 @@ async function analyze() {
             }
         });
 
-        let ctxRsi = document.getElementById('rsiChart').getContext('2d');
-        let rsiGradient = ctxRsi.createLinearGradient(0, 160, 0, 0); 
-        rsiGradient.addColorStop(0, 'rgba(239, 68, 68, 0.4)');     
-        rsiGradient.addColorStop(0.35, 'rgba(239, 68, 68, 0.0)');  
-        rsiGradient.addColorStop(0.85, 'rgba(34, 197, 94, 0.0)');  
-        rsiGradient.addColorStop(1, 'rgba(34, 197, 94, 0.4)');     
-
         if (rsiChartInstance) rsiChartInstance.destroy();
-        rsiChartInstance = new Chart(ctxRsi, {
+        rsiChartInstance = new Chart(document.getElementById('rsiChart').getContext('2d'), {
             type: 'line',
             data: {
                 labels: chartDates,
                 datasets: [
-                    { label: 'RSI', data: chartRsi, borderColor: '#8b5cf6', backgroundColor: rsiGradient, fill: true, borderWidth: 1.0, tension: 0.5, pointRadius: 0 },
-                    { label: 'RSI SMA', data: chartRsiSma, borderColor: '#eab308', borderWidth: 1.0, tension: 0.5, pointRadius: 0 },
+                    // RSI čiara - vyfarbuje len nad 85 do zelena
+                    { label: 'RSI', data: chartRsi, borderColor: '#8b5cf6', borderWidth: 1.0, tension: 0.6, pointRadius: 0, fill: { target: {value: 85}, above: 'rgba(34, 197, 94, 0.4)', below: 'transparent' } },
+                    // Skrytá duplicitná RSI čiara - vyfarbuje len pod 40 do červena (TradingView štýl)
+                    { label: 'RSI Drop', data: chartRsi, borderColor: 'transparent', borderWidth: 0, tension: 0.6, pointRadius: 0, fill: { target: {value: 40}, below: 'rgba(239, 68, 68, 0.4)', above: 'transparent' } },
+                    { label: 'RSI SMA', data: chartRsiSma, borderColor: '#eab308', borderWidth: 1.0, tension: 0.6, pointRadius: 0 },
                     { label: 'Overbought', data: new Array(chartDates.length).fill(85), borderColor: '#525252', borderWidth: 0.6, borderDash: [5, 5], pointRadius: 0 },
                     { label: 'Oversold', data: new Array(chartDates.length).fill(40), borderColor: '#525252', borderWidth: 0.6, borderDash: [5, 5], pointRadius: 0 }
                 ]
@@ -363,7 +381,7 @@ async function analyze() {
             data: {
                 labels: chartDates,
                 datasets: [
-                    { label: 'Score %', data: chartScore, borderColor: gradientStroke, backgroundColor: gradientFill, fill: true, borderWidth: 1.0, tension: 0.5, pointRadius: 0 }
+                    { label: 'Score %', data: chartScore, borderColor: gradientStroke, backgroundColor: gradientFill, fill: true, borderWidth: 1.0, tension: 0.6, pointRadius: 0 }
                 ]
             },
             options: { 
