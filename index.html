@@ -13,23 +13,20 @@
     <header class="w-full mb-6">
         <div class="flex justify-between items-center w-full mb-1">
             <h1 class="text-3xl font-extrabold tracking-tighter text-white flex items-center gap-1">
-                V<span class="text-[#F7931A]">₿</span><span class="text-green-500">$</span>X
+                V<span class="text-[#F7931A]">₿</span><span class="text-[#22c55e]">$</span>X
             </h1>
             <div class="bg-neutral-900 rounded-lg p-1 border border-neutral-800 flex gap-1 shrink-0 h-fit">
                 <button id="lang-en" onclick="setLang('EN')" class="px-3 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition">EN</button>
                 <button id="lang-sk" onclick="setLang('SK')" class="px-3 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition">SK</button>
             </div>
         </div>
-        <div class="flex justify-between w-full text-[9px] text-neutral-500 font-bold tracking-widest uppercase mt-2">
-            <span>Value</span>
-            <span>Bitcoin</span>
-            <span>Dollar</span>
-            <span>Index</span>
+        <div class="w-full text-[11px] text-neutral-500 font-bold tracking-[0.25em] uppercase mt-1 text-left">
+            Value Bitcoin Dollar Index
         </div>
     </header>
 
     <button onclick="analyze()" id="btn" class="w-full h-14 bg-[#F7931A] rounded-xl text-black font-black text-lg hover:bg-orange-500 transition active:scale-95 shadow-[0_0_20px_rgba(247,147,26,0.2)] tracking-wide">
-      ANALYZE V₿$X
+      ANALYZE V₿<span class="text-[#22c55e]">$</span>X
     </button>
 
     <div id="spinner" class="hidden text-center text-[#F7931A] font-bold mt-6 h-6 text-xs tracking-widest uppercase"></div>
@@ -52,7 +49,7 @@ let currentLang = 'EN';
 
 const i18n = {
     EN: {
-        btn: 'ANALYZE V₿$X',
+        btn: 'ANALYZE V₿<span class="text-[#22c55e]">$</span>X',
         loading: ["Accessing Liquidity...", "Calculating Log-Reg...", "Mapping Cycles...", "Generating Strategy..."],
         score: "Score",
         error: "❌ Connection Error. Backend waking up. Try again in 15s.",
@@ -61,7 +58,7 @@ const i18n = {
         legDist: "EXIT ZONE (DCA OUT)"
     },
     SK: {
-        btn: 'ANALÝZA V₿$X',
+        btn: 'ANALÝZA V₿<span class="text-[#22c55e]">$</span>X',
         loading: ["Získavam dáta...", "Počítam regresiu...", "Mapujem cykly...", "Generujem stratégiu..."],
         score: "Skóre",
         error: "❌ Chyba pripojenia. Backend sa prebúdza. Skúste znova o 15s.",
@@ -75,7 +72,7 @@ function setLang(lang) {
     currentLang = lang;
     document.getElementById('lang-en').className = lang === 'EN' ? "px-3 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition" : "px-3 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition";
     document.getElementById('lang-sk').className = lang === 'SK' ? "px-3 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition" : "px-3 py-1 rounded-md text-neutral-400 hover:text-white font-bold text-xs transition";
-    document.getElementById('btn').innerText = i18n[lang].btn;
+    document.getElementById('btn').innerHTML = i18n[lang].btn;
     if (!document.getElementById('output').classList.contains('hidden')) analyze();
 }
 
@@ -166,18 +163,17 @@ async function analyze() {
 
     if(data.error) throw new Error(data.error);
 
-    const colorClass = data.change > 0 ? "text-green-500" : (data.change < 0 ? "text-red-500" : "text-neutral-400");
+    const colorClass = data.change > 0 ? "text-[#22c55e]" : (data.change < 0 ? "text-red-500" : "text-neutral-400");
     const sign = data.change > 0 ? "+" : "";
     const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     const score = data.cycle_score || 0;
     
-    // Čistá neónová zelená (#22c55e) zladená naprieč aplikáciou
-    let scoreColor = score <= 20 ? "bg-green-500" : (score >= 75 ? "bg-red-500" : "bg-[#F7931A]");
-    let scoreTextColor = score <= 20 ? "text-green-500" : (score >= 75 ? "text-red-500" : "text-[#F7931A]");
+    let scoreColor = score <= 20 ? "bg-[#22c55e]" : (score >= 75 ? "bg-red-500" : "bg-[#F7931A]");
+    let scoreTextColor = score <= 20 ? "text-[#22c55e]" : (score >= 75 ? "text-red-500" : "text-[#F7931A]");
     
-    // Badge farba presne kopíruje vzhľad spodného verdiktu
-    let phaseBadgeColor = score <= 20 ? "bg-green-900/20 text-green-400 border border-green-500/60 shadow-[0_0_15px_rgba(34,197,94,0.3)]" : (score >= 75 ? "bg-red-900/30 text-red-400 border border-red-500/60 shadow-[0_0_15px_rgba(239,68,68,0.25)]" : "bg-orange-900/30 text-[#F7931A] border border-[#F7931A]/60 shadow-[0_0_15px_rgba(247,147,26,0.25)]");
+    // Temnejšie pozadie pre tag (#092612) a čistý neónový rámik (#22c55e)
+    let phaseBadgeColor = score <= 20 ? "bg-[#092612] text-[#22c55e] border border-[#22c55e]/60 shadow-[0_0_15px_rgba(34,197,94,0.25)]" : (score >= 75 ? "bg-red-900/30 text-red-400 border border-red-500/60 shadow-[0_0_15px_rgba(239,68,68,0.25)]" : "bg-orange-900/30 text-[#F7931A] border border-[#F7931A]/60 shadow-[0_0_15px_rgba(247,147,26,0.25)]");
 
     let finalHTML = `
       <div class="bg-neutral-900 p-6 rounded-3xl border border-neutral-800 shadow-2xl">
@@ -205,7 +201,7 @@ async function analyze() {
                 <div class="h-full ${scoreColor} transition-all duration-1000 ease-out" style="width: ${score}%"></div>
             </div>
             <div class="flex flex-col gap-2 text-[10px] sm:text-xs text-neutral-500 font-bold tracking-wider px-1">
-                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-green-500 shrink-0"></div><span>0% - 20% &bull; ${i18n[currentLang].legAcc}</span></div>
+                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#22c55e] shrink-0"></div><span>0% - 20% &bull; ${i18n[currentLang].legAcc}</span></div>
                 <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#F7931A] shrink-0"></div><span>21% - 74% &bull; ${i18n[currentLang].legHold}</span></div>
                 <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-red-500 shrink-0"></div><span>75% - 100% &bull; ${i18n[currentLang].legDist}</span></div>
             </div>
@@ -225,7 +221,7 @@ async function analyze() {
             <div style="height: 100%; padding-top: 1.5rem;"><canvas id="priceChart"></canvas></div>
         </div>
         <div style="height: 160px; position: relative; border-top: 1px solid #262626; padding-top: 1.5rem;">
-            <div style="position: absolute; top: 12px; left: 0; font-size: 0.65rem; color: #a3a3a3; font-bold; text-transform: uppercase; letter-spacing: 0.1em;">Weekly RSI (14) + SMA</div>
+            <div style="position: absolute; top: 12px; left: 0; font-size: 0.65rem; color: #a3a3a3; font-bold; text-transform: uppercase; letter-spacing: 0.1em;">Weekly RSI (14)</div>
             <div style="height: 100%;"><canvas id="rsiChart"></canvas></div>
         </div>
       </div>
@@ -243,7 +239,8 @@ async function analyze() {
         let c = title.toUpperCase();
         if (c.includes("VERDICT") || c.includes("VERDIKT") || c.includes("STRATÉGIA") || c.includes("STRATEGY")) {
             if (score <= 20) {
-                boxStyle = "bg-green-900/20 border-green-500/60 shadow-[0_0_25px_rgba(34,197,94,0.3)] p-6 rounded-3xl border transition-all duration-500"; titleStyle = "text-green-400";
+                // Temnejšie pozadie (#092612) a čistá neónová zelená
+                boxStyle = "bg-[#092612] border-[#22c55e]/60 shadow-[0_0_25px_rgba(34,197,94,0.25)] p-6 rounded-3xl border transition-all duration-500"; titleStyle = "text-[#22c55e]";
             } else if (score >= 75) {
                 boxStyle = "bg-red-900/30 border-red-500/60 shadow-[0_0_25px_rgba(239,68,68,0.25)] p-6 rounded-3xl border transition-all duration-500"; titleStyle = "text-red-400";
             } else {
@@ -267,7 +264,7 @@ async function analyze() {
     footer.innerHTML = `MARTIN VOJTUŠ &copy; 2026 &bull; BUILD V1.0.0`;
     footer.classList.remove("hidden");
     
-    // LIMIT DÁT NA POSLEDNÝCH 1000 DNÍ (cca 143 týždňov) PRE KRAJŠÍ GRAF
+    // LIMIT DÁT NA POSLEDNÝCH 1000 DNÍ (cca 143 týždňov)
     const limit = -143;
     const chartDates = data.chart_dates.slice(limit);
     const chartPrices = data.chart_prices.slice(limit);
@@ -315,7 +312,6 @@ async function analyze() {
             data: {
                 labels: chartDates,
                 datasets: [
-                    // Zvýšený tension na 0.6 pre hladšie čiary
                     { label: 'Price ($)', data: chartPrices, borderColor: '#ffffff', borderWidth: 1.0, tension: 0.6, pointRadius: 0 },
                     { label: '50W MA', data: chartMa50, borderColor: '#06b6d4', borderWidth: 0.6, tension: 0.6, pointRadius: 0 },
                     { label: '200W MA', data: chartMa200, borderColor: '#a855f7', borderWidth: 0.6, tension: 0.6, pointRadius: 0 }
@@ -340,9 +336,7 @@ async function analyze() {
             data: {
                 labels: chartDates,
                 datasets: [
-                    // RSI čiara - vyfarbuje len nad 85 do zelena
                     { label: 'RSI', data: chartRsi, borderColor: '#8b5cf6', borderWidth: 1.0, tension: 0.6, pointRadius: 0, fill: { target: {value: 85}, above: 'rgba(34, 197, 94, 0.4)', below: 'transparent' } },
-                    // Skrytá duplicitná RSI čiara - vyfarbuje len pod 40 do červena (TradingView štýl)
                     { label: 'RSI Drop', data: chartRsi, borderColor: 'transparent', borderWidth: 0, tension: 0.6, pointRadius: 0, fill: { target: {value: 40}, below: 'rgba(239, 68, 68, 0.4)', above: 'transparent' } },
                     { label: 'RSI SMA', data: chartRsiSma, borderColor: '#eab308', borderWidth: 1.0, tension: 0.6, pointRadius: 0 },
                     { label: 'Overbought', data: new Array(chartDates.length).fill(85), borderColor: '#525252', borderWidth: 0.6, borderDash: [5, 5], pointRadius: 0 },
@@ -364,7 +358,7 @@ async function analyze() {
 
         let ctxScore = document.getElementById('scoreChart').getContext('2d');
         let gradientStroke = ctxScore.createLinearGradient(0, 180, 0, 0); 
-        gradientStroke.addColorStop(0, '#22c55e');    // Čistá neónová zelená
+        gradientStroke.addColorStop(0, '#22c55e');    
         gradientStroke.addColorStop(0.3, '#22c55e');  
         gradientStroke.addColorStop(0.6, '#F7931A');  
         gradientStroke.addColorStop(0.8, '#ef4444');  
