@@ -26,12 +26,11 @@
 
     <div id="spinner" class="hidden text-center text-[#F7931A] font-medium mt-6 h-6 text-sm"></div>
     <div id="error-box" class="hidden bg-red-900/20 border border-red-900 p-4 rounded-xl text-red-500 font-bold text-center mt-4 text-sm"></div>
-
     <div id="divider" class="hidden border-b border-neutral-800 my-6"></div>
 
     <div id="output" class="hidden flex flex-col gap-5"></div>
 
-    <footer id="footer" class="hidden text-center text-[9px] text-neutral-600 font-bold mt-10 border-t border-neutral-800 pt-6 tracking-[0.2em] whitespace-nowrap"></footer>
+    <footer id="footer" class="hidden text-center text-[9px] text-neutral-500 font-bold mt-10 border-t border-neutral-800 pt-6 tracking-[0.2em] whitespace-nowrap"></footer>
 
 </div>
 
@@ -79,7 +78,6 @@ function setLang(lang) {
     if (!document.getElementById('output').classList.contains('hidden')) analyze();
 }
 
-// Zrušenie tooltipov kliknutím mimo
 function hideTooltips() {
     [priceChartInstance, rsiChartInstance, scoreChartInstance].forEach(chart => {
         if (chart) { chart.tooltip.setActiveElements([], {x:0,y:0}); chart.update(); }
@@ -88,7 +86,7 @@ function hideTooltips() {
 document.addEventListener('touchstart', e => { if (e.target.tagName !== 'CANVAS') hideTooltips(); });
 document.addEventListener('click', e => { if (e.target.tagName !== 'CANVAS') hideTooltips(); });
 
-// Vlastný plugin pre Vertikálnu zameriavaciu čiaru (Crosshair)
+// Vlastný plugin pre Crosshair
 const crosshairPlugin = {
   id: 'crosshair',
   afterDraw: chart => {
@@ -229,12 +227,13 @@ async function analyze() {
         
         let c = title.toUpperCase();
         if (c.includes("VERDICT") || c.includes("VERDIKT") || c.includes("STRATÉGIA") || c.includes("STRATEGY")) {
+            // Výraznejšie pozadie a silnejší glow efekt
             if (score <= 20) {
-                boxStyle = "bg-green-900/10 border-green-500/50 shadow-[0_0_20px_rgba(34,197,94,0.15)]"; titleStyle = "text-green-500";
+                boxStyle = "bg-green-900/30 border-green-500/60 shadow-[0_0_25px_rgba(34,197,94,0.25)]"; titleStyle = "text-green-400";
             } else if (score >= 75) {
-                boxStyle = "bg-red-900/10 border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.15)]"; titleStyle = "text-red-500";
+                boxStyle = "bg-red-900/30 border-red-500/60 shadow-[0_0_25px_rgba(239,68,68,0.25)]"; titleStyle = "text-red-400";
             } else {
-                boxStyle = "bg-orange-900/10 border-[#F7931A]/50 shadow-[0_0_20px_rgba(247,147,26,0.15)]"; titleStyle = "text-[#F7931A]";
+                boxStyle = "bg-orange-900/30 border-[#F7931A]/60 shadow-[0_0_25px_rgba(247,147,26,0.25)]"; titleStyle = "text-[#F7931A]";
             }
         }
 
@@ -251,41 +250,41 @@ async function analyze() {
     divider.classList.remove("hidden");
     output.classList.remove("hidden");
     
-    footer.innerHTML = `MARTIN VOJTUŠ &copy; ${new Date().getFullYear()} &bull; BUILD V1.0.0`;
+    footer.innerHTML = `MARTIN VOJTUŠ &copy; 2026 &bull; BUILD V1.0.0`;
     footer.classList.remove("hidden");
     
     if (data.chart_dates.length > 0 && data.chart_prices.length > 0) {
-        Chart.defaults.color = '#525252'; // Farba osí a textov
+        Chart.defaults.color = '#525252'; 
         Chart.defaults.font.size = 9;
-        Chart.defaults.font.family = 'sans-serif';
         
+        // Drobný, priehľadný tooltip, ktorý neprekáža
         const commonOptions = {
             responsive: true, maintainAspectRatio: false,
             plugins: { 
                 legend: { display: false }, 
                 tooltip: { 
                     displayColors: false, 
-                    backgroundColor: 'rgba(20,20,20,0.95)', 
-                    titleColor: '#a3a3a3',
-                    bodyColor: '#fff',
+                    backgroundColor: 'rgba(15,15,15,0.85)', 
+                    titleColor: '#888',
+                    bodyColor: '#ccc',
                     borderColor: '#333', 
                     borderWidth: 1, 
-                    padding: 8,
-                    yAlign: 'bottom', // Box vyskočí VŽDY NAD prstom
-                    caretPadding: 15,
-                    titleFont: { size: 10 },
-                    bodyFont: { size: 12, weight: 'bold' }
+                    padding: 6,
+                    yAlign: 'bottom', // Vynúti zobrazenie nad prstom
+                    caretPadding: 10,
+                    titleFont: { size: 9, weight: 'normal' },
+                    bodyFont: { size: 10, weight: 'normal' }
                 } 
             },
             layout: { padding: { left: 0, right: 0, top: 10, bottom: 0 } },
             interaction: { mode: 'index', intersect: false }
         };
 
-        // Konfigurácia X Osi (Dátumy)
+        // Redukcia dátumov na osi X
         const xAxisConfig = {
             display: true,
             grid: { display: false, drawBorder: false },
-            ticks: { maxTicksLimit: 6, maxRotation: 0, autoSkip: true, color: '#737373' }
+            ticks: { maxTicksLimit: 5, maxRotation: 0, autoSkip: true, color: '#525252' }
         };
 
         if (priceChartInstance) priceChartInstance.destroy();
@@ -305,20 +304,29 @@ async function analyze() {
                     x: xAxisConfig, 
                     y: { 
                         display: true, position: 'right', type: 'logarithmic', 
-                        grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false },
-                        ticks: { color: '#737373', callback: val => '$' + (val/1000).toFixed(0) + 'k' }
+                        grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false, tickLength: 0 },
+                        ticks: { maxTicksLimit: 5, color: '#525252', callback: val => '$' + (val/1000).toFixed(0) + 'k' }
                     } 
                 } 
             }
         });
 
+        // RSI Gradient (Zelený pri 85+, Červený pod 40)
+        let ctxRsi = document.getElementById('rsiChart').getContext('2d');
+        let rsiGradient = ctxRsi.createLinearGradient(0, 180, 0, 0); 
+        rsiGradient.addColorStop(0, 'rgba(239, 68, 68, 0.4)');     
+        rsiGradient.addColorStop(0.35, 'rgba(239, 68, 68, 0.0)');  
+        rsiGradient.addColorStop(0.85, 'rgba(34, 197, 94, 0.0)');  
+        rsiGradient.addColorStop(1, 'rgba(34, 197, 94, 0.4)');     
+
         if (rsiChartInstance) rsiChartInstance.destroy();
-        rsiChartInstance = new Chart(document.getElementById('rsiChart').getContext('2d'), {
+        rsiChartInstance = new Chart(ctxRsi, {
             type: 'line',
             data: {
                 labels: data.chart_dates,
                 datasets: [
-                    { label: 'RSI', data: data.chart_rsi, borderColor: '#8b5cf6', borderWidth: 1.0, tension: 0.4, pointRadius: 0 }, // Fialová
+                    { label: 'RSI', data: data.chart_rsi, borderColor: '#8b5cf6', backgroundColor: rsiGradient, fill: true, borderWidth: 1.0, tension: 0.4, pointRadius: 0 },
+                    { label: 'RSI SMA', data: data.chart_rsi_sma, borderColor: '#eab308', borderWidth: 1.0, tension: 0.4, pointRadius: 0 }, // Žltá SMA
                     { label: 'Overbought', data: new Array(data.chart_dates.length).fill(85), borderColor: '#525252', borderWidth: 0.6, borderDash: [5, 5], pointRadius: 0 },
                     { label: 'Oversold', data: new Array(data.chart_dates.length).fill(40), borderColor: '#525252', borderWidth: 0.6, borderDash: [5, 5], pointRadius: 0 }
                 ]
@@ -329,18 +337,17 @@ async function analyze() {
                     x: xAxisConfig, 
                     y: { 
                         display: true, position: 'right', min: 20, max: 100, 
-                        grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false },
-                        ticks: { stepSize: 20, color: '#737373' }
+                        grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false, tickLength: 0 },
+                        ticks: { stepSize: 20, color: '#525252' }
                     } 
                 } 
             }
         });
 
         let ctxScore = document.getElementById('scoreChart').getContext('2d');
-        // Upravený gradient - Zelená farba siaha až do výšky 30% grafu, aby bola krásne viditeľná
         let gradientStroke = ctxScore.createLinearGradient(0, 180, 0, 0); 
         gradientStroke.addColorStop(0, '#22c55e');    
-        gradientStroke.addColorStop(0.3, '#22c55e');  // Zelená je potiahnutá vyššie
+        gradientStroke.addColorStop(0.3, '#22c55e');  
         gradientStroke.addColorStop(0.6, '#F7931A');  
         gradientStroke.addColorStop(0.8, '#ef4444');  
         gradientStroke.addColorStop(1, '#ef4444');    
@@ -365,8 +372,8 @@ async function analyze() {
                     x: xAxisConfig, 
                     y: { 
                         display: true, position: 'right', min: 0, max: 100, 
-                        grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false },
-                        ticks: { stepSize: 25, color: '#737373' }
+                        grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false, tickLength: 0 },
+                        ticks: { stepSize: 25, color: '#525252' }
                     } 
                 } 
             }
