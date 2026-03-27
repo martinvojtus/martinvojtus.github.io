@@ -31,7 +31,7 @@
 
     <div id="output" class="hidden flex flex-col gap-5"></div>
 
-    <footer id="footer" class="hidden text-center text-[10px] text-neutral-600 font-medium mt-10 border-t border-neutral-800 pt-6 uppercase tracking-widest"></footer>
+    <footer id="footer" class="hidden text-center text-[9px] text-neutral-600 font-bold mt-10 border-t border-neutral-800 pt-6 tracking-[0.2em] whitespace-nowrap"></footer>
 
 </div>
 
@@ -49,18 +49,18 @@ const i18n = {
         loading: ["Extracting On-Chain Metrics...", "Calculating Regression...", "Evaluating Algorithms...", "Generating Strategy..."],
         score: "Score",
         error: "❌ Connection Error. Backend waking up. Try again in 15s.",
-        legAcc: "HEAVY ACC.",
-        legHold: "HODL",
-        legDist: "DIST."
+        legAcc: "HEAVY ACCUMULATION / BUY",
+        legHold: "HEALTHY GROWTH / HODL",
+        legDist: "EXTREME EUPHORIA / SELL"
     },
     SK: {
         btn: 'Analyzovať Cyklus',
         loading: ["Získavam historické dáta...", "Počítam regresné priemery...", "Vyhodnocujem algoritmy...", "Generujem stratégiu..."],
         score: "Skóre",
         error: "❌ Chyba pripojenia. Backend sa prebúdza. Skúste znova o 15s.",
-        legAcc: "AKUMULÁCIA",
-        legHold: "HODL",
-        legDist: "DISTRIBÚCIA"
+        legAcc: "SILNÁ AKUMULÁCIA / NÁKUP",
+        legHold: "ZDRAVÝ RAST / HODL",
+        legDist: "EXTRÉMNA EUFÓRIA / PREDAJ"
     }
 };
 
@@ -133,7 +133,6 @@ async function analyze() {
 
     const score = data.cycle_score || 0;
     
-    // Farby podľa logiky
     let scoreColor = "bg-[#F7931A]";
     let scoreTextColor = "text-[#F7931A]";
     let phaseBadgeColor = "bg-orange-900/20 text-[#F7931A] border-[#F7931A]/30";
@@ -170,13 +169,13 @@ async function analyze() {
         </div>
         
         <div class="mb-8">
-            <div class="w-full bg-neutral-800 h-2.5 rounded-full overflow-hidden mb-2">
+            <div class="w-full bg-neutral-800 h-2.5 rounded-full overflow-hidden mb-3">
                 <div class="h-full ${scoreColor} transition-all duration-1000 ease-out" style="width: ${score}%"></div>
             </div>
-            <div class="flex justify-between text-[8px] sm:text-[9px] text-neutral-500 font-bold tracking-wider px-1">
-                <div class="flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>0-20% (${i18n[currentLang].legAcc})</div>
-                <div class="flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-[#F7931A]"></div>21-70% (${i18n[currentLang].legHold})</div>
-                <div class="flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-red-500"></div>71-100% (${i18n[currentLang].legDist})</div>
+            <div class="flex flex-col gap-2 text-[10px] sm:text-xs text-neutral-500 font-bold tracking-wider px-1">
+                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-green-500 shrink-0"></div><span>0% - 20% (${i18n[currentLang].legAcc})</span></div>
+                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#F7931A] shrink-0"></div><span>21% - 74% (${i18n[currentLang].legHold})</span></div>
+                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-red-500 shrink-0"></div><span>75% - 100% (${i18n[currentLang].legDist})</span></div>
             </div>
         </div>
         
@@ -207,7 +206,6 @@ async function analyze() {
         let boxStyle = "bg-neutral-900 border-neutral-800";
         let titleStyle = "text-white"; 
         
-        // Zvýraznenie Verdiktu s glow efektom
         let c = title.toUpperCase();
         if (c.includes("VERDICT") || c.includes("VERDIKT") || c.includes("STRATÉGIA") || c.includes("STRATEGY")) {
             if (score <= 20) {
@@ -232,18 +230,30 @@ async function analyze() {
     divider.classList.remove("hidden");
     output.classList.remove("hidden");
     
-    // Zobrazenie pätičky s rokom
-    footer.innerHTML = `Created by Martin Vojtuš &copy; ${new Date().getFullYear()} <br> Build v1.0.0`;
+    // Zobrazenie pätičky
+    footer.innerHTML = `MARTIN VOJTUŠ &copy; ${new Date().getFullYear()} &bull; BUILD V1.0.0`;
     footer.classList.remove("hidden");
     
-    // Vykreslenie grafov s tenkými a hladkými krivkami
+    // VYKRESLENIE GRAFOV
     if (data.chart_dates.length > 0 && data.chart_prices.length > 0) {
         Chart.defaults.color = '#737373';
         Chart.defaults.font.size = 10;
         
+        // Tooltip posunutý nad prst
         const commonOptions = {
             responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { displayColors: false, backgroundColor: '#1a1a1a', borderColor: '#333', borderWidth: 1, padding: 10 } },
+            plugins: { 
+                legend: { display: false }, 
+                tooltip: { 
+                    displayColors: false, 
+                    backgroundColor: 'rgba(26,26,26,0.95)', 
+                    borderColor: '#333', 
+                    borderWidth: 1, 
+                    padding: 10,
+                    yAlign: 'bottom',  // Vynúti tooltip nad bodom dotyku
+                    caretPadding: 15   // Zabezpečí odstup od prsta
+                } 
+            },
             scales: { x: { display: false }, y: { display: false } }, layout: { padding: 0 },
             interaction: { mode: 'index', intersect: false }
         };
@@ -254,9 +264,9 @@ async function analyze() {
             data: {
                 labels: data.chart_dates,
                 datasets: [
-                    { label: 'Price', data: data.chart_prices, borderColor: '#ffffff', borderWidth: 1.2, tension: 0.5, pointRadius: 0 },
-                    { label: '50W MA', data: data.chart_ma50, borderColor: '#06b6d4', borderWidth: 0.8, tension: 0.5, pointRadius: 0 },
-                    { label: '200W MA', data: data.chart_ma200, borderColor: '#a855f7', borderWidth: 0.8, tension: 0.5, pointRadius: 0 }
+                    { label: 'Price', data: data.chart_prices, borderColor: '#ffffff', borderWidth: 1.0, tension: 0.4, pointRadius: 0 },
+                    { label: '50W MA', data: data.chart_ma50, borderColor: '#06b6d4', borderWidth: 0.6, tension: 0.4, pointRadius: 0 },
+                    { label: '200W MA', data: data.chart_ma200, borderColor: '#a855f7', borderWidth: 0.6, tension: 0.4, pointRadius: 0 }
                 ]
             },
             options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, type: 'logarithmic' } } }
@@ -268,21 +278,36 @@ async function analyze() {
             data: {
                 labels: data.chart_dates,
                 datasets: [
-                    { label: 'RSI', data: data.chart_rsi, borderColor: '#06b6d4', borderWidth: 1.2, tension: 0.5, pointRadius: 0 },
-                    { label: 'O/B', data: new Array(data.chart_dates.length).fill(85), borderColor: '#ef4444', borderWidth: 0.8, borderDash: [5, 5], pointRadius: 0 },
-                    { label: 'O/S', data: new Array(data.chart_dates.length).fill(40), borderColor: '#22c55e', borderWidth: 0.8, borderDash: [5, 5], pointRadius: 0 }
+                    { label: 'RSI', data: data.chart_rsi, borderColor: '#8b5cf6', borderWidth: 1.0, tension: 0.4, pointRadius: 0 }, // Fialová TV farba
+                    { label: 'O/B', data: new Array(data.chart_dates.length).fill(85), borderColor: '#525252', borderWidth: 0.6, borderDash: [5, 5], pointRadius: 0 }, // Sivá
+                    { label: 'O/S', data: new Array(data.chart_dates.length).fill(40), borderColor: '#525252', borderWidth: 0.6, borderDash: [5, 5], pointRadius: 0 }  // Sivá
                 ]
             },
             options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, min: 20, max: 100 } } }
         });
 
+        // Tvorba Gradientu pre Score graf
+        let ctxScore = document.getElementById('scoreChart').getContext('2d');
+        let gradientStroke = ctxScore.createLinearGradient(0, 140, 0, 0); // Od spodu (140) hore (0)
+        gradientStroke.addColorStop(0, '#22c55e');    // Zelená na 0%
+        gradientStroke.addColorStop(0.2, '#22c55e');  // Zelená do 20%
+        gradientStroke.addColorStop(0.35, '#F7931A'); // Oranžová od 35%
+        gradientStroke.addColorStop(0.75, '#F7931A'); // Oranžová do 75%
+        gradientStroke.addColorStop(0.85, '#ef4444'); // Červená od 85%
+        gradientStroke.addColorStop(1, '#ef4444');    // Červená do 100%
+
+        let gradientFill = ctxScore.createLinearGradient(0, 140, 0, 0);
+        gradientFill.addColorStop(0, 'rgba(34, 197, 94, 0.1)');
+        gradientFill.addColorStop(0.5, 'rgba(247, 147, 26, 0.1)');
+        gradientFill.addColorStop(1, 'rgba(239, 68, 68, 0.1)');
+
         if (scoreChartInstance) scoreChartInstance.destroy();
-        scoreChartInstance = new Chart(document.getElementById('scoreChart').getContext('2d'), {
+        scoreChartInstance = new Chart(ctxScore, {
             type: 'line',
             data: {
                 labels: data.chart_dates,
                 datasets: [
-                    { label: 'Cycle Score', data: data.chart_score, borderColor: '#F7931A', backgroundColor: 'rgba(247, 147, 26, 0.1)', fill: true, borderWidth: 1.2, tension: 0.5, pointRadius: 0 }
+                    { label: 'Cycle Score', data: data.chart_score, borderColor: gradientStroke, backgroundColor: gradientFill, fill: true, borderWidth: 1.0, tension: 0.4, pointRadius: 0 }
                 ]
             },
             options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } }
