@@ -15,7 +15,7 @@
             <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tighter text-white flex items-center gap-1">
                 V<span class="text-[#F7931A]">₿</span><span class="text-green-500">$</span>X
             </h1>
-            <p class="text-[9px] text-neutral-500 font-bold tracking-[0.2em] uppercase mt-1">Value Bitcoin Strategic Index</p>
+            <p class="text-[9px] text-neutral-500 font-bold tracking-[0.2em] uppercase mt-1">Value Bitcoin Dollar Index</p>
         </div>
         <div class="bg-neutral-900 rounded-lg p-1 border border-neutral-800 flex gap-1 shrink-0 h-fit">
             <button id="lang-en" onclick="setLang('EN')" class="px-3 py-1 rounded-md bg-[#F7931A] text-black font-bold text-xs transition">EN</button>
@@ -143,21 +143,22 @@ async function analyze() {
 
     if(data.error) throw new Error(data.error);
 
-    const colorClass = data.change > 0 ? "text-green-500" : (data.change < 0 ? "text-red-500" : "text-neutral-400");
+    const colorClass = data.change > 0 ? "text-[#a3e635]" : (data.change < 0 ? "text-red-500" : "text-neutral-400");
     const sign = data.change > 0 ? "+" : "";
     const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     const score = data.cycle_score || 0;
     
-    let scoreColor = score <= 20 ? "bg-green-500" : (score >= 75 ? "bg-red-500" : "bg-[#F7931A]");
-    let scoreTextColor = score <= 20 ? "text-green-500" : (score >= 75 ? "text-red-500" : "text-[#F7931A]");
-    let phaseBadgeColor = score <= 20 ? "bg-green-900/20 text-green-400 border-green-800/30" : (score >= 75 ? "bg-red-900/20 text-red-400 border-red-800/30" : "bg-orange-900/20 text-[#F7931A] border-[#F7931A]/30");
+    // Neónová žlto-zelená farba pre dno (Tailwind Lime)
+    let scoreColor = score <= 20 ? "bg-[#a3e635]" : (score >= 75 ? "bg-red-500" : "bg-[#F7931A]");
+    let scoreTextColor = score <= 20 ? "text-[#a3e635]" : (score >= 75 ? "text-red-500" : "text-[#F7931A]");
+    let phaseBadgeColor = score <= 20 ? "bg-[#a3e635]/20 text-[#a3e635] border-[#a3e635]/40" : (score >= 75 ? "bg-red-900/20 text-red-400 border-red-800/30" : "bg-orange-900/20 text-[#F7931A] border-[#F7931A]/30");
 
     let finalHTML = `
       <div class="bg-neutral-900 p-6 rounded-3xl border border-neutral-800 shadow-2xl">
         
         <div class="flex justify-between items-center mb-6">
-            <div class="text-neutral-500 text-[10px] font-bold uppercase tracking-[0.15em]">V₿$X Market Overview</div>
+            <div class="text-neutral-500 text-[10px] font-bold uppercase tracking-[0.15em]">${data.name} (${data.ticker})</div>
             <div class="${phaseBadgeColor} text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-md border uppercase tracking-wide">${data.phase}</div>
         </div>
         
@@ -179,24 +180,27 @@ async function analyze() {
                 <div class="h-full ${scoreColor} transition-all duration-1000 ease-out" style="width: ${score}%"></div>
             </div>
             <div class="flex flex-col gap-2 text-[10px] sm:text-xs text-neutral-500 font-bold tracking-wider px-1">
-                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-green-500 shrink-0"></div><span>0% - 20% &bull; ${i18n[currentLang].legAcc}</span></div>
+                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#a3e635] shrink-0"></div><span>0% - 20% &bull; ${i18n[currentLang].legAcc}</span></div>
                 <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#F7931A] shrink-0"></div><span>21% - 74% &bull; ${i18n[currentLang].legHold}</span></div>
                 <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-red-500 shrink-0"></div><span>75% - 100% &bull; ${i18n[currentLang].legDist}</span></div>
             </div>
         </div>
         
-        <div class="space-y-8">
-            <div style="height: 260px; position: relative; border-top: 1px solid #262626; padding-top: 2rem;">
+        <div class="space-y-4">
+            <div style="height: 240px; position: relative; border-top: 1px solid #262626; padding-top: 2rem;">
                 <div style="position: absolute; top: 12px; left: 0; font-size: 0.65rem; color: #a3a3a3; font-bold; text-transform: uppercase; letter-spacing: 0.1em;">Price & MAs (50W, 200W)</div>
                 <canvas id="priceChart"></canvas>
             </div>
-            <div style="height: 180px; position: relative; border-top: 1px solid #262626; padding-top: 2rem;">
+            <div style="height: 160px; position: relative; border-top: 1px solid #262626; padding-top: 2rem;">
                 <div style="position: absolute; top: 12px; left: 0; font-size: 0.65rem; color: #a3a3a3; font-bold; text-transform: uppercase; letter-spacing: 0.1em;">Weekly RSI (14) + SMA</div>
                 <canvas id="rsiChart"></canvas>
             </div>
-            <div style="height: 180px; position: relative; border-top: 1px solid #262626; padding-top: 2rem;">
-                <div style="position: absolute; top: 12px; left: 0; font-size: 0.65rem; color: #a3a3a3; font-bold; text-transform: uppercase; letter-spacing: 0.1em;">V₿$X Cycle Score (0-100%)</div>
-                <canvas id="scoreChart"></canvas>
+
+            <div class="bg-[#0a0a0a] border border-[#F7931A]/30 rounded-2xl p-4 shadow-[0_0_15px_rgba(247,147,26,0.1)] relative mt-8">
+                <div style="position: absolute; top: 16px; left: 16px; font-size: 0.65rem; color: #F7931A; font-bold; text-transform: uppercase; letter-spacing: 0.1em;">V₿$X Cycle Score (0-100%)</div>
+                <div style="height: 180px; padding-top: 1.5rem;">
+                    <canvas id="scoreChart"></canvas>
+                </div>
             </div>
         </div>
       </div>
@@ -214,7 +218,8 @@ async function analyze() {
         let c = title.toUpperCase();
         if (c.includes("VERDICT") || c.includes("VERDIKT") || c.includes("STRATÉGIA") || c.includes("STRATEGY")) {
             if (score <= 20) {
-                boxStyle = "bg-green-900/30 border-green-500/60 shadow-[0_0_25px_rgba(34,197,94,0.25)] p-6 rounded-3xl border transition-all duration-500"; titleStyle = "text-green-400";
+                // NEÓNOVÝ ŽLTO-ZELENÝ EFEKT PRE NÁKUP
+                boxStyle = "bg-[#a3e635]/10 border-[#a3e635]/50 shadow-[0_0_25px_rgba(163,230,53,0.2)] p-6 rounded-3xl border transition-all duration-500"; titleStyle = "text-[#a3e635]";
             } else if (score >= 75) {
                 boxStyle = "bg-red-900/30 border-red-500/60 shadow-[0_0_25px_rgba(239,68,68,0.25)] p-6 rounded-3xl border transition-all duration-500"; titleStyle = "text-red-400";
             } else {
@@ -276,9 +281,9 @@ async function analyze() {
             data: {
                 labels: data.chart_dates,
                 datasets: [
-                    { label: 'Price ($)', data: data.chart_prices, borderColor: '#ffffff', borderWidth: 1.0, tension: 0.4, pointRadius: 0 },
-                    { label: '50W MA', data: data.chart_ma50, borderColor: '#06b6d4', borderWidth: 0.6, tension: 0.4, pointRadius: 0 },
-                    { label: '200W MA', data: data.chart_ma200, borderColor: '#a855f7', borderWidth: 0.6, tension: 0.4, pointRadius: 0 }
+                    { label: 'Price ($)', data: data.chart_prices, borderColor: '#ffffff', borderWidth: 0.8, tension: 0.6, pointRadius: 0 },
+                    { label: '50W MA', data: data.chart_ma50, borderColor: '#06b6d4', borderWidth: 0.4, tension: 0.6, pointRadius: 0 },
+                    { label: '200W MA', data: data.chart_ma200, borderColor: '#a855f7', borderWidth: 0.4, tension: 0.6, pointRadius: 0 }
                 ]
             },
             options: { 
@@ -295,11 +300,11 @@ async function analyze() {
         });
 
         let ctxRsi = document.getElementById('rsiChart').getContext('2d');
-        let rsiGradient = ctxRsi.createLinearGradient(0, 180, 0, 0); 
+        let rsiGradient = ctxRsi.createLinearGradient(0, 160, 0, 0); 
         rsiGradient.addColorStop(0, 'rgba(239, 68, 68, 0.4)');     
         rsiGradient.addColorStop(0.35, 'rgba(239, 68, 68, 0.0)');  
-        rsiGradient.addColorStop(0.85, 'rgba(34, 197, 94, 0.0)');  
-        rsiGradient.addColorStop(1, 'rgba(34, 197, 94, 0.4)');     
+        rsiGradient.addColorStop(0.85, 'rgba(163, 230, 53, 0.0)'); // Prispôsobené na Lime zeleň
+        rsiGradient.addColorStop(1, 'rgba(163, 230, 53, 0.4)');     
 
         if (rsiChartInstance) rsiChartInstance.destroy();
         rsiChartInstance = new Chart(ctxRsi, {
@@ -307,10 +312,10 @@ async function analyze() {
             data: {
                 labels: data.chart_dates,
                 datasets: [
-                    { label: 'RSI', data: data.chart_rsi, borderColor: '#8b5cf6', backgroundColor: rsiGradient, fill: true, borderWidth: 1.0, tension: 0.4, pointRadius: 0 },
-                    { label: 'RSI SMA', data: data.chart_rsi_sma, borderColor: '#eab308', borderWidth: 1.0, tension: 0.4, pointRadius: 0 },
-                    { label: 'Overbought', data: new Array(data.chart_dates.length).fill(85), borderColor: '#525252', borderWidth: 0.6, borderDash: [5, 5], pointRadius: 0 },
-                    { label: 'Oversold', data: new Array(data.chart_dates.length).fill(40), borderColor: '#525252', borderWidth: 0.6, borderDash: [5, 5], pointRadius: 0 }
+                    { label: 'RSI', data: data.chart_rsi, borderColor: '#8b5cf6', backgroundColor: rsiGradient, fill: true, borderWidth: 0.8, tension: 0.6, pointRadius: 0 },
+                    { label: 'RSI SMA', data: data.chart_rsi_sma, borderColor: '#eab308', borderWidth: 0.8, tension: 0.6, pointRadius: 0 },
+                    { label: 'Overbought', data: new Array(data.chart_dates.length).fill(85), borderColor: '#525252', borderWidth: 0.4, borderDash: [5, 5], pointRadius: 0 },
+                    { label: 'Oversold', data: new Array(data.chart_dates.length).fill(40), borderColor: '#525252', borderWidth: 0.4, borderDash: [5, 5], pointRadius: 0 }
                 ]
             },
             options: { 
@@ -328,14 +333,14 @@ async function analyze() {
 
         let ctxScore = document.getElementById('scoreChart').getContext('2d');
         let gradientStroke = ctxScore.createLinearGradient(0, 180, 0, 0); 
-        gradientStroke.addColorStop(0, '#22c55e');    
-        gradientStroke.addColorStop(0.3, '#22c55e');  
+        gradientStroke.addColorStop(0, '#a3e635');    // Neónová zeleno-žltá
+        gradientStroke.addColorStop(0.3, '#a3e635');  
         gradientStroke.addColorStop(0.6, '#F7931A');  
         gradientStroke.addColorStop(0.8, '#ef4444');  
         gradientStroke.addColorStop(1, '#ef4444');    
 
         let gradientFill = ctxScore.createLinearGradient(0, 180, 0, 0);
-        gradientFill.addColorStop(0, 'rgba(34, 197, 94, 0.15)');
+        gradientFill.addColorStop(0, 'rgba(163, 230, 53, 0.15)');
         gradientFill.addColorStop(0.5, 'rgba(247, 147, 26, 0.1)');
         gradientFill.addColorStop(1, 'rgba(239, 68, 68, 0.15)');
 
@@ -345,7 +350,7 @@ async function analyze() {
             data: {
                 labels: data.chart_dates,
                 datasets: [
-                    { label: 'Score %', data: data.chart_score, borderColor: gradientStroke, backgroundColor: gradientFill, fill: true, borderWidth: 1.0, tension: 0.4, pointRadius: 0 }
+                    { label: 'Score %', data: data.chart_score, borderColor: gradientStroke, backgroundColor: gradientFill, fill: true, borderWidth: 0.8, tension: 0.6, pointRadius: 0 }
                 ]
             },
             options: { 
