@@ -78,18 +78,22 @@ function setLang(lang) {
 
 function hideTooltips() {
     [priceChartInstance, rsiChartInstance, scoreChartInstance].forEach(chart => {
-        if (chart) { chart.tooltip.setActiveElements([], {x:0,y:0}); chart.update(); }
+        if (chart) { 
+            chart.setActiveElements([]); 
+            chart.update(); 
+        }
     });
 }
 document.addEventListener('touchstart', e => { if (e.target.tagName !== 'CANVAS') hideTooltips(); });
 document.addEventListener('click', e => { if (e.target.tagName !== 'CANVAS') hideTooltips(); });
 
-// Vylepšený plugin pre TradingView Crosshair so štítkami na osiach
+// Vlastný plugin pre TradingView Crosshair so štítkami na osiach
 const crosshairPlugin = {
   id: 'crosshair',
   afterDraw: chart => {
-    if (chart.tooltip?._active?.length) {
-      let activePoint = chart.tooltip._active[0];
+    const activeElements = chart.getActiveElements();
+    if (activeElements.length > 0) {
+      let activePoint = activeElements[0];
       let x = activePoint.element.x;
       let y = activePoint.element.y;
       let yAxis = chart.scales.y;
@@ -118,15 +122,16 @@ const crosshairPlugin = {
       let xLabel = chart.data.labels[activePoint.index];
       if (xLabel) {
           ctx.fillStyle = '#171717'; // bg-neutral-900
-          let textWidth = ctx.measureText(xLabel).width;
-          ctx.fillRect(x - (textWidth + 16)/2, yAxis.bottom, textWidth + 16, 18);
-          ctx.strokeStyle = '#525252';
-          ctx.strokeRect(x - (textWidth + 16)/2, yAxis.bottom, textWidth + 16, 18);
-          ctx.fillStyle = '#a3a3a3';
           ctx.font = 'bold 9px sans-serif';
+          let textWidth = ctx.measureText(xLabel).width;
+          let boxY = yAxis.bottom + 2;
+          ctx.fillRect(x - (textWidth + 16)/2, boxY, textWidth + 16, 18);
+          ctx.strokeStyle = '#525252';
+          ctx.strokeRect(x - (textWidth + 16)/2, boxY, textWidth + 16, 18);
+          ctx.fillStyle = '#a3a3a3';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText(xLabel, x, yAxis.bottom + 9);
+          ctx.fillText(xLabel, x, boxY + 9);
       }
 
       // Štítok na Y osi (Hodnota)
@@ -141,20 +146,21 @@ const crosshairPlugin = {
       ctx.fillStyle = '#171717';
       ctx.font = 'bold 9px sans-serif';
       let yTextWidth = ctx.measureText(yLabel).width;
-      ctx.fillRect(xAxis.right, y - 9, yTextWidth + 16, 18);
+      let boxX = xAxis.right + 2;
+      ctx.fillRect(boxX, y - 9, yTextWidth + 16, 18);
       ctx.strokeStyle = '#525252';
-      ctx.strokeRect(xAxis.right, y - 9, yTextWidth + 16, 18);
+      ctx.strokeRect(boxX, y - 9, yTextWidth + 16, 18);
       ctx.fillStyle = '#a3a3a3';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(yLabel, xAxis.right + (yTextWidth + 16)/2, y);
+      ctx.fillText(yLabel, boxX + (yTextWidth + 16)/2, y);
 
       ctx.restore();
     }
   }
 };
 
-// Vlastný plugin pre fialové pozadie v RSI (TradingView štýl, posunuté na 70 a 30)
+// Vlastný plugin pre fialové pozadie v RSI (TradingView štýl, 70 a 30)
 const rsiBackgroundPlugin = {
     id: 'rsiBackground',
     beforeDraw: (chart) => {
@@ -330,21 +336,10 @@ async function analyze() {
             responsive: true, maintainAspectRatio: false,
             plugins: { 
                 legend: { display: false }, 
-                tooltip: { 
-                    displayColors: false, 
-                    backgroundColor: 'rgba(15,15,15,0.95)', 
-                    titleColor: '#888',
-                    bodyColor: '#ccc',
-                    borderColor: '#333', 
-                    borderWidth: 1, 
-                    padding: 8,
-                    yAlign: 'bottom',
-                    caretPadding: 12,
-                    titleFont: { size: 9, weight: 'normal' },
-                    bodyFont: { size: 10, weight: 'bold' }
-                } 
+                tooltip: { enabled: false } // Vypnutie starého plávajúceho boxu
             },
-            layout: { padding: { left: 0, right: 0, top: 10, bottom: 0 } },
+            // Pridaný padding aby krížový zameriavač mal miesto na štítky
+            layout: { padding: { left: 10, right: 48, top: 10, bottom: 25 } },
             interaction: { mode: 'index', intersect: false }
         };
 
