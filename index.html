@@ -227,7 +227,6 @@ async function analyze() {
         
         let c = title.toUpperCase();
         if (c.includes("VERDICT") || c.includes("VERDIKT") || c.includes("STRATÉGIA") || c.includes("STRATEGY")) {
-            // Výraznejšie pozadie a silnejší glow efekt
             if (score <= 20) {
                 boxStyle = "bg-green-900/30 border-green-500/60 shadow-[0_0_25px_rgba(34,197,94,0.25)]"; titleStyle = "text-green-400";
             } else if (score >= 75) {
@@ -257,7 +256,6 @@ async function analyze() {
         Chart.defaults.color = '#525252'; 
         Chart.defaults.font.size = 9;
         
-        // Drobný, priehľadný tooltip, ktorý neprekáža
         const commonOptions = {
             responsive: true, maintainAspectRatio: false,
             plugins: { 
@@ -270,7 +268,7 @@ async function analyze() {
                     borderColor: '#333', 
                     borderWidth: 1, 
                     padding: 6,
-                    yAlign: 'bottom', // Vynúti zobrazenie nad prstom
+                    yAlign: 'bottom',
                     caretPadding: 10,
                     titleFont: { size: 9, weight: 'normal' },
                     bodyFont: { size: 10, weight: 'normal' }
@@ -280,7 +278,6 @@ async function analyze() {
             interaction: { mode: 'index', intersect: false }
         };
 
-        // Redukcia dátumov na osi X
         const xAxisConfig = {
             display: true,
             grid: { display: false, drawBorder: false },
@@ -311,7 +308,6 @@ async function analyze() {
             }
         });
 
-        // RSI Gradient (Zelený pri 85+, Červený pod 40)
         let ctxRsi = document.getElementById('rsiChart').getContext('2d');
         let rsiGradient = ctxRsi.createLinearGradient(0, 180, 0, 0); 
         rsiGradient.addColorStop(0, 'rgba(239, 68, 68, 0.4)');     
@@ -326,7 +322,7 @@ async function analyze() {
                 labels: data.chart_dates,
                 datasets: [
                     { label: 'RSI', data: data.chart_rsi, borderColor: '#8b5cf6', backgroundColor: rsiGradient, fill: true, borderWidth: 1.0, tension: 0.4, pointRadius: 0 },
-                    { label: 'RSI SMA', data: data.chart_rsi_sma, borderColor: '#eab308', borderWidth: 1.0, tension: 0.4, pointRadius: 0 }, // Žltá SMA
+                    { label: 'RSI SMA', data: data.chart_rsi_sma, borderColor: '#eab308', borderWidth: 1.0, tension: 0.4, pointRadius: 0 },
                     { label: 'Overbought', data: new Array(data.chart_dates.length).fill(85), borderColor: '#525252', borderWidth: 0.6, borderDash: [5, 5], pointRadius: 0 },
                     { label: 'Oversold', data: new Array(data.chart_dates.length).fill(40), borderColor: '#525252', borderWidth: 0.6, borderDash: [5, 5], pointRadius: 0 }
                 ]
