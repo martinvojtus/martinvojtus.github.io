@@ -243,7 +243,6 @@ async function analyze() {
     let chartDates = data.chart_dates.slice(limit);
     const chartScore = data.chart_score.slice(limit);
 
-    // ZMENA: Až 16 prázdnych týždňov pre masívny priestor na pravej strane grafu
     for (let i = 0; i < 16; i++) {
         chartDates.push("");
     }
@@ -278,7 +277,6 @@ async function analyze() {
                     data: chartScore, 
                     fill: false,
                     borderWidth: 0.75, 
-                    // ZMENA: Maximálne bezpečné zjemnenie krivky
                     tension: 0.5, 
                     pointRadius: 0,
                     borderColor: function(context) {
@@ -306,12 +304,15 @@ async function analyze() {
                         min: 0, 
                         max: 100, 
                         grid: { 
+                            // ZMENA: Vykreslenie gridu AKO VRSTVA NAD grafom
+                            z: 1,
                             color: function(context) {
                                 let v = context.tick.value;
                                 let op = 0.1; 
                                 
                                 if (v === 0 || v === 100) op = 0.05; 
-                                else if (v === 20 || v === 80) op = 0.2; 
+                                // ZMENA: Zvýraznené hraničné čiary 20 a 80 (opacity 50%)
+                                else if (v === 20 || v === 80) op = 0.5; 
 
                                 if (v <= 20) return `rgba(34, 197, 94, ${op})`;     
                                 if (v < 80) return `rgba(255, 255, 0, ${op})`;     
