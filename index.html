@@ -63,7 +63,6 @@ const crosshairPlugin = {
       let xLabel = chart.data.labels[activePoint.index];
       if (xLabel) {
           ctx.fillStyle = '#171717'; 
-          // ZMENA: Základná hrúbka fontu pre zameriavač
           ctx.font = 'normal 9.6px sans-serif'; 
           let textWidth = ctx.measureText(xLabel).width;
           let boxY = yAxis.bottom + 4; 
@@ -125,7 +124,7 @@ function hideTooltips() {
         let titleDiv = document.getElementById('dynamic-title');
         
         if (scoreDiv && window.currentScoreData) {
-            scoreDiv.innerText = window.currentScoreData.score + '%';
+            scoreDiv.innerText = Number(window.currentScoreData.score).toFixed(1) + '%';
             scoreDiv.style.color = window.currentScoreData.rawColor;
             if (titleDiv) titleDiv.style.color = window.currentScoreData.rawColor;
         }
@@ -181,12 +180,11 @@ async function analyze() {
 
     window.currentScoreData = { score: score, rawColor: scoreHex };
 
-    // Všetky font-bold atribúty odstránené z celého výstupu
     let finalHTML = `
       <div class="relative w-full mb-0">
           <div class="flex justify-between items-center px-1 mb-2 text-[0.6rem] uppercase tracking-widest">
               <div id="dynamic-title" style="color: ${scoreHex}" class="transition-colors duration-150">SCORE</div>
-              <div id="dynamic-score" style="color: ${scoreHex}" class="transition-colors duration-150">${score}%</div>
+              <div id="dynamic-score" style="color: ${scoreHex}" class="transition-colors duration-150">${score.toFixed(1)}%</div>
           </div>
           <div class="h-56 w-full relative">
               <canvas id="scoreChart"></canvas>
@@ -202,13 +200,13 @@ async function analyze() {
         
         <div class="flex justify-between items-start mb-8 gap-4">
             <div>
-                <div class="text-[1.8rem] leading-none tracking-tight text-white">$${formattedPrice}</div>
+                <div class="text-[1.8rem] font-bold leading-none tracking-tight text-white">$${formattedPrice}</div>
                 <div class="${colorClass} text-[0.6rem] uppercase tracking-widest mt-2 flex items-center gap-1.5">
                     ${sign}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded">24H</span>
                 </div>
             </div>
             <div class="text-right">
-                <div class="text-[1.8rem] leading-none" style="color: ${scoreHex}">${score}%</div>
+                <div class="text-[1.8rem] font-bold leading-none" style="color: ${scoreHex}">${score.toFixed(1)}%</div>
                 <div class="text-[0.6rem] text-neutral-500 uppercase tracking-widest mt-2">SCORE</div>
             </div>
         </div>
@@ -246,7 +244,12 @@ async function analyze() {
             interaction: { mode: 'index', intersect: false }
         };
 
-        const xAxisConfig = { display: true, grid: { display: false, drawBorder: false }, ticks: { display: false } };
+        const xAxisConfig = { 
+            display: true, 
+            grid: { display: false, drawBorder: false }, 
+            border: { display: false },
+            ticks: { display: false } 
+        };
 
         let ctxScore = document.getElementById('scoreChart').getContext('2d');
 
@@ -281,7 +284,10 @@ async function analyze() {
                 scales: { 
                     x: xAxisConfig, 
                     y: { 
-                        display: true, position: 'right', min: 0, max: 100, 
+                        display: true, 
+                        position: 'right', 
+                        min: 0, 
+                        max: 100, 
                         grid: { 
                             color: function(context) {
                                 let v = context.tick.value;
@@ -296,9 +302,13 @@ async function analyze() {
                             }, 
                             drawBorder: false, 
                             tickLength: 0,
-                            // ZMENA: Čiarkovaný grid (Dashed lines)
+                            // Definovanie čiarkovanej mriežky (Dashed grid lines)
                             borderDash: [4, 4]
-                        }, 
+                        },
+                        border: {
+                            display: false,
+                            dash: [4, 4]
+                        },
                         ticks: { display: false, stepSize: 10 } 
                     } 
                 } 
