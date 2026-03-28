@@ -1,21 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: black; color: white; }
+    </style>
 </head>
-
-<body class="bg-black text-white flex justify-center min-h-screen items-start pt-6 font-sans pb-10">
+<body class="flex justify-center min-h-screen items-start pt-6 pb-10">
 
 <div class="w-full max-w-xl p-5 space-y-4">
 
-    <div id="spinner" class="text-center text-[#F7931A] font-bold mt-20 h-6 text-xs tracking-widest uppercase">CALCULATING V₿$X CYCLES...</div>
+    <header class="w-full mb-2">
+        <h1 class="text-3xl font-black tracking-tighter text-white">
+            V<span class="text-[#F7931A]">₿</span><span class="text-[#22c55e]">$</span>X
+        </h1>
+    </header>
+
+    <div id="spinner" class="text-center text-[#F7931A] font-bold mt-20 h-6 text-xs tracking-widest uppercase">Počítam cykly V₿$X...</div>
     <div id="error-box" class="hidden bg-red-900/20 border border-red-900 p-4 rounded-xl text-red-500 font-bold text-center mt-10 text-xs"></div>
 
-    <div id="output" class="hidden flex flex-col gap-6"></div>
+    <div id="output" class="hidden flex flex-col gap-6 pt-4"></div>
 
     <footer id="footer" class="hidden text-center text-[9px] text-neutral-500 font-bold mt-12 border-t border-neutral-900 pt-6 tracking-[0.25em] whitespace-nowrap uppercase">
         MARTIN VOJTUŠ &copy; 2026 &bull; BUILD V1.0.0
@@ -29,13 +38,13 @@ let spinnerInterval = null;
 window.currentScoreData = { score: 0, colorClass: "" };
 
 const loadingMsgs = [
-    "ACCESSING LIQUIDITY...", 
-    "CALCULATING LOG-REG...", 
-    "MAPPING CYCLES...", 
-    "GENERATING STRATEGY..."
+    "Získavam dáta...", 
+    "Počítam log-regresiu...", 
+    "Mapujem cykly...", 
+    "Generujem stratégiu..."
 ];
 
-// 1. Zameriavač (Len vertikálna čiara a zmenšená medzera pre dátum)
+// 1. Zameriavač (Len vertikálna čiara, vtlačený dátum)
 const crosshairPlugin = {
   id: 'crosshair',
   afterDraw: chart => {
@@ -54,12 +63,12 @@ const crosshairPlugin = {
       ctx.moveTo(x, yAxis.top); ctx.lineTo(x, yAxis.bottom);
       ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.stroke();
 
-      // Štítok X (Dátum - zmenšená výška)
+      // Štítok X (Dátum - vtlačený do priestoru dole)
       let xLabel = chart.data.labels[activePoint.index];
       if (xLabel) {
           ctx.fillStyle = '#171717'; ctx.font = 'bold 9px sans-serif';
           let textWidth = ctx.measureText(xLabel).width;
-          let boxY = yAxis.bottom + 2; // Tesne pod osou
+          let boxY = yAxis.bottom + 4; // Kreslíme do vyhradeného priestoru
           let boxX = x - (textWidth + 12)/2;
           
           if (boxX < xAxis.left) boxX = xAxis.left;
@@ -76,7 +85,14 @@ const crosshairPlugin = {
       let scoreDiv = document.getElementById('dynamic-score');
       if (scoreDiv) {
           scoreDiv.innerText = val.toFixed(1) + '%';
-          scoreDiv.className = val <= 20 ? "text-[#22c55e] font-black" : (val >= 75 ? "text-red-500 font-black" : "text-[#F7931A] font-black");
+          
+          if (val <= 20) {
+              scoreDiv.className = "text-[#22c55e] font-black transition-colors duration-150"; // Green
+          } else if (val >= 75) {
+              scoreDiv.className = "text-[#BF00FF] font-black transition-colors duration-150"; // Purple
+          } else {
+              scoreDiv.className = "text-[#FF10F0] font-black transition-colors duration-150"; // Pink
+          }
       }
 
       ctx.restore();
@@ -84,7 +100,7 @@ const crosshairPlugin = {
   }
 };
 
-// 2. Efekty: Už len gulička na konci (odstránený fade-in efekt)
+// 2. Efekty: Gulička na konci, plynulý gradient (odstránená transparentnosť zľava)
 const visualsPlugin = {
     id: 'visualsPlugin',
     afterDatasetsDraw: chart => {
@@ -95,7 +111,7 @@ const visualsPlugin = {
         // Vykreslenie zakončovacej guličky na konci čiary
         const lastPoint = meta.data[meta.data.length - 1];
         const val = chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1];
-        let dotColor = val <= 20 ? '#22c55e' : (val >= 75 ? '#ef4444' : '#F7931A');
+        let dotColor = val <= 20 ? '#22c55e' : (val >= 75 ? '#BF00FF' : '#FF10F0');
         
         ctx.save();
         ctx.beginPath();
@@ -155,30 +171,33 @@ async function analyze() {
 
     const score = data.cycle_score || 0;
     
-    let scoreColor = score <= 20 ? "bg-[#22c55e]" : (score >= 75 ? "bg-red-500" : "bg-[#F7931A]");
-    let scoreTextColor = score <= 20 ? "text-[#22c55e]" : (score >= 75 ? "text-red-500" : "text-[#F7931A]");
-    let phaseBadgeColor = score <= 20 ? "bg-[#030a05] text-[#22c55e] border border-[#22c55e]/60 shadow-[0_0_15px_rgba(34,197,94,0.25)]" : (score >= 75 ? "bg-red-900/30 text-red-400 border border-red-500/60 shadow-[0_0_15px_rgba(239,68,68,0.25)]" : "bg-orange-900/30 text-[#F7931A] border border-[#F7931A]/60 shadow-[0_0_15px_rgba(247,147,26,0.25)]");
+    // Prísne nové farby
+    let scoreColor = score <= 20 ? "bg-[#22c55e]" : (score >= 75 ? "bg-[#BF00FF]" : "bg-[#FF10F0]");
+    let scoreTextColor = score <= 20 ? "text-[#22c55e]" : (score >= 75 ? "text-[#BF00FF]" : "text-[#FF10F0]");
+    let phaseBadgeColor = score <= 20 ? "bg-[#030a05] text-[#22c55e] border border-[#22c55e]/60 shadow-[0_0_15px_rgba(34,197,94,0.25)]" : (score >= 75 ? "bg-violet-900/30 text-[#BF00FF] border border-[#BF00FF]/60 shadow-[0_0_15px_rgba(191,0,255,0.25)]" : "bg-pink-900/30 text-[#FF10F0] border border-[#FF10F0]/60 shadow-[0_0_15px_rgba(255,16,240,0.25)]");
 
     window.currentScoreData = { score: score, colorClass: scoreTextColor };
 
+    // Formátovanie textu verdiktu (Predpokladáme, že backend developer opraví raw text na konzistentnú slovenčinu podľa emojis)
     let formattedContent = data.analysis
         .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
         .replace(/\n/g, '<br>');
 
+    // Štýlovanie tej JEDINEJ tabuľky podľa percent
     let boxStyle = "bg-neutral-900 border-neutral-800 shadow-lg";
     let titleStyle = "text-white"; 
     if (score <= 20) {
         boxStyle = "bg-[#030a05] border-[#22c55e]/60 shadow-[0_0_25px_rgba(34,197,94,0.25)]"; titleStyle = "text-[#22c55e]";
     } else if (score >= 75) {
-        boxStyle = "bg-red-900/30 border-red-500/60 shadow-[0_0_25px_rgba(239,68,68,0.25)]"; titleStyle = "text-red-400";
+        boxStyle = "bg-violet-900/30 border-[#BF00FF]/60 shadow-[0_0_25px_rgba(191,0,255,0.25)]"; titleStyle = "text-[#BF00FF]";
     } else {
-        boxStyle = "bg-orange-900/30 border-[#F7931A]/60 shadow-[0_0_25px_rgba(247,147,26,0.25)]"; titleStyle = "text-[#F7931A]";
+        boxStyle = "bg-pink-900/30 border-[#FF10F0]/60 shadow-[0_0_25px_rgba(255,16,240,0.25)]"; titleStyle = "text-[#FF10F0]";
     }
 
     let finalHTML = `
-      <div class="relative w-full mb-8">
-          <div class="flex justify-between items-center px-1 mb-3 text-[10px] font-bold uppercase tracking-widest">
-              <div class="text-[#F7931A]">CYCLE SCORE</div>
+      <div class="relative w-full mb-4 mt-2">
+          <div class="flex justify-between items-center px-1 mb-2 text-[10px] font-bold uppercase tracking-widest">
+              <div class="text-[#F7931A]">Cycle Score</div>
               <div id="dynamic-score" class="${scoreTextColor} font-black transition-colors duration-150">${score}%</div>
           </div>
           <div class="h-[180px] w-full relative">
@@ -186,7 +205,7 @@ async function analyze() {
           </div>
       </div>
 
-      <div class="bg-neutral-900 p-6 rounded-3xl border border-neutral-800 shadow-2xl">
+      <div class="bg-neutral-900 p-6 rounded-3xl border border-[#BF00FF]/30 shadow-[0_0_20px_rgba(191,0,255,0.15)]">
         <div class="flex justify-between items-center mb-6">
             <div class="text-neutral-500 text-[10px] font-bold uppercase tracking-[0.15em]">${data.name} (${data.ticker})</div>
             <div class="${phaseBadgeColor} text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-md uppercase tracking-wide">${data.phase}</div>
@@ -211,14 +230,14 @@ async function analyze() {
             </div>
             <div class="flex flex-col gap-2 text-[10px] sm:text-xs text-neutral-500 font-bold tracking-wider px-1">
                 <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#22c55e] shrink-0"></div><span>0% - 20% &bull; VALUE ZONE (DCA IN)</span></div>
-                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#F7931A] shrink-0"></div><span>21% - 74% &bull; NEUTRAL ZONE (HODL)</span></div>
-                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-red-500 shrink-0"></div><span>75% - 100% &bull; EXIT ZONE (DCA OUT)</span></div>
+                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#FF10F0] shrink-0"></div><span>21% - 74% &bull; NEUTRAL ZONE (HODL)</span></div>
+                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#BF00FF] shrink-0"></div><span>75% - 100% &bull; EXIT ZONE (DCA OUT)</span></div>
             </div>
         </div>
       </div>
 
       <div class="p-6 rounded-3xl border transition-all duration-500 ${boxStyle}">
-        <h2 class="${titleStyle} text-xs font-bold mb-4 uppercase tracking-[0.15em]">V₿$X VERDICT & STRATEGY</h2>
+        <h2 class="${titleStyle} text-xs font-bold mb-4 uppercase tracking-[0.15em]">Verdikt & Stratégia</h2>
         <div class="text-neutral-300 text-sm leading-loose">${formattedContent}</div>
       </div>
     `;
@@ -227,6 +246,7 @@ async function analyze() {
     output.classList.remove("hidden");
     footer.classList.remove("hidden");
     
+    // LIMIT DÁT NA POSLEDNÝCH 1000 DNÍ
     const limit = -143;
     const chartDates = data.chart_dates.slice(limit);
     const chartScore = data.chart_score.slice(limit);
@@ -238,8 +258,8 @@ async function analyze() {
         const commonOptions = {
             responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            // Zmenšený padding bottom na 16 pre minimalizovanie medzery
-            layout: { padding: { left: 0, right: 0, top: 5, bottom: 16 } },
+            // Zmenšený padding bottom pre minimalizovanie medzery
+            layout: { padding: { left: 0, right: 0, top: 5, bottom: 20 } },
             interaction: { mode: 'index', intersect: false }
         };
 
@@ -254,10 +274,11 @@ async function analyze() {
                 labels: chartDates,
                 datasets: [{ 
                     data: chartScore, 
-                    fill: false, // Odstránená plošná výplň pod krivkou
+                    fill: false, // Odstránená transparentnosť/výplň grafu
                     borderWidth: 1.5, 
                     tension: 0.6, 
                     pointRadius: 0,
+                    // Plynulý gradient, ktorý sa vypočíta presne podľa výšky okna grafu
                     borderColor: function(context) {
                         const chart = context.chart;
                         const {ctx, chartArea} = chart;
@@ -265,10 +286,10 @@ async function analyze() {
                         const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
                         gradient.addColorStop(0, '#22c55e'); 
                         gradient.addColorStop(0.20, '#22c55e'); 
-                        gradient.addColorStop(0.35, '#F7931A'); 
-                        gradient.addColorStop(0.74, '#F7931A'); 
-                        gradient.addColorStop(0.85, '#ef4444'); 
-                        gradient.addColorStop(1, '#ef4444'); 
+                        gradient.addColorStop(0.35, '#FF10F0'); 
+                        gradient.addColorStop(0.74, '#FF10F0'); 
+                        gradient.addColorStop(0.85, '#BF00FF'); 
+                        gradient.addColorStop(1, '#BF00FF'); 
                         return gradient;
                     }
                 }]
