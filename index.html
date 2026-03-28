@@ -16,8 +16,8 @@
 <div class="w-full max-w-xl p-5 space-y-4">
 
     <div id="spinner" class="flex flex-col items-center justify-center mt-32 space-y-4">
-        <div class="w-8 h-8 border-4 border-[#FFFF00]/20 border-t-[#FFFF00] rounded-full animate-spin"></div>
-        <div id="loading-text" class="text-center text-[#FFFF00] text-[0.6rem] tracking-widest uppercase">ANALYZING MACRO CYCLES...</div>
+        <div class="w-8 h-8 border-4 border-neutral-600/50 border-t-white rounded-full animate-spin"></div>
+        <div id="loading-text" class="text-center text-white text-[0.6rem] tracking-widest uppercase">ANALYZING MACRO CYCLES...</div>
     </div>
 
     <div id="error-box" class="hidden bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center mt-10"></div>
@@ -60,7 +60,6 @@ const crosshairPlugin = {
       ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.stroke();
 
       let xLabel = chart.data.labels[activePoint.index];
-      // Nechceme zobrazovať dátum nad prázdnymi štítkami napravo
       if (xLabel && xLabel !== "") {
           ctx.fillStyle = '#171717'; 
           ctx.font = 'normal 9.6px sans-serif'; 
@@ -99,7 +98,6 @@ const visualsPlugin = {
         const ctx = chart.ctx;
         const meta = chart.getDatasetMeta(0);
         
-        // Nájdeme posledný platný bod (nie prázdny štítok napravo)
         let lastValidIndex = -1;
         for (let i = chart.data.labels.length - 1; i >= 0; i--) {
             if (chart.data.labels[i] !== "") {
@@ -119,7 +117,6 @@ const visualsPlugin = {
         
         ctx.save();
         ctx.beginPath();
-        // Vykreslíme guličku presne na posledný platný bod
         ctx.arc(lastValidPoint.x, lastValidPoint.y, 4, 0, 2 * Math.PI);
         ctx.fillStyle = dotColor;
         ctx.fill();
@@ -200,6 +197,7 @@ async function analyze() {
               <div id="dynamic-score" style="color: ${scoreHex}" class="transition-colors duration-150">${score.toFixed(1)}%</div>
           </div>
           <div class="h-56 w-full relative">
+              <div class="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none"></div>
               <canvas id="scoreChart"></canvas>
           </div>
       </div>
@@ -241,13 +239,12 @@ async function analyze() {
     output.classList.remove("hidden");
     footer.classList.remove("hidden");
     
-    // 260 týždňov = presne 5 rokov histórie
     const limit = -260;
-    let chartDates = data.chart_dates.slice(limit); // let, aby sme mohli pushovať
+    let chartDates = data.chart_dates.slice(limit);
     const chartScore = data.chart_score.slice(limit);
 
-    // Pridáme 4 prázdne štítky napravo pre Padding osi
-    for (let i = 0; i < 4; i++) {
+    // ZMENA: Až 16 prázdnych týždňov pre masívny priestor na pravej strane grafu
+    for (let i = 0; i < 16; i++) {
         chartDates.push("");
     }
 
@@ -280,11 +277,9 @@ async function analyze() {
                 datasets: [{ 
                     data: chartScore, 
                     fill: false,
-                    // ZMENA: borderDash sa hádal s vizuálnym zaoblením. Odstránený.
-                    // ZMENA: borderDash: [4, 4]
                     borderWidth: 0.75, 
-                    // ZMENA: Pridané vizuálne zaoblenie (0.4 = jemná vlnovka)
-                    tension: 0.4, 
+                    // ZMENA: Maximálne bezpečné zjemnenie krivky
+                    tension: 0.5, 
                     pointRadius: 0,
                     borderColor: function(context) {
                         const chart = context.chart;
@@ -324,7 +319,6 @@ async function analyze() {
                             }, 
                             drawBorder: false, 
                             tickLength: 0,
-                            // Definovanie čiarkovanej mriežky (Dashed grid lines)
                             borderDash: [4, 4]
                         },
                         border: {
