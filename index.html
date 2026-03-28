@@ -60,7 +60,8 @@ const crosshairPlugin = {
       ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.stroke();
 
       let xLabel = chart.data.labels[activePoint.index];
-      if (xLabel) {
+      // Nechceme zobrazovať dátum nad prázdnymi štítkami napravo
+      if (xLabel && xLabel !== "") {
           ctx.fillStyle = '#171717'; 
           ctx.font = 'normal 9.6px sans-serif'; 
           let textWidth = ctx.measureText(xLabel).width;
@@ -80,7 +81,7 @@ const crosshairPlugin = {
       let scoreDiv = document.getElementById('dynamic-score');
       let titleDiv = document.getElementById('dynamic-title');
       
-      if (scoreDiv) {
+      if (scoreDiv && activePoint.element.$context.raw !== undefined) {
           let scoreHex = val <= 20 ? "#22c55e" : (val >= 80 ? "#EC4899" : "#FFFF00");
           scoreDiv.innerText = val.toFixed(1) + '%';
           scoreDiv.style.color = scoreHex;
@@ -97,15 +98,29 @@ const visualsPlugin = {
     afterDatasetsDraw: chart => {
         const ctx = chart.ctx;
         const meta = chart.getDatasetMeta(0);
-        if (!meta.data || meta.data.length === 0) return;
         
-        const lastPoint = meta.data[meta.data.length - 1];
-        const val = chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1];
+        // Nájdeme posledný platný bod (nie prázdny štítok napravo)
+        let lastValidIndex = -1;
+        for (let i = chart.data.labels.length - 1; i >= 0; i--) {
+            if (chart.data.labels[i] !== "") {
+                lastValidIndex = i;
+                break;
+            }
+        }
+
+        if (!meta.data || meta.data.length === 0 || lastValidIndex === -1) return;
+        
+        const lastValidPoint = meta.data[lastValidIndex];
+        const val = chart.data.datasets[0].data[lastValidIndex];
+        
+        if (val === undefined) return;
+        
         let dotColor = val <= 20 ? '#22c55e' : (val >= 80 ? '#EC4899' : '#FFFF00');
         
         ctx.save();
         ctx.beginPath();
-        ctx.arc(lastPoint.x, lastPoint.y, 4, 0, 2 * Math.PI);
+        // Vykreslíme guličku presne na posledný platný bod
+        ctx.arc(lastValidPoint.x, lastValidPoint.y, 4, 0, 2 * Math.PI);
         ctx.fillStyle = dotColor;
         ctx.fill();
         ctx.restore();
@@ -226,10 +241,15 @@ async function analyze() {
     output.classList.remove("hidden");
     footer.classList.remove("hidden");
     
-    // ZMENA: 260 týždňov = presne 5 rokov histórie
+    // 260 týždňov = presne 5 rokov histórie
     const limit = -260;
-    const chartDates = data.chart_dates.slice(limit);
+    let chartDates = data.chart_dates.slice(limit); // let, aby sme mohli pushovať
     const chartScore = data.chart_score.slice(limit);
+
+    // Pridáme 4 prázdne štítky napravo pre Padding osi
+    for (let i = 0; i < 4; i++) {
+        chartDates.push("");
+    }
 
     if (chartDates.length > 0 && chartScore.length > 0) {
         Chart.defaults.color = '#525252'; 
@@ -260,8 +280,11 @@ async function analyze() {
                 datasets: [{ 
                     data: chartScore, 
                     fill: false,
+                    // ZMENA: borderDash sa hádal s vizuálnym zaoblením. Odstránený.
+                    // ZMENA: borderDash: [4, 4]
                     borderWidth: 0.75, 
-                    tension: 0.6, 
+                    // ZMENA: Pridané vizuálne zaoblenie (0.4 = jemná vlnovka)
+                    tension: 0.4, 
                     pointRadius: 0,
                     borderColor: function(context) {
                         const chart = context.chart;
@@ -301,6 +324,7 @@ async function analyze() {
                             }, 
                             drawBorder: false, 
                             tickLength: 0,
+                            // Definovanie čiarkovanej mriežky (Dashed grid lines)
                             borderDash: [4, 4]
                         },
                         border: {
