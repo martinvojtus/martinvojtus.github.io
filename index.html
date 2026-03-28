@@ -8,12 +8,18 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body class="bg-black text-white flex justify-center min-h-screen items-start pt-2 font-sans pb-10">
+<body class="bg-black text-white flex justify-center min-h-screen items-start pt-6 font-sans pb-10">
 
 <div class="w-full max-w-xl p-5 space-y-4">
 
-    <div id="spinner" class="text-center text-[#F7931A] font-bold mt-32 h-6 text-xs tracking-widest uppercase">INITIALIZING V₿$X...</div>
-    <div id="error-box" class="hidden bg-red-900/20 border border-red-900 p-4 rounded-xl text-red-500 font-bold text-center mt-20 text-xs"></div>
+    <header class="w-full mb-6">
+        <h1 class="text-3xl font-extrabold tracking-tighter text-white flex items-center gap-1">
+            V<span class="text-[#F7931A]">₿</span><span class="text-[#22c55e]">$</span>X
+        </h1>
+    </header>
+
+    <div id="spinner" class="text-center text-[#F7931A] font-bold mt-20 h-6 text-xs tracking-widest uppercase">CALCULATING V₿$X CYCLES...</div>
+    <div id="error-box" class="hidden bg-red-900/20 border border-red-900 p-4 rounded-xl text-red-500 font-bold text-center mt-10 text-xs"></div>
 
     <div id="output" class="hidden flex flex-col gap-6"></div>
 
@@ -34,7 +40,7 @@ const loadingMsgs = [
     "GENERATING STRATEGY..."
 ];
 
-// Zameriavač s hodnotami kreslenými dovnútra grafu (zabraňuje orezaniu a prázdnym miestam)
+// Zameriavač s hodnotami vtlačenými DOVNÚTRA (zabraňuje orezaniu)
 const crosshairPlugin = {
   id: 'crosshair',
   afterDraw: chart => {
@@ -57,16 +63,16 @@ const crosshairPlugin = {
       ctx.moveTo(xAxis.left, y); ctx.lineTo(xAxis.right, y);
       ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.stroke();
 
-      // Štítok X (Dátum) ukotvený DOVNÚTRA (hore od spodnej hrany)
+      // Štítok X (Dátum) ukotvený DOVNÚTRA od spodnej hrany (0 horizontal line)
       let xLabel = chart.data.labels[activePoint.index];
       if (xLabel) {
           ctx.fillStyle = '#171717'; ctx.font = 'bold 9px sans-serif';
           let textWidth = ctx.measureText(xLabel).width;
-          let boxY = yAxis.bottom - 20; // 20px nad spodným okrajom
+          let boxY = yAxis.bottom + 4; // Kreslíme do priestoru pod čiarou 0
           let boxX = x - (textWidth + 16)/2;
           
-          if (boxX < xAxis.left) boxX = xAxis.left + 2;
-          if (boxX + textWidth + 16 > xAxis.right) boxX = xAxis.right - textWidth - 18;
+          if (boxX < 0) boxX = 0;
+          if (boxX + textWidth + 16 > chart.width) boxX = chart.width - textWidth - 16;
           
           ctx.fillRect(boxX, boxY, textWidth + 16, 18);
           ctx.strokeStyle = '#525252'; ctx.strokeRect(boxX, boxY, textWidth + 16, 18);
@@ -74,13 +80,13 @@ const crosshairPlugin = {
           ctx.fillText(xLabel, boxX + (textWidth + 16)/2, boxY + 9);
       }
 
-      // Štítok Y (Hodnota v %) ukotvený DOVNÚTRA (vľavo od pravej hrany)
+      // Štítok Y (Hodnota v %) ukotvený DOVNÚTRA od pravej hrany
       let val = activePoint.element.$context.parsed.y;
       let yLabel = val.toFixed(0) + '%';
       
       ctx.fillStyle = '#171717'; ctx.font = 'bold 9px sans-serif';
       let yTextWidth = ctx.measureText(yLabel).width;
-      let yBoxX = xAxis.right - yTextWidth - 18; // 18px doľava od pravého okraja
+      let yBoxX = xAxis.right - yTextWidth - 16; 
       
       ctx.fillRect(yBoxX, y - 9, yTextWidth + 16, 18);
       ctx.strokeStyle = '#525252'; ctx.strokeRect(yBoxX, y - 9, yTextWidth + 16, 18);
@@ -140,12 +146,12 @@ async function analyze() {
     let scoreTextColor = score <= 20 ? "text-[#22c55e]" : (score >= 75 ? "text-red-500" : "text-[#F7931A]");
     let phaseBadgeColor = score <= 20 ? "bg-[#030a05] text-[#22c55e] border border-[#22c55e]/60 shadow-[0_0_15px_rgba(34,197,94,0.25)]" : (score >= 75 ? "bg-red-900/30 text-red-400 border border-red-500/60 shadow-[0_0_15px_rgba(239,68,68,0.25)]" : "bg-orange-900/30 text-[#F7931A] border border-[#F7931A]/60 shadow-[0_0_15px_rgba(247,147,26,0.25)]");
 
-    // Zvýraznenie **tučného textu** v jednom kroku
+    // Formátovanie textu verdiktu (**tučné texty** a odrážky)
     let formattedContent = data.analysis
         .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
         .replace(/\n/g, '<br>');
 
-    // Štýlovanie tej JEDINEJ tabuľky
+    // Štýlovanie tej JEDINEJ tabuľky podľa percent
     let boxStyle = "bg-neutral-900 border-neutral-800 shadow-lg";
     let titleStyle = "text-white"; 
     if (score <= 20) {
@@ -157,11 +163,19 @@ async function analyze() {
     }
 
     let finalHTML = `
+      <div class="bg-[#1c120a] border border-[#F7931A]/40 rounded-3xl p-6 shadow-[0_0_20px_rgba(247,147,26,0.15)] relative">
+          <div class="flex justify-between items-center mb-6 text-[10px] font-bold uppercase tracking-widest">
+              <div class="text-[#F7931A]">V₿$X Cycle Score (0-100%)</div>
+              <div class="${scoreTextColor}">${score}%</div>
+          </div>
+          <div class="h-[220px] pt-6 relative">
+              <canvas id="scoreChart"></canvas>
+          </div>
+      </div>
+
       <div class="bg-neutral-900 p-6 rounded-3xl border border-neutral-800 shadow-2xl">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-xl font-extrabold tracking-tighter text-white flex items-center gap-1">
-                V<span class="text-[#F7931A]">₿</span><span class="text-[#22c55e]">$</span>X
-            </h1>
+            <div class="text-neutral-500 text-[10px] font-bold uppercase tracking-[0.15em]">${data.name} (${data.ticker})</div>
             <div class="${phaseBadgeColor} text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-md uppercase tracking-wide">${data.phase}</div>
         </div>
         
@@ -183,16 +197,11 @@ async function analyze() {
                 <div class="h-full ${scoreColor} transition-all duration-1000 ease-out" style="width: ${score}%"></div>
             </div>
             <div class="flex flex-col gap-2 text-[10px] sm:text-xs text-neutral-500 font-bold tracking-wider px-1">
-                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#22c55e] shrink-0"></div><span>0% - 20% &bull; VALUE ZONE (DCA IN)</span></div>
+                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-green-500 shrink-0"></div><span>0% - 20% &bull; VALUE ZONE (DCA IN)</span></div>
                 <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#F7931A] shrink-0"></div><span>21% - 74% &bull; GROWTH ZONE (HODL)</span></div>
                 <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-red-500 shrink-0"></div><span>75% - 100% &bull; EXIT ZONE (DCA OUT)</span></div>
             </div>
         </div>
-      </div>
-
-      <div class="relative w-full h-[220px] mt-4 mb-4">
-          <div class="absolute top-0 left-2 text-[10px] font-bold text-[#F7931A] uppercase tracking-widest z-10">V₿$X Cycle Score (0-100%)</div>
-          <canvas id="scoreChart"></canvas>
       </div>
 
       <div class="p-6 rounded-3xl border transition-all duration-500 ${boxStyle}">
@@ -217,23 +226,25 @@ async function analyze() {
         const commonOptions = {
             responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            layout: { padding: 0 }, // Žiadny vnútorný okraj, 100% využitie šírky
+            layout: { padding: 0 }, // ZMAZANÝ padding - využíva plnú šírku
             interaction: { mode: 'index', intersect: false }
         };
 
         const xAxisConfig = { display: true, grid: { display: false, drawBorder: false }, ticks: { display: false } };
 
         let ctxScore = document.getElementById('scoreChart').getContext('2d');
-        let gradientStroke = ctxScore.createLinearGradient(0, 180, 0, 0); 
+        let gradientStroke = ctxScore.createLinearGradient(0, 220, 0, 0); 
         gradientStroke.addColorStop(0, '#22c55e');    
-        gradientStroke.addColorStop(0.3, '#22c55e');  
-        gradientStroke.addColorStop(0.6, '#F7931A');  
-        gradientStroke.addColorStop(0.8, '#ef4444');  
+        gradientStroke.addColorStop(0.2, '#22c55e');  
+        gradientStroke.addColorStop(0.74, '#F7931A');  
+        gradientStroke.addColorStop(0.75, '#ef4444');  
         gradientStroke.addColorStop(1, '#ef4444');    
 
-        let gradientFill = ctxScore.createLinearGradient(0, 180, 0, 0);
+        let gradientFill = ctxScore.createLinearGradient(0, 220, 0, 0);
         gradientFill.addColorStop(0, 'rgba(34, 197, 94, 0.15)');
-        gradientFill.addColorStop(0.5, 'rgba(247, 147, 26, 0.1)');
+        gradientFill.addColorStop(0.2, 'rgba(34, 197, 94, 0.1)');
+        gradientFill.addColorStop(0.74, 'rgba(247, 147, 26, 0.05)');
+        gradientFill.addColorStop(0.75, 'rgba(239, 68, 68, 0.1)');
         gradientFill.addColorStop(1, 'rgba(239, 68, 68, 0.15)');
 
         if (scoreChartInstance) scoreChartInstance.destroy();
