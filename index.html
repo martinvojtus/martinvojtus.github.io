@@ -124,7 +124,29 @@ const visualsPlugin = {
     }
 };
 
-Chart.register(crosshairPlugin, visualsPlugin);
+// ZMENA: Vlastný plugin pre Fade-in iba na krivku grafu (3% zľava)
+const lineFadePlugin = {
+    id: 'lineFadePlugin',
+    afterDatasetsDraw: chart => {
+        const {ctx, chartArea} = chart;
+        if (!chartArea) return;
+        
+        // Šírka fade-in efektu presne 3%
+        const fadeWidth = chartArea.width * 0.03; 
+        
+        const gradient = ctx.createLinearGradient(chartArea.left, 0, chartArea.left + fadeWidth, 0);
+        gradient.addColorStop(0, 'rgba(0,0,0,1)'); // Plná čierna
+        gradient.addColorStop(1, 'rgba(0,0,0,0)'); // Stratí sa do priehľadna
+        
+        ctx.save();
+        ctx.fillStyle = gradient;
+        // Prekryje iba úvodných 3%, grid s `z: 1` sa vykreslí až následne na to
+        ctx.fillRect(chartArea.left, chartArea.top, fadeWidth, chartArea.bottom - chartArea.top);
+        ctx.restore();
+    }
+};
+
+Chart.register(crosshairPlugin, visualsPlugin, lineFadePlugin);
 
 function hideTooltips() {
     if (scoreChartInstance) { 
@@ -197,7 +219,6 @@ async function analyze() {
               <div id="dynamic-score" style="color: ${scoreHex}" class="transition-colors duration-150">${score.toFixed(1)}%</div>
           </div>
           <div class="h-56 w-full relative">
-              <div class="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none"></div>
               <canvas id="scoreChart"></canvas>
           </div>
       </div>
@@ -304,14 +325,12 @@ async function analyze() {
                         min: 0, 
                         max: 100, 
                         grid: { 
-                            // ZMENA: Vykreslenie gridu AKO VRSTVA NAD grafom
                             z: 1,
                             color: function(context) {
                                 let v = context.tick.value;
                                 let op = 0.1; 
                                 
                                 if (v === 0 || v === 100) op = 0.05; 
-                                // ZMENA: Zvýraznené hraničné čiary 20 a 80 (opacity 50%)
                                 else if (v === 20 || v === 80) op = 0.5; 
 
                                 if (v <= 20) return `rgba(34, 197, 94, ${op})`;     
