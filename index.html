@@ -17,14 +17,14 @@
 
     <div id="spinner" class="flex flex-col items-center justify-center mt-32 space-y-4">
         <div class="w-8 h-8 border-4 border-[#F7931A]/20 border-t-[#F7931A] rounded-full animate-spin"></div>
-        <div id="loading-text" class="text-center text-[#F7931A] text-[0.7rem] font-bold tracking-widest uppercase">ANALYZING MACRO CYCLES...</div>
+        <div id="loading-text" class="text-center text-[#F7931A] text-[0.6rem] font-bold tracking-widest uppercase">ANALYZING MACRO CYCLES...</div>
     </div>
 
-    <div id="error-box" class="hidden bg-red-900/20 border border-red-900 p-4 rounded-xl text-red-500 text-[0.7rem] font-bold tracking-widest uppercase text-center mt-10"></div>
+    <div id="error-box" class="hidden bg-red-900/20 border border-red-900 p-4 rounded-xl text-red-500 text-[0.6rem] font-bold tracking-widest uppercase text-center mt-10"></div>
 
     <div id="output" class="hidden flex flex-col pt-1"></div>
 
-    <footer id="footer" class="hidden text-center text-[0.7rem] text-neutral-500 font-bold mt-12 tracking-[0.25em] uppercase">
+    <footer id="footer" class="hidden text-center text-[0.6rem] text-neutral-500 font-bold mt-12 tracking-[0.25em] uppercase">
         MARTIN VOJTUŠ &copy; 2026 &bull; BUILD V1.0.0
     </footer>
 
@@ -42,7 +42,7 @@ const loadingMsgs = [
     "GENERATING STRATEGY..."
 ];
 
-// 1. Zameriavač (Prispôsobený pre 0.7rem / 11.2px)
+// 1. Zameriavač (Prispôsobený pre 0.6rem / cca 9.6px)
 const crosshairPlugin = {
   id: 'crosshair',
   afterDraw: chart => {
@@ -63,7 +63,7 @@ const crosshairPlugin = {
       let xLabel = chart.data.labels[activePoint.index];
       if (xLabel) {
           ctx.fillStyle = '#171717'; 
-          ctx.font = 'bold 11.2px sans-serif'; 
+          ctx.font = 'bold 9.6px sans-serif'; 
           let textWidth = ctx.measureText(xLabel).width;
           let boxY = yAxis.bottom + 4; 
           let boxX = x - (textWidth + 16)/2;
@@ -180,23 +180,9 @@ async function analyze() {
 
     window.currentScoreData = { score: score, rawColor: scoreHex };
 
-    let formattedContent = data.analysis
-        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
-        .replace(/\n/g, '<br>');
-
-    let boxStyle = "bg-neutral-900 border-neutral-800";
-    let titleStyle = "text-white"; 
-    if (score <= 20) {
-        boxStyle = "bg-[#030a05] border border-[#22c55e]/40"; titleStyle = "text-[#22c55e]";
-    } else if (score >= 75) {
-        boxStyle = "bg-[#ef4444]/5 border border-[#ef4444]/40"; titleStyle = "text-[#ef4444]";
-    } else {
-        boxStyle = "bg-[#F7931A]/5 border border-[#F7931A]/40"; titleStyle = "text-[#F7931A]";
-    }
-
     let finalHTML = `
       <div class="relative w-full mb-0">
-          <div class="flex justify-between items-center px-1 mb-2 text-[0.7rem] font-bold uppercase tracking-widest">
+          <div class="flex justify-between items-center px-1 mb-2 text-[0.6rem] font-bold uppercase tracking-widest">
               <div id="dynamic-title" style="color: ${scoreHex}" class="transition-colors duration-150">CYCLE SCORE</div>
               <div id="dynamic-score" style="color: ${scoreHex}" class="transition-colors duration-150">${score}%</div>
           </div>
@@ -207,21 +193,21 @@ async function analyze() {
 
       <div class="p-6 rounded-3xl ${dashboardStyle} mt-0">
           
-        <div class="flex justify-between items-center mb-6 text-[0.7rem] font-bold uppercase tracking-widest">
+        <div class="flex justify-between items-center mb-6 text-[0.6rem] font-bold uppercase tracking-widest">
             <div class="text-neutral-500">${data.name} (${data.ticker})</div>
             <div class="${phaseBadgeColor} px-3 py-1.5 rounded-md">${data.phase}</div>
         </div>
         
         <div class="flex justify-between items-start mb-8 gap-4">
             <div>
-                <div class="text-[1.4rem] leading-none font-bold tracking-tight text-white">$${formattedPrice}</div>
-                <div class="${colorClass} text-[0.7rem] font-bold uppercase tracking-widest mt-2 flex items-center gap-1.5">
+                <div class="text-[1.8rem] leading-none font-bold tracking-tight text-white">$${formattedPrice}</div>
+                <div class="${colorClass} text-[0.6rem] font-bold uppercase tracking-widest mt-2 flex items-center gap-1.5">
                     ${sign}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded">24H</span>
                 </div>
             </div>
             <div class="text-right">
-                <div class="text-[1.4rem] leading-none font-bold" style="color: ${scoreHex}">${score}%</div>
-                <div class="text-[0.7rem] text-neutral-500 font-bold uppercase tracking-widest mt-2">SCORE</div>
+                <div class="text-[1.8rem] leading-none font-bold" style="color: ${scoreHex}">${score}%</div>
+                <div class="text-[0.6rem] text-neutral-500 font-bold uppercase tracking-widest mt-2">SCORE</div>
             </div>
         </div>
         
@@ -229,17 +215,12 @@ async function analyze() {
             <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-5">
                 <div class="h-full transition-all duration-1000 ease-out" style="width: ${score}%; background-color: ${scoreHex}"></div>
             </div>
-            <div class="flex flex-col gap-3 text-[0.7rem] text-neutral-400 font-bold uppercase tracking-widest px-1">
+            <div class="flex flex-col gap-3 text-[0.6rem] text-neutral-400 font-bold uppercase tracking-widest px-1">
                 <div class="flex items-center gap-2.5"><div class="w-2 h-2 rounded-full bg-[#22c55e] shrink-0"></div><span class="text-white">0% - 20%</span> &bull; VALUE ZONE (DCA IN)</div>
                 <div class="flex items-center gap-2.5"><div class="w-2 h-2 rounded-full bg-[#F7931A] shrink-0"></div><span class="text-white">21% - 74%</span> &bull; NEUTRAL ZONE (HODL)</div>
                 <div class="flex items-center gap-2.5"><div class="w-2 h-2 rounded-full bg-[#ef4444] shrink-0"></div><span class="text-white">75% - 100%</span> &bull; EXIT ZONE (DCA OUT)</div>
             </div>
         </div>
-      </div>
-
-      <div class="p-6 rounded-3xl border transition-all duration-500 ${boxStyle} mt-4">
-        <h2 class="${titleStyle} text-[0.7rem] font-bold mb-4 uppercase tracking-widest">VERDICT & STRATEGY</h2>
-        <div class="space-y-3 text-[0.7rem] leading-loose text-neutral-300">${formattedContent}</div>
       </div>
     `;
 
@@ -254,7 +235,7 @@ async function analyze() {
     if (chartDates.length > 0 && chartScore.length > 0) {
         Chart.defaults.color = '#525252'; 
         Chart.defaults.font.family = "'Inter', sans-serif";
-        Chart.defaults.font.size = 11.2; // 0.7rem = 11.2px
+        Chart.defaults.font.size = 9.6; // 0.6rem = 9.6px
         
         const commonOptions = {
             responsive: true, maintainAspectRatio: false,
@@ -300,16 +281,15 @@ async function analyze() {
                     y: { 
                         display: true, position: 'right', min: 0, max: 100, 
                         grid: { 
-                            // Dynamická farba gridu každej desiatky presne podľa farebnej zóny (10% opacity)
                             color: function(context) {
-                                if (context.tick.value <= 20) return 'rgba(34, 197, 94, 0.1)';     // Green
-                                if (context.tick.value <= 74) return 'rgba(247, 147, 26, 0.1)';    // Orange
-                                return 'rgba(239, 68, 68, 0.1)';                                   // Red
+                                if (context.tick.value <= 20) return 'rgba(34, 197, 94, 0.1)';     
+                                if (context.tick.value <= 74) return 'rgba(247, 147, 26, 0.1)';    
+                                return 'rgba(239, 68, 68, 0.1)';                                   
                             }, 
                             drawBorder: false, 
                             tickLength: 0 
                         }, 
-                        ticks: { display: false, stepSize: 10 } // Čiary každých 10%
+                        ticks: { display: false, stepSize: 10 } 
                     } 
                 } 
             }
