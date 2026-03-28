@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sk">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: black; color: white; }
     </style>
 </head>
@@ -17,7 +17,7 @@
 
     <div id="spinner" class="flex flex-col items-center justify-center mt-32 space-y-4">
         <div class="w-8 h-8 border-4 border-[#F7931A]/20 border-t-[#F7931A] rounded-full animate-spin"></div>
-        <div id="loading-text" class="text-center text-[#F7931A] font-bold text-xs tracking-widest uppercase">Počítam cykly V₿$X...</div>
+        <div id="loading-text" class="text-center text-[#F7931A] font-bold text-xs tracking-widest uppercase">CALCULATING V₿$X CYCLES...</div>
     </div>
 
     <div id="error-box" class="hidden bg-red-900/20 border border-red-900 p-4 rounded-xl text-red-500 font-bold text-center mt-10 text-xs"></div>
@@ -36,10 +36,10 @@ let spinnerInterval = null;
 window.currentScoreData = { score: 0, colorClass: "" };
 
 const loadingMsgs = [
-    "Získavam dáta...", 
-    "Počítam log-regresiu...", 
-    "Mapujem cykly...", 
-    "Generujem stratégiu..."
+    "ACCESSING LIQUIDITY...", 
+    "CALCULATING LOG-REG...", 
+    "MAPPING CYCLES...", 
+    "GENERATING STRATEGY..."
 ];
 
 // 1. Zameriavač (Vtlačený dátum bez extra medzery)
@@ -61,7 +61,7 @@ const crosshairPlugin = {
       ctx.moveTo(x, yAxis.top); ctx.lineTo(x, yAxis.bottom);
       ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.stroke();
 
-      // Štítok X (Dátum - vtlačený priamo do grafu tesne nad os)
+      // Štítok X (Dátum - vtlačený priamo do grafu tesne nad osou)
       let xLabel = chart.data.labels[activePoint.index];
       if (xLabel) {
           ctx.fillStyle = '#171717'; ctx.font = 'bold 9px sans-serif';
@@ -78,7 +78,7 @@ const crosshairPlugin = {
           ctx.fillText(xLabel, boxX + (textWidth + 12)/2, boxY + 8);
       }
 
-      // Aktualizácia percenta v pravej hornej časti
+      // Aktualizácia percenta v pravej hornej časti (Zjednotený font a farba)
       let val = activePoint.element.$context.parsed.y;
       let scoreDiv = document.getElementById('dynamic-score');
       let titleDiv = document.getElementById('dynamic-title');
@@ -201,7 +201,7 @@ async function analyze() {
       <div class="relative w-full mb-2">
           <div class="flex justify-between items-center px-1 mb-3 text-[10px] font-bold uppercase tracking-widest">
               <div id="dynamic-title" style="color: ${scoreHex}" class="transition-colors duration-150">CYCLE SCORE</div>
-              <div id="dynamic-score" style="color: ${scoreHex}" class="font-extrabold text-sm transition-colors duration-150">${score}%</div>
+              <div id="dynamic-score" style="color: ${scoreHex}" class="transition-colors duration-150">${score}%</div>
           </div>
           <div class="h-[180px] w-full relative">
               <canvas id="scoreChart"></canvas>
@@ -214,15 +214,15 @@ async function analyze() {
             <div class="${phaseBadgeColor} text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-md uppercase tracking-wide">${data.phase}</div>
         </div>
         
-        <div class="flex justify-between items-center mb-8 whitespace-nowrap">
+        <div class="flex justify-between items-start mb-8 gap-4">
             <div>
-                <div class="text-4xl font-extrabold tracking-tight text-white">$${formattedPrice}</div>
+                <div class="text-3xl sm:text-4xl font-bold tracking-tight text-white">$${formattedPrice}</div>
                 <div class="${colorClass} text-sm font-semibold mt-1 flex items-center gap-1">
                     ${sign}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wider ml-1">24H</span>
                 </div>
             </div>
             <div class="text-right">
-                <div class="text-4xl font-extrabold" style="color: ${scoreHex}">${score}%</div>
+                <div class="text-3xl sm:text-4xl font-bold" style="color: ${scoreHex}">${score}%</div>
                 <div class="text-[10px] text-neutral-500 uppercase font-bold tracking-widest mt-1">SCORE</div>
             </div>
         </div>
@@ -231,16 +231,16 @@ async function analyze() {
             <div class="w-full bg-neutral-800 h-2 rounded-full overflow-hidden mb-4">
                 <div class="h-full transition-all duration-1000 ease-out" style="width: ${score}%; background-color: ${scoreHex}"></div>
             </div>
-            <div class="flex flex-col gap-2.5 text-[10px] sm:text-xs text-neutral-400 font-bold tracking-wider px-1">
-                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#22c55e] shrink-0"></div><span class="text-white">0% - 20%</span> &bull; VALUE ZÓNA (DCA IN)</div>
-                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#eab308] shrink-0"></div><span class="text-white">21% - 74%</span> &bull; NEUTRÁLNA ZÓNA (HODL)</div>
-                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#ff1493] shrink-0"></div><span class="text-white">75% - 100%</span> &bull; EXIT ZÓNA (DCA OUT)</div>
+            <div class="flex flex-col gap-2.5 text-[10px] sm:text-xs text-neutral-400 font-semibold tracking-wider px-1">
+                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#22c55e] shrink-0"></div><span class="text-white">0% - 20%</span> &bull; VALUE ZONE (DCA IN)</div>
+                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#eab308] shrink-0"></div><span class="text-white">21% - 74%</span> &bull; NEUTRAL ZONE (HODL)</div>
+                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#ff1493] shrink-0"></div><span class="text-white">75% - 100%</span> &bull; EXIT ZONE (DCA OUT)</div>
             </div>
         </div>
       </div>
 
       <div class="p-6 rounded-3xl border transition-all duration-500 ${boxStyle}">
-        <h2 class="${titleStyle} text-xs font-extrabold mb-4 uppercase tracking-[0.15em]">Verdikt & Stratégia</h2>
+        <h2 class="${titleStyle} text-xs font-bold mb-4 uppercase tracking-[0.15em]">VERDICT & STRATEGY</h2>
         <div class="space-y-2 text-sm leading-relaxed text-neutral-300">${formattedContent}</div>
       </div>
     `;
@@ -313,12 +313,11 @@ async function analyze() {
   } catch (error) {
     clearInterval(spinnerInterval);
     spinner.classList.add("hidden");
-    errorBox.innerText = "❌ CHYBA PRIPOJENIA. SKÚSTE OBNOVIŤ STRÁNKU.";
+    errorBox.innerText = "❌ CONNECTION ERROR. PLEASE REFRESH THE PAGE.";
     errorBox.classList.remove("hidden");
   }
 }
 
-// Spustenie analýzy okamžite po načítaní okna
 window.addEventListener('DOMContentLoaded', analyze);
 </script>
 </body>
