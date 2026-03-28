@@ -1,21 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: black; color: white; }
+    </style>
 </head>
-
-<body class="bg-black text-white flex justify-center min-h-screen items-start pt-6 font-sans pb-10">
+<body class="flex justify-center min-h-screen items-start pt-6 pb-10">
 
 <div class="w-full max-w-xl p-5 space-y-4">
 
-    <div id="spinner" class="text-center text-[#F7931A] font-bold mt-20 h-6 text-xs tracking-widest uppercase">CALCULATING V₿$X CYCLES...</div>
+    <div id="spinner" class="text-center text-[#F7931A] font-bold mt-20 h-6 text-xs tracking-widest uppercase">Počítam cykly V₿$X...</div>
     <div id="error-box" class="hidden bg-red-900/20 border border-red-900 p-4 rounded-xl text-red-500 font-bold text-center mt-10 text-xs"></div>
 
-    <div id="output" class="hidden flex flex-col gap-6"></div>
+    <div id="output" class="hidden flex flex-col gap-6 pt-1"></div>
 
     <footer id="footer" class="hidden text-center text-[9px] text-neutral-500 font-bold mt-12 border-t border-neutral-900 pt-6 tracking-[0.25em] whitespace-nowrap uppercase">
         MARTIN VOJTUŠ &copy; 2026 &bull; BUILD V1.0.0
@@ -29,12 +32,13 @@ let spinnerInterval = null;
 window.currentScoreData = { score: 0, colorClass: "" };
 
 const loadingMsgs = [
-    "ACCESSING LIQUIDITY...", 
-    "CALCULATING LOG-REG...", 
-    "MAPPING CYCLES...", 
-    "GENERATING STRATEGY..."
+    "Získavam dáta...", 
+    "Počítam log-regresiu...", 
+    "Mapujem cykly...", 
+    "Generujem stratégiu..."
 ];
 
+// 1. Zameriavač (Len vertikálna čiara, vtlačený dátum bez extra medzery)
 const crosshairPlugin = {
   id: 'crosshair',
   afterDraw: chart => {
@@ -47,15 +51,18 @@ const crosshairPlugin = {
       let ctx = chart.ctx;
       
       ctx.save();
+      
+      // Iba Vertikálna čiara
       ctx.beginPath();
       ctx.moveTo(x, yAxis.top); ctx.lineTo(x, yAxis.bottom);
       ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.stroke();
 
+      // Štítok X (Dátum - vtlačený priamo na os, ZMENA: boxY)
       let xLabel = chart.data.labels[activePoint.index];
       if (xLabel) {
           ctx.fillStyle = '#171717'; ctx.font = 'bold 9px sans-serif';
           let textWidth = ctx.measureText(xLabel).width;
-          let boxY = yAxis.bottom - 16; // VTLAČENÉ DOVNÚTRA - nulová medzera pod grafom
+          let boxY = yAxis.bottom - 16; // VTLAČENÉ DOVNÚTRA grafu
           let boxX = x - (textWidth + 12)/2;
           
           if (boxX < xAxis.left) boxX = xAxis.left;
@@ -67,29 +74,37 @@ const crosshairPlugin = {
           ctx.fillText(xLabel, boxX + (textWidth + 12)/2, boxY + 7);
       }
 
+      // Aktualizácia percenta v pravej hornej časti s farbou podľa fázy
       let val = activePoint.element.$context.parsed.y;
       let scoreDiv = document.getElementById('dynamic-score');
       let titleDiv = document.getElementById('dynamic-title');
+      
       if (scoreDiv) {
-          let color = val <= 20 ? "#22c55e" : (val >= 75 ? "#ff1493" : "#38bdf8");
+          let scoreHex = val <= 20 ? "#22c55e" : (val >= 75 ? "#ff1493" : "#38bdf8");
           scoreDiv.innerText = val.toFixed(1) + '%';
-          scoreDiv.style.color = color;
-          if (titleDiv) titleDiv.style.color = color;
+          scoreDiv.style.color = scoreHex;
+          if (titleDiv) titleDiv.style.color = scoreHex;
       }
+
       ctx.restore();
     }
   }
 };
 
+// 2. Efekty: Gulička na konci, gradient farieb
 const visualsPlugin = {
     id: 'visualsPlugin',
     afterDatasetsDraw: chart => {
         const ctx = chart.ctx;
         const meta = chart.getDatasetMeta(0);
         if (!meta.data || meta.data.length === 0) return;
+        
+        // Vykreslenie zakončovacej guličky na konci čiary
         const lastPoint = meta.data[meta.data.length - 1];
         const val = chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1];
+        // Farba guličky presne podľa aktuálnej zóny
         let dotColor = val <= 20 ? '#22c55e' : (val >= 75 ? '#ff1493' : '#38bdf8');
+        
         ctx.save();
         ctx.beginPath();
         ctx.arc(lastPoint.x, lastPoint.y, 4, 0, 2 * Math.PI);
@@ -107,6 +122,7 @@ function hideTooltips() {
         scoreChartInstance.update(); 
         let scoreDiv = document.getElementById('dynamic-score');
         let titleDiv = document.getElementById('dynamic-title');
+        
         if (scoreDiv && window.currentScoreData) {
             scoreDiv.innerText = window.currentScoreData.score + '%';
             scoreDiv.style.color = window.currentScoreData.rawColor;
@@ -135,21 +151,51 @@ async function analyze() {
       method: "POST",
       headers: {"Content-Type": "application/json"}
     });
+
+    if (!res.ok) throw new Error("Server error");
     const data = await res.json();
+    
     clearInterval(spinnerInterval);
     spinner.classList.add("hidden");
 
-    const score = data.cycle_score || 0;
-    let scoreHex = score <= 20 ? "#22c55e" : (score >= 75 ? "#ff1493" : "#38bdf8");
-    window.currentScoreData = { score: score, rawColor: scoreHex };
+    if(data.error) throw new Error(data.error);
 
+    const colorClass = data.change > 0 ? "text-[#22c55e]" : (data.change < 0 ? "text-red-500" : "text-neutral-400");
+    const sign = data.change > 0 ? "+" : "";
+    const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    const score = data.cycle_score || 0;
+    
+    // Nový color pallete: Green Value, Neon Blue Neutral, Neon Pink Exit.
+    let scoreColor = score <= 20 ? "bg-[#22c55e]" : (score >= 75 ? "bg-[#ff1493]" : "bg-[#38bdf8]");
+    let scoreTextColor = score <= 20 ? "text-[#22c55e]" : (score >= 75 ? "text-[#ff1493]" : "text-[#38bdf8]");
+    let scoreHex = score <= 20 ? "#22c55e" : (score >= 75 ? "#ff1493" : "#38bdf8");
+
+    
+    let dashboardStyle = "bg-neutral-900 border border-[#ff1493]/40 shadow-[0_0_20px_rgba(255,20,147,0.15)]";
+    let phaseBadgeColor = score <= 20 ? "bg-[#030a05] text-[#22c55e] border border-[#22c55e]/60 shadow-[0_0_15px_rgba(34,197,94,0.25)]" : (score >= 75 ? "bg-rose-900/30 text-[#ff1493] border border-[#ff1493]/60 shadow-[0_0_15px_rgba(255,20,147,0.25)]" : "bg-sky-900/30 text-[#38bdf8] border border-[#38bdf8]/60 shadow-[0_0_15px_rgba(56,189,248,0.25)]");
+
+    window.currentScoreData = { score: score, colorClass: scoreTextColor, rawColor: scoreHex };
+
+    // Formátovanie textu verdiktu
     let formattedContent = data.analysis
         .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
         .replace(/\n/g, '<br>');
 
+    // Štýlovanie tej JEDINEJ tabuľky VERDIKTU podľa percent
+    let boxStyle = "bg-neutral-900 border-neutral-800 shadow-lg";
+    let titleStyle = "text-white"; 
+    if (score <= 20) {
+        boxStyle = "bg-[#030a05] border border-[#22c55e]/60 shadow-[0_0_25px_rgba(34,197,94,0.25)]"; titleStyle = "text-[#22c55e]";
+    } else if (score >= 75) {
+        boxStyle = "bg-rose-900/30 border border-[#ff1493]/60 shadow-[0_0_25px_rgba(255,20,147,0.25)]"; titleStyle = "text-[#ff1493]";
+    } else {
+        boxStyle = "bg-sky-900/30 border border-[#38bdf8]/60 shadow-[0_0_25px_rgba(56,189,248,0.25)]"; titleStyle = "text-[#38bdf8]";
+    }
+
     let finalHTML = `
-      <div class="relative w-full mb-4">
-          <div class="flex justify-between items-center px-1 mb-3 text-[10px] font-bold uppercase tracking-widest">
+      <div class="relative w-full mb-2">
+          <div class="flex justify-between items-center px-1 mb-2 text-[10px] font-bold uppercase tracking-widest">
               <div id="dynamic-title" style="color: ${scoreHex}">CYCLE SCORE</div>
               <div id="dynamic-score" style="color: ${scoreHex}" class="font-black transition-colors duration-150">${score}%</div>
           </div>
@@ -158,16 +204,18 @@ async function analyze() {
           </div>
       </div>
 
-      <div class="bg-neutral-900 p-6 rounded-3xl border border-[#ff1493]/40 shadow-[0_0_20px_rgba(255,20,147,0.15)]">
+      <div class="p-6 rounded-3xl ${dashboardStyle}">
         <div class="flex justify-between items-center mb-6">
             <div class="text-neutral-500 text-[10px] font-bold uppercase tracking-[0.15em]">${data.name} (${data.ticker})</div>
-            <div class="text-[10px] font-bold px-3 py-1.5 rounded-md uppercase border border-white/20">${data.phase}</div>
+            <div class="${phaseBadgeColor} text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-md uppercase tracking-wide">${data.phase}</div>
         </div>
         
-        <div class="flex justify-between items-center mb-8">
+        <div class="flex justify-between items-center mb-8 whitespace-nowrap">
             <div>
-                <div class="text-3xl sm:text-4xl font-extrabold tracking-tight">$${data.price.toLocaleString()}</div>
-                <div class="${data.change > 0 ? 'text-[#22c55e]' : 'text-red-500'} text-xs font-semibold mt-1">${data.change > 0 ? '+' : ''}${data.change}%</div>
+                <div class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">$${formattedPrice}</div>
+                <div class="${colorClass} text-xs sm:text-sm font-semibold mt-1 flex items-center gap-1">
+                    ${sign}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wider ml-1">24H</span>
+                </div>
             </div>
             <div class="text-right">
                 <div class="text-3xl sm:text-4xl font-black" style="color: ${scoreHex}">${score}%</div>
@@ -175,21 +223,21 @@ async function analyze() {
             </div>
         </div>
         
-        <div class="space-y-3">
-            <div class="w-full bg-neutral-800 h-2 rounded-full overflow-hidden">
-                <div class="h-full transition-all duration-1000" style="width: ${score}%; background-color: ${scoreHex}"></div>
+        <div>
+            <div class="w-full bg-neutral-800 h-2 rounded-full overflow-hidden mb-3">
+                <div class="h-full transition-all duration-1000 ease-out" style="width: ${score}%; background-color: ${scoreHex}"></div>
             </div>
-            <div class="flex flex-col gap-2 text-[10px] text-neutral-500 font-bold uppercase tracking-wider">
-                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#22c55e]"></div>0-20% &bull; VALUE ZONE (DCA IN)</div>
-                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#38bdf8]"></div>21-74% &bull; NEUTRAL ZONE (HODL)</div>
-                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#ff1493]"></div>75-100% &bull; EXIT ZONE (DCA OUT)</div>
+            <div class="flex flex-col gap-2 text-[10px] sm:text-xs text-neutral-500 font-bold tracking-wider px-1">
+                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#22c55e] shrink-0"></div><span>0% - 20% &bull; VALUE ZÓNA (DCA IN)</span></div>
+                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#38bdf8] shrink-0"></div><span>21% - 74% &bull; NEUTRÁLNA ZÓNA (HODL)</span></div>
+                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#ff1493] shrink-0"></div><span>75% - 100% &bull; EXIT ZÓNA (DCA OUT)</span></div>
             </div>
         </div>
       </div>
 
-      <div class="p-6 rounded-3xl border border-white/10 bg-neutral-900 shadow-lg">
-        <h2 class="text-xs font-bold mb-4 uppercase tracking-[0.15em] opacity-80">VERDICT & STRATEGY</h2>
-        <div class="text-neutral-300 text-sm leading-loose">${formattedContent}</div>
+      <div class="p-6 rounded-3xl border transition-all duration-500 ${boxStyle}">
+        <h2 class="${titleStyle} text-xl font-black mb-4">Verdikt & Stratégia</h2>
+        <div class="space-y-4 text-sm leading-relaxed text-gray-300">${formattedContent}</div>
       </div>
     `;
 
@@ -197,51 +245,78 @@ async function analyze() {
     output.classList.remove("hidden");
     footer.classList.remove("hidden");
     
-    renderChart(data.chart_dates.slice(-143), data.chart_score.slice(-143));
+    // LIMIT DÁT NA POSLEDNÝCH 1000 DNÍ
+    const limit = -143;
+    const chartDates = data.chart_dates.slice(limit);
+    const chartScore = data.chart_score.slice(limit);
+
+    if (chartDates.length > 0 && chartScore.length > 0) {
+        Chart.defaults.color = '#525252'; 
+        Chart.defaults.font.size = 9;
+        
+        const commonOptions = {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            // ZMENA: Úplne odstránený padding bottom (medzera je preč)
+            layout: { padding: { left: 0, right: 0, top: 5, bottom: 0 } },
+            interaction: { mode: 'index', intersect: false }
+        };
+
+        const xAxisConfig = { display: true, grid: { display: false, drawBorder: false }, ticks: { display: false } };
+
+        let ctxScore = document.getElementById('scoreChart').getContext('2d');
+
+        if (scoreChartInstance) scoreChartInstance.destroy();
+        scoreChartInstance = new Chart(ctxScore, {
+            type: 'line',
+            data: {
+                labels: chartDates,
+                datasets: [{ 
+                    data: chartScore, 
+                    fill: false, // Odstránená transparentnosť/výplň grafu
+                    borderWidth: 1.5, 
+                    tension: 0.6, 
+                    pointRadius: 0,
+                    // Plynulý gradient, ktorý sa vypočíta presne podľa výšky okna grafu a nových farieb
+                    borderColor: function(context) {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+                        if (!chartArea) return;
+                        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                        // Standard colors for consistency
+                        gradient.addColorStop(0, '#22c55e'); 
+                        gradient.addColorStop(0.20, '#22c55e'); 
+                        gradient.addColorStop(0.35, '#38bdf8'); 
+                        gradient.addColorStop(0.74, '#38bdf8'); 
+                        gradient.addColorStop(0.85, '#ff1493'); 
+                        gradient.addColorStop(1, '#ff1493'); 
+                        return gradient;
+                    }
+                }]
+            },
+            options: { 
+                ...commonOptions, 
+                scales: { 
+                    x: xAxisConfig, 
+                    y: { 
+                        display: true, position: 'right', min: 0, max: 100, 
+                        grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false, tickLength: 0 }, 
+                        ticks: { display: false } 
+                    } 
+                } 
+            }
+        });
+    }
 
   } catch (error) {
     clearInterval(spinnerInterval);
+    spinner.classList.add("hidden");
+    errorBox.innerText = "❌ CONNECTION ERROR. RELOAD IN 15S.";
     errorBox.classList.remove("hidden");
   }
 }
 
-function renderChart(dates, scores) {
-    let ctx = document.getElementById('scoreChart').getContext('2d');
-    if (scoreChartInstance) scoreChartInstance.destroy();
-    scoreChartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: dates,
-            datasets: [{ 
-                data: scores, 
-                fill: false, borderWidth: 1.5, tension: 0.6, pointRadius: 0,
-                borderColor: function(context) {
-                    const chart = context.chart;
-                    const {ctx, chartArea} = chart;
-                    if (!chartArea) return;
-                    const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                    gradient.addColorStop(0, '#22c55e'); 
-                    gradient.addColorStop(0.20, '#22c55e'); 
-                    gradient.addColorStop(0.40, '#38bdf8'); 
-                    gradient.addColorStop(0.74, '#38bdf8'); 
-                    gradient.addColorStop(0.85, '#ff1493'); 
-                    gradient.addColorStop(1, '#ff1493'); 
-                    return gradient;
-                }
-            }]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            layout: { padding: 0 },
-            scales: { 
-                x: { display: true, grid: { display: false }, ticks: { display: false } },
-                y: { display: true, position: 'right', min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { display: false } }
-            }
-        }
-    });
-}
-
+// Spustenie analýzy okamžite po načítaní okna
 window.addEventListener('DOMContentLoaded', analyze);
 </script>
 </body>
