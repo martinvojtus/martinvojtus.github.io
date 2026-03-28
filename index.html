@@ -12,12 +12,6 @@
 
 <div class="w-full max-w-xl p-5 space-y-4">
 
-    <header class="w-full mb-2">
-        <h1 class="text-3xl font-extrabold tracking-tighter text-white flex items-center gap-1">
-            V<span class="text-[#F7931A]">₿</span><span class="text-[#22c55e]">$</span>X
-        </h1>
-    </header>
-
     <div id="spinner" class="text-center text-[#F7931A] font-bold mt-20 h-6 text-xs tracking-widest uppercase">CALCULATING V₿$X CYCLES...</div>
     <div id="error-box" class="hidden bg-red-900/20 border border-red-900 p-4 rounded-xl text-red-500 font-bold text-center mt-10 text-xs"></div>
 
@@ -41,7 +35,7 @@ const loadingMsgs = [
     "GENERATING STRATEGY..."
 ];
 
-// 1. Zameriavač s dynamickým textom a dátumom
+// 1. Zameriavač (Len vertikálna čiara a zmenšená medzera pre dátum)
 const crosshairPlugin = {
   id: 'crosshair',
   afterDraw: chart => {
@@ -49,36 +43,32 @@ const crosshairPlugin = {
     if (activeElements.length > 0) {
       let activePoint = activeElements[0];
       let x = activePoint.element.x;
-      let y = activePoint.element.y;
       let yAxis = chart.scales.y;
       let xAxis = chart.scales.x;
       let ctx = chart.ctx;
       
       ctx.save();
       
-      // Vykreslenie kríža
+      // Iba Vertikálna čiara
       ctx.beginPath();
       ctx.moveTo(x, yAxis.top); ctx.lineTo(x, yAxis.bottom);
       ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(xAxis.left, y); ctx.lineTo(xAxis.right, y);
-      ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.stroke();
 
-      // Štítok X (Dátum - umiestnený do padingu dole)
+      // Štítok X (Dátum - zmenšená výška)
       let xLabel = chart.data.labels[activePoint.index];
       if (xLabel) {
           ctx.fillStyle = '#171717'; ctx.font = 'bold 9px sans-serif';
           let textWidth = ctx.measureText(xLabel).width;
-          let boxY = yAxis.bottom + 4; // Kreslí do prázdneho miesta
-          let boxX = x - (textWidth + 16)/2;
+          let boxY = yAxis.bottom + 2; // Tesne pod osou
+          let boxX = x - (textWidth + 12)/2;
           
           if (boxX < xAxis.left) boxX = xAxis.left;
-          if (boxX + textWidth + 16 > xAxis.right) boxX = xAxis.right - textWidth - 16;
+          if (boxX + textWidth + 12 > xAxis.right) boxX = xAxis.right - textWidth - 12;
           
-          ctx.fillRect(boxX, boxY, textWidth + 16, 18);
-          ctx.strokeStyle = '#525252'; ctx.strokeRect(boxX, boxY, textWidth + 16, 18);
+          ctx.fillRect(boxX, boxY, textWidth + 12, 14);
+          ctx.strokeStyle = '#525252'; ctx.strokeRect(boxX, boxY, textWidth + 12, 14);
           ctx.fillStyle = '#a3a3a3'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.fillText(xLabel, boxX + (textWidth + 16)/2, boxY + 9);
+          ctx.fillText(xLabel, boxX + (textWidth + 12)/2, boxY + 7);
       }
 
       // Aktualizácia percenta v pravej hornej časti
@@ -94,7 +84,7 @@ const crosshairPlugin = {
   }
 };
 
-// 2. Efekty: Gulička na konci a prechod do stratena
+// 2. Efekty: Už len gulička na konci (odstránený fade-in efekt)
 const visualsPlugin = {
     id: 'visualsPlugin',
     afterDatasetsDraw: chart => {
@@ -112,18 +102,6 @@ const visualsPlugin = {
         ctx.arc(lastPoint.x, lastPoint.y, 4, 0, 2 * Math.PI);
         ctx.fillStyle = dotColor;
         ctx.fill();
-        ctx.restore();
-    },
-    afterDraw: chart => {
-        const ctx = chart.ctx;
-        const chartArea = chart.chartArea;
-        // Fade maska na lavej strane grafu (do čiernej)
-        ctx.save();
-        const fadeGrad = ctx.createLinearGradient(chartArea.left, 0, chartArea.left + 50, 0);
-        fadeGrad.addColorStop(0, 'rgba(0,0,0,1)');
-        fadeGrad.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = fadeGrad;
-        ctx.fillRect(chartArea.left, chartArea.top, 50, chartArea.bottom - chartArea.top);
         ctx.restore();
     }
 };
@@ -198,9 +176,9 @@ async function analyze() {
     }
 
     let finalHTML = `
-      <div class="relative w-full">
+      <div class="relative w-full mb-8">
           <div class="flex justify-between items-center px-1 mb-3 text-[10px] font-bold uppercase tracking-widest">
-              <div class="text-[#F7931A]">V₿$X Cycle Score</div>
+              <div class="text-[#F7931A]">CYCLE SCORE</div>
               <div id="dynamic-score" class="${scoreTextColor} font-black transition-colors duration-150">${score}%</div>
           </div>
           <div class="h-[180px] w-full relative">
@@ -260,8 +238,8 @@ async function analyze() {
         const commonOptions = {
             responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            // Vyhradený priestor pre dátum (bottom: 25) bez zbytočných orezávajúcich okrajov
-            layout: { padding: { left: 0, right: 0, top: 5, bottom: 25 } },
+            // Zmenšený padding bottom na 16 pre minimalizovanie medzery
+            layout: { padding: { left: 0, right: 0, top: 5, bottom: 16 } },
             interaction: { mode: 'index', intersect: false }
         };
 
@@ -276,35 +254,21 @@ async function analyze() {
                 labels: chartDates,
                 datasets: [{ 
                     data: chartScore, 
-                    fill: true, 
+                    fill: false, // Odstránená plošná výplň pod krivkou
                     borderWidth: 1.5, 
                     tension: 0.6, 
                     pointRadius: 0,
-                    // Plynulý gradient, ktorý sa vypočíta presne podľa výšky okna grafu
                     borderColor: function(context) {
                         const chart = context.chart;
                         const {ctx, chartArea} = chart;
                         if (!chartArea) return;
                         const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                        gradient.addColorStop(0, '#22c55e'); // 0-20 zelená
+                        gradient.addColorStop(0, '#22c55e'); 
                         gradient.addColorStop(0.20, '#22c55e'); 
-                        gradient.addColorStop(0.35, '#F7931A'); // Plynulý prechod
+                        gradient.addColorStop(0.35, '#F7931A'); 
                         gradient.addColorStop(0.74, '#F7931A'); 
-                        gradient.addColorStop(0.85, '#ef4444'); // Plynulý prechod
+                        gradient.addColorStop(0.85, '#ef4444'); 
                         gradient.addColorStop(1, '#ef4444'); 
-                        return gradient;
-                    },
-                    backgroundColor: function(context) {
-                        const chart = context.chart;
-                        const {ctx, chartArea} = chart;
-                        if (!chartArea) return;
-                        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                        gradient.addColorStop(0, 'rgba(34, 197, 94, 0.15)');
-                        gradient.addColorStop(0.20, 'rgba(34, 197, 94, 0.1)');
-                        gradient.addColorStop(0.35, 'rgba(247, 147, 26, 0.05)');
-                        gradient.addColorStop(0.74, 'rgba(247, 147, 26, 0.05)');
-                        gradient.addColorStop(0.85, 'rgba(239, 68, 68, 0.1)');
-                        gradient.addColorStop(1, 'rgba(239, 68, 68, 0.15)');
                         return gradient;
                     }
                 }]
