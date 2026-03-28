@@ -42,7 +42,6 @@ const loadingMsgs = [
     "GENERATING STRATEGY..."
 ];
 
-// 1. Zameriavač 
 const crosshairPlugin = {
   id: 'crosshair',
   afterDraw: chart => {
@@ -63,7 +62,6 @@ const crosshairPlugin = {
       let xLabel = chart.data.labels[activePoint.index];
       if (xLabel) {
           ctx.fillStyle = '#171717'; 
-          // Základná hrúbka fontu pre zameriavač
           ctx.font = 'normal 9.6px sans-serif'; 
           let textWidth = ctx.measureText(xLabel).width;
           let boxY = yAxis.bottom + 4; 
@@ -83,7 +81,6 @@ const crosshairPlugin = {
       let titleDiv = document.getElementById('dynamic-title');
       
       if (scoreDiv) {
-          // Color update to Neon Pink/Neon Yellow
           let scoreHex = val <= 20 ? "#22c55e" : (val >= 80 ? "#EC4899" : "#FFFF00");
           scoreDiv.innerText = val.toFixed(1) + '%';
           scoreDiv.style.color = scoreHex;
@@ -95,7 +92,6 @@ const crosshairPlugin = {
   }
 };
 
-// 2. Efekty: Gulička na konci
 const visualsPlugin = {
     id: 'visualsPlugin',
     afterDatasetsDraw: chart => {
@@ -105,7 +101,6 @@ const visualsPlugin = {
         
         const lastPoint = meta.data[meta.data.length - 1];
         const val = chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1];
-        // Color update to Neon Pink/Neon Yellow
         let dotColor = val <= 20 ? '#22c55e' : (val >= 80 ? '#EC4899' : '#FFFF00');
         
         ctx.save();
@@ -165,12 +160,10 @@ async function analyze() {
     if(data.error) throw new Error(data.error);
 
     const sign = data.change > 0 ? "+" : "";
-    // Price change to Neon Pink text
     const colorClass = data.change > 0 ? "text-[#22c55e]" : (data.change < 0 ? "text-pink-500" : "text-neutral-500");
     const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const score = data.cycle_score || 0;
     
-    // Zone colors to Neon Pink/Neon Yellow
     let scoreHex = score <= 20 ? "#22c55e" : (score >= 80 ? "#EC4899" : "#FFFF00");
 
     let dashboardStyle = "bg-neutral-900 border-neutral-800"; 
@@ -233,7 +226,8 @@ async function analyze() {
     output.classList.remove("hidden");
     footer.classList.remove("hidden");
     
-    const limit = -143;
+    // ZMENA: 260 týždňov = presne 5 rokov histórie
+    const limit = -260;
     const chartDates = data.chart_dates.slice(limit);
     const chartScore = data.chart_score.slice(limit);
 
@@ -269,7 +263,6 @@ async function analyze() {
                     borderWidth: 0.75, 
                     tension: 0.6, 
                     pointRadius: 0,
-                    // Chart gradient to Neon Pink/Neon Yellow
                     borderColor: function(context) {
                         const chart = context.chart;
                         const {ctx, chartArea} = chart;
@@ -295,7 +288,6 @@ async function analyze() {
                         min: 0, 
                         max: 100, 
                         grid: { 
-                            // Grid colors and borderDash update
                             color: function(context) {
                                 let v = context.tick.value;
                                 let op = 0.1; 
@@ -304,17 +296,15 @@ async function analyze() {
                                 else if (v === 20 || v === 80) op = 0.2; 
 
                                 if (v <= 20) return `rgba(34, 197, 94, ${op})`;     
-                                if (v < 80) return `rgba(255, 255, 0, ${op})`;     // Neon Yellow RGBA
-                                return `rgba(236, 72, 153, ${op})`;                  // Neon Pink RGBA
+                                if (v < 80) return `rgba(255, 255, 0, ${op})`;     
+                                return `rgba(236, 72, 153, ${op})`;                  
                             }, 
                             drawBorder: false, 
                             tickLength: 0,
-                            // Definovanie čiarkovanej mriežky (Dashed grid lines)
                             borderDash: [4, 4]
                         },
                         border: {
                             display: false,
-                            // Also dashed for borders
                             dash: [4, 4]
                         },
                         ticks: { display: false, stepSize: 10 } 
