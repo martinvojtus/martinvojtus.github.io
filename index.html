@@ -17,14 +17,14 @@
 
     <div id="spinner" class="flex flex-col items-center justify-center mt-32 space-y-4">
         <div class="w-8 h-8 border-4 border-[#F7931A]/20 border-t-[#F7931A] rounded-full animate-spin"></div>
-        <div id="loading-text" class="text-center text-[#F7931A] text-[10px] font-bold tracking-widest uppercase">ANALYZING MACRO CYCLES...</div>
+        <div id="loading-text" class="text-center text-[#F7931A] text-xs font-bold tracking-widest uppercase">ANALYZING MACRO CYCLES...</div>
     </div>
 
-    <div id="error-box" class="hidden bg-red-900/20 border border-red-900 p-4 rounded-xl text-red-500 text-[10px] font-bold tracking-widest uppercase text-center mt-10"></div>
+    <div id="error-box" class="hidden bg-red-900/20 border border-red-900 p-4 rounded-xl text-red-500 text-xs font-bold tracking-widest uppercase text-center mt-10"></div>
 
     <div id="output" class="hidden flex flex-col gap-6 pt-1"></div>
 
-    <footer id="footer" class="hidden text-center text-[10px] text-neutral-500 font-bold mt-12 tracking-[0.25em] uppercase">
+    <footer id="footer" class="hidden text-center text-xs text-neutral-500 font-bold mt-12 tracking-widest uppercase">
         MARTIN VOJTUŠ &copy; 2026 &bull; BUILD V1.0.0
     </footer>
 
@@ -42,7 +42,7 @@ const loadingMsgs = [
     "GENERATING STRATEGY..."
 ];
 
-// 1. Zameriavač
+// 1. Zameriavač (Prispôsobený na väčší základný font)
 const crosshairPlugin = {
   id: 'crosshair',
   afterDraw: chart => {
@@ -62,18 +62,19 @@ const crosshairPlugin = {
 
       let xLabel = chart.data.labels[activePoint.index];
       if (xLabel) {
-          ctx.fillStyle = '#171717'; ctx.font = 'bold 9px sans-serif';
+          ctx.fillStyle = '#171717'; 
+          ctx.font = 'bold 12px sans-serif'; // Zjednotené s Tailwind text-xs (12px)
           let textWidth = ctx.measureText(xLabel).width;
-          let boxY = yAxis.bottom - 18; 
-          let boxX = x - (textWidth + 12)/2;
+          let boxY = yAxis.bottom - 20; // Vtlačené dovnútra
+          let boxX = x - (textWidth + 16)/2;
           
           if (boxX < xAxis.left) boxX = xAxis.left;
-          if (boxX + textWidth + 12 > xAxis.right) boxX = xAxis.right - textWidth - 12;
+          if (boxX + textWidth + 16 > xAxis.right) boxX = xAxis.right - textWidth - 16;
           
-          ctx.fillRect(boxX, boxY, textWidth + 12, 16);
-          ctx.strokeStyle = '#525252'; ctx.strokeRect(boxX, boxY, textWidth + 12, 16);
+          ctx.fillRect(boxX, boxY, textWidth + 16, 20);
+          ctx.strokeStyle = '#525252'; ctx.strokeRect(boxX, boxY, textWidth + 16, 20);
           ctx.fillStyle = '#a3a3a3'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.fillText(xLabel, boxX + (textWidth + 12)/2, boxY + 8);
+          ctx.fillText(xLabel, boxX + (textWidth + 16)/2, boxY + 10);
       }
 
       let val = activePoint.element.$context.parsed.y;
@@ -160,10 +161,9 @@ async function analyze() {
 
     if(data.error) throw new Error(data.error);
 
-    const colorClass = data.change > 0 ? "text-[#22c55e]" : (data.change < 0 ? "text-red-500" : "text-neutral-500");
     const sign = data.change > 0 ? "+" : "";
+    const colorClass = data.change > 0 ? "text-[#22c55e]" : (data.change < 0 ? "text-red-500" : "text-neutral-500");
     const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
     const score = data.cycle_score || 0;
     
     let scoreHex = score <= 20 ? "#22c55e" : (score >= 75 ? "#ef4444" : "#F7931A");
@@ -196,32 +196,32 @@ async function analyze() {
 
     let finalHTML = `
       <div class="relative w-full mb-2">
-          <div class="flex justify-between items-center px-1 mb-3 text-[10px] font-bold uppercase tracking-widest">
+          <div class="flex justify-between items-center px-1 mb-3 text-xs font-bold uppercase tracking-widest">
               <div id="dynamic-title" style="color: ${scoreHex}" class="transition-colors duration-150">CYCLE SCORE</div>
               <div id="dynamic-score" style="color: ${scoreHex}" class="transition-colors duration-150">${score}%</div>
           </div>
-          <div class="h-[180px] w-full relative">
+          <div class="h-44 w-full relative">
               <canvas id="scoreChart"></canvas>
           </div>
       </div>
 
       <div class="p-6 rounded-3xl ${dashboardStyle}">
           
-        <div class="flex justify-between items-center mb-6 text-[10px] font-bold uppercase tracking-widest">
+        <div class="flex justify-between items-center mb-6 text-xs font-bold uppercase tracking-widest">
             <div class="text-neutral-500">${data.name} (${data.ticker})</div>
             <div class="${phaseBadgeColor} px-3 py-1.5 rounded-md">${data.phase}</div>
         </div>
         
         <div class="flex justify-between items-start mb-8 gap-4">
             <div>
-                <div class="text-2xl sm:text-3xl font-bold tracking-tight text-white">$${formattedPrice}</div>
-                <div class="${colorClass} text-[10px] font-bold uppercase tracking-widest mt-2 flex items-center gap-1.5">
+                <div class="text-3xl font-bold tracking-tight text-white">$${formattedPrice}</div>
+                <div class="${colorClass} text-xs font-bold uppercase tracking-widest mt-2 flex items-center gap-1.5">
                     ${sign}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded">24H</span>
                 </div>
             </div>
             <div class="text-right">
-                <div class="text-2xl sm:text-3xl font-bold" style="color: ${scoreHex}">${score}%</div>
-                <div class="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mt-2">SCORE</div>
+                <div class="text-3xl font-bold" style="color: ${scoreHex}">${score}%</div>
+                <div class="text-xs text-neutral-500 font-bold uppercase tracking-widest mt-2">SCORE</div>
             </div>
         </div>
         
@@ -229,7 +229,7 @@ async function analyze() {
             <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-5">
                 <div class="h-full transition-all duration-1000 ease-out" style="width: ${score}%; background-color: ${scoreHex}"></div>
             </div>
-            <div class="flex flex-col gap-3 text-[10px] text-neutral-400 font-bold uppercase tracking-widest px-1">
+            <div class="flex flex-col gap-3 text-xs text-neutral-400 font-bold uppercase tracking-widest px-1">
                 <div class="flex items-center gap-2.5"><div class="w-2 h-2 rounded-full bg-[#22c55e] shrink-0"></div><span class="text-white">0% - 20%</span> &bull; VALUE ZONE (DCA IN)</div>
                 <div class="flex items-center gap-2.5"><div class="w-2 h-2 rounded-full bg-[#F7931A] shrink-0"></div><span class="text-white">21% - 74%</span> &bull; NEUTRAL ZONE (HODL)</div>
                 <div class="flex items-center gap-2.5"><div class="w-2 h-2 rounded-full bg-[#ef4444] shrink-0"></div><span class="text-white">75% - 100%</span> &bull; EXIT ZONE (DCA OUT)</div>
@@ -238,8 +238,8 @@ async function analyze() {
       </div>
 
       <div class="p-6 rounded-3xl border transition-all duration-500 ${boxStyle}">
-        <h2 class="${titleStyle} text-[10px] font-bold mb-4 uppercase tracking-widest">VERDICT & STRATEGY</h2>
-        <div class="space-y-3 text-[10px] leading-loose text-neutral-300">${formattedContent}</div>
+        <h2 class="${titleStyle} text-xs font-bold mb-4 uppercase tracking-widest">VERDICT & STRATEGY</h2>
+        <div class="space-y-3 text-xs leading-loose text-neutral-300">${formattedContent}</div>
       </div>
     `;
 
@@ -254,6 +254,7 @@ async function analyze() {
     if (chartDates.length > 0 && chartScore.length > 0) {
         Chart.defaults.color = '#525252'; 
         Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.font.size = 12; // Update Chart JS defaults k Tailwind text-xs
         
         const commonOptions = {
             responsive: true, maintainAspectRatio: false,
