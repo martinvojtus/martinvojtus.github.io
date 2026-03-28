@@ -17,14 +17,14 @@
 
     <div id="spinner" class="flex flex-col items-center justify-center mt-32 space-y-4">
         <div class="w-8 h-8 border-4 border-[#F7931A]/20 border-t-[#F7931A] rounded-full animate-spin"></div>
-        <div id="loading-text" class="text-center text-[#F7931A] font-bold text-xs tracking-widest uppercase">ANALYZING MACRO CYCLES...</div>
+        <div id="loading-text" class="text-center text-[#F7931A] text-[10px] font-bold tracking-widest uppercase">ANALYZING MACRO CYCLES...</div>
     </div>
 
-    <div id="error-box" class="hidden bg-red-900/20 border border-red-900 p-4 rounded-xl text-red-500 font-bold text-center mt-10 text-xs"></div>
+    <div id="error-box" class="hidden bg-red-900/20 border border-red-900 p-4 rounded-xl text-red-500 text-[10px] font-bold uppercase tracking-widest text-center mt-10"></div>
 
     <div id="output" class="hidden flex flex-col gap-6 pt-1"></div>
 
-    <footer id="footer" class="hidden text-center text-[9px] text-neutral-500 font-bold mt-12 tracking-[0.25em] whitespace-nowrap uppercase">
+    <footer id="footer" class="hidden text-center text-[10px] text-neutral-500 font-bold mt-12 tracking-widest uppercase">
         MARTIN VOJTUŠ &copy; 2026 &bull; BUILD V1.0.0
     </footer>
 
@@ -56,12 +56,10 @@ const crosshairPlugin = {
       
       ctx.save();
       
-      // Iba Vertikálna čiara
       ctx.beginPath();
       ctx.moveTo(x, yAxis.top); ctx.lineTo(x, yAxis.bottom);
       ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.stroke();
 
-      // Štítok X (Dátum - vtlačený priamo do grafu tesne nad osou)
       let xLabel = chart.data.labels[activePoint.index];
       if (xLabel) {
           ctx.fillStyle = '#171717'; ctx.font = 'bold 9px sans-serif';
@@ -78,13 +76,11 @@ const crosshairPlugin = {
           ctx.fillText(xLabel, boxX + (textWidth + 12)/2, boxY + 8);
       }
 
-      // Aktualizácia percenta v pravej hornej časti (Green, Orange, or Red)
       let val = activePoint.element.$context.parsed.y;
       let scoreDiv = document.getElementById('dynamic-score');
       let titleDiv = document.getElementById('dynamic-title');
       
       if (scoreDiv) {
-          // Color logic: Green, Orange, or separate Red Exit
           let scoreHex = val <= 20 ? "#22c55e" : (val >= 75 ? "#ef4444" : "#F7931A");
           scoreDiv.innerText = val.toFixed(1) + '%';
           scoreDiv.style.color = scoreHex;
@@ -106,7 +102,6 @@ const visualsPlugin = {
         
         const lastPoint = meta.data[meta.data.length - 1];
         const val = chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1];
-        // Dot Color: Green, Orange, or Red Exit
         let dotColor = val <= 20 ? '#22c55e' : (val >= 75 ? '#ef4444' : '#F7931A');
         
         ctx.save();
@@ -171,28 +166,28 @@ async function analyze() {
 
     const score = data.cycle_score || 0;
     
-    // Farby: Green Value, Orange Neutral, separate Red Exit
+    // Farby: Green Value, Orange Neutral, Red Exit
     let scoreHex = score <= 20 ? "#22c55e" : (score >= 75 ? "#ef4444" : "#F7931A");
 
-    // Dashboard with separate Red tint logic (no glow)
-    let dashboardStyle = "border bg-neutral-900"; // default
-    if (score <= 20) dashboardStyle = "bg-[#030a05] border border-[#22c55e]/30"; // green
-    else if (score >= 75) dashboardStyle = "bg-[#ef4444]/5 border border-[#ef4444]/30"; // red exit
-    else dashboardStyle = "bg-[#F7931A]/5 border border-[#F7931A]/30"; // orange hodl
+    // Dashboard s jemným zafarbením pozadia a rámiku
+    let dashboardStyle = "bg-neutral-900 border-neutral-800"; 
+    if (score <= 20) dashboardStyle = "bg-[#030a05] border border-[#22c55e]/30"; 
+    else if (score >= 75) dashboardStyle = "bg-[#ef4444]/5 border border-[#ef4444]/30"; 
+    else dashboardStyle = "bg-[#F7931A]/5 border border-[#F7931A]/30"; 
     
-    let phaseBadgeColor = "text-white border border-white/20"; // default
-    if (score <= 20) phaseBadgeColor = "bg-[#030a05] text-[#22c55e] border border-[#22c55e]/50"; // green
-    else if (score >= 75) phaseBadgeColor = "bg-[#ef4444]/10 text-[#ef4444] border border-[#ef4444]/50"; // red exit
-    else phaseBadgeColor = "bg-[#F7931A]/10 text-[#F7931A] border border-[#F7931A]/50"; // orange hodl
+    let phaseBadgeColor = "text-white border border-white/20"; 
+    if (score <= 20) phaseBadgeColor = "bg-[#030a05] text-[#22c55e] border border-[#22c55e]/50"; 
+    else if (score >= 75) phaseBadgeColor = "bg-[#ef4444]/10 text-[#ef4444] border border-[#ef4444]/50"; 
+    else phaseBadgeColor = "bg-[#F7931A]/10 text-[#F7931A] border border-[#F7931A]/50"; 
 
     window.currentScoreData = { score: score, rawColor: scoreHex };
 
-    // Verdict English summaries
+    // Verdict
     let formattedContent = data.analysis
         .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
         .replace(/\n/g, '<br>');
 
-    // Verdict Box with Red Exit logic (no glow)
+    // Verdict Box
     let boxStyle = "bg-neutral-900 border-neutral-800";
     let titleStyle = "text-white"; 
     if (score <= 20) {
@@ -215,39 +210,40 @@ async function analyze() {
       </div>
 
       <div class="p-6 rounded-3xl ${dashboardStyle}">
-        <div class="flex justify-between items-center mb-6">
-            <div class="text-neutral-500 text-[10px] font-bold uppercase tracking-[0.15em]">${data.name} (${data.ticker})</div>
-            <div class="${phaseBadgeColor} text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-md uppercase tracking-wide">${data.phase}</div>
+          
+        <div class="flex justify-between items-center mb-6 text-[10px] font-bold uppercase tracking-widest">
+            <div class="text-neutral-500">${data.name} (${data.ticker})</div>
+            <div class="${phaseBadgeColor} px-3 py-1.5 rounded-md">${data.phase}</div>
         </div>
         
         <div class="flex justify-between items-start mb-8 gap-4">
             <div>
-                <div class="text-3xl sm:text-4xl font-bold tracking-tight text-white">$${formattedPrice}</div>
-                <div class="${colorClass} text-sm font-semibold mt-1 flex items-center gap-1">
-                    ${sign}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wider ml-1">24H</span>
+                <div class="text-4xl font-bold tracking-tight text-white">$${formattedPrice}</div>
+                <div class="${colorClass} text-[10px] font-bold uppercase tracking-widest mt-2 flex items-center gap-1.5">
+                    ${sign}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded">24H</span>
                 </div>
             </div>
             <div class="text-right">
-                <div class="text-3xl sm:text-4xl font-bold" style="color: ${scoreHex}">${score}%</div>
-                <div class="text-[10px] text-neutral-500 uppercase font-bold tracking-widest mt-1">SCORE</div>
+                <div class="text-4xl font-bold" style="color: ${scoreHex}">${score}%</div>
+                <div class="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mt-2">SCORE</div>
             </div>
         </div>
         
         <div>
-            <div class="w-full bg-neutral-800 h-2 rounded-full overflow-hidden mb-4">
+            <div class="w-full bg-neutral-800 h-2 rounded-full overflow-hidden mb-5">
                 <div class="h-full transition-all duration-1000 ease-out" style="width: ${score}%; background-color: ${scoreHex}"></div>
             </div>
-            <div class="flex flex-col gap-2.5 text-[10px] sm:text-xs text-neutral-400 font-semibold tracking-wider px-1">
-                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#22c55e] shrink-0"></div><span class="text-white">0% - 20%</span> &bull; VALUE ZONE (DCA IN)</div>
-                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#F7931A] shrink-0"></div><span class="text-white">21% - 74%</span> &bull; NEUTRAL ZONE (HODL)</div>
-                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#ef4444] shrink-0"></div><span class="text-white">75% - 100%</span> &bull; EXIT ZONE (DCA OUT)</div>
+            <div class="flex flex-col gap-3 text-[10px] text-neutral-400 font-bold uppercase tracking-widest px-1">
+                <div class="flex items-center gap-2.5"><div class="w-2 h-2 rounded-full bg-[#22c55e] shrink-0"></div><span class="text-white">0% - 20%</span> &bull; VALUE ZONE (DCA IN)</div>
+                <div class="flex items-center gap-2.5"><div class="w-2 h-2 rounded-full bg-[#F7931A] shrink-0"></div><span class="text-white">21% - 74%</span> &bull; NEUTRAL ZONE (HODL)</div>
+                <div class="flex items-center gap-2.5"><div class="w-2 h-2 rounded-full bg-[#ef4444] shrink-0"></div><span class="text-white">75% - 100%</span> &bull; EXIT ZONE (DCA OUT)</div>
             </div>
         </div>
       </div>
 
       <div class="p-6 rounded-3xl border transition-all duration-500 ${boxStyle}">
-        <h2 class="${titleStyle} text-xs font-bold mb-4 uppercase tracking-[0.15em]">VERDICT & STRATEGY</h2>
-        <div class="space-y-2 text-sm leading-relaxed text-neutral-300">${formattedContent}</div>
+        <h2 class="${titleStyle} text-[10px] font-bold mb-4 uppercase tracking-widest">VERDICT & STRATEGY</h2>
+        <div class="space-y-3 text-xs leading-relaxed text-neutral-300">${formattedContent}</div>
       </div>
     `;
 
@@ -255,7 +251,6 @@ async function analyze() {
     output.classList.remove("hidden");
     footer.classList.remove("hidden");
     
-    // LIMIT DÁT NA POSLEDNÝCH 1000 DNÍ
     const limit = -143;
     const chartDates = data.chart_dates.slice(limit);
     const chartScore = data.chart_score.slice(limit);
@@ -283,22 +278,20 @@ async function analyze() {
                 datasets: [{ 
                     data: chartScore, 
                     fill: false,
-                    // ZMENA: Extrémne tenká čiara
                     borderWidth: 0.75, 
                     tension: 0.6, 
                     pointRadius: 0,
-                    // Plynulý gradient (Zelená -> Oranžová -> Červená Exit)
                     borderColor: function(context) {
                         const chart = context.chart;
                         const {ctx, chartArea} = chart;
                         if (!chartArea) return;
                         const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
                         gradient.addColorStop(0, '#22c55e'); 
-                        gradient.addColorStop(0.20, '#22c55e'); // Green bot
-                        gradient.addColorStop(0.40, '#F7931A'); // Orange Neutral
+                        gradient.addColorStop(0.20, '#22c55e'); 
+                        gradient.addColorStop(0.40, '#F7931A'); 
                         gradient.addColorStop(0.70, '#F7931A'); 
-                        gradient.addColorStop(0.85, '#ef4444'); // Red Exit start
-                        gradient.addColorStop(1, '#ef4444');    // Red Exit top
+                        gradient.addColorStop(0.85, '#ef4444'); 
+                        gradient.addColorStop(1, '#ef4444');    
                         return gradient;
                     }
                 }]
