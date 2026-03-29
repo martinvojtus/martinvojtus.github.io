@@ -124,8 +124,38 @@ const visualsPlugin = {
     }
 };
 
-// ZMENA: Fade-in plugin odstránený
-Chart.register(crosshairPlugin, visualsPlugin);
+// ZMENA: Nový plugin pre označenie historického začiatku na ľavej strane (zvislá čiara/tick)
+const historicalStartPlugin = {
+    id: 'historicalStart',
+    afterDatasetsDraw: chart => {
+        const ctx = chart.ctx;
+        const meta = chart.getDatasetMeta(0);
+        
+        // Nájdeme prvý platný bod histórie naľavo (nesmie to byť prázdny label, ale prvý bod)
+        if (!meta.data || meta.data.length === 0 || chart.data.labels[0] === "") return;
+        
+        const firstValidPoint = meta.data[0];
+        const val = chart.data.datasets[0].data[0];
+        
+        if (val === undefined) return;
+        
+        let startColor = val <= 20 ? '#22c55e' : (val >= 80 ? '#EC4899' : '#FFFF00');
+        
+        ctx.save();
+        ctx.beginPath();
+        // Vykreslíme malú zvislú čiaru (tick mark) na prvý historický bod
+        const tickHeight = 10;
+        ctx.moveTo(firstValidPoint.x, firstValidPoint.y - tickHeight/2);
+        ctx.lineTo(firstValidPoint.x, firstValidPoint.y + tickHeight/2);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = startColor;
+        ctx.stroke();
+        ctx.restore();
+    }
+};
+
+// ZMENA: Registrácia nového start pluginu
+Chart.register(crosshairPlugin, visualsPlugin, historicalStartPlugin);
 
 function hideTooltips() {
     if (scoreChartInstance) { 
@@ -239,12 +269,17 @@ async function analyze() {
     output.classList.remove("hidden");
     footer.classList.remove("hidden");
     
+    // ZMENA: Dáta zostávajú rovnaké, ale zobrazovanie orežeme
     const limit = -260;
-    let chartDates = data.chart_dates.slice(limit);
-    const chartScore = data.chart_score.slice(limit);
+    let chartDatesRaw = data.chart_dates.slice(limit);
+    let chartScoreRaw = data.chart_score.slice(limit);
 
-    // ZMENA: Zvýšené na 20 prázdnych týždňov pre ešte väčší priestor napravo
-    for (let i = 0; i < 20; i++) {
+    // ZMENA: Schováme (orežeme) prvých 24 týždňov poolu zľava
+    let chartDates = chartDatesRaw.slice(24);
+    let chartScore = chartScoreRaw.slice(24);
+
+    // ZMENA: Navýšené na 24 prázdnych týždňov pre ešte väčší priestor napravo
+    for (let i = 0; i < 24; i++) {
         chartDates.push("");
     }
 
