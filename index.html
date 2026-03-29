@@ -117,6 +117,7 @@ const visualsPlugin = {
         
         ctx.save();
         ctx.beginPath();
+        // Polomer je tu natvrdo 4 pixely
         ctx.arc(lastValidPoint.x, lastValidPoint.y, 4, 0, 2 * Math.PI);
         ctx.fillStyle = dotColor;
         ctx.fill();
@@ -124,58 +125,8 @@ const visualsPlugin = {
     }
 };
 
-const lineFadePlugin = {
-    id: 'lineFadePlugin',
-    afterDatasetsDraw: chart => {
-        const {ctx, chartArea} = chart;
-        if (!chartArea) return;
-        
-        // ZMENA: Fade in presne na 10%
-        const fadeWidth = chartArea.width * 0.10; 
-        
-        const gradient = ctx.createLinearGradient(chartArea.left, 0, chartArea.left + fadeWidth, 0);
-        gradient.addColorStop(0, 'rgba(0,0,0,1)'); // Plná čierna
-        gradient.addColorStop(1, 'rgba(0,0,0,0)'); // Stratí sa do priehľadna
-        
-        ctx.save();
-        ctx.fillStyle = gradient;
-        ctx.fillRect(chartArea.left, chartArea.top, fadeWidth, chartArea.bottom - chartArea.top);
-        ctx.restore();
-    }
-};
-
-// ZMENA: Úplne nový plugin, ktorý kreslí Grid na celú šírku okna, nezávisle od krivky
-const fullGridPlugin = {
-    id: 'fullGrid',
-    afterDatasetsDraw: chart => {
-        const {ctx, scales: {y}, width} = chart;
-        ctx.save();
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 4]);
-        
-        y.ticks.forEach(tick => {
-            const v = tick.value;
-            const yPos = y.getPixelForValue(v);
-            
-            let op = 0.1; 
-            if (v === 0 || v === 100) op = 0.05; 
-            else if (v === 20 || v === 80) op = 0.5; // Zvýraznené hraničné čiary
-
-            if (v <= 20) ctx.strokeStyle = `rgba(34, 197, 94, ${op})`;     
-            else if (v < 80) ctx.strokeStyle = `rgba(255, 255, 0, ${op})`;     
-            else ctx.strokeStyle = `rgba(236, 72, 153, ${op})`;                  
-
-            ctx.beginPath();
-            ctx.moveTo(0, yPos); // Začína úplne na ľavom okraji plátna
-            ctx.lineTo(width, yPos); // Končí úplne na pravom okraji plátna
-            ctx.stroke();
-        });
-        ctx.restore();
-    }
-};
-
-// ZMENA: fullGridPlugin sa načíta ako posledný z Dataset vrstvy, takže prekryje krivku aj fade-in.
-Chart.register(crosshairPlugin, visualsPlugin, lineFadePlugin, fullGridPlugin);
+// ZMENA: Čistý register len týchto dvoch pluginov. Zvyšok (fade-in, custom grid) je preč.
+Chart.register(crosshairPlugin, visualsPlugin);
 
 function hideTooltips() {
     if (scoreChartInstance) { 
@@ -290,7 +241,7 @@ async function analyze() {
     footer.classList.remove("hidden");
     
     const limit = -260;
-    // ZMENA: Nechávame čisté dáta, žiadne umelé prázdne štítky, pretože zarovnávame matematicky!
+    // ZMENA: Dáta zostávajú čisté, bez akýchkoľvek umelých prázdnych týždňov
     let chartDates = data.chart_dates.slice(limit);
     const chartScore = data.chart_score.slice(limit);
 
@@ -302,8 +253,8 @@ async function analyze() {
         const commonOptions = {
             responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            // ZMENA: PIXEL PERFECT PADDING. Týchto 24 px je presne odsadenie textu "p-6" v Tailwind karte!
-            layout: { padding: { left: 24, right: 24, top: 5, bottom: 28 } },
+            // ZMENA: Left je 0 (od okraja). Right je 15px (odraz pre guličku).
+            layout: { padding: { left: 0, right: 15, top: 5, bottom: 28 } },
             interaction: { mode: 'index', intersect: false }
         };
 
@@ -351,10 +302,28 @@ async function analyze() {
                         position: 'right', 
                         min: 0, 
                         max: 100, 
-                        // ZMENA: Vypol som originálny grid, lebo používame náš vlastný zľava doprava
-                        grid: { display: false },
-                        border: { display: false },
-                        // Musíme nechať ticks, aby náš vlastný grid vedel, kde má kresliť čiary
+                        // ZMENA: Vrátený natívny grid, s hodnotou z:1 aby presvital cez krivku
+                        grid: { 
+                            z: 1,
+                            color: function(context) {
+                                let v = context.tick.value;
+                                let op = 0.1; 
+                                
+                                if (v === 0 || v === 100) op = 0.05; 
+                                else if (v === 20 || v === 80) op = 0.5; // Zvýraznené 20/80
+
+                                if (v <= 20) return `rgba(34, 197, 94, ${op})`;     
+                                if (v < 80) return `rgba(255, 255, 0, ${op})`;     
+                                return `rgba(236, 72, 153, ${op})`;                  
+                            }, 
+                            drawBorder: false, 
+                            tickLength: 0,
+                            borderDash: [4, 4]
+                        },
+                        border: {
+                            display: false,
+                            dash: [4, 4]
+                        },
                         ticks: { display: false, stepSize: 10 } 
                     } 
                 } 
