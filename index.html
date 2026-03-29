@@ -124,15 +124,14 @@ const visualsPlugin = {
     }
 };
 
-// ZMENA: Vrátený lineFadePlugin s 5% šírkou zľava
+// ZMENA: Fade-in šírka upravená presne na 10%
 const lineFadePlugin = {
     id: 'lineFadePlugin',
     afterDatasetsDraw: chart => {
         const {ctx, chartArea} = chart;
         if (!chartArea) return;
         
-        // Šírka fade-in efektu cca 5%
-        const fadeWidth = chartArea.width * 0.05; 
+        const fadeWidth = chartArea.width * 0.10; 
         
         const gradient = ctx.createLinearGradient(chartArea.left, 0, chartArea.left + fadeWidth, 0);
         gradient.addColorStop(0, 'rgba(0,0,0,1)'); // Plná čierna
@@ -140,13 +139,11 @@ const lineFadePlugin = {
         
         ctx.save();
         ctx.fillStyle = gradient;
-        // Prekryje iba úvodných 5%, grid s `z: 1` sa vykreslí až následne na to
         ctx.fillRect(chartArea.left, chartArea.top, fadeWidth, chartArea.bottom - chartArea.top);
         ctx.restore();
     }
 };
 
-// ZMENA: Registrácia vráteného lineFadePlugin a odstránenie historicalStart
 Chart.register(crosshairPlugin, visualsPlugin, lineFadePlugin);
 
 function hideTooltips() {
@@ -261,15 +258,10 @@ async function analyze() {
     output.classList.remove("hidden");
     footer.classList.remove("hidden");
     
-    // ZMENA: Vrátené späť na všetkých 260 týždňov
     const limit = -260;
+    // ZMENA: Žiadne manuálne dopĺňanie prázdnych týždňov, dáta zostávajú čisté.
     let chartDates = data.chart_dates.slice(limit);
     const chartScore = data.chart_score.slice(limit);
-
-    // Zachované: 24 prázdnych týždňov napravo
-    for (let i = 0; i < 24; i++) {
-        chartDates.push("");
-    }
 
     if (chartDates.length > 0 && chartScore.length > 0) {
         Chart.defaults.color = '#525252'; 
@@ -279,7 +271,9 @@ async function analyze() {
         const commonOptions = {
             responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            layout: { padding: { left: 0, right: 0, top: 5, bottom: 28 } },
+            // ZMENA: Pixel-perfect padding (left: 24px, right: 24px). 
+            // Toto sa presne rovná "p-6" v Tailwind triede tvojho panelu dole!
+            layout: { padding: { left: 24, right: 24, top: 5, bottom: 28 } },
             interaction: { mode: 'index', intersect: false }
         };
 
