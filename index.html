@@ -124,38 +124,30 @@ const visualsPlugin = {
     }
 };
 
-// ZMENA: Nový plugin pre označenie historického začiatku na ľavej strane (zvislá čiara/tick)
-const historicalStartPlugin = {
-    id: 'historicalStart',
+// ZMENA: Vrátený lineFadePlugin s 5% šírkou zľava
+const lineFadePlugin = {
+    id: 'lineFadePlugin',
     afterDatasetsDraw: chart => {
-        const ctx = chart.ctx;
-        const meta = chart.getDatasetMeta(0);
+        const {ctx, chartArea} = chart;
+        if (!chartArea) return;
         
-        // Nájdeme prvý platný bod histórie naľavo (nesmie to byť prázdny label, ale prvý bod)
-        if (!meta.data || meta.data.length === 0 || chart.data.labels[0] === "") return;
+        // Šírka fade-in efektu cca 5%
+        const fadeWidth = chartArea.width * 0.05; 
         
-        const firstValidPoint = meta.data[0];
-        const val = chart.data.datasets[0].data[0];
-        
-        if (val === undefined) return;
-        
-        let startColor = val <= 20 ? '#22c55e' : (val >= 80 ? '#EC4899' : '#FFFF00');
+        const gradient = ctx.createLinearGradient(chartArea.left, 0, chartArea.left + fadeWidth, 0);
+        gradient.addColorStop(0, 'rgba(0,0,0,1)'); // Plná čierna
+        gradient.addColorStop(1, 'rgba(0,0,0,0)'); // Stratí sa do priehľadna
         
         ctx.save();
-        ctx.beginPath();
-        // Vykreslíme malú zvislú čiaru (tick mark) na prvý historický bod
-        const tickHeight = 10;
-        ctx.moveTo(firstValidPoint.x, firstValidPoint.y - tickHeight/2);
-        ctx.lineTo(firstValidPoint.x, firstValidPoint.y + tickHeight/2);
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = startColor;
-        ctx.stroke();
+        ctx.fillStyle = gradient;
+        // Prekryje iba úvodných 5%, grid s `z: 1` sa vykreslí až následne na to
+        ctx.fillRect(chartArea.left, chartArea.top, fadeWidth, chartArea.bottom - chartArea.top);
         ctx.restore();
     }
 };
 
-// ZMENA: Registrácia nového start pluginu
-Chart.register(crosshairPlugin, visualsPlugin, historicalStartPlugin);
+// ZMENA: Registrácia vráteného lineFadePlugin a odstránenie historicalStart
+Chart.register(crosshairPlugin, visualsPlugin, lineFadePlugin);
 
 function hideTooltips() {
     if (scoreChartInstance) { 
@@ -269,16 +261,12 @@ async function analyze() {
     output.classList.remove("hidden");
     footer.classList.remove("hidden");
     
-    // ZMENA: Dáta zostávajú rovnaké, ale zobrazovanie orežeme
+    // ZMENA: Vrátené späť na všetkých 260 týždňov
     const limit = -260;
-    let chartDatesRaw = data.chart_dates.slice(limit);
-    let chartScoreRaw = data.chart_score.slice(limit);
+    let chartDates = data.chart_dates.slice(limit);
+    const chartScore = data.chart_score.slice(limit);
 
-    // ZMENA: Schováme (orežeme) prvých 24 týždňov poolu zľava
-    let chartDates = chartDatesRaw.slice(24);
-    let chartScore = chartScoreRaw.slice(24);
-
-    // ZMENA: Navýšené na 24 prázdnych týždňov pre ešte väčší priestor napravo
+    // Zachované: 24 prázdnych týždňov napravo
     for (let i = 0; i < 24; i++) {
         chartDates.push("");
     }
