@@ -64,7 +64,7 @@ const crosshairPlugin = {
           ctx.fillStyle = '#171717'; 
           ctx.font = 'normal 9.6px sans-serif'; 
           let textWidth = ctx.measureText(xLabel).width;
-          let boxY = yAxis.bottom + 4; 
+          let boxY = yAxis.bottom + 10; // ZMENA: Zvýšené odsadenie z 4 na 10 pre čistý odstup aj pri spodných hodnotách
           let boxX = x - (textWidth + 16)/2;
           
           if (boxX < xAxis.left) boxX = xAxis.left;
@@ -254,7 +254,7 @@ async function analyze() {
                 <div class="h-full transition-all duration-1000 ease-out" style="width: ${score}%; background-color: ${scoreHex}"></div>
             </div>
             
-            <table class="w-full text-left border-collapse text-[0.6rem] text-neutral-400 uppercase tracking-widest">
+            <table class="w-full text-left border-collapse text-[0.6rem] text-neutral-400 uppercase tracking-widest border border-neutral-800/80 rounded-md">
                 <tbody>
                     <tr>
                         <td class="py-2.5 pr-4 border-b border-r border-neutral-800/80 w-10 text-center align-middle">
@@ -355,9 +355,13 @@ async function analyze() {
                 scales: { 
                     x: xAxisConfig, 
                     y: { 
-                        display: false, 
+                        display: true, 
+                        position: 'right', 
                         min: 0, 
-                        max: 100 
+                        max: 100, 
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { display: false, stepSize: 10 } 
                     } 
                 } 
             }
