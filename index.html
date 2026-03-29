@@ -124,29 +124,8 @@ const visualsPlugin = {
     }
 };
 
-// ZMENA: Vlastný plugin pre Fade-in iba na krivku grafu (zmenené z 3% na 50% zľava)
-const lineFadePlugin = {
-    id: 'lineFadePlugin',
-    afterDatasetsDraw: chart => {
-        const {ctx, chartArea} = chart;
-        if (!chartArea) return;
-        
-        // Šírka fade-in efektu presne 50%
-        const fadeWidth = chartArea.width * 0.50; 
-        
-        const gradient = ctx.createLinearGradient(chartArea.left, 0, chartArea.left + fadeWidth, 0);
-        gradient.addColorStop(0, 'rgba(0,0,0,1)'); // Plná čierna
-        gradient.addColorStop(1, 'rgba(0,0,0,0)'); // Stratí sa do priehľadna
-        
-        ctx.save();
-        ctx.fillStyle = gradient;
-        // Prekryje iba úvodných 50%, grid s `z: 1` sa vykreslí až následne na to
-        ctx.fillRect(chartArea.left, chartArea.top, fadeWidth, chartArea.bottom - chartArea.top);
-        ctx.restore();
-    }
-};
-
-Chart.register(crosshairPlugin, visualsPlugin, lineFadePlugin);
+// ZMENA: Fade-in plugin odstránený
+Chart.register(crosshairPlugin, visualsPlugin);
 
 function hideTooltips() {
     if (scoreChartInstance) { 
@@ -264,7 +243,8 @@ async function analyze() {
     let chartDates = data.chart_dates.slice(limit);
     const chartScore = data.chart_score.slice(limit);
 
-    for (let i = 0; i < 16; i++) {
+    // ZMENA: Zvýšené na 20 prázdnych týždňov pre ešte väčší priestor napravo
+    for (let i = 0; i < 20; i++) {
         chartDates.push("");
     }
 
