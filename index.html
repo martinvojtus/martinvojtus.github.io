@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: black; color: white; }
     </style>
 </head>
-<body class="flex justify-center min-h-screen items-start pt-6 pb-10">
+<body class="font-['Inter'] bg-black text-white flex justify-center min-h-screen items-start pt-6 pb-10">
 
 <div class="w-full max-w-xl p-5 space-y-4">
 
@@ -42,7 +40,6 @@ const loadingMsgs = [
     "GENERATING STRATEGY..."
 ];
 
-// ZMENA: Prepracovaný crosshairPlugin pre vlastné osi a tooltipy bez orezávania
 const customChartPlugin = {
   id: 'customChart',
   afterDraw: chart => {
@@ -80,7 +77,7 @@ const customChartPlugin = {
       
       ctx.save();
       
-      // Vertikálna čiara (cez celú výšku, nezávisle od dát)
+      // Vertikálna čiara
       ctx.beginPath();
       ctx.moveTo(xPos, top); 
       ctx.lineTo(xPos, bottom);
@@ -88,7 +85,7 @@ const customChartPlugin = {
       ctx.strokeStyle = 'rgba(255,255,255,0.15)'; 
       ctx.stroke();
 
-      // Tooltip s Dátumom (ZMENA: Vrátené odsadenie na +4, orezávanie vyriešené na úrovni dát)
+      // Tooltip s Dátumom
       let xLabel = chart.data.labels[activePoint.index];
       if (xLabel && xLabel !== "") {
           ctx.fillStyle = '#171717'; 
@@ -108,9 +105,8 @@ const customChartPlugin = {
 
       // Aktualizácia dynamic score v UI
       let visualY = activePoint.element.$context.parsed.y;
-      // Inverzné mapovanie vizuálnej hodnoty (5-95) späť na reálnu (0-100)
       let val = ((visualY - 5) / 90) * 100;
-      val = Math.max(0, Math.min(100, val)); // Orezanie len pre istotu
+      val = Math.max(0, Math.min(100, val)); 
 
       let scoreDiv = document.getElementById('dynamic-score');
       let titleDiv = document.getElementById('dynamic-title');
@@ -138,7 +134,6 @@ const customChartPlugin = {
     if (datasetMeta.data && datasetMeta.data.length > 0 && lastValidIndex !== -1) {
         const lastValidPoint = datasetMeta.data[lastValidIndex];
         const visualValue = chart.data.datasets[0].data[lastValidIndex];
-        // Inverzné mapovanie pre farbu guličky
         const val = ((visualValue - 5) / 90) * 100;
         
         if (val !== undefined) {
@@ -146,7 +141,6 @@ const customChartPlugin = {
             
             ctx.save();
             ctx.beginPath();
-            // Polomer je 4 pixely. Vďaka mapovaniu na 5-95 sa vizuálne 0-100 nikdy neodreže o okraj plátna.
             ctx.arc(lastValidPoint.x, lastValidPoint.y, 4, 0, 2 * Math.PI);
             ctx.fillStyle = dotColor;
             ctx.fill();
@@ -156,7 +150,6 @@ const customChartPlugin = {
   }
 };
 
-// ZMENA: Používame len crosshair, visuals a grid sú zlúčené do customChartPlugin
 Chart.register(customChartPlugin);
 
 function hideTooltips() {
@@ -236,9 +229,9 @@ async function analyze() {
 
       <div class="p-6 rounded-3xl ${dashboardStyle} mt-0">
           
-        <div class="flex justify-between items-center mb-6 text-[0.6rem] uppercase tracking-widest gap-2">
-            <div class="text-neutral-400 border border-neutral-600/50 px-3 py-1.5 rounded-md flex-1 text-center min-w-0 truncate">${data.name} (${data.ticker})</div>
-            <div class="${phaseBadgeColor} px-3 py-1.5 rounded-md flex-1 text-center min-w-0 truncate">${data.phase}</div>
+        <div class="flex justify-between items-center mb-6 text-[0.6rem] uppercase tracking-widest">
+            <div class="text-neutral-400 border border-neutral-600/50 px-3 py-1.5 rounded-md">${data.name} (${data.ticker})</div>
+            <div class="${phaseBadgeColor} px-3 py-1.5 rounded-md">${data.phase}</div>
         </div>
         
         <div class="flex justify-between items-start mb-8 gap-4 px-1">
@@ -308,7 +301,6 @@ async function analyze() {
     let chartDates = data.chart_dates.slice(limit);
     let chartScoreRaw = data.chart_score.slice(limit);
 
-    // ZMENA: Mapovanie hodnôt 0-100 na vizuálny rozsah 5-95 pre pointer bez orezania
     let chartScoreVisual = chartScoreRaw.map(v => 5 + (v / 100) * 90);
 
     if (chartDates.length > 0 && chartScoreVisual.length > 0) {
@@ -319,7 +311,6 @@ async function analyze() {
         const commonOptions = {
             responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            // ZMENA: Vrátený pôvodný, čistý padding. right: 6px na doraz guličky.
             layout: { padding: { left: 0, right: 6, top: 5, bottom: 28 } },
             interaction: { mode: 'index', intersect: false }
         };
@@ -337,7 +328,6 @@ async function analyze() {
                     borderWidth: 0.75, 
                     tension: 0.5, 
                     pointRadius: 0,
-                    // Hover pointer nastavenia
                     pointHoverRadius: 4, 
                     pointHoverBackgroundColor: '#171717',
                     pointHoverBorderWidth: 1.5,
@@ -351,12 +341,11 @@ async function analyze() {
                         const {ctx, chartArea} = chart;
                         if (!chartArea) return;
                         const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                        // Mapovanie gradientu na nové vizuálne hranice 5% - 95%
                         gradient.addColorStop(0, '#22c55e'); 
-                        gradient.addColorStop(0.23, '#22c55e'); // Reálnych 20% je vizuálne na ~23% plátna
-                        gradient.addColorStop(0.32, '#FFFF00'); // Reálnych 30% je vizuálne na ~32%
-                        gradient.addColorStop(0.68, '#FFFF00'); // Reálnych 70% je vizuálne na ~68%
-                        gradient.addColorStop(0.77, '#EC4899'); // Reálnych 80% je vizuálne na ~77%
+                        gradient.addColorStop(0.23, '#22c55e'); 
+                        gradient.addColorStop(0.32, '#FFFF00'); 
+                        gradient.addColorStop(0.68, '#FFFF00'); 
+                        gradient.addColorStop(0.77, '#EC4899'); 
                         gradient.addColorStop(1, '#EC4899');    
                         return gradient;
                     }
@@ -364,12 +353,10 @@ async function analyze() {
             },
             options: { 
                 ...commonOptions, 
-                // ZMENA: Úplne vypnuté osi X a Y. Rendering robí custom plugin.
                 scales: { 
                     x: { display: false },
                     y: { 
                         display: false, 
-                        // Vizuálny rozsah pre rendering, gulička má na 5 a 95 priestor
                         min: 0, 
                         max: 100 
                     } 
