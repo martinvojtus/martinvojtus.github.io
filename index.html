@@ -14,68 +14,86 @@
 
 <div class="w-full max-w-xl p-5 relative">
 
-    <div id="skeleton" class="w-full flex flex-col pt-1 animate-pulse">
+    <div class="flex justify-between items-center px-1 mb-2 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
+        <div class="w-16 text-left">
+            <div id="dynamic-title" class="text-neutral-600 transition-colors duration-500">SCORE</div>
+        </div>
+        <div class="flex gap-1 absolute left-1/2 -translate-x-1/2">
+            <button onclick="updateChart('1Y')" id="btn-1Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1Y</button>
+            <button onclick="updateChart('2Y')" id="btn-2Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">2Y</button>
+            <button onclick="updateChart('4Y')" id="btn-4Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">4Y</button>
+            <button onclick="updateChart('ALL')" id="btn-ALL" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">ALL</button>
+        </div>
+        <div class="w-16 flex justify-end">
+            <div id="dynamic-score" class="transition-colors duration-500 flex items-center h-full">
+                <div class="h-2 w-8 bg-neutral-800 rounded animate-pulse"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="h-60 w-full relative mb-1">
+        <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] pr-[6px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-5"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-50"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-50"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-5"></div>
+        </div>
+        <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000"></canvas>
+    </div>
+
+    <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 mt-0 shadow-2xl shadow-black/50 transition-colors duration-1000">
         
-        <div class="flex justify-between items-center px-1 mb-2 relative h-[24px]">
-            <div class="w-16"><div class="h-2 w-10 bg-neutral-800 rounded mt-1"></div></div>
-            <div class="flex gap-1 absolute left-1/2 -translate-x-1/2">
-                <div class="px-3 py-1 rounded-md bg-neutral-800 h-[24px] w-[34px]"></div>
-                <div class="px-3 py-1 rounded-md bg-neutral-800 h-[24px] w-[34px]"></div>
-                <div class="px-3 py-1 rounded-md bg-neutral-800 h-[24px] w-[34px]"></div>
-                <div class="px-3 py-1 rounded-md bg-neutral-800 h-[24px] w-[38px]"></div>
+        <div class="flex justify-between items-center mb-6 text-[0.6rem] uppercase tracking-widest">
+            <div id="badge-name" class="border border-neutral-600/50 px-3 py-1.5 rounded-md text-neutral-400">
+                <div class="h-2 w-16 bg-neutral-700 rounded animate-pulse"></div>
             </div>
-            <div class="w-16 flex justify-end"><div class="h-2 w-8 bg-neutral-800 rounded mt-1"></div></div>
+            <div id="badge-phase" class="border border-neutral-800 px-3 py-1.5 rounded-md flex items-center">
+                <div class="h-2 w-12 bg-neutral-800 rounded animate-pulse"></div>
+            </div>
         </div>
-
-        <div class="h-60 w-full relative mb-1 pt-[5px] pb-[28px] pr-[6px] flex flex-col justify-between">
-            <div class="w-full border-b border-dashed border-neutral-600 opacity-5"></div>
-            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
-            <div class="w-full border-b border-dashed border-neutral-600 opacity-50"></div>
-            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
-            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
-            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
-            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
-            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
-            <div class="w-full border-b border-dashed border-neutral-600 opacity-50"></div>
-            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
-            <div class="w-full border-b border-dashed border-neutral-600 opacity-5"></div>
-        </div>
-
-        <div class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 mt-0 shadow-2xl shadow-black/50">
-            <div class="flex justify-between items-center mb-6 text-[0.6rem] uppercase tracking-widest">
-                <div class="border border-neutral-800 px-3 py-1.5 rounded-md"><div class="h-2 w-16 bg-neutral-800 rounded"></div></div>
-                <div class="border border-neutral-800 px-3 py-1.5 rounded-md"><div class="h-2 w-20 bg-neutral-800 rounded"></div></div>
-            </div>
-            
-            <div class="flex justify-between items-start mb-8 gap-4 px-1">
-                <div>
-                    <div class="h-7 w-32 bg-neutral-800 rounded mb-0"></div>
-                    <div class="h-2 w-16 bg-neutral-800 rounded mt-3"></div>
-                </div>
-                <div class="text-right flex flex-col items-end">
-                    <div class="h-7 w-16 bg-neutral-800 rounded mb-0"></div>
-                    <div class="h-2 w-10 bg-neutral-800 rounded mt-3"></div>
-                </div>
-            </div>
-            
+        
+        <div class="flex justify-between items-start mb-8 gap-4 px-1">
             <div>
-                <div class="w-full bg-neutral-800 h-1.5 rounded-full mb-7"></div>
-                <table class="w-full text-left text-[0.6rem] uppercase tracking-widest border border-neutral-800 rounded-lg overflow-hidden border-separate [border-spacing:0]">
-                    <tbody>
-                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div class="w-2 h-2 rounded-full bg-neutral-800 inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-center w-24"><div class="h-2 w-12 bg-neutral-800 rounded mx-auto"></div></td><td class="py-2.5 pl-5 border-b border-l border-neutral-800"><div class="h-2 w-24 bg-neutral-800 rounded"></div></td></tr>
-                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div class="w-2 h-2 rounded-full bg-neutral-800 inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-center"><div class="h-2 w-12 bg-neutral-800 rounded mx-auto"></div></td><td class="py-2.5 pl-5 border-b border-l border-neutral-800"><div class="h-2 w-24 bg-neutral-800 rounded"></div></td></tr>
-                        <tr><td class="py-2.5 px-0 align-middle text-center"><div class="w-2 h-2 rounded-full bg-neutral-800 inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-center"><div class="h-2 w-12 bg-neutral-800 rounded mx-auto"></div></td><td class="py-2.5 pl-5 border-l border-neutral-800"><div class="h-2 w-24 bg-neutral-800 rounded"></div></td></tr>
-                    </tbody>
-                </table>
+                <div id="val-price" class="text-[1.8rem] font-bold leading-none tracking-tight text-white flex items-center h-8">
+                    <div class="h-7 w-32 bg-neutral-800 rounded animate-pulse"></div>
+                </div>
+                <div id="val-change" class="text-[0.6rem] uppercase tracking-widest mt-2 flex items-center gap-1.5 h-3">
+                    <div class="h-2 w-16 bg-neutral-800 rounded animate-pulse"></div>
+                </div>
             </div>
+            <div class="text-right flex flex-col items-end">
+                <div id="val-score-large" class="text-[1.8rem] font-bold leading-none transition-colors duration-1000 flex items-center justify-end h-8">
+                    <div class="h-7 w-16 bg-neutral-800 rounded animate-pulse"></div>
+                </div>
+                <div class="text-[0.6rem] text-neutral-500 uppercase tracking-widest mt-2">SCORE</div>
+            </div>
+        </div>
+        
+        <div>
+            <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-7 relative">
+                <div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: transparent;"></div>
+            </div>
+            
+            <table class="w-full text-left text-[0.6rem] text-neutral-400 uppercase tracking-widest border border-neutral-800 rounded-lg overflow-hidden border-separate [border-spacing:0]">
+                <tbody>
+                    <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#22c55e] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap w-24 text-center">0 – 20 (%)</td><td class="py-2.5 pl-5 border-b border-l border-neutral-800">VALUE ZONE (DCA IN)</td></tr>
+                    <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#FFFF00] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">21 – 79 (%)</td><td class="py-2.5 pl-5 border-b border-l border-neutral-800">NEUTRAL ZONE (HODL)</td></tr>
+                    <tr><td class="py-2.5 px-0 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#EC4899] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">80 – 100 (%)</td><td class="py-2.5 pl-5 border-l border-neutral-800">EXIT ZONE (DCA OUT)</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
     <div id="error-box" class="hidden mt-4 bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center"></div>
 
-    <div id="output" class="hidden flex-col pt-1"></div>
-
-    <footer id="footer" class="text-center text-[0.6rem] text-neutral-500 mt-12 tracking-[0.25em] uppercase transition-opacity duration-[1000ms] opacity-0">
+    <footer class="text-center text-[0.6rem] text-neutral-500 mt-6 tracking-[0.25em] uppercase">
         MARTIN VOJTUŠ &copy; 2026 &bull; BUILD V1.0.0
     </footer>
 
@@ -267,90 +285,58 @@ async function analyze() {
     const colorClass = data.change > 0 ? "text-[#22c55e]" : (data.change < 0 ? "text-pink-500" : "text-neutral-500");
     const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     
-    let dashboardStyle = score <= 20 ? "bg-[#030a05] border border-[#22c55e]/30" : (score >= 80 ? "bg-[#EC4899]/5 border border-[#EC4899]/30" : "bg-[#FFFF00]/5 border border-[#FFFF00]/30"); 
-    let phaseBadgeColor = score <= 20 ? "bg-[#030a05] text-[#22c55e] border border-[#22c55e]/50" : (score >= 80 ? "bg-[#EC4899]/10 text-[#EC4899] border border-[#EC4899]/50" : "bg-[#FFFF00]/10 text-[#FFFF00] border border-[#FFFF00]/50"); 
+    let dashboardStyle = score <= 20 ? "bg-[#030a05] border-[#22c55e]/30" : (score >= 80 ? "bg-[#EC4899]/5 border-[#EC4899]/30" : "bg-[#FFFF00]/5 border-[#FFFF00]/30"); 
+    let phaseBadgeColor = score <= 20 ? "bg-[#030a05] text-[#22c55e] border-[#22c55e]/50" : (score >= 80 ? "bg-[#EC4899]/10 text-[#EC4899] border-[#EC4899]/50" : "bg-[#FFFF00]/10 text-[#FFFF00] border-[#FFFF00]/50"); 
 
-    const output = document.getElementById("output");
-    
-    let finalHTML = `
-      <div class="flex justify-between items-center px-1 mb-2 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
-          <div class="w-16 text-left">
-              <div id="dynamic-title" style="color: ${scoreHex}; text-shadow: 0 0 10px ${scoreHex}80" class="transition-colors duration-150">SCORE</div>
-          </div>
-          <div class="flex gap-1 absolute left-1/2 -translate-x-1/2">
-              <button onclick="updateChart('1Y')" id="btn-1Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1Y</button>
-              <button onclick="updateChart('2Y')" id="btn-2Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">2Y</button>
-              <button onclick="updateChart('4Y')" id="btn-4Y" class="px-3 py-1 rounded-md text-white bg-neutral-800 transition-all duration-300">4Y</button>
-              <button onclick="updateChart('ALL')" id="btn-ALL" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">ALL</button>
-          </div>
-          <div class="w-16 text-right">
-              <div id="dynamic-score" style="color: ${scoreHex}; text-shadow: 0 0 10px ${scoreHex}80" class="transition-colors duration-150">${score.toFixed(1)}%</div>
-          </div>
-      </div>
-      <div class="h-60 w-full relative mb-1">
-          <canvas id="scoreChart"></canvas>
-      </div>
+    // 1. Aktualizácia Karty (Farby)
+    document.getElementById("main-card").className = `p-6 rounded-3xl border mt-0 shadow-2xl shadow-black/50 transition-colors duration-1000 ${dashboardStyle}`;
 
-      <div class="p-6 rounded-3xl ${dashboardStyle} mt-0 shadow-2xl shadow-black/50">
-        <div class="flex justify-between items-center mb-6 text-[0.6rem] uppercase tracking-widest">
-            <div class="text-neutral-400 border border-neutral-600/50 px-3 py-1.5 rounded-md">${data.name} (${data.ticker})</div>
-            <div class="${phaseBadgeColor} px-3 py-1.5 rounded-md">${data.phase}</div>
-        </div>
-        <div class="flex justify-between items-start mb-8 gap-4 px-1">
-            <div>
-                <div class="text-[1.8rem] font-bold leading-none tracking-tight text-white">$${formattedPrice}</div>
-                <div class="${colorClass} text-[0.6rem] uppercase tracking-widest mt-2 flex items-center gap-1.5">
-                    ${sign}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded">24H</span>
-                </div>
-            </div>
-            <div class="text-right">
-                <div class="text-[1.8rem] font-bold leading-none" style="color: ${scoreHex}; text-shadow: 0 0 12px ${scoreHex}80">${score.toFixed(1)}%</div>
-                <div class="text-[0.6rem] text-neutral-500 uppercase tracking-widest mt-2">SCORE</div>
-            </div>
-        </div>
-        <div>
-            <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-7 relative">
-                <div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: ${scoreHex}; box-shadow: 0 0 10px ${scoreHex}"></div>
-            </div>
-            
-            <table class="w-full text-left text-[0.6rem] text-neutral-400 uppercase tracking-widest border border-neutral-800 rounded-lg overflow-hidden border-separate [border-spacing:0]">
-                <tbody>
-                    <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#22c55e] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap w-24 text-center">0 – 20 (%)</td><td class="py-2.5 pl-5 border-b border-l border-neutral-800">VALUE ZONE (DCA IN)</td></tr>
-                    <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#FFFF00] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">21 – 79 (%)</td><td class="py-2.5 pl-5 border-b border-l border-neutral-800">NEUTRAL ZONE (HODL)</td></tr>
-                    <tr><td class="py-2.5 px-0 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#EC4899] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">80 – 100 (%)</td><td class="py-2.5 pl-5 border-l border-neutral-800">EXIT ZONE (DCA OUT)</td></tr>
-                </tbody>
-            </table>
-        </div>
-      </div>
-    `;
+    // 2. Aktualizácia Textov
+    document.getElementById("badge-name").innerHTML = `${data.name} (${data.ticker})`;
+    
+    let phaseBadge = document.getElementById("badge-phase");
+    phaseBadge.className = `border px-3 py-1.5 rounded-md flex items-center transition-colors duration-1000 ${phaseBadgeColor}`;
+    phaseBadge.innerHTML = data.phase;
 
-    output.innerHTML = finalHTML;
-    output.className = "flex flex-col pt-1 opacity-0 transition-opacity duration-[1000ms] ease-out";
+    document.getElementById("val-price").innerHTML = `$${formattedPrice}`;
     
-    document.getElementById("skeleton").classList.add("hidden");
-    output.classList.remove("hidden");
-    
-    // Vynútené prekreslenie prehliadača (aby fungovali plynulé CSS prechody)
-    void output.offsetWidth; 
-    
-    output.classList.remove("opacity-0");
-    output.classList.add("opacity-100");
-    
-    const footer = document.getElementById("footer");
-    footer.classList.remove("opacity-0");
-    footer.classList.add("opacity-100");
+    let valChange = document.getElementById("val-change");
+    valChange.className = `text-[0.6rem] uppercase tracking-widest mt-2 flex items-center gap-1.5 h-3 ${colorClass}`;
+    valChange.innerHTML = `${sign}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded">24H</span>`;
 
+    let scoreLarge = document.getElementById("val-score-large");
+    scoreLarge.innerHTML = `${score.toFixed(1)}%`;
+    scoreLarge.style.color = scoreHex;
+    scoreLarge.style.textShadow = `0 0 12px ${scoreHex}80`;
+
+    let dynScore = document.getElementById("dynamic-score");
+    dynScore.innerHTML = `${score.toFixed(1)}%`;
+    dynScore.style.color = scoreHex;
+    dynScore.style.textShadow = `0 0 10px ${scoreHex}80`;
+
+    let dynTitle = document.getElementById("dynamic-title");
+    dynTitle.style.color = scoreHex;
+    dynTitle.style.textShadow = `0 0 10px ${scoreHex}80`;
+
+    // 3. Prepnutie grafu
+    document.getElementById("chart-skeleton").classList.add("opacity-0");
+    document.getElementById("scoreChart").classList.remove("opacity-0");
+
+    // Vykreslenie Chart.js
     updateChart('4Y');
 
-    // ZMENA 5: Animácia Loading baru. Krátko po zobrazení mu priradíme finálnu šírku percenta
+    // 4. Animácia Loading baru z 0% na aktuálnu hodnotu
     setTimeout(() => {
         const bar = document.getElementById("animated-score-bar");
-        if(bar) bar.style.width = `${score}%`;
+        bar.style.width = `${score}%`;
+        bar.style.backgroundColor = scoreHex;
+        bar.style.boxShadow = `0 0 10px ${scoreHex}`;
     }, 50);
 
   } catch (error) {
-    document.getElementById("skeleton").classList.add("hidden");
-    const eb = document.getElementById("error-box"); eb.innerText = "❌ SERVER OFFLINE. PLEASE TRY AGAIN."; eb.classList.remove("hidden");
+    const eb = document.getElementById("error-box"); 
+    eb.innerText = "❌ SERVER OFFLINE. PLEASE TRY AGAIN."; 
+    eb.classList.remove("hidden");
   }
 }
 
