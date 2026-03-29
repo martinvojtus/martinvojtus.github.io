@@ -46,9 +46,9 @@ const customChartPlugin = {
   afterDraw: chart => {
     const ctx = chart.ctx;
     if (!chart.chartArea) return; 
-    const { chartArea: {top, bottom, left, right}, scales: {y} } = chart;
+    const { chartArea: {top, bottom, left, right}, scales: {y, x} } = chart;
 
-    // 1. Vlastný Rendering Gridu
+    // 1. Vlastný Rendering Gridu (Lineárny 0-100)
     ctx.save();
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
@@ -105,9 +105,8 @@ const customChartPlugin = {
           ctx.fillText(xLabel, boxX + (textWidth + 16)/2, boxY + 10);
       }
 
-      // Aktualizácia dynamic score v UI
-      let visualY = activePoint.element.$context.parsed.y;
-      let val = ((visualY - 5) / 90) * 100;
+      // Aktualizácia dynamic score v UI (Čistá hodnota bez mapovania)
+      let val = activePoint.element.$context.parsed.y;
       val = Math.max(0, Math.min(100, val)); 
 
       let scoreDiv = document.getElementById('dynamic-score');
@@ -123,7 +122,7 @@ const customChartPlugin = {
       ctx.restore();
     }
 
-    // 3. Vykreslenie živej koncovej guličky (Now)
+    // 3. Vykreslenie živej koncovej guličky (Čistá hodnota bez mapovania)
     const datasetMeta = chart.getDatasetMeta(0);
     let lastValidIndex = -1;
     if (chart.data.labels) {
@@ -137,9 +136,8 @@ const customChartPlugin = {
 
     if (datasetMeta.data && datasetMeta.data.length > 0 && lastValidIndex !== -1) {
         const lastValidPoint = datasetMeta.data[lastValidIndex];
-        const visualValue = chart.data.datasets[0].data[lastValidIndex];
-        if (visualValue !== null && visualValue !== undefined) {
-            const val = ((visualValue - 5) / 90) * 100;
+        const val = chart.data.datasets[0].data[lastValidIndex];
+        if (val !== null && val !== undefined) {
             let dotColor = val <= 20 ? '#22c55e' : (val >= 80 ? '#EC4899' : '#FFFF00');
             
             ctx.save();
@@ -304,9 +302,7 @@ async function analyze() {
     let chartDates = data.chart_dates.slice(limit);
     let chartScoreRaw = data.chart_score.slice(limit);
 
-    let chartScoreVisual = chartScoreRaw.map(v => (v === null || v === undefined) ? null : 5 + (v / 100) * 90);
-
-    if (chartDates.length > 0 && chartScoreVisual.length > 0) {
+    if (chartDates.length > 0 && chartScoreRaw.length > 0) {
         Chart.defaults.color = '#525252'; 
         Chart.defaults.font.family = "'Inter', sans-serif";
         Chart.defaults.font.size = 9.6; 
@@ -326,17 +322,17 @@ async function analyze() {
             data: {
                 labels: chartDates,
                 datasets: [{ 
-                    data: chartScoreVisual, 
+                    data: chartScoreRaw, // POUŽÍVAME ČISTÉ DÁTA
                     fill: false,
                     borderWidth: 0.75, 
                     tension: 0.5, 
                     pointRadius: 0,
+                    clip: false, // DÔLEŽITÉ: Gulička sa nevymaže mimo chartArea
                     pointHoverRadius: 4, 
                     pointHoverBackgroundColor: '#171717',
                     pointHoverBorderWidth: 1.5,
                     pointHoverBorderColor: function(context) {
-                        const visualY = context.parsed.y;
-                        const val = ((visualY - 5) / 90) * 100;
+                        const val = context.parsed.y;
                         return val <= 20 ? "#22c55e" : (val >= 80 ? "#EC4899" : "#FFFF00");
                     },
                     borderColor: function(context) {
@@ -344,11 +340,12 @@ async function analyze() {
                         const {ctx, chartArea} = chart;
                         if (!chartArea) return;
                         const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                        // Gradient nastavený na skutočné body 20, 30, 70, 80
                         gradient.addColorStop(0, '#22c55e'); 
-                        gradient.addColorStop(0.23, '#22c55e'); 
-                        gradient.addColorStop(0.32, '#FFFF00'); 
-                        gradient.addColorStop(0.68, '#FFFF00'); 
-                        gradient.addColorStop(0.77, '#EC4899'); 
+                        gradient.addColorStop(0.2, '#22c55e'); 
+                        gradient.addColorStop(0.3, '#FFFF00'); 
+                        gradient.addColorStop(0.7, '#FFFF00'); 
+                        gradient.addColorStop(0.8, '#EC4899'); 
                         gradient.addColorStop(1, '#EC4899');    
                         return gradient;
                     }
