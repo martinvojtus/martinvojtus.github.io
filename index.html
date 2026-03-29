@@ -28,17 +28,17 @@
         </div>
 
         <div class="h-60 w-full relative mb-1 pt-[5px] pb-[28px] pr-[6px] flex flex-col justify-between">
-            <div class="w-full border-b border-dashed border-[#EC4899] opacity-5"></div>
-            <div class="w-full border-b border-dashed border-[#EC4899] opacity-10"></div>
-            <div class="w-full border-b border-dashed border-[#EC4899] opacity-50"></div>
-            <div class="w-full border-b border-dashed border-[#FFFF00] opacity-10"></div>
-            <div class="w-full border-b border-dashed border-[#FFFF00] opacity-10"></div>
-            <div class="w-full border-b border-dashed border-[#FFFF00] opacity-10"></div>
-            <div class="w-full border-b border-dashed border-[#FFFF00] opacity-10"></div>
-            <div class="w-full border-b border-dashed border-[#FFFF00] opacity-10"></div>
-            <div class="w-full border-b border-dashed border-[#22c55e] opacity-50"></div>
-            <div class="w-full border-b border-dashed border-[#22c55e] opacity-10"></div>
-            <div class="w-full border-b border-dashed border-[#22c55e] opacity-5"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-5"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-50"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-50"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
+            <div class="w-full border-b border-dashed border-neutral-600 opacity-5"></div>
         </div>
 
         <div class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 mt-0 shadow-2xl shadow-black/50">
@@ -60,7 +60,6 @@
             
             <div>
                 <div class="w-full bg-neutral-800 h-1.5 rounded-full mb-7"></div>
-                
                 <table class="w-full text-left text-[0.6rem] uppercase tracking-widest border border-neutral-800 rounded-lg overflow-hidden border-separate [border-spacing:0]">
                     <tbody>
                         <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div class="w-2 h-2 rounded-full bg-neutral-800 inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-center w-24"><div class="h-2 w-12 bg-neutral-800 rounded mx-auto"></div></td><td class="py-2.5 pl-5 border-b border-l border-neutral-800"><div class="h-2 w-24 bg-neutral-800 rounded"></div></td></tr>
@@ -70,13 +69,17 @@
                 </table>
             </div>
         </div>
+
+        <div class="flex justify-center mt-12">
+            <div class="h-2.5 w-48 bg-neutral-800/50 rounded"></div>
+        </div>
     </div>
 
     <div id="error-box" class="hidden bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center mt-10"></div>
 
     <div id="output" class="hidden flex-col pt-1"></div>
 
-    <footer id="footer" class="hidden text-center text-[0.6rem] text-neutral-500 mt-12 tracking-[0.25em] uppercase transition-opacity duration-1000 opacity-0">
+    <footer id="footer" class="hidden text-center text-[0.6rem] text-neutral-500 mt-12 tracking-[0.25em] uppercase transition-opacity duration-[1000ms] opacity-0">
         MARTIN VOJTUŠ &copy; 2026 &bull; BUILD V1.0.0
     </footer>
 
@@ -113,11 +116,9 @@ const customChartPlugin = {
       let xPos = activePoint.element.x;
       
       ctx.save();
-      // Vertikálna čiara
       ctx.beginPath(); ctx.moveTo(xPos, top); ctx.lineTo(xPos, bottom);
       ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.stroke();
 
-      // Tooltip s Dátumom
       let xLabel = chart.data.labels[activePoint.index];
       if (xLabel && xLabel !== "") {
           ctx.fillStyle = '#171717'; ctx.font = 'normal 9.6px sans-serif'; 
@@ -133,12 +134,10 @@ const customChartPlugin = {
           ctx.fillText(xLabel, boxX + (textWidth + 16)/2, boxY + 10);
       }
 
-      // Hodnoty pre farbu
       let val = activePoint.element.$context.parsed.y;
       val = Math.max(0, Math.min(100, val)); 
       let scoreHex = val <= 20 ? "#22c55e" : (val >= 80 ? "#EC4899" : "#FFFF00");
 
-      // Aktualizácia textov v UI
       let scoreDiv = document.getElementById('dynamic-score');
       let titleDiv = document.getElementById('dynamic-title');
       if (scoreDiv) {
@@ -231,7 +230,6 @@ function updateChart(period) {
                 data: chartScoreRaw, 
                 fill: false, borderWidth: 1.5, tension: 0.5, pointRadius: 0, clip: false, 
                 
-                // Návrat k natívnemu hoveru (starý klasický pointer)
                 pointHoverRadius: 4, 
                 pointHoverBackgroundColor: '#171717', 
                 pointHoverBorderWidth: 1.5,
@@ -267,7 +265,7 @@ async function analyze() {
     const data = await res.json();
     if(data.error) throw new Error(data.error);
 
-    document.getElementById("skeleton").classList.add("hidden");
+    // ZMENA 2: Skeleton nechávame bežať, kým nie je všetko vyrenderované.
 
     window.fullData = data; 
     const score = data.cycle_score || 0;
@@ -335,22 +333,22 @@ async function analyze() {
       </div>
     `;
 
-    // ZMENA: Čistý fade-in bez "Slide-Up" animácie, aby obrazovka neposkakovala
     output.innerHTML = finalHTML;
     output.className = "flex flex-col pt-1 opacity-0 transition-opacity duration-[1000ms] ease-out";
     
-    void output.offsetWidth; 
+    // ZMENA 3: Úplne hladká výmena. Skeleton a Output si vymenia zobrazenie v jednom frame.
+    document.getElementById("skeleton").classList.add("hidden");
+    output.classList.remove("hidden");
     
-    output.classList.remove("hidden", "opacity-0");
+    const footer = document.getElementById("footer");
+    footer.classList.remove("hidden");
+
+    void output.offsetWidth; // Force reflow
+    
+    output.classList.remove("opacity-0");
     output.classList.add("opacity-100");
-    
-    setTimeout(() => {
-        const footer = document.getElementById("footer");
-        footer.classList.remove("hidden");
-        void footer.offsetWidth;
-        footer.classList.remove("opacity-0");
-        footer.classList.add("opacity-100");
-    }, 500);
+    footer.classList.remove("opacity-0");
+    footer.classList.add("opacity-100");
 
     updateChart('4Y');
 
