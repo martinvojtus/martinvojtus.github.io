@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" href="favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -44,9 +44,10 @@ const customChartPlugin = {
   id: 'customChart',
   afterDraw: chart => {
     const ctx = chart.ctx;
-    const { chartArea: {top, bottom, left, width}, scales: {y, x} } = chart;
+    if (!chart.chartArea) return; 
+    const { chartArea: {top, bottom, left, right}, scales: {y} } = chart;
 
-    // 1. Vlastný Rendering Gridu (Z: 1)
+    // 1. Vlastný Rendering Gridu
     ctx.save();
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
@@ -56,7 +57,7 @@ const customChartPlugin = {
         
         let op = 0.1; 
         if (v === 0 || v === 100) op = 0.05; 
-        else if (v === 20 || v === 80) op = 0.5; // Zvýraznené hraničné čiary
+        else if (v === 20 || v === 80) op = 0.5; 
 
         if (v <= 20) ctx.strokeStyle = `rgba(34, 197, 94, ${op})`;     
         else if (v < 80) ctx.strokeStyle = `rgba(255, 255, 0, ${op})`;     
@@ -64,7 +65,7 @@ const customChartPlugin = {
 
         ctx.beginPath();
         ctx.moveTo(0, yPos); 
-        ctx.lineTo(width, yPos); 
+        ctx.lineTo(chart.width, yPos); 
         ctx.stroke();
     }
     ctx.restore();
@@ -95,7 +96,7 @@ const customChartPlugin = {
           let boxX = xPos - (textWidth + 16)/2;
           
           if (boxX < left) boxX = left;
-          if (boxX + textWidth + 16 > width + 24) boxX = width + 24 - textWidth - 16;
+          if (boxX + textWidth + 16 > right) boxX = right - textWidth - 16;
           
           ctx.fillRect(boxX, boxY, textWidth + 16, 20);
           ctx.strokeStyle = '#525252'; ctx.strokeRect(boxX, boxY, textWidth + 16, 20);
@@ -124,19 +125,20 @@ const customChartPlugin = {
     // 3. Vykreslenie živej koncovej guličky (Now)
     const datasetMeta = chart.getDatasetMeta(0);
     let lastValidIndex = -1;
-    for (let i = chart.data.labels.length - 1; i >= 0; i--) {
-        if (chart.data.labels[i] !== "") {
-            lastValidIndex = i;
-            break;
+    if (chart.data.labels) {
+        for (let i = chart.data.labels.length - 1; i >= 0; i--) {
+            if (chart.data.labels[i] !== "") {
+                lastValidIndex = i;
+                break;
+            }
         }
     }
 
     if (datasetMeta.data && datasetMeta.data.length > 0 && lastValidIndex !== -1) {
         const lastValidPoint = datasetMeta.data[lastValidIndex];
         const visualValue = chart.data.datasets[0].data[lastValidIndex];
-        const val = ((visualValue - 5) / 90) * 100;
-        
-        if (val !== undefined) {
+        if (visualValue !== null && visualValue !== undefined) {
+            const val = ((visualValue - 5) / 90) * 100;
             let dotColor = val <= 20 ? '#22c55e' : (val >= 80 ? '#EC4899' : '#FFFF00');
             
             ctx.save();
@@ -301,7 +303,7 @@ async function analyze() {
     let chartDates = data.chart_dates.slice(limit);
     let chartScoreRaw = data.chart_score.slice(limit);
 
-    let chartScoreVisual = chartScoreRaw.map(v => 5 + (v / 100) * 90);
+    let chartScoreVisual = chartScoreRaw.map(v => (v === null || v === undefined) ? null : 5 + (v / 100) * 90);
 
     if (chartDates.length > 0 && chartScoreVisual.length > 0) {
         Chart.defaults.color = '#525252'; 
