@@ -40,7 +40,7 @@
 let scoreChartInstance = null;
 let spinnerInterval = null;
 window.currentScoreData = { score: 0, colorClass: "" };
-window.fullData = null; // Globálna premenná pre uloženie dát kvôli prepínaniu času
+window.fullData = null; 
 
 const loadingMsgs = [
     "ACCESSING LIQUIDITY...", 
@@ -56,7 +56,7 @@ const customChartPlugin = {
     if (!chart.chartArea) return; 
     const { chartArea: {top, bottom, left, right}, scales: {y} } = chart;
 
-    // Grid
+    // Grid (Lineárny 0-100)
     ctx.save();
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
@@ -102,7 +102,6 @@ const customChartPlugin = {
           let scoreHex = val <= 20 ? "#22c55e" : (val >= 80 ? "#EC4899" : "#FFFF00");
           scoreDiv.innerText = val.toFixed(1) + '%';
           scoreDiv.style.color = scoreHex;
-          // ZMENA 4: Glow effect na dynamické percentá počas behania po grafe
           scoreDiv.style.textShadow = `0 0 10px ${scoreHex}80`;
           if (titleDiv) {
               titleDiv.style.color = scoreHex;
@@ -112,7 +111,7 @@ const customChartPlugin = {
       ctx.restore();
     }
 
-    // Now Dot
+    // Now Dot (Čistá hodnota bez mapovania)
     const datasetMeta = chart.getDatasetMeta(0);
     let lastValidIndex = -1;
     if (chart.data.labels) {
@@ -155,11 +154,10 @@ function hideTooltips() {
 document.addEventListener('touchstart', e => { if (e.target.tagName !== 'CANVAS') hideTooltips(); });
 document.addEventListener('click', e => { if (e.target.tagName !== 'CANVAS') hideTooltips(); });
 
-// ZMENA 2: Logika pre vykreslenie grafu podľa vybraného času
 function updateChart(period) {
     if (!window.fullData) return;
 
-    ['3M', '6M', '1Y', 'ALL'].forEach(p => {
+    ['1Y', '2Y', '4Y', 'ALL'].forEach(p => {
         const btn = document.getElementById(`btn-${p}`);
         if(btn) {
             if(p === period) btn.className = "px-3 py-1 rounded-md text-white bg-neutral-800 transition-all duration-300";
@@ -167,14 +165,14 @@ function updateChart(period) {
         }
     });
 
-    let days = 365; // Default 1Y
-    if (period === '3M') days = 90;
-    if (period === '6M') days = 180;
-    if (period === '1Y') days = 365;
-    if (period === 'ALL') days = window.fullData.chart_dates.length;
+    let points = 208; // Default 4Y po týždňoch
+    if (period === '1Y') points = 52;
+    if (period === '2Y') points = 104;
+    if (period === '4Y') points = 208;
+    if (period === 'ALL') points = window.fullData.chart_dates.length;
 
-    const chartDates = window.fullData.chart_dates.slice(-days);
-    const chartScoreRaw = window.fullData.chart_score.slice(-days);
+    const chartDates = window.fullData.chart_dates.slice(-points);
+    const chartScoreRaw = window.fullData.chart_score.slice(-points);
 
     if (scoreChartInstance) scoreChartInstance.destroy();
     
@@ -189,7 +187,7 @@ function updateChart(period) {
             labels: chartDates,
             datasets: [{ 
                 data: chartScoreRaw, 
-                fill: false, borderWidth: 1.5, tension: 0.5, pointRadius: 0, clip: false,
+                fill: false, borderWidth: 1.5, tension: 0.5, pointRadius: 0, clip: false, // clip: false chráni orezanie 0/100
                 pointHoverRadius: 4, pointHoverBackgroundColor: '#171717', pointHoverBorderWidth: 1.5,
                 pointHoverBorderColor: function(c) {
                     const val = c.parsed.y; return val <= 20 ? "#22c55e" : (val >= 80 ? "#EC4899" : "#FFFF00");
@@ -205,7 +203,7 @@ function updateChart(period) {
         },
         options: { 
             responsive: true, maintainAspectRatio: false,
-            animation: { duration: 1000, easing: 'easeOutQuart' }, // Animácia prekreslenia čiary
+            animation: { duration: 1000, easing: 'easeOutQuart' }, 
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
             layout: { padding: { left: 0, right: 6, top: 5, bottom: 28 } },
             interaction: { mode: 'index', intersect: false },
@@ -243,15 +241,19 @@ async function analyze() {
     const output = document.getElementById("output");
     
     let finalHTML = `
-      <div class="flex justify-between items-center px-1 mb-2 text-[0.6rem] uppercase tracking-widest">
-          <div id="dynamic-title" style="color: ${scoreHex}; text-shadow: 0 0 10px ${scoreHex}80" class="transition-colors duration-150">SCORE</div>
-          <div class="flex gap-1">
-              <button onclick="updateChart('3M')" id="btn-3M" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">3M</button>
-              <button onclick="updateChart('6M')" id="btn-6M" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">6M</button>
-              <button onclick="updateChart('1Y')" id="btn-1Y" class="px-3 py-1 rounded-md text-white bg-neutral-800 transition-all duration-300">1Y</button>
+      <div class="flex justify-between items-center px-1 mb-2 text-[0.6rem] uppercase tracking-widest relative">
+          <div class="w-16 text-left">
+              <div id="dynamic-title" style="color: ${scoreHex}; text-shadow: 0 0 10px ${scoreHex}80" class="transition-colors duration-150">SCORE</div>
+          </div>
+          <div class="flex gap-1 absolute left-1/2 -translate-x-1/2">
+              <button onclick="updateChart('1Y')" id="btn-1Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1Y</button>
+              <button onclick="updateChart('2Y')" id="btn-2Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">2Y</button>
+              <button onclick="updateChart('4Y')" id="btn-4Y" class="px-3 py-1 rounded-md text-white bg-neutral-800 transition-all duration-300">4Y</button>
               <button onclick="updateChart('ALL')" id="btn-ALL" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">ALL</button>
           </div>
-          <div id="dynamic-score" style="color: ${scoreHex}; text-shadow: 0 0 10px ${scoreHex}80" class="transition-colors duration-150">${score.toFixed(1)}%</div>
+          <div class="w-16 text-right">
+              <div id="dynamic-score" style="color: ${scoreHex}; text-shadow: 0 0 10px ${scoreHex}80" class="transition-colors duration-150">${score.toFixed(1)}%</div>
+          </div>
       </div>
       <div class="h-60 w-full relative mb-1">
           <canvas id="scoreChart"></canvas>
@@ -290,11 +292,9 @@ async function analyze() {
       </div>
     `;
 
-    // ZMENA 3: Plynulá vstupná animácia (Slide-Up + Fade-In)
     output.innerHTML = finalHTML;
     output.className = "flex flex-col pt-1 opacity-0 translate-y-8 transition-all duration-[1200ms] ease-out";
     
-    // Vyvolanie vykreslenia prehliadača (Reflow) aby fungovala animácia
     void output.offsetWidth;
     
     output.classList.remove("hidden", "opacity-0", "translate-y-8");
@@ -308,8 +308,8 @@ async function analyze() {
         footer.classList.add("opacity-100");
     }, 500);
 
-    // Vykreslí predvolený graf (1 Rok)
-    updateChart('1Y');
+    // Vykreslí predvolený graf: Makro 4 roky (1 cyklus)
+    updateChart('4Y');
 
   } catch (error) {
     clearInterval(spinnerInterval);
