@@ -124,7 +124,6 @@ const visualsPlugin = {
     }
 };
 
-// ZMENA: Návrat k vlastnému pluginu pre mriežku (kreslí od okraja po okraj obrazovky)
 const fullGridPlugin = {
     id: 'fullGrid',
     afterDatasetsDraw: chart => {
@@ -154,7 +153,6 @@ const fullGridPlugin = {
     }
 };
 
-// ZMENA: Registrácia fullGridPlugin na záver
 Chart.register(crosshairPlugin, visualsPlugin, fullGridPlugin);
 
 function hideTooltips() {
@@ -227,7 +225,7 @@ async function analyze() {
               <div id="dynamic-title" style="color: ${scoreHex}" class="transition-colors duration-150">SCORE</div>
               <div id="dynamic-score" style="color: ${scoreHex}" class="transition-colors duration-150">${score.toFixed(1)}%</div>
           </div>
-          <div class="h-56 w-full relative">
+          <div class="h-60 w-full relative">
               <canvas id="scoreChart"></canvas>
           </div>
       </div>
@@ -281,7 +279,8 @@ async function analyze() {
         const commonOptions = {
             responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            layout: { padding: { left: 0, right: 15, top: 5, bottom: 28 } },
+            // ZMENA: Right padding znížený z 15 na 6 (iba presne na vykreslenie celej 4px guličky)
+            layout: { padding: { left: 0, right: 6, top: 5, bottom: 28 } },
             interaction: { mode: 'index', intersect: false }
         };
 
@@ -329,7 +328,6 @@ async function analyze() {
                         position: 'right', 
                         min: 0, 
                         max: 100, 
-                        // ZMENA: Natívny grid vypnutý. Plnú prácu robí fullGridPlugin vo vrstve navrchu.
                         grid: { display: false },
                         border: { display: false },
                         ticks: { display: false, stepSize: 10 } 
