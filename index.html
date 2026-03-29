@@ -14,7 +14,7 @@
 
 <div class="w-full max-w-xl p-5 relative">
 
-    <div class="flex justify-between items-center px-1 mb-2 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
+    <div class="flex justify-between items-center px-1 mb-4 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
         <div class="w-16 text-left">
             <div id="dynamic-title" class="text-neutral-600 transition-colors duration-500">SCORE</div>
         </div>
@@ -25,13 +25,13 @@
             <button onclick="updateChart('ALL')" id="btn-ALL" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">ALL</button>
         </div>
         <div class="w-16 flex justify-end">
-            <div id="dynamic-score" class="transition-colors duration-500">
+            <div id="dynamic-score" class="transition-colors duration-500 flex items-center h-full">
                 <span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">00.0%</span>
             </div>
         </div>
     </div>
 
-    <div class="h-60 w-full relative mb-1">
+    <div class="h-60 w-full relative mb-4">
         <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] pr-[6px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
             <div class="w-full border-b border-dashed border-neutral-600 opacity-5"></div>
             <div class="w-full border-b border-dashed border-neutral-600 opacity-10"></div>
@@ -48,7 +48,7 @@
         <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000"></canvas>
     </div>
 
-    <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 mt-0 shadow-2xl shadow-black/50 transition-colors duration-1000">
+    <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000">
         
         <div class="flex justify-between items-center mb-6 text-[0.6rem] uppercase tracking-widest">
             <div id="badge-name" class="border border-neutral-600/50 px-3 py-1.5 rounded-md text-neutral-400">
@@ -94,7 +94,7 @@
 
     <div id="error-box" class="hidden mt-4 bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center"></div>
 
-    <footer class="text-center text-[0.6rem] text-neutral-500 mt-6 tracking-[0.25em] uppercase">
+    <footer class="text-center text-[0.6rem] text-neutral-500 mt-4 tracking-[0.25em] uppercase">
         MARTIN VOJTUŠ &copy; 2026 &bull; BUILD V1.0.0
     </footer>
 
@@ -289,7 +289,6 @@ async function analyze() {
     let dashboardStyle = score <= 20 ? "bg-[#030a05] border-[#22c55e]/30" : (score >= 80 ? "bg-[#EC4899]/5 border-[#EC4899]/30" : "bg-[#FFFF00]/5 border-[#FFFF00]/30"); 
     let phaseBadgeColor = score <= 20 ? "bg-[#030a05] text-[#22c55e] border-[#22c55e]/50" : (score >= 80 ? "bg-[#EC4899]/10 text-[#EC4899] border-[#EC4899]/50" : "bg-[#FFFF00]/10 text-[#FFFF00] border-[#FFFF00]/50"); 
 
-    // 1. Zrušenie animácie pozadia u fáz a prepísanie reálnych hodnôt (žiaden pixelový skok vďaka "neviditeľnému textu")
     document.getElementById("badge-name").innerHTML = `${data.name} (${data.ticker})`;
 
     let phaseBadge = document.getElementById("badge-phase");
@@ -316,15 +315,13 @@ async function analyze() {
     dynTitle.style.color = scoreHex;
     dynTitle.style.textShadow = `0 0 10px ${scoreHex}80`;
 
-    // 2. Aktualizácia Karty a Grafu
-    document.getElementById("main-card").className = `p-6 rounded-3xl border mt-0 shadow-2xl shadow-black/50 transition-colors duration-1000 ${dashboardStyle}`;
+    document.getElementById("main-card").className = `p-6 rounded-3xl border shadow-2xl shadow-black/50 transition-colors duration-1000 ${dashboardStyle}`;
     
     document.getElementById("chart-skeleton").classList.add("opacity-0");
     document.getElementById("scoreChart").classList.remove("opacity-0");
 
     updateChart('4Y');
 
-    // 3. Animácia Loading baru (vystrelí z nuly)
     setTimeout(() => {
         const bar = document.getElementById("animated-score-bar");
         bar.style.width = `${score}%`;
