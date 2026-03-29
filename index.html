@@ -12,7 +12,7 @@
 </head>
 <body class="font-['Inter'] bg-black text-white flex justify-center min-h-screen items-start pt-6 pb-10 overflow-x-hidden">
 
-<div class="w-full max-w-xl p-5 space-y-4 relative">
+<div class="w-full max-w-xl p-5 relative">
 
     <div id="skeleton" class="w-full flex flex-col pt-1 animate-pulse">
         
@@ -49,11 +49,11 @@
             
             <div class="flex justify-between items-start mb-8 gap-4 px-1">
                 <div>
-                    <div class="h-8 w-32 bg-neutral-800 rounded mb-2"></div>
+                    <div class="h-7 w-32 bg-neutral-800 rounded mb-0"></div>
                     <div class="h-2 w-16 bg-neutral-800 rounded mt-3"></div>
                 </div>
                 <div class="text-right flex flex-col items-end">
-                    <div class="h-8 w-16 bg-neutral-800 rounded mb-2"></div>
+                    <div class="h-7 w-16 bg-neutral-800 rounded mb-0"></div>
                     <div class="h-2 w-10 bg-neutral-800 rounded mt-3"></div>
                 </div>
             </div>
@@ -69,17 +69,13 @@
                 </table>
             </div>
         </div>
-
-        <div class="flex justify-center mt-12">
-            <div class="h-2.5 w-48 bg-neutral-800/50 rounded"></div>
-        </div>
     </div>
 
-    <div id="error-box" class="hidden bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center mt-10"></div>
+    <div id="error-box" class="hidden mt-4 bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center"></div>
 
     <div id="output" class="hidden flex-col pt-1"></div>
 
-    <footer id="footer" class="hidden text-center text-[0.6rem] text-neutral-500 mt-12 tracking-[0.25em] uppercase transition-opacity duration-[1000ms] opacity-0">
+    <footer id="footer" class="text-center text-[0.6rem] text-neutral-500 mt-12 tracking-[0.25em] uppercase transition-opacity duration-[1000ms] opacity-0">
         MARTIN VOJTUŠ &copy; 2026 &bull; BUILD V1.0.0
     </footer>
 
@@ -97,7 +93,6 @@ const customChartPlugin = {
     if (!chart.chartArea) return; 
     const { chartArea: {top, bottom, left, right}, scales: {y} } = chart;
 
-    // Grid (Lineárny 0-100)
     ctx.save();
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
@@ -109,7 +104,6 @@ const customChartPlugin = {
     }
     ctx.restore();
 
-    // Crosshair & Tooltip
     const activeElements = chart.getActiveElements();
     if (activeElements.length > 0) {
       let activePoint = activeElements[0];
@@ -152,7 +146,6 @@ const customChartPlugin = {
       ctx.restore();
     }
 
-    // Now Dot (Koncová gulička)
     const datasetMeta = chart.getDatasetMeta(0);
     let lastValidIndex = -1;
     if (chart.data.labels) {
@@ -206,7 +199,7 @@ function updateChart(period) {
         }
     });
 
-    let points = 208; // Default 4Y po týždňoch
+    let points = 208; 
     if (period === '1Y') points = 52;
     if (period === '2Y') points = 104;
     if (period === '4Y') points = 208;
@@ -265,8 +258,6 @@ async function analyze() {
     const data = await res.json();
     if(data.error) throw new Error(data.error);
 
-    // ZMENA 2: Skeleton nechávame bežať, kým nie je všetko vyrenderované.
-
     window.fullData = data; 
     const score = data.cycle_score || 0;
     let scoreHex = score <= 20 ? "#22c55e" : (score >= 80 ? "#EC4899" : "#FFFF00");
@@ -319,7 +310,7 @@ async function analyze() {
         </div>
         <div>
             <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-7 relative">
-                <div class="h-full transition-all duration-1000 ease-out" style="width: ${score}%; background-color: ${scoreHex}; box-shadow: 0 0 10px ${scoreHex}"></div>
+                <div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: ${scoreHex}; box-shadow: 0 0 10px ${scoreHex}"></div>
             </div>
             
             <table class="w-full text-left text-[0.6rem] text-neutral-400 uppercase tracking-widest border border-neutral-800 rounded-lg overflow-hidden border-separate [border-spacing:0]">
@@ -336,21 +327,26 @@ async function analyze() {
     output.innerHTML = finalHTML;
     output.className = "flex flex-col pt-1 opacity-0 transition-opacity duration-[1000ms] ease-out";
     
-    // ZMENA 3: Úplne hladká výmena. Skeleton a Output si vymenia zobrazenie v jednom frame.
     document.getElementById("skeleton").classList.add("hidden");
     output.classList.remove("hidden");
     
-    const footer = document.getElementById("footer");
-    footer.classList.remove("hidden");
-
-    void output.offsetWidth; // Force reflow
+    // Vynútené prekreslenie prehliadača (aby fungovali plynulé CSS prechody)
+    void output.offsetWidth; 
     
     output.classList.remove("opacity-0");
     output.classList.add("opacity-100");
+    
+    const footer = document.getElementById("footer");
     footer.classList.remove("opacity-0");
     footer.classList.add("opacity-100");
 
     updateChart('4Y');
+
+    // ZMENA 5: Animácia Loading baru. Krátko po zobrazení mu priradíme finálnu šírku percenta
+    setTimeout(() => {
+        const bar = document.getElementById("animated-score-bar");
+        if(bar) bar.style.width = `${score}%`;
+    }, 50);
 
   } catch (error) {
     document.getElementById("skeleton").classList.add("hidden");
