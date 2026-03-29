@@ -14,14 +14,24 @@
 
 <div class="w-full max-w-xl p-5 space-y-4">
 
-    <div id="skeleton" class="w-full flex flex-col pt-1 gap-2 transition-opacity duration-500">
-        <div class="h-60 w-full animate-pulse flex flex-col justify-between py-4">
-            <div class="w-full border-b border-dashed border-neutral-800/40"></div>
-            <div class="w-full border-b border-dashed border-neutral-800/40"></div>
-            <div class="w-full border-b border-dashed border-neutral-800/40"></div>
-            <div class="w-full border-b border-dashed border-neutral-800/40"></div>
+    <div id="skeleton" class="w-full flex flex-col pt-1 transition-opacity duration-500">
+        <div class="h-6 mb-2"></div>
+        
+        <div class="h-60 w-full relative mb-1 pt-[5px] pb-[28px] pr-[6px] flex flex-col justify-between animate-pulse">
+            <div class="w-full border-b border-dashed border-[#EC4899] opacity-5"></div>
+            <div class="w-full border-b border-dashed border-[#EC4899] opacity-10"></div>
+            <div class="w-full border-b border-dashed border-[#EC4899] opacity-50"></div>
+            <div class="w-full border-b border-dashed border-[#FFFF00] opacity-10"></div>
+            <div class="w-full border-b border-dashed border-[#FFFF00] opacity-10"></div>
+            <div class="w-full border-b border-dashed border-[#FFFF00] opacity-10"></div>
+            <div class="w-full border-b border-dashed border-[#FFFF00] opacity-10"></div>
+            <div class="w-full border-b border-dashed border-[#FFFF00] opacity-10"></div>
+            <div class="w-full border-b border-dashed border-[#22c55e] opacity-50"></div>
+            <div class="w-full border-b border-dashed border-[#22c55e] opacity-10"></div>
+            <div class="w-full border-b border-dashed border-[#22c55e] opacity-5"></div>
         </div>
-        <div class="p-6 rounded-3xl bg-neutral-900/40 animate-pulse border border-neutral-800/50 mt-4 space-y-8 shadow-2xl shadow-black/50">
+
+        <div class="p-6 rounded-3xl bg-neutral-900/40 animate-pulse border border-neutral-800/50 mt-0 space-y-8 shadow-2xl shadow-black/50">
             <div class="flex justify-between"><div class="w-24 h-5 bg-neutral-800/50 rounded-md"></div><div class="w-16 h-5 bg-neutral-800/50 rounded-md"></div></div>
             <div class="flex justify-between items-start"><div class="space-y-3"><div class="w-32 h-8 bg-neutral-800/50 rounded"></div><div class="w-20 h-4 bg-neutral-800/50 rounded"></div></div><div class="space-y-3 text-right"><div class="w-20 h-8 bg-neutral-800/50 rounded ml-auto"></div><div class="w-12 h-4 bg-neutral-800/50 rounded ml-auto"></div></div></div>
             <div class="w-full h-1.5 bg-neutral-800/50 rounded-full"></div>
@@ -41,7 +51,7 @@
 
 <script>
 let scoreChartInstance = null;
-let spinnerInterval = null; // Interval nechávame len pre prípadné logovanie, ale text už nezobrazujeme
+let spinnerInterval = null; 
 window.currentScoreData = { score: 0, colorClass: "" };
 window.fullData = null; 
 
@@ -64,7 +74,7 @@ const customChartPlugin = {
     }
     ctx.restore();
 
-    // Crosshair, Tooltip & ZMENA 2: Glowing Hover Dot
+    // Crosshair & Tooltip
     const activeElements = chart.getActiveElements();
     if (activeElements.length > 0) {
       let activePoint = activeElements[0];
@@ -92,18 +102,10 @@ const customChartPlugin = {
           ctx.fillText(xLabel, boxX + (textWidth + 16)/2, boxY + 10);
       }
 
-      // Hodnoty pre farbu
+      // Hodnoty pre farbu (Gulička je vrátená do Chart configu nižšie)
       let val = activePoint.element.$context.parsed.y;
       val = Math.max(0, Math.min(100, val)); 
       let scoreHex = val <= 20 ? "#22c55e" : (val >= 80 ? "#EC4899" : "#FFFF00");
-
-      // Vykreslenie našej vlastnej guličky so svietiacim Glow efektom
-      ctx.beginPath();
-      ctx.arc(xPos, yPos, 4, 0, 2 * Math.PI);
-      ctx.fillStyle = scoreHex;
-      ctx.shadowBlur = 12; // Sila vyžarovania
-      ctx.shadowColor = scoreHex; // Farba vyžarovania podľa zóny
-      ctx.fill();
 
       // Aktualizácia textov v UI
       let scoreDiv = document.getElementById('dynamic-score');
@@ -120,7 +122,7 @@ const customChartPlugin = {
       ctx.restore();
     }
 
-    // Now Dot (Koncová gulička bez hoveru - zachovaná čistá farba)
+    // Now Dot (Koncová gulička - svieti, ukazuje aktuálny stav)
     const datasetMeta = chart.getDatasetMeta(0);
     let lastValidIndex = -1;
     if (chart.data.labels) {
@@ -197,7 +199,16 @@ function updateChart(period) {
             datasets: [{ 
                 data: chartScoreRaw, 
                 fill: false, borderWidth: 1.5, tension: 0.5, pointRadius: 0, clip: false, 
-                pointHoverRadius: 0, // Vypíname natívny hover point, vykresľujeme vlastný s Glow efektom v plugine
+                
+                // ZMENA 2: Vrátený pôvodný natívny pointer (čierne vnútro s farebným okrajom)
+                pointHoverRadius: 4, 
+                pointHoverBackgroundColor: '#171717', 
+                pointHoverBorderWidth: 1.5,
+                pointHoverBorderColor: function(context) {
+                    const val = context.parsed.y;
+                    return val <= 20 ? "#22c55e" : (val >= 80 ? "#EC4899" : "#FFFF00");
+                },
+
                 borderColor: function(c) {
                     const {ctx, chartArea} = c.chart; if (!chartArea) return;
                     const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
