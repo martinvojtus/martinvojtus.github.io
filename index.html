@@ -108,6 +108,27 @@ let scoreChartInstance = null;
 window.currentScoreData = { score: 0, colorClass: "" };
 window.fullData = null; 
 
+// ZMENA: Dynamický výpočet pre mriežku v Skeleton Loadri (reaguje aj na otočenie/resajzovanie okna)
+function updateSkeletonGrid() {
+    const skeleton = document.getElementById('chart-skeleton');
+    if (!skeleton) return;
+    const width = skeleton.clientWidth;
+    if (width === 0) return;
+    
+    const targetDash = 4;
+    const numDashes = Math.round((width / targetDash + 1) / 2);
+    const exactDash = width / (2 * numDashes - 1);
+    
+    const grad = `repeating-linear-gradient(to right, #525252 0, #525252 ${exactDash}px, transparent ${exactDash}px, transparent ${exactDash * 2}px)`;
+    
+    const lines = skeleton.children;
+    for (let i = 0; i < lines.length; i++) {
+        lines[i].style.backgroundImage = grad;
+    }
+}
+window.addEventListener('resize', updateSkeletonGrid);
+
+
 const customChartPlugin = {
   id: 'customChart',
   afterDraw: chart => {
@@ -117,13 +138,19 @@ const customChartPlugin = {
 
     ctx.save();
     ctx.lineWidth = 1;
-    ctx.setLineDash([4, 4]);
+
+    // ZMENA: Dynamický výpočet pre dokonalé čiarky v ostrom grafe
+    const gridWidth = right - left;
+    const targetDash = 4;
+    const numDashes = Math.round((gridWidth / targetDash + 1) / 2);
+    const exactDash = gridWidth / (2 * numDashes - 1);
+    ctx.setLineDash([exactDash, exactDash]);
+
     for (let v = 0; v <= 100; v += 10) {
         const yPos = y.getPixelForValue(v);
         let op = 0.1; if (v === 0 || v === 100) op = 0.05; else if (v === 20 || v === 80) op = 0.5; 
         if (v <= 20) ctx.strokeStyle = `rgba(34, 197, 94, ${op})`; else if (v < 80) ctx.strokeStyle = `rgba(255, 255, 0, ${op})`; else ctx.strokeStyle = `rgba(236, 72, 153, ${op})`;                  
         
-        // ZMENA: Mriežka grafu sa kreslí presne od "left" po "right", aby neprečnievala do posunutých okrajov
         ctx.beginPath(); ctx.moveTo(left, yPos); ctx.lineTo(right, yPos); ctx.stroke();
     }
     ctx.restore();
@@ -268,7 +295,6 @@ function updateChart(period) {
             responsive: true, maintainAspectRatio: false,
             animation: { duration: 1000, easing: 'easeOutQuart' }, 
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            // ZMENA: Left a Right padding nastavený na 8, čo vykompenzuje náš 8px posun celého plátna. 
             layout: { padding: { left: 8, right: 8, top: 5, bottom: 28 } },
             interaction: { mode: 'index', intersect: false },
             scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } 
@@ -342,7 +368,11 @@ async function analyze() {
   }
 }
 
-window.addEventListener('DOMContentLoaded', analyze);
+// ZMENA: Ihneď pri prvotnom načítaní sa grid presne dopočíta podľa šírky displeja
+window.addEventListener('DOMContentLoaded', () => {
+    updateSkeletonGrid();
+    analyze();
+});
 </script>
 </body>
 </html>
