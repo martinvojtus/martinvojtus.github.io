@@ -32,7 +32,7 @@
     </div>
 
     <div class="h-60 w-full relative mb-4">
-        <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] pr-[6px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
+        <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
             <div class="w-full h-[1px] opacity-5" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
             <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
             <div class="w-full h-[1px] opacity-50" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
@@ -45,7 +45,10 @@
             <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
             <div class="w-full h-[1px] opacity-5" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
         </div>
-        <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000"></canvas>
+        
+        <div class="absolute top-0 bottom-0 left-0 w-[calc(100%+8px)] pointer-events-none">
+            <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000 pointer-events-auto"></canvas>
+        </div>
     </div>
 
     <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000">
@@ -119,7 +122,9 @@ const customChartPlugin = {
         const yPos = y.getPixelForValue(v);
         let op = 0.1; if (v === 0 || v === 100) op = 0.05; else if (v === 20 || v === 80) op = 0.5; 
         if (v <= 20) ctx.strokeStyle = `rgba(34, 197, 94, ${op})`; else if (v < 80) ctx.strokeStyle = `rgba(255, 255, 0, ${op})`; else ctx.strokeStyle = `rgba(236, 72, 153, ${op})`;                  
-        ctx.beginPath(); ctx.moveTo(0, yPos); ctx.lineTo(chart.width, yPos); ctx.stroke();
+        
+        // ZMENA: Mriežka grafu sa kreslí len po hodnotu "right" (okraj webu), do "výbežku" ide len gulička
+        ctx.beginPath(); ctx.moveTo(0, yPos); ctx.lineTo(right, yPos); ctx.stroke();
     }
     ctx.restore();
 
@@ -263,7 +268,8 @@ function updateChart(period) {
             responsive: true, maintainAspectRatio: false,
             animation: { duration: 1000, easing: 'easeOutQuart' }, 
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            layout: { padding: { left: 0, right: 6, top: 5, bottom: 28 } },
+            // ZMENA: Right padding nastavený na 8, aby sa vytvorilo miesto pre guličku v extra časti plátna
+            layout: { padding: { left: 0, right: 8, top: 5, bottom: 28 } },
             interaction: { mode: 'index', intersect: false },
             scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } 
         }
