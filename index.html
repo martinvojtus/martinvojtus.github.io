@@ -14,10 +14,14 @@
 
 <div class="w-full max-w-xl p-5 relative">
 
-    <div class="flex justify-center mb-6">
+    <div class="flex flex-col sm:flex-row justify-center items-center gap-3 mb-6">
         <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex text-[0.6rem] uppercase tracking-widest relative">
-            <button onclick="toggleAsset('BTC')" id="toggle-btc" class="px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300 relative z-10">Bitcoin</button>
-            <button onclick="toggleAsset('SOL')" id="toggle-sol" class="px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 relative z-10">Solana</button>
+            <button onclick="toggleAsset('BTC')" id="toggle-asset-btc" class="px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300">Bitcoin</button>
+            <button onclick="toggleAsset('SOL')" id="toggle-asset-sol" class="px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">Solana</button>
+        </div>
+        <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex text-[0.6rem] uppercase tracking-widest relative">
+            <button onclick="toggleMode('MACRO')" id="toggle-mode-macro" class="px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300">Macro</button>
+            <button onclick="toggleMode('TRADING')" id="toggle-mode-trading" class="px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">Trading</button>
         </div>
     </div>
 
@@ -25,12 +29,20 @@
         <div class="w-16 text-left">
             <div id="dynamic-title" class="text-neutral-600 transition-colors duration-500">SCORE</div>
         </div>
-        <div class="flex gap-1 absolute left-1/2 -translate-x-1/2">
+        
+        <div id="macro-buttons" class="flex gap-1 absolute left-1/2 -translate-x-1/2">
             <button onclick="updateChart('1Y')" id="btn-1Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1Y</button>
             <button onclick="updateChart('2Y')" id="btn-2Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">2Y</button>
             <button onclick="updateChart('4Y')" id="btn-4Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">4Y</button>
             <button onclick="updateChart('ALL')" id="btn-ALL" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">ALL</button>
         </div>
+        
+        <div id="trading-buttons" class="hidden flex gap-1 absolute left-1/2 -translate-x-1/2">
+            <button onclick="changeTradingInterval('1d')" id="btn-1d" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1D</button>
+            <button onclick="changeTradingInterval('4h')" id="btn-4h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">4H</button>
+            <button onclick="changeTradingInterval('1h')" id="btn-1h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1H</button>
+        </div>
+
         <div class="w-16 flex justify-end">
             <div id="dynamic-score" class="transition-colors duration-500 flex items-center h-full">
                 <span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">00.0%</span>
@@ -111,34 +123,70 @@
 </div>
 
 <script>
+// --- GLOBALS ---
 let scoreChartInstance = null;
 window.currentScoreData = { score: 0, colorClass: "" };
 window.fullData = null; 
-window.currentAsset = 'BTC'; // Ukladá aktuálne zvolené aktívum
 
+// STATE PREPÍNAČOV
+window.currentAsset = 'BTC'; 
+window.currentMode = 'MACRO';
+window.currentInterval = '1w'; // Pre Macro: 1w. Pre Trading: 1d, 4h, 1h.
+window.currentMacroView = '4Y'; // Default pre zobrazenie grafu v Macro
+
+// --- TOGGLE LOGIC ---
 function toggleAsset(asset) {
     if (window.currentAsset === asset) return;
     window.currentAsset = asset;
     
-    // Prepnutie vizuálu tlačidiel
-    const btnBTC = document.getElementById('toggle-btc');
-    const btnSOL = document.getElementById('toggle-sol');
+    document.getElementById('toggle-asset-btc').className = asset === 'BTC' ? "px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
+    document.getElementById('toggle-asset-sol').className = asset === 'SOL' ? "px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
+
+    triggerAnalysis();
+}
+
+function toggleMode(mode) {
+    if (window.currentMode === mode) return;
+    window.currentMode = mode;
     
-    if (asset === 'BTC') {
-        btnBTC.className = "px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300 relative z-10";
-        btnSOL.className = "px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 relative z-10";
+    document.getElementById('toggle-mode-macro').className = mode === 'MACRO' ? "px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
+    document.getElementById('toggle-mode-trading').className = mode === 'TRADING' ? "px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
+
+    if (mode === 'MACRO') {
+        document.getElementById('macro-buttons').classList.remove('hidden');
+        document.getElementById('trading-buttons').classList.add('hidden');
+        window.currentInterval = '1w';
     } else {
-        btnSOL.className = "px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300 relative z-10";
-        btnBTC.className = "px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 relative z-10";
+        document.getElementById('macro-buttons').classList.add('hidden');
+        document.getElementById('trading-buttons').classList.remove('hidden');
+        window.currentInterval = '1d'; // Default pre Trading
+        highlightTradingButton('1d');
     }
 
-    // Návrat na skeleton loader pred spustením analýzy
+    triggerAnalysis();
+}
+
+function changeTradingInterval(interval) {
+    if (window.currentInterval === interval && window.currentMode === 'TRADING') return;
+    window.currentInterval = interval;
+    highlightTradingButton(interval);
+    triggerAnalysis();
+}
+
+function highlightTradingButton(interval) {
+    ['1d', '4h', '1h'].forEach(p => {
+        const btn = document.getElementById(`btn-${p}`);
+        if(btn) btn.className = p === interval ? "px-3 py-1 rounded-md text-white bg-neutral-800 transition-all duration-300" : "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
+    });
+}
+
+function triggerAnalysis() {
     document.getElementById("scoreChart").classList.add("opacity-0");
     document.getElementById("chart-skeleton").classList.remove("opacity-0");
-    
     analyze();
 }
 
+// --- SKELETON GRID ---
 function updateSkeletonGrid() {
     const skeleton = document.getElementById('chart-skeleton');
     if (!skeleton) return;
@@ -158,7 +206,7 @@ function updateSkeletonGrid() {
 }
 window.addEventListener('resize', updateSkeletonGrid);
 
-
+// --- CHART PLUGIN ---
 const customChartPlugin = {
   id: 'customChart',
   afterDraw: chart => {
@@ -268,22 +316,26 @@ function hideTooltips() {
 document.addEventListener('touchstart', e => { if (e.target.tagName !== 'CANVAS') hideTooltips(); });
 document.addEventListener('click', e => { if (e.target.tagName !== 'CANVAS') hideTooltips(); });
 
+// VYKRESLENIE GRAFU
 function updateChart(period) {
     if (!window.fullData) return;
 
-    ['1Y', '2Y', '4Y', 'ALL'].forEach(p => {
-        const btn = document.getElementById(`btn-${p}`);
-        if(btn) {
-            if(p === period) btn.className = "px-3 py-1 rounded-md text-white bg-neutral-800 transition-all duration-300";
-            else btn.className = "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
-        }
-    });
+    if (window.currentMode === 'MACRO') {
+        window.currentMacroView = period;
+        ['1Y', '2Y', '4Y', 'ALL'].forEach(p => {
+            const btn = document.getElementById(`btn-${p}`);
+            if(btn) btn.className = p === period ? "px-3 py-1 rounded-md text-white bg-neutral-800 transition-all duration-300" : "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
+        });
+    }
 
+    // Pre Macro filtrujeme počet sviečok, pre Trading zobrazíme vždy posledných ~200 sviečok aktuálneho intervalu
     let points = 208; 
-    if (period === '1Y') points = 52;
-    if (period === '2Y') points = 104;
-    if (period === '4Y') points = 208;
-    if (period === 'ALL') points = window.fullData.chart_dates.length;
+    if (window.currentMode === 'MACRO') {
+        if (period === '1Y') points = 52;
+        if (period === '2Y') points = 104;
+        if (period === '4Y') points = 208;
+        if (period === 'ALL') points = window.fullData.chart_dates.length;
+    }
 
     const chartDates = window.fullData.chart_dates.slice(-points);
     const chartScoreRaw = window.fullData.chart_score.slice(-points);
@@ -331,13 +383,17 @@ function updateChart(period) {
     });
 }
 
+// FETCH DÁT
 async function analyze() {
   try {
-    // POSIELAME ASSET V JSON TELE POŽIADAVKY
     const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", { 
         method: "POST", 
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ asset: window.currentAsset })
+        body: JSON.stringify({ 
+            asset: window.currentAsset, 
+            mode: window.currentMode, 
+            interval: window.currentInterval 
+        })
     });
     
     if (!res.ok) throw new Error("Server error");
@@ -387,7 +443,7 @@ async function analyze() {
     document.getElementById("chart-skeleton").classList.add("opacity-0");
     document.getElementById("scoreChart").classList.remove("opacity-0");
 
-    updateChart('4Y');
+    updateChart(window.currentMode === 'MACRO' ? window.currentMacroView : null);
 
     setTimeout(() => {
         const bar = document.getElementById("animated-score-bar");
@@ -405,6 +461,7 @@ async function analyze() {
 
 window.addEventListener('DOMContentLoaded', () => {
     updateSkeletonGrid();
+    highlightTradingButton('1d'); // Default UI prep for trading buttons
     analyze();
 });
 </script>
