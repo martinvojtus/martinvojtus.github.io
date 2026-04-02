@@ -14,14 +14,14 @@
 
 <div class="w-full max-w-xl p-5 relative">
 
-    <div class="flex flex-col sm:flex-row justify-center items-center gap-3 mb-6">
-        <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex text-[0.6rem] uppercase tracking-widest relative">
-            <button onclick="toggleAsset('BTC')" id="toggle-asset-btc" class="px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300">Bitcoin</button>
-            <button onclick="toggleAsset('SOL')" id="toggle-asset-sol" class="px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">Solana</button>
+    <div class="grid grid-cols-2 gap-3 mb-6 w-full">
+        <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex w-full text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
+            <button onclick="toggleAsset('BTC')" id="toggle-asset-btc" class="flex-1 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300">Bitcoin</button>
+            <button onclick="toggleAsset('SOL')" id="toggle-asset-sol" class="flex-1 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">Solana</button>
         </div>
-        <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex text-[0.6rem] uppercase tracking-widest relative">
-            <button onclick="toggleMode('MACRO')" id="toggle-mode-macro" class="px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300">Macro</button>
-            <button onclick="toggleMode('TRADING')" id="toggle-mode-trading" class="px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">Trading</button>
+        <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex w-full text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
+            <button onclick="toggleMode('MACRO')" id="toggle-mode-macro" class="flex-1 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300">Macro</button>
+            <button onclick="toggleMode('TRADING')" id="toggle-mode-trading" class="flex-1 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">Trading</button>
         </div>
     </div>
 
@@ -139,8 +139,9 @@ function toggleAsset(asset) {
     if (window.currentAsset === asset) return;
     window.currentAsset = asset;
     
-    document.getElementById('toggle-asset-btc').className = asset === 'BTC' ? "px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
-    document.getElementById('toggle-asset-sol').className = asset === 'SOL' ? "px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
+    // Zmena tried prispôsobená pre flex-1
+    document.getElementById('toggle-asset-btc').className = asset === 'BTC' ? "flex-1 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "flex-1 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
+    document.getElementById('toggle-asset-sol').className = asset === 'SOL' ? "flex-1 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "flex-1 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
 
     triggerAnalysis();
 }
@@ -149,8 +150,9 @@ function toggleMode(mode) {
     if (window.currentMode === mode) return;
     window.currentMode = mode;
     
-    document.getElementById('toggle-mode-macro').className = mode === 'MACRO' ? "px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
-    document.getElementById('toggle-mode-trading').className = mode === 'TRADING' ? "px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
+    // Zmena tried prispôsobená pre flex-1
+    document.getElementById('toggle-mode-macro').className = mode === 'MACRO' ? "flex-1 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "flex-1 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
+    document.getElementById('toggle-mode-trading').className = mode === 'TRADING' ? "flex-1 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "flex-1 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
 
     if (mode === 'MACRO') {
         document.getElementById('macro-buttons').classList.remove('hidden');
@@ -328,7 +330,6 @@ function updateChart(period) {
         });
     }
 
-    // Pre Macro filtrujeme počet sviečok, pre Trading zobrazíme vždy posledných ~200 sviečok aktuálneho intervalu
     let points = 208; 
     if (window.currentMode === 'MACRO') {
         if (period === '1Y') points = 52;
@@ -461,7 +462,7 @@ async function analyze() {
 
 window.addEventListener('DOMContentLoaded', () => {
     updateSkeletonGrid();
-    highlightTradingButton('1d'); // Default UI prep for trading buttons
+    highlightTradingButton('1d');
     analyze();
 });
 </script>
