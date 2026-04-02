@@ -14,6 +14,13 @@
 
 <div class="w-full max-w-xl p-5 relative">
 
+    <div class="flex justify-center mb-6">
+        <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex text-[0.6rem] uppercase tracking-widest relative">
+            <button onclick="toggleAsset('BTC')" id="toggle-btc" class="px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300 relative z-10">Bitcoin</button>
+            <button onclick="toggleAsset('SOL')" id="toggle-sol" class="px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 relative z-10">Solana</button>
+        </div>
+    </div>
+
     <div class="flex justify-between items-center px-1 mb-4 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
         <div class="w-16 text-left">
             <div id="dynamic-title" class="text-neutral-600 transition-colors duration-500">SCORE</div>
@@ -107,8 +114,31 @@
 let scoreChartInstance = null;
 window.currentScoreData = { score: 0, colorClass: "" };
 window.fullData = null; 
+window.currentAsset = 'BTC'; // Ukladá aktuálne zvolené aktívum
 
-// ZMENA: Dynamický výpočet pre mriežku v Skeleton Loadri (reaguje aj na otočenie/resajzovanie okna)
+function toggleAsset(asset) {
+    if (window.currentAsset === asset) return;
+    window.currentAsset = asset;
+    
+    // Prepnutie vizuálu tlačidiel
+    const btnBTC = document.getElementById('toggle-btc');
+    const btnSOL = document.getElementById('toggle-sol');
+    
+    if (asset === 'BTC') {
+        btnBTC.className = "px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300 relative z-10";
+        btnSOL.className = "px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 relative z-10";
+    } else {
+        btnSOL.className = "px-5 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300 relative z-10";
+        btnBTC.className = "px-5 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 relative z-10";
+    }
+
+    // Návrat na skeleton loader pred spustením analýzy
+    document.getElementById("scoreChart").classList.add("opacity-0");
+    document.getElementById("chart-skeleton").classList.remove("opacity-0");
+    
+    analyze();
+}
+
 function updateSkeletonGrid() {
     const skeleton = document.getElementById('chart-skeleton');
     if (!skeleton) return;
@@ -139,7 +169,6 @@ const customChartPlugin = {
     ctx.save();
     ctx.lineWidth = 1;
 
-    // ZMENA: Dynamický výpočet pre dokonalé čiarky v ostrom grafe
     const gridWidth = right - left;
     const targetDash = 4;
     const numDashes = Math.round((gridWidth / targetDash + 1) / 2);
@@ -304,7 +333,13 @@ function updateChart(period) {
 
 async function analyze() {
   try {
-    const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", { method: "POST", headers: {"Content-Type": "application/json"} });
+    // POSIELAME ASSET V JSON TELE POŽIADAVKY
+    const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", { 
+        method: "POST", 
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ asset: window.currentAsset })
+    });
+    
     if (!res.ok) throw new Error("Server error");
     const data = await res.json();
     if(data.error) throw new Error(data.error);
@@ -368,7 +403,6 @@ async function analyze() {
   }
 }
 
-// ZMENA: Ihneď pri prvotnom načítaní sa grid presne dopočíta podľa šírky displeja
 window.addEventListener('DOMContentLoaded', () => {
     updateSkeletonGrid();
     analyze();
