@@ -106,9 +106,9 @@
             
             <table class="w-full text-left text-[0.6rem] text-neutral-400 uppercase tracking-widest border border-neutral-800 rounded-lg overflow-hidden border-separate [border-spacing:0]">
                 <tbody>
-                    <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#22c55e] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap w-24 text-center">0 – 20 (%)</td><td class="py-2.5 pl-5 border-b border-l border-neutral-800">VALUE ZONE (DCA IN)</td></tr>
-                    <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#FFFF00] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">21 – 79 (%)</td><td class="py-2.5 pl-5 border-b border-l border-neutral-800">NEUTRAL ZONE (HODL)</td></tr>
-                    <tr><td class="py-2.5 px-0 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#EC4899] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">80 – 100 (%)</td><td class="py-2.5 pl-5 border-l border-neutral-800">EXIT ZONE (DCA OUT)</td></tr>
+                    <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#22c55e] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap w-24 text-center">0 – 20 (%)</td><td id="legend-low" class="py-2.5 pl-5 border-b border-l border-neutral-800">VALUE ZONE (DCA IN)</td></tr>
+                    <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#FFFF00] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">21 – 79 (%)</td><td id="legend-mid" class="py-2.5 pl-5 border-b border-l border-neutral-800">NEUTRAL ZONE (HODL)</td></tr>
+                    <tr><td class="py-2.5 px-0 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#EC4899] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">80 – 100 (%)</td><td id="legend-high" class="py-2.5 pl-5 border-l border-neutral-800">EXIT ZONE (DCA OUT)</td></tr>
                 </tbody>
             </table>
         </div>
@@ -157,10 +157,16 @@ function toggleMode(mode) {
     if (mode === 'MACRO') {
         document.getElementById('macro-buttons').classList.remove('hidden');
         document.getElementById('trading-buttons').classList.add('hidden');
+        document.getElementById('legend-low').innerText = "VALUE ZONE (DCA IN)";
+        document.getElementById('legend-mid').innerText = "NEUTRAL ZONE (HODL)";
+        document.getElementById('legend-high').innerText = "EXIT ZONE (DCA OUT)";
         window.currentInterval = '1w';
     } else {
         document.getElementById('macro-buttons').classList.add('hidden');
         document.getElementById('trading-buttons').classList.remove('hidden');
+        document.getElementById('legend-low').innerText = "VALUE ZONE (LONG)";
+        document.getElementById('legend-mid').innerText = "NEUTRAL ZONE (HODL)";
+        document.getElementById('legend-high').innerText = "EXIT ZONE (SHORT)";
         window.currentInterval = '1d'; // Default pre Trading
         highlightTradingButton('1d');
     }
@@ -415,9 +421,17 @@ async function analyze() {
 
     document.getElementById("badge-name").innerHTML = `${data.name} (${data.ticker})`;
 
+    // Logika zobrazenia pre TRADING vs MACRO v pulzujúcom štítku
+    let displayPhase = data.phase;
+    if (window.currentMode === 'TRADING') {
+        if (score <= 20) displayPhase = "LONG";
+        else if (score >= 80) displayPhase = "SHORT";
+        else displayPhase = "HODL";
+    }
+    
     let phaseBadge = document.getElementById("badge-phase");
     phaseBadge.className = `border px-3 py-1.5 rounded-md transition-colors duration-1000 ${phaseBadgeColor}`;
-    phaseBadge.innerHTML = data.phase;
+    phaseBadge.innerHTML = displayPhase;
 
     document.getElementById("val-price").innerHTML = `$${formattedPrice}`;
     
