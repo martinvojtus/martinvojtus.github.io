@@ -52,10 +52,10 @@
         </div>
     </div>
 
-    <div id="main-card" class="shrink-0 w-full landscape:w-[350px] md:w-[350px] lg:w-[400px] h-auto landscape:h-full md:h-full p-5 md:p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000 flex flex-col overflow-y-auto">
+    <div id="main-card" class="shrink-0 w-full landscape:w-[350px] md:w-[350px] lg:w-[400px] h-auto landscape:h-full md:h-full p-5 md:p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000 flex flex-col justify-between overflow-hidden">
         
-        <div class="flex flex-col shrink-0">
-            <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
+        <div>
+            <div class="flex justify-between items-center mb-6 text-[0.6rem] uppercase tracking-widest">
                 <div id="badge-name" class="border border-neutral-600/50 px-3 py-1.5 rounded-md text-neutral-400">
                     Bitcoin (BTC)
                 </div>
@@ -64,7 +64,7 @@
                 </div>
             </div>
             
-            <div class="flex justify-between items-start mb-4 gap-4 px-1">
+            <div class="flex justify-between items-start gap-4 px-1">
                 <div>
                     <div id="val-price" class="text-[1.8rem] font-bold leading-none tracking-tight text-white">
                         <span class="bg-neutral-800 text-transparent animate-pulse rounded">$00,000.00</span>
@@ -83,9 +83,7 @@
             </div>
         </div>
         
-        <div class="flex-1 min-h-[1rem]"></div>
-        
-        <div class="flex flex-col shrink-0 mt-auto">
+        <div class="mt-8">
             <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-4 relative">
                 <div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: transparent;"></div>
             </div>
@@ -99,10 +97,6 @@
             </table>
 
             <div id="error-box" class="hidden mt-4 bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center"></div>
-
-            <footer class="text-center text-[0.6rem] text-neutral-500 mt-6 tracking-[0.25em] uppercase">
-                MARTIN VOJTUŠ &copy; 2026 &bull; BUILD V1.0.0
-            </footer>
         </div>
     </div>
 
@@ -359,7 +353,7 @@ async function analyze() {
     dynTitle.style.color = scoreHex;
     dynTitle.style.textShadow = `0 0 10px ${scoreHex}80`;
 
-    document.getElementById("main-card").className = `shrink-0 w-full landscape:w-[350px] md:w-[350px] lg:w-[400px] h-auto landscape:h-full md:h-full p-5 md:p-6 rounded-3xl border shadow-2xl shadow-black/50 transition-colors duration-1000 flex flex-col overflow-y-auto ${dashboardStyle}`;
+    document.getElementById("main-card").className = `shrink-0 w-full landscape:w-[350px] md:w-[350px] lg:w-[400px] h-auto landscape:h-full md:h-full p-5 md:p-6 rounded-3xl border shadow-2xl shadow-black/50 transition-colors duration-1000 flex flex-col justify-between overflow-hidden ${dashboardStyle}`;
     
     document.getElementById("chart-skeleton").classList.add("opacity-0");
     document.getElementById("scoreChart").classList.remove("opacity-0");
