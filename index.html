@@ -21,17 +21,18 @@
             </svg>
         </div>
         
-        <div class="flex-1 flex justify-center text-[0.6rem] lowercase tracking-widest text-neutral-500">
-            martinvojtus•space
+        <div class="flex-1 flex justify-center text-[0.6rem] uppercase tracking-widest text-neutral-500 whitespace-nowrap">
+            MARTINVOJTUS • SPACE
         </div>
         
-        <div class="flex-1 flex justify-end items-center">
-            <button class="md:hidden text-neutral-500 hover:text-white transition-colors focus:outline-none">
+        <div class="flex-1 flex justify-end items-center relative">
+            <button id="mobile-btn" onclick="toggleMenu()" class="md:hidden text-neutral-500 hover:text-white transition-colors focus:outline-none">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-[14px] w-[14px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
-            <nav class="hidden md:flex items-center gap-6 text-[0.6rem] uppercase tracking-widest text-neutral-500">
+            
+            <nav id="nav-menu" class="hidden absolute top-8 right-0 w-48 bg-neutral-900 border border-neutral-800 rounded-xl flex-col items-end gap-4 p-5 shadow-2xl md:static md:w-auto md:bg-transparent md:border-none md:rounded-none md:p-0 md:shadow-none md:flex md:flex-row md:items-center md:gap-6 text-[0.6rem] uppercase tracking-widest text-neutral-500 z-50">
                 <a href="/" class="flex items-center gap-1.5 hover:text-white transition-colors">
                     <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded flex items-center justify-center font-sans text-[0.65rem] leading-none">₿</span> 
                     DCA INDICATOR
@@ -136,10 +137,19 @@
     </main>
 
 <script>
+// --- MENU LOGIC ---
+function toggleMenu() {
+    const nav = document.getElementById('nav-menu');
+    nav.classList.toggle('hidden');
+    nav.classList.toggle('flex');
+}
+
+// --- GLOBALS ---
 let scoreChartInstance = null;
 window.currentScoreData = { score: 0, colorClass: "" };
 window.fullData = null; 
 
+// --- SKELETON GRID ---
 function updateSkeletonGrid() {
     const skeleton = document.getElementById('chart-skeleton');
     if (!skeleton) return;
@@ -159,6 +169,7 @@ function updateSkeletonGrid() {
 }
 window.addEventListener('resize', updateSkeletonGrid);
 
+// --- CUSTOM CHART PLUGIN ---
 const customChartPlugin = {
   id: 'customChart',
   afterDraw: chart => {
@@ -247,6 +258,7 @@ const customChartPlugin = {
 
 Chart.register(customChartPlugin);
 
+// --- INTERACTION LOGIC (Click Outside to Close Tooltips/Menu) ---
 function hideTooltips() {
     if (scoreChartInstance) { 
         scoreChartInstance.setActiveElements([]); 
@@ -265,9 +277,28 @@ function hideTooltips() {
         }
     }
 }
-document.addEventListener('touchstart', e => { if (e.target.tagName !== 'CANVAS' && !e.target.closest('header')) hideTooltips(); });
-document.addEventListener('click', e => { if (e.target.tagName !== 'CANVAS' && !e.target.closest('header')) hideTooltips(); });
 
+document.addEventListener('touchstart', e => { 
+    if (e.target.tagName !== 'CANVAS' && !e.target.closest('header')) hideTooltips(); 
+    
+    // Close Mobile Menu
+    const nav = document.getElementById('nav-menu');
+    if (nav && !nav.classList.contains('hidden') && !e.target.closest('#nav-menu') && !e.target.closest('#mobile-btn')) {
+        toggleMenu();
+    }
+});
+
+document.addEventListener('click', e => { 
+    if (e.target.tagName !== 'CANVAS' && !e.target.closest('header')) hideTooltips(); 
+    
+    // Close Mobile Menu
+    const nav = document.getElementById('nav-menu');
+    if (nav && !nav.classList.contains('hidden') && !e.target.closest('#nav-menu') && !e.target.closest('#mobile-btn')) {
+        toggleMenu();
+    }
+});
+
+// --- CHART RENDERING ---
 function updateChart(period) {
     if (!window.fullData) return;
 
@@ -331,6 +362,7 @@ function updateChart(period) {
     });
 }
 
+// --- DATA FETCH ---
 async function analyze() {
   try {
     const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", { method: "POST", headers: {"Content-Type": "application/json"} });
