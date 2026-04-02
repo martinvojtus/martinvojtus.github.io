@@ -10,137 +10,103 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     </style>    
 </head>
-<body class="font-['Inter'] bg-black text-white min-h-screen flex flex-col overflow-x-hidden">
+<body class="font-['Inter'] bg-black text-white h-[100dvh] w-screen overflow-hidden flex flex-col landscape:flex-row md:flex-row p-4 gap-4 box-border">
 
-    <header class="w-full px-6 py-5 flex justify-between items-center z-50 relative">
-        <div class="flex-1 flex justify-start items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="72.35 270 935.31 810" class="h-[14px] w-auto text-neutral-500" fill="currentColor">
-              <g transform="translate(540, 540)">
-                <path d="M 0,0 L 467.654, -270 L 467.654, 270 L 0, 540 L -467.654, 270 L -467.654, -270 Z" />
-              </g>
-            </svg>
-        </div>
+    <div class="flex-1 flex flex-col min-h-0 min-w-0 relative">
         
-        <div class="flex-1 flex justify-center text-[0.6rem] uppercase tracking-widest text-neutral-500 whitespace-nowrap">
-            MARTINVOJTUS • SPACE
+        <div class="flex justify-between items-center px-1 mb-4 text-[0.6rem] uppercase tracking-widest shrink-0 h-[24px]">
+            <div class="w-16 text-left">
+                <div id="dynamic-title" class="text-neutral-600 transition-colors duration-500">SCORE</div>
+            </div>
+            <div class="flex gap-1 absolute left-1/2 -translate-x-1/2">
+                <button onclick="updateChart('1Y')" id="btn-1Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1Y</button>
+                <button onclick="updateChart('2Y')" id="btn-2Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">2Y</button>
+                <button onclick="updateChart('4Y')" id="btn-4Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">4Y</button>
+                <button onclick="updateChart('ALL')" id="btn-ALL" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">ALL</button>
+            </div>
+            <div class="w-16 flex justify-end">
+                <div id="dynamic-score" class="transition-colors duration-500 flex items-center h-full">
+                    <span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">00.0%</span>
+                </div>
+            </div>
         </div>
-        
-        <div class="flex-1 flex justify-end items-center">
-            <button id="mobile-btn" onclick="toggleMenu()" class="md:hidden text-neutral-500 hover:text-white transition-colors focus:outline-none z-50 relative">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-[14px] w-[14px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
+
+        <div class="flex-1 relative w-full min-h-0">
+            <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
+                <div class="w-full h-[1px] opacity-5" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
+                <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
+                <div class="w-full h-[1px] opacity-50" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
+                <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
+                <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
+                <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
+                <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
+                <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
+                <div class="w-full h-[1px] opacity-50" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
+                <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
+                <div class="w-full h-[1px] opacity-5" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
+            </div>
             
-            <nav id="nav-menu" class="hidden absolute top-full left-0 w-full bg-black/40 backdrop-blur-lg border-b border-neutral-800/80 py-8 px-6 flex-col items-start gap-6 shadow-2xl md:static md:w-auto md:bg-transparent md:backdrop-blur-none md:border-none md:py-0 md:px-0 md:shadow-none md:flex md:flex-row md:items-center md:gap-6 text-[0.6rem] uppercase tracking-widest text-neutral-500 z-40">
-                <a href="/" class="hover:text-white transition-colors">DCA INDICATOR</a>
-                <a href="#" class="hover:text-white transition-colors">Methodology</a>
-                <a href="#" class="hover:text-white transition-colors">Contact</a>
-            </nav>
+            <div class="absolute top-0 bottom-0 -left-[8px] w-[calc(100%+16px)] pointer-events-none">
+                <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000 pointer-events-auto"></canvas>
+            </div>
         </div>
-    </header>
+    </div>
 
-    <main class="flex-1 flex justify-center items-start pt-2 pb-10 w-full">
-        <div class="w-full max-w-xl p-5 relative">
-
-            <div class="flex justify-between items-center px-1 mb-4 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
-                <div class="w-16 text-left">
-                    <div id="dynamic-title" class="text-neutral-600 transition-colors duration-500">SCORE</div>
+    <div id="main-card" class="shrink-0 w-full landscape:w-[350px] md:w-[350px] lg:w-[400px] h-auto landscape:h-full md:h-full p-5 md:p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000 flex flex-col overflow-y-auto">
+        
+        <div class="flex flex-col shrink-0">
+            <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
+                <div id="badge-name" class="border border-neutral-600/50 px-3 py-1.5 rounded-md text-neutral-400">
+                    Bitcoin (BTC)
                 </div>
-                <div class="flex gap-1 absolute left-1/2 -translate-x-1/2">
-                    <button onclick="updateChart('1Y')" id="btn-1Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1Y</button>
-                    <button onclick="updateChart('2Y')" id="btn-2Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">2Y</button>
-                    <button onclick="updateChart('4Y')" id="btn-4Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">4Y</button>
-                    <button onclick="updateChart('ALL')" id="btn-ALL" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">ALL</button>
-                </div>
-                <div class="w-16 flex justify-end">
-                    <div id="dynamic-score" class="transition-colors duration-500 flex items-center h-full">
-                        <span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">00.0%</span>
-                    </div>
+                <div id="badge-phase" class="border border-neutral-800 px-3 py-1.5 rounded-md transition-colors duration-1000 text-transparent bg-neutral-800 animate-pulse">
+                    LOADING ZONE
                 </div>
             </div>
-
-            <div class="h-60 w-full relative mb-4">
-                <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
-                    <div class="w-full h-[1px] opacity-5" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-                    <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-                    <div class="w-full h-[1px] opacity-50" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-                    <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-                    <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-                    <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-                    <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-                    <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-                    <div class="w-full h-[1px] opacity-50" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-                    <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-                    <div class="w-full h-[1px] opacity-5" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-                </div>
-                
-                <div class="absolute top-0 bottom-0 -left-[8px] w-[calc(100%+16px)] pointer-events-none">
-                    <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000 pointer-events-auto"></canvas>
-                </div>
-            </div>
-
-            <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000">
-                
-                <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
-                    <div id="badge-name" class="border border-neutral-600/50 px-3 py-1.5 rounded-md text-neutral-400">
-                        Bitcoin (BTC)
-                    </div>
-                    <div id="badge-phase" class="border border-neutral-800 px-3 py-1.5 rounded-md transition-colors duration-1000 text-transparent bg-neutral-800 animate-pulse">
-                        LOADING ZONE
-                    </div>
-                </div>
-                
-                <div class="flex justify-between items-start mb-4 gap-4 px-1">
-                    <div>
-                        <div id="val-price" class="text-[1.8rem] font-bold leading-none tracking-tight text-white">
-                            <span class="bg-neutral-800 text-transparent animate-pulse rounded">$00,000.00</span>
-                        </div>
-                        <div id="val-change" class="text-[0.6rem] uppercase tracking-widest mt-2 flex items-center gap-1.5">
-                            <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">+0.00%</span> 
-                            <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1.5 py-0.5">24H</span>
-                        </div>
-                    </div>
-                    <div class="text-right flex flex-col items-end">
-                        <div id="val-score-large" class="text-[1.8rem] font-bold leading-none">
-                            <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">00.0%</span>
-                        </div>
-                        <div class="text-[0.6rem] text-neutral-500 uppercase tracking-widest mt-2">SCORE</div>
-                    </div>
-                </div>
-                
+            
+            <div class="flex justify-between items-start mb-4 gap-4 px-1">
                 <div>
-                    <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-4 relative">
-                        <div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: transparent;"></div>
+                    <div id="val-price" class="text-[1.8rem] font-bold leading-none tracking-tight text-white">
+                        <span class="bg-neutral-800 text-transparent animate-pulse rounded">$00,000.00</span>
                     </div>
-                    
-                    <table class="w-full text-left text-[0.6rem] text-neutral-400 uppercase tracking-widest border border-neutral-800 rounded-lg overflow-hidden border-separate [border-spacing:0]">
-                        <tbody>
-                            <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#22c55e] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap w-24 text-center">0 – 20 (%)</td><td class="py-2.5 pl-5 border-b border-l border-neutral-800">VALUE ZONE (DCA IN)</td></tr>
-                            <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#FFFF00] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">21 – 79 (%)</td><td class="py-2.5 pl-5 border-b border-l border-neutral-800">NEUTRAL ZONE (HODL)</td></tr>
-                            <tr><td class="py-2.5 px-0 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#EC4899] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">80 – 100 (%)</td><td class="py-2.5 pl-5 border-l border-neutral-800">EXIT ZONE (DCA OUT)</td></tr>
-                        </tbody>
-                    </table>
+                    <div id="val-change" class="text-[0.6rem] uppercase tracking-widest mt-2 flex items-center gap-1.5">
+                        <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">+0.00%</span> 
+                        <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1.5 py-0.5">24H</span>
+                    </div>
+                </div>
+                <div class="text-right flex flex-col items-end">
+                    <div id="val-score-large" class="text-[1.8rem] font-bold leading-none">
+                        <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">00.0%</span>
+                    </div>
+                    <div class="text-[0.6rem] text-neutral-500 uppercase tracking-widest mt-2">SCORE</div>
                 </div>
             </div>
+        </div>
+        
+        <div class="flex-1 min-h-[1rem]"></div>
+        
+        <div class="flex flex-col shrink-0 mt-auto">
+            <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-4 relative">
+                <div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: transparent;"></div>
+            </div>
+            
+            <table class="w-full text-left text-[0.6rem] text-neutral-400 uppercase tracking-widest border border-neutral-800 rounded-lg overflow-hidden border-separate [border-spacing:0]">
+                <tbody>
+                    <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#22c55e] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap w-24 text-center">0 – 20 (%)</td><td class="py-2.5 pl-5 border-b border-l border-neutral-800">VALUE ZONE (DCA IN)</td></tr>
+                    <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#FFFF00] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">21 – 79 (%)</td><td class="py-2.5 pl-5 border-b border-l border-neutral-800">NEUTRAL ZONE (HODL)</td></tr>
+                    <tr><td class="py-2.5 px-0 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#EC4899] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">80 – 100 (%)</td><td class="py-2.5 pl-5 border-l border-neutral-800">EXIT ZONE (DCA OUT)</td></tr>
+                </tbody>
+            </table>
 
             <div id="error-box" class="hidden mt-4 bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center"></div>
 
-            <footer class="text-center text-[0.6rem] text-neutral-500 mt-4 tracking-[0.25em] uppercase">
+            <footer class="text-center text-[0.6rem] text-neutral-500 mt-6 tracking-[0.25em] uppercase">
                 MARTIN VOJTUŠ &copy; 2026 &bull; BUILD V1.0.0
             </footer>
-
         </div>
-    </main>
+    </div>
 
 <script>
-// --- MENU LOGIC ---
-function toggleMenu() {
-    const nav = document.getElementById('nav-menu');
-    nav.classList.toggle('hidden');
-    nav.classList.toggle('flex');
-}
-
 // --- GLOBALS ---
 let scoreChartInstance = null;
 window.currentScoreData = { score: 0, colorClass: "" };
@@ -255,7 +221,7 @@ const customChartPlugin = {
 
 Chart.register(customChartPlugin);
 
-// --- INTERACTION LOGIC (Click Outside to Close Tooltips/Menu) ---
+// --- INTERACTION LOGIC ---
 function hideTooltips() {
     if (scoreChartInstance) { 
         scoreChartInstance.setActiveElements([]); 
@@ -276,23 +242,11 @@ function hideTooltips() {
 }
 
 document.addEventListener('touchstart', e => { 
-    if (e.target.tagName !== 'CANVAS' && !e.target.closest('header')) hideTooltips(); 
-    
-    // Close Mobile Menu
-    const nav = document.getElementById('nav-menu');
-    if (nav && !nav.classList.contains('hidden') && !e.target.closest('#nav-menu') && !e.target.closest('#mobile-btn')) {
-        toggleMenu();
-    }
+    if (e.target.tagName !== 'CANVAS') hideTooltips(); 
 });
 
 document.addEventListener('click', e => { 
-    if (e.target.tagName !== 'CANVAS' && !e.target.closest('header')) hideTooltips(); 
-    
-    // Close Mobile Menu
-    const nav = document.getElementById('nav-menu');
-    if (nav && !nav.classList.contains('hidden') && !e.target.closest('#nav-menu') && !e.target.closest('#mobile-btn')) {
-        toggleMenu();
-    }
+    if (e.target.tagName !== 'CANVAS') hideTooltips(); 
 });
 
 // --- CHART RENDERING ---
@@ -405,7 +359,7 @@ async function analyze() {
     dynTitle.style.color = scoreHex;
     dynTitle.style.textShadow = `0 0 10px ${scoreHex}80`;
 
-    document.getElementById("main-card").className = `p-6 rounded-3xl border shadow-2xl shadow-black/50 transition-colors duration-1000 ${dashboardStyle}`;
+    document.getElementById("main-card").className = `shrink-0 w-full landscape:w-[350px] md:w-[350px] lg:w-[400px] h-auto landscape:h-full md:h-full p-5 md:p-6 rounded-3xl border shadow-2xl shadow-black/50 transition-colors duration-1000 flex flex-col overflow-y-auto ${dashboardStyle}`;
     
     document.getElementById("chart-skeleton").classList.add("opacity-0");
     document.getElementById("scoreChart").classList.remove("opacity-0");
