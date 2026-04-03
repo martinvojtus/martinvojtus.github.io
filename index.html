@@ -14,15 +14,20 @@
 
 <div class="w-full max-w-xl p-5 relative">
 
-    <div class="grid grid-cols-2 gap-3 mb-6 w-full">
-        <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex w-full text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
-            <button onclick="toggleAsset('BTC')" id="toggle-asset-btc" class="flex-1 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300">Bitcoin</button>
-            <button onclick="toggleAsset('SOL')" id="toggle-asset-sol" class="flex-1 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">Solana</button>
+    <div class="flex gap-2 sm:gap-3 mb-6 w-full h-[34px]">
+        <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
+            <button onclick="toggleAsset('BTC')" id="toggle-asset-btc" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Bitcoin</button>
+            <button onclick="toggleAsset('SOL')" id="toggle-asset-sol" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Solana</button>
         </div>
-        <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex w-full text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
-            <button onclick="toggleMode('MACRO')" id="toggle-mode-macro" class="flex-1 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300">Macro</button>
-            <button onclick="toggleMode('TRADING')" id="toggle-mode-trading" class="flex-1 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">Trading</button>
+        <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
+            <button onclick="toggleMode('MACRO')" id="toggle-mode-macro" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Macro</button>
+            <button onclick="toggleMode('TRADING')" id="toggle-mode-trading" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Trading</button>
         </div>
+        <button onclick="triggerAnalysis()" class="bg-neutral-900 border border-neutral-800 rounded-lg w-[34px] sm:w-[38px] flex items-center justify-center text-neutral-500 hover:text-white transition-all duration-300 shrink-0 h-full">
+            <svg id="btn-refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+        </button>
     </div>
 
     <div class="flex justify-between items-center px-1 mb-4 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
@@ -120,36 +125,27 @@
 </div>
 
 <script>
-// --- GLOBALS ---
+// --- GLOBALS & STATE RECOVERY (LOCAL STORAGE) ---
 let scoreChartInstance = null;
 window.currentScoreData = { score: 0, colorClass: "" };
 window.fullData = null; 
 
-// STATE PREPÍNAČOV
-window.currentAsset = 'BTC'; 
-window.currentMode = 'MACRO';
-window.currentInterval = '1w'; // Pre Macro: 1w. Pre Trading: 1d, 4h, 2h, 1h.
-window.currentMacroView = '4Y'; // Default pre zobrazenie grafu v Macro
+window.currentAsset = localStorage.getItem('vbsx_asset') || 'BTC'; 
+window.currentMode = localStorage.getItem('vbsx_mode') || 'MACRO';
+window.currentInterval = localStorage.getItem('vbsx_interval') || '1w'; 
+window.currentMacroView = localStorage.getItem('vbsx_macro_view') || '4Y';
 
-// --- TOGGLE LOGIC ---
-function toggleAsset(asset) {
-    if (window.currentAsset === asset) return;
-    window.currentAsset = asset;
-    
-    document.getElementById('toggle-asset-btc').className = asset === 'BTC' ? "flex-1 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "flex-1 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
-    document.getElementById('toggle-asset-sol').className = asset === 'SOL' ? "flex-1 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "flex-1 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
+// --- UI INIT ---
+function initUI() {
+    // Assets
+    document.getElementById('toggle-asset-btc').className = window.currentAsset === 'BTC' ? "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
+    document.getElementById('toggle-asset-sol').className = window.currentAsset === 'SOL' ? "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
 
-    triggerAnalysis();
-}
+    // Modes
+    document.getElementById('toggle-mode-macro').className = window.currentMode === 'MACRO' ? "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
+    document.getElementById('toggle-mode-trading').className = window.currentMode === 'TRADING' ? "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
 
-function toggleMode(mode) {
-    if (window.currentMode === mode) return;
-    window.currentMode = mode;
-    
-    document.getElementById('toggle-mode-macro').className = mode === 'MACRO' ? "flex-1 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "flex-1 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
-    document.getElementById('toggle-mode-trading').className = mode === 'TRADING' ? "flex-1 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "flex-1 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
-
-    if (mode === 'MACRO') {
+    if (window.currentMode === 'MACRO') {
         document.getElementById('macro-buttons').classList.remove('hidden');
         document.getElementById('trading-buttons').classList.add('hidden');
         document.getElementById('legend-low').innerText = "VALUE ZONE (DCA IN)";
@@ -162,22 +158,37 @@ function toggleMode(mode) {
         document.getElementById('legend-low').innerText = "VALUE ZONE (LONG)";
         document.getElementById('legend-mid').innerText = "NEUTRAL ZONE (HODL)";
         document.getElementById('legend-high').innerText = "EXIT ZONE (SHORT)";
-        window.currentInterval = '1d'; // Default pre Trading
-        highlightTradingButton('1d');
+        if (window.currentInterval === '1w') window.currentInterval = '1d';
+        highlightTradingButton(window.currentInterval);
     }
+}
 
+// --- TOGGLE LOGIC ---
+function toggleAsset(asset) {
+    if (window.currentAsset === asset) return;
+    window.currentAsset = asset;
+    localStorage.setItem('vbsx_asset', asset);
+    initUI();
+    triggerAnalysis();
+}
+
+function toggleMode(mode) {
+    if (window.currentMode === mode) return;
+    window.currentMode = mode;
+    localStorage.setItem('vbsx_mode', mode);
+    initUI();
     triggerAnalysis();
 }
 
 function changeTradingInterval(interval) {
     if (window.currentInterval === interval && window.currentMode === 'TRADING') return;
     window.currentInterval = interval;
+    localStorage.setItem('vbsx_interval', interval);
     highlightTradingButton(interval);
     triggerAnalysis();
 }
 
 function highlightTradingButton(interval) {
-    // Pridané 2h do poľa
     ['1d', '4h', '2h', '1h'].forEach(p => {
         const btn = document.getElementById(`btn-${p}`);
         if(btn) btn.className = p === interval ? "px-3 py-1 rounded-md text-white bg-neutral-800 transition-all duration-300" : "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
@@ -185,6 +196,10 @@ function highlightTradingButton(interval) {
 }
 
 function triggerAnalysis() {
+    // Roztočenie refresh ikony
+    const refBtn = document.getElementById('btn-refresh-icon');
+    if (refBtn) refBtn.classList.add('animate-spin');
+
     document.getElementById("scoreChart").classList.add("opacity-0");
     document.getElementById("chart-skeleton").classList.remove("opacity-0");
     analyze();
@@ -326,6 +341,7 @@ function updateChart(period) {
 
     if (window.currentMode === 'MACRO') {
         window.currentMacroView = period;
+        localStorage.setItem('vbsx_macro_view', period);
         ['1Y', '2Y', '4Y', 'ALL'].forEach(p => {
             const btn = document.getElementById(`btn-${p}`);
             if(btn) btn.className = p === period ? "px-3 py-1 rounded-md text-white bg-neutral-800 transition-all duration-300" : "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
@@ -466,13 +482,17 @@ async function analyze() {
     const eb = document.getElementById("error-box"); 
     eb.innerText = "❌ SERVER OFFLINE. PLEASE TRY AGAIN."; 
     eb.classList.remove("hidden");
+  } finally {
+    // Vždy vypnúť animáciu točenia po dokončení požiadavky (aj pri chybe)
+    const refBtn = document.getElementById('btn-refresh-icon');
+    if (refBtn) refBtn.classList.remove('animate-spin');
   }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
     updateSkeletonGrid();
-    highlightTradingButton('1d');
-    analyze();
+    initUI(); // Načíta uložene dáta a pripraví UI
+    triggerAnalysis(); // Zavolá stiahnutie
 });
 </script>
 </body>
