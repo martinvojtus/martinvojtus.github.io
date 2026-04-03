@@ -203,7 +203,6 @@ function initUI() {
     updateExecutionDeskUI();
 }
 
-// Ochrana: Phantom funguje len na SOL, preto pri BTC zmeníme UI
 function updateExecutionDeskUI() {
     const btcOverlay = document.getElementById('exec-btc-overlay');
     const solUI = document.getElementById('exec-sol-ui');
@@ -256,13 +255,26 @@ function triggerAnalysis() {
     analyze();
 }
 
-// --- WEB3 PHANTOM & JUPITER LOGIC ---
+// --- WEB3 PHANTOM & JUPITER LOGIC (UPDATED WITH DEEP LINK) ---
 async function connectPhantom() {
     const provider = window.phantom?.solana;
+    
     if (!provider?.isPhantom) {
-        alert("Nainštaluj si Phantom peňaženku (phantom.app) z oficiálnej stránky.");
-        return;
+        // Skontrolujeme, či je užívateľ na mobile
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+            // Sme na mobile v bežnom prehliadači -> Použijeme Phantom Universal Link
+            const currentUrl = encodeURIComponent(window.location.href);
+            window.location.href = `https://phantom.app/ul/browse/${currentUrl}?ref=${currentUrl}`;
+            return;
+        } else {
+            // Sme na PC bez peňaženky
+            alert("Nainštaluj si Phantom peňaženku (phantom.app) z oficiálnej stránky.");
+            return;
+        }
     }
+    
     try {
         const resp = await provider.connect();
         userWallet = resp.publicKey.toString();
@@ -309,14 +321,12 @@ async function executeTrade(action) {
     const amountInLamports = Math.floor(parseFloat(amountInput) * (10 ** decimals));
 
     try {
-        // 1. Získať najlepší kurz z Jupitera (Slippage 0.5%)
         const quoteResponse = await (await fetch(`https://quote-api.jup.ag/v6/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${amountInLamports}&slippageBps=50`)).json();
         
         if(quoteResponse.error) throw new Error("Chyba likvidity alebo prázdna peňaženka.");
 
         statusDiv.innerHTML = `<span class="text-[#ab9ff2]">Potvrď transakciu vo Phantome...</span>`;
 
-        // 2. Vyžiadať pripravenú transakciu od Jupitera
         const { swapTransaction } = await (await fetch('https://quote-api.jup.ag/v6/swap', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -327,7 +337,6 @@ async function executeTrade(action) {
             })
         })).json();
 
-        // 3. Dekódovať a podpísať vo Phantome
         const swapTransactionBuf = Uint8Array.from(atob(swapTransaction), c => c.charCodeAt(0));
         const transaction = solanaWeb3.VersionedTransaction.deserialize(swapTransactionBuf);
         
