@@ -40,6 +40,7 @@
         <div id="trading-buttons" class="hidden flex gap-1 absolute left-1/2 -translate-x-1/2">
             <button onclick="changeTradingInterval('1d')" id="btn-1d" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1D</button>
             <button onclick="changeTradingInterval('4h')" id="btn-4h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">4H</button>
+            <button onclick="changeTradingInterval('2h')" id="btn-2h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">2H</button>
             <button onclick="changeTradingInterval('1h')" id="btn-1h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1H</button>
         </div>
 
@@ -116,10 +117,6 @@
 
     <div id="error-box" class="hidden mt-4 bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center"></div>
 
-    <footer class="text-center text-[0.6rem] text-neutral-500 mt-4 tracking-[0.25em] uppercase">
-        MARTIN VOJTUŠ &copy; 2026 &bull; BUILD V1.0.0
-    </footer>
-
 </div>
 
 <script>
@@ -131,7 +128,7 @@ window.fullData = null;
 // STATE PREPÍNAČOV
 window.currentAsset = 'BTC'; 
 window.currentMode = 'MACRO';
-window.currentInterval = '1w'; // Pre Macro: 1w. Pre Trading: 1d, 4h, 1h.
+window.currentInterval = '1w'; // Pre Macro: 1w. Pre Trading: 1d, 4h, 2h, 1h.
 window.currentMacroView = '4Y'; // Default pre zobrazenie grafu v Macro
 
 // --- TOGGLE LOGIC ---
@@ -139,7 +136,6 @@ function toggleAsset(asset) {
     if (window.currentAsset === asset) return;
     window.currentAsset = asset;
     
-    // Zmena tried prispôsobená pre flex-1
     document.getElementById('toggle-asset-btc').className = asset === 'BTC' ? "flex-1 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "flex-1 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
     document.getElementById('toggle-asset-sol').className = asset === 'SOL' ? "flex-1 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "flex-1 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
 
@@ -150,7 +146,6 @@ function toggleMode(mode) {
     if (window.currentMode === mode) return;
     window.currentMode = mode;
     
-    // Zmena tried prispôsobená pre flex-1
     document.getElementById('toggle-mode-macro').className = mode === 'MACRO' ? "flex-1 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "flex-1 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
     document.getElementById('toggle-mode-trading').className = mode === 'TRADING' ? "flex-1 py-1.5 rounded-md bg-neutral-700 text-white transition-all duration-300" : "flex-1 py-1.5 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
 
@@ -182,7 +177,8 @@ function changeTradingInterval(interval) {
 }
 
 function highlightTradingButton(interval) {
-    ['1d', '4h', '1h'].forEach(p => {
+    // Pridané 2h do poľa
+    ['1d', '4h', '2h', '1h'].forEach(p => {
         const btn = document.getElementById(`btn-${p}`);
         if(btn) btn.className = p === interval ? "px-3 py-1 rounded-md text-white bg-neutral-800 transition-all duration-300" : "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
     });
@@ -421,7 +417,6 @@ async function analyze() {
 
     document.getElementById("badge-name").innerHTML = `${data.name} (${data.ticker})`;
 
-    // Logika zobrazenia pre TRADING vs MACRO v pulzujúcom štítku
     let displayPhase = data.phase;
     if (window.currentMode === 'TRADING') {
         if (score <= 20) displayPhase = "LONG";
