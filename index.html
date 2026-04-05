@@ -19,11 +19,11 @@
 <div class="w-full max-w-xl p-5 relative">
 
     <!-- TRADER WARNING BOX -->
-    <div id="top-warning-box" class="mb-6 animate-fade-in relative overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900/40 py-3 text-center transition-colors duration-1000">
+    <div id="top-warning-box" class="mb-6 animate-fade-in relative overflow-hidden rounded-md border border-neutral-800 bg-neutral-900/40 py-1.5 text-center transition-colors duration-1000">
         <!-- Pixel perfect alignment placeholder -->
         <div class="opacity-0 select-none text-[0.6rem] uppercase tracking-widest font-bold">ALIGN</div>
         <div class="absolute inset-0 flex items-center justify-center gap-2">
-            <svg id="warning-icon" class="w-3.5 h-3.5 hidden animate-pulse-soft transition-colors duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg id="warning-icon" class="w-3 h-3 hidden animate-pulse-soft transition-colors duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             <span id="warning-text-display" class="text-[0.6rem] uppercase tracking-widest font-bold animate-pulse-soft transition-colors duration-500">STANDBY</span>
@@ -369,7 +369,7 @@ async function analyze() {
         wText = `${data.last_signal.signal} SIGNAL CONFIRMED`;
         wTime = data.last_signal.time;
     } else {
-        if (wText.includes("PROBABLE")) {
+        if (wText.includes("INCOMING")) {
             wText += " - WAIT FOR SIGNAL";
             showIcon = true;
         }
@@ -380,7 +380,7 @@ async function analyze() {
     else if (wColor === "#EC4899") { boxColors = "bg-[#EC4899]/5 border-[#EC4899]/30"; }
     else if (wColor === "#FFFF00") { boxColors = "bg-[#FFFF00]/5 border-[#FFFF00]/30"; }
 
-    wBox.className = `mb-6 animate-fade-in relative overflow-hidden rounded-xl border py-3 text-center transition-colors duration-1000 ${boxColors}`;
+    wBox.className = `mb-6 animate-fade-in relative overflow-hidden rounded-md border py-1.5 text-center transition-colors duration-1000 ${boxColors}`;
     wBox.style.backgroundColor = "";
     wBox.style.borderColor = "";
 

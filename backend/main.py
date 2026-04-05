@@ -419,10 +419,10 @@ def analyze(req: AnalyzeRequest = None):
                 best_score = s
                 
         if best_score <= 30:
-            warning_text = "PROBABLE LONG"
+            warning_text = "INCOMING LONG"
             warning_color = "#22c55e"
         elif best_score >= 70:
-            warning_text = "PROBABLE SHORT"
+            warning_text = "INCOMING SHORT"
             warning_color = "#EC4899"
         else:
             warning_text = "NEUTRAL ZONE"
