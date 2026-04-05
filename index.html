@@ -354,8 +354,6 @@ async function analyze() {
     const wTextDisplay = document.getElementById("warning-text-display");
     const wTimeDisplay = document.getElementById("warning-time-display");
 
-    let wBg = "rgba(23, 23, 23, 0.4)"; // Default neutral-900/40
-    let wBorder = "rgba(38, 38, 38, 1)"; // Default neutral-800
     let wText = data.warning_text || "STANDBY";
     let wColor = data.warning_color || "#525252";
     let wTime = "";
@@ -363,18 +361,19 @@ async function analyze() {
     if (data.last_signal) {
         const isLong = data.last_signal.signal === "LONG";
         wColor = isLong ? "#22c55e" : "#EC4899";
-        wBg = isLong ? "rgba(34, 197, 94, 0.15)" : "rgba(236, 72, 153, 0.15)";
-        wBorder = isLong ? "rgba(34, 197, 94, 0.4)" : "rgba(236, 72, 153, 0.4)";
         wText = `${data.last_signal.signal} SIGNAL CONFIRMED`;
         wTime = data.last_signal.time;
-    } else {
-        if (wColor === "#22c55e") { wBg = "rgba(34, 197, 94, 0.15)"; wBorder = "rgba(34, 197, 94, 0.4)"; }
-        else if (wColor === "#EC4899") { wBg = "rgba(236, 72, 153, 0.15)"; wBorder = "rgba(236, 72, 153, 0.4)"; }
-        else if (wColor === "#FFFF00") { wBg = "rgba(255, 255, 0, 0.1)"; wBorder = "rgba(255, 255, 0, 0.2)"; }
     }
 
-    wBox.style.backgroundColor = wBg;
-    wBox.style.borderColor = wBorder;
+    let boxColors = "bg-neutral-900/40 border-neutral-800";
+    if (wColor === "#22c55e") { boxColors = "bg-[#030a05] border-[#22c55e]/30"; }
+    else if (wColor === "#EC4899") { boxColors = "bg-[#EC4899]/5 border-[#EC4899]/30"; }
+    else if (wColor === "#FFFF00") { boxColors = "bg-[#FFFF00]/5 border-[#FFFF00]/30"; }
+
+    wBox.className = `mb-6 animate-fade-in relative overflow-hidden rounded-xl border py-3 text-center transition-colors duration-1000 ${boxColors}`;
+    wBox.style.backgroundColor = "";
+    wBox.style.borderColor = "";
+
     wTextDisplay.innerText = wText;
     wTextDisplay.style.color = wColor;
 
