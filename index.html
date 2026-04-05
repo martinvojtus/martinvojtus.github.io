@@ -8,140 +8,256 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
     </style>    
 </head>
 <body class="font-['Inter'] bg-black text-white flex justify-center min-h-screen items-start pt-6 pb-10 overflow-x-hidden">
 
 <div class="w-full max-w-xl p-5 relative">
 
-    <div class="flex gap-2 sm:gap-3 mb-6 w-full h-[34px]">
-        <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
-            <button onclick="toggleAsset('BTC')" id="toggle-asset-btc" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Bitcoin</button>
-            <button onclick="toggleAsset('SOL')" id="toggle-asset-sol" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Solana</button>
-        </div>
-        <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
-            <button onclick="toggleMode('MACRO')" id="toggle-mode-macro" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Macro</button>
-            <button onclick="toggleMode('TRADING')" id="toggle-mode-trading" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Trading</button>
-        </div>
-        <button onclick="triggerAnalysis()" class="bg-neutral-900 border border-neutral-800 rounded-lg w-[34px] sm:w-[38px] flex items-center justify-center text-neutral-500 hover:text-white transition-all duration-300 shrink-0 h-full">
-            <svg id="btn-refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
-        </button>
-    </div>
-
-    <div class="flex justify-between items-center px-1 mb-4 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
-        <div class="w-16 text-left">
-            <div id="dynamic-title" class="text-neutral-600 transition-colors duration-500">SCORE</div>
-        </div>
-        
-        <div id="macro-buttons" class="flex gap-1 absolute left-1/2 -translate-x-1/2">
-            <button onclick="updateChart('1Y')" id="btn-1Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1Y</button>
-            <button onclick="updateChart('2Y')" id="btn-2Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">2Y</button>
-            <button onclick="updateChart('4Y')" id="btn-4Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">4Y</button>
-            <button onclick="updateChart('ALL')" id="btn-ALL" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">ALL</button>
-        </div>
-        
-        <div id="trading-buttons" class="hidden flex gap-1 absolute left-1/2 -translate-x-1/2">
-            <button onclick="changeTradingInterval('1d')" id="btn-1d" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1D</button>
-            <button onclick="changeTradingInterval('4h')" id="btn-4h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">4H</button>
-            <button onclick="changeTradingInterval('2h')" id="btn-2h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">2H</button>
-            <button onclick="changeTradingInterval('1h')" id="btn-1h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1H</button>
-        </div>
-
-        <div class="w-16 flex justify-end">
-            <div id="dynamic-score" class="transition-colors duration-500 flex items-center h-full">
-                <span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">00.0%</span>
+    <!-- TOP NAVIGATION / TOGGLES -->
+    <div class="flex flex-col gap-3 mb-6">
+        <div class="flex gap-2 sm:gap-3 w-full h-[34px]">
+            <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
+                <button onclick="toggleAsset('BTC')" id="toggle-asset-btc" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Bitcoin</button>
+                <button onclick="toggleAsset('SOL')" id="toggle-asset-sol" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Solana</button>
             </div>
+            <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
+                <button onclick="toggleMode('MACRO')" id="toggle-mode-macro" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Macro</button>
+                <button onclick="toggleMode('TRADING')" id="toggle-mode-trading" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Trading</button>
+            </div>
+        </div>
+        
+        <div class="flex gap-2 sm:gap-3 w-full h-[34px]">
+            <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center font-bold">
+                <button onclick="toggleView('dashboard')" id="toggle-view-dashboard" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Dashboard</button>
+                <button onclick="toggleView('wallet')" id="toggle-view-wallet" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Wallet</button>
+            </div>
+            <button onclick="triggerAnalysis()" class="bg-neutral-900 border border-neutral-800 rounded-lg w-[34px] sm:w-[38px] flex items-center justify-center text-neutral-500 hover:text-white transition-all duration-300 shrink-0 h-full">
+                <svg id="btn-refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+            </button>
         </div>
     </div>
 
-    <div class="h-60 w-full relative mb-4">
-        <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
-            <div class="w-full h-[1px] opacity-5" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-            <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-            <div class="w-full h-[1px] opacity-50" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-            <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-            <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-            <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-            <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-            <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-            <div class="w-full h-[1px] opacity-50" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-            <div class="w-full h-[1px] opacity-10" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-            <div class="w-full h-[1px] opacity-5" style="background-image: repeating-linear-gradient(to right, #525252 0, #525252 4px, transparent 4px, transparent 8px);"></div>
-        </div>
-        
-        <div class="absolute top-0 bottom-0 -left-[8px] w-[calc(100%+16px)] pointer-events-none">
-            <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000 pointer-events-auto"></canvas>
-        </div>
-    </div>
-
-    <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000">
-        
-        <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
-            <div id="badge-name" class="border border-neutral-600/50 px-3 py-1.5 rounded-md text-neutral-400">
-                Bitcoin (BTC)
-            </div>
-            <div id="badge-phase" class="border border-neutral-800 px-3 py-1.5 rounded-md transition-colors duration-1000 text-transparent bg-neutral-800 animate-pulse">
-                LOADING ZONE
-            </div>
-        </div>
-        
-        <div class="flex justify-between items-start mb-4 gap-4 px-1">
-            <div>
-                <div id="val-price" class="text-[1.8rem] font-bold leading-none tracking-tight text-white">
-                    <span class="bg-neutral-800 text-transparent animate-pulse rounded">$00,000.00</span>
-                </div>
-                <div id="val-change" class="text-[0.6rem] uppercase tracking-widest mt-2 flex items-center gap-1.5">
-                    <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">+0.00%</span> 
-                    <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1.5 py-0.5">24H</span>
-                </div>
-            </div>
-            <div class="text-right flex flex-col items-end">
-                <div id="val-score-large" class="text-[1.8rem] font-bold leading-none">
-                    <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">00.0%</span>
-                </div>
-                <div class="text-[0.6rem] text-neutral-500 uppercase tracking-widest mt-2">SCORE</div>
-            </div>
-        </div>
-        
-        <div>
-            <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-4 relative">
-                <div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: transparent;"></div>
+    <!-- VIEW: DASHBOARD -->
+    <div id="view-dashboard-container" class="animate-fade-in">
+        <div class="flex justify-between items-center px-1 mb-4 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
+            <div class="w-16 text-left">
+                <div id="dynamic-title" class="text-neutral-600 transition-colors duration-500">SCORE</div>
             </div>
             
-            <table class="w-full text-left text-[0.6rem] text-neutral-400 uppercase tracking-widest border border-neutral-800 rounded-lg overflow-hidden border-separate [border-spacing:0]">
-                <tbody>
-                    <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#22c55e] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap w-24 text-center">0 – 20 (%)</td><td id="legend-low" class="py-2.5 pl-5 border-b border-l border-neutral-800">VALUE ZONE (DCA IN)</td></tr>
-                    <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#FFFF00] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">21 – 79 (%)</td><td id="legend-mid" class="py-2.5 pl-5 border-b border-l border-neutral-800">NEUTRAL ZONE (HODL)</td></tr>
-                    <tr><td class="py-2.5 px-0 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#EC4899] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">80 – 100 (%)</td><td id="legend-high" class="py-2.5 pl-5 border-l border-neutral-800">EXIT ZONE (DCA OUT)</td></tr>
-                </tbody>
-            </table>
+            <div id="macro-buttons" class="flex gap-1 absolute left-1/2 -translate-x-1/2">
+                <button onclick="updateChart('1Y')" id="btn-1Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1Y</button>
+                <button onclick="updateChart('2Y')" id="btn-2Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">2Y</button>
+                <button onclick="updateChart('4Y')" id="btn-4Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">4Y</button>
+                <button onclick="updateChart('ALL')" id="btn-ALL" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">ALL</button>
+            </div>
+            
+            <div id="trading-buttons" class="hidden flex gap-1 absolute left-1/2 -translate-x-1/2">
+                <button onclick="changeTradingInterval('1d')" id="btn-1d" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1D</button>
+                <button onclick="changeTradingInterval('4h')" id="btn-4h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">4H</button>
+                <button onclick="changeTradingInterval('2h')" id="btn-2h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">2H</button>
+                <button onclick="changeTradingInterval('1h')" id="btn-1h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1H</button>
+            </div>
+
+            <div class="w-16 flex justify-end">
+                <div id="dynamic-score" class="transition-colors duration-500 flex items-center h-full">
+                    <span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">00.0%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="h-60 w-full relative mb-4">
+            <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
+                <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
+            </div>
+            
+            <div class="absolute top-0 bottom-0 -left-[8px] w-[calc(100%+16px)] pointer-events-none">
+                <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000 pointer-events-auto"></canvas>
+            </div>
+        </div>
+
+        <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000">
+            <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
+                <div id="badge-name" class="border border-neutral-600/50 px-3 py-1.5 rounded-md text-neutral-400">Bitcoin (BTC)</div>
+                <div id="badge-phase" class="border border-neutral-800 px-3 py-1.5 rounded-md transition-colors duration-1000 text-transparent bg-neutral-800 animate-pulse">LOADING ZONE</div>
+            </div>
+            
+            <div class="flex justify-between items-start mb-4 gap-4 px-1">
+                <div>
+                    <div id="val-price" class="text-[1.8rem] font-bold leading-none tracking-tight text-white"><span class="bg-neutral-800 text-transparent animate-pulse rounded">$00,000.00</span></div>
+                    <div id="val-change" class="text-[0.6rem] uppercase tracking-widest mt-2 flex items-center gap-1.5"><span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">+0.00%</span><span class="bg-neutral-800 text-transparent animate-pulse rounded px-1.5 py-0.5">24H</span></div>
+                </div>
+                <div class="text-right flex flex-col items-end">
+                    <div id="val-score-large" class="text-[1.8rem] font-bold leading-none"><span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">00.0%</span></div>
+                    <div class="text-[0.6rem] text-neutral-500 uppercase tracking-widest mt-2">SCORE</div>
+                </div>
+            </div>
+            
+            <div>
+                <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-4 relative"><div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: transparent;"></div></div>
+                <table class="w-full text-left text-[0.6rem] text-neutral-400 uppercase tracking-widest border border-neutral-800 rounded-lg overflow-hidden border-separate [border-spacing:0]">
+                    <tbody>
+                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#22c55e] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap w-24 text-center">0 – 20 (%)</td><td id="legend-low" class="py-2.5 pl-5 border-b border-l border-neutral-800">VALUE ZONE (DCA IN)</td></tr>
+                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#FFFF00] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">21 – 79 (%)</td><td id="legend-mid" class="py-2.5 pl-5 border-b border-l border-neutral-800">NEUTRAL ZONE (HODL)</td></tr>
+                        <tr><td class="py-2.5 px-0 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#EC4899] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">80 – 100 (%)</td><td id="legend-high" class="py-2.5 pl-5 border-l border-neutral-800">EXIT ZONE (DCA OUT)</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <div id="error-box" class="hidden mt-4 bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center"></div>
+    <!-- VIEW: WALLET -->
+    <div id="view-wallet-container" class="hidden animate-fade-in">
+        <div class="p-8 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl flex flex-col items-center text-center min-h-[350px] justify-center text-white">
+            <div id="wallet-disconnected">
+                <div class="w-16 h-16 bg-neutral-800 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                    <svg class="w-8 h-8 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 9l-6 6m0-6l6 6"></path></svg>
+                </div>
+                <h2 class="text-xl font-bold mb-2">Connect Phantom</h2>
+                <p class="text-[0.65rem] text-neutral-500 uppercase tracking-widest mb-8">Access your Solana assets directly</p>
+                <button onclick="connectWallet()" class="bg-white text-black px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-neutral-200 transition-all">Connect Wallet</button>
+            </div>
+
+            <div id="wallet-connected" class="hidden w-full">
+                <div class="flex items-center gap-3 mb-8 justify-center">
+                    <div class="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center border border-purple-500/30">
+                        <div class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                    </div>
+                    <div class="text-left">
+                        <div id="wallet-address-display" class="text-[0.7rem] font-mono text-neutral-400 tracking-tighter">0x...</div>
+                        <div class="text-[0.5rem] uppercase tracking-widest text-neutral-600 font-bold">Phantom Wallet Active</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 mb-8">
+                    <div class="bg-neutral-800/50 p-6 rounded-2xl border border-neutral-700/30 shadow-inner">
+                        <div class="text-[0.55rem] text-neutral-500 uppercase tracking-widest mb-1 text-center font-bold">Current SOL Balance</div>
+                        <div id="wallet-balance" class="text-3xl font-bold text-center tracking-tight">0.00 SOL</div>
+                    </div>
+                </div>
+
+                <button onclick="disconnectWallet()" class="text-[0.55rem] text-neutral-600 uppercase tracking-widest hover:text-neutral-400 transition-colors font-bold">Disconnect Wallet</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="error-box" class="hidden mt-4 bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center font-bold">❌ SERVER OFFLINE. PLEASE TRY AGAIN.</div>
 
 </div>
 
 <script>
-// --- GLOBALS & STATE RECOVERY (LOCAL STORAGE) ---
+// --- GLOBALS & STATE ---
 let scoreChartInstance = null;
 window.currentScoreData = { score: 0, colorClass: "" };
 window.fullData = null; 
-
 window.currentAsset = localStorage.getItem('vbsx_asset') || 'BTC'; 
 window.currentMode = localStorage.getItem('vbsx_mode') || 'MACRO';
 window.currentInterval = localStorage.getItem('vbsx_interval') || '1w'; 
 window.currentMacroView = localStorage.getItem('vbsx_macro_view') || '4Y';
+window.currentView = 'dashboard';
+window.walletAddress = null;
 
-// --- UI INIT ---
+// --- VIEW SWITCHING ---
+function toggleView(view) {
+    window.currentView = view;
+    const dashBtn = document.getElementById('toggle-view-dashboard');
+    const wallBtn = document.getElementById('toggle-view-wallet');
+    const dashCont = document.getElementById('view-dashboard-container');
+    const wallCont = document.getElementById('view-wallet-container');
+
+    if (view === 'dashboard') {
+        dashBtn.className = "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full";
+        wallBtn.className = "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
+        dashCont.classList.remove('hidden');
+        wallCont.classList.add('hidden');
+    } else {
+        wallBtn.className = "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full";
+        dashBtn.className = "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
+        dashCont.classList.add('hidden');
+        wallCont.classList.remove('hidden');
+        checkExistingConnection();
+    }
+}
+
+// --- PHANTOM WALLET LOGIC ---
+async function connectWallet() {
+    try {
+        const isPhantomInstalled = window.solana && window.solana.isPhantom;
+        if (!isPhantomInstalled) {
+            alert("Phantom Wallet is not installed!");
+            window.open("https://phantom.app/", "_blank");
+            return;
+        }
+        const resp = await window.solana.connect();
+        window.walletAddress = resp.publicKey.toString();
+        updateWalletUI();
+        fetchSolBalance();
+    } catch (err) {
+        console.error("Wallet connection failed", err);
+    }
+}
+
+async function checkExistingConnection() {
+    if (window.solana && window.solana.isPhantom) {
+        try {
+            const resp = await window.solana.connect({ onlyIfTrusted: true });
+            window.walletAddress = resp.publicKey.toString();
+            updateWalletUI();
+            fetchSolBalance();
+        } catch (err) { /* Not trusted */ }
+    }
+}
+
+function disconnectWallet() {
+    if (window.solana) {
+        window.solana.disconnect();
+        window.walletAddress = null;
+        updateWalletUI();
+    }
+}
+
+function updateWalletUI() {
+    const disconnectedDiv = document.getElementById('wallet-disconnected');
+    const connectedDiv = document.getElementById('wallet-connected');
+    const addrDisplay = document.getElementById('wallet-address-display');
+    if (window.walletAddress) {
+        disconnectedDiv.classList.add('hidden');
+        connectedDiv.classList.remove('hidden');
+        addrDisplay.innerText = window.walletAddress.slice(0, 4) + "..." + window.walletAddress.slice(-4);
+    } else {
+        disconnectedDiv.classList.remove('hidden');
+        connectedDiv.classList.add('hidden');
+    }
+}
+
+async function fetchSolBalance() {
+    if (!window.walletAddress) return;
+    try {
+        const response = await fetch("https://api.mainnet-beta.solana.com", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                jsonrpc: "2.0", id: 1,
+                method: "getBalance",
+                params: [window.walletAddress]
+            })
+        });
+        const data = await response.json();
+        const sol = data.result.value / 1000000000;
+        document.getElementById('wallet-balance').innerText = sol.toFixed(3) + " SOL";
+    } catch (err) {
+        console.error("Balance fetch error", err);
+    }
+}
+
+// --- DASHBOARD LOGIC ---
 function initUI() {
-    // Assets
     document.getElementById('toggle-asset-btc').className = window.currentAsset === 'BTC' ? "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
     document.getElementById('toggle-asset-sol').className = window.currentAsset === 'SOL' ? "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
-
-    // Modes
     document.getElementById('toggle-mode-macro').className = window.currentMode === 'MACRO' ? "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
     document.getElementById('toggle-mode-trading').className = window.currentMode === 'TRADING' ? "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
 
@@ -163,7 +279,6 @@ function initUI() {
     }
 }
 
-// --- TOGGLE LOGIC ---
 function toggleAsset(asset) {
     if (window.currentAsset === asset) return;
     window.currentAsset = asset;
@@ -196,57 +311,42 @@ function highlightTradingButton(interval) {
 }
 
 function triggerAnalysis() {
-    // Roztočenie refresh ikony
     const refBtn = document.getElementById('btn-refresh-icon');
     if (refBtn) refBtn.classList.add('animate-spin');
-
     document.getElementById("scoreChart").classList.add("opacity-0");
     document.getElementById("chart-skeleton").classList.remove("opacity-0");
     analyze();
 }
 
-// --- SKELETON GRID ---
 function updateSkeletonGrid() {
     const skeleton = document.getElementById('chart-skeleton');
     if (!skeleton) return;
     const width = skeleton.clientWidth;
     if (width === 0) return;
-    
     const targetDash = 4;
     const numDashes = Math.round((width / targetDash + 1) / 2);
     const exactDash = width / (2 * numDashes - 1);
-    
     const grad = `repeating-linear-gradient(to right, #525252 0, #525252 ${exactDash}px, transparent ${exactDash}px, transparent ${exactDash * 2}px)`;
-    
     const lines = skeleton.children;
-    for (let i = 0; i < lines.length; i++) {
-        lines[i].style.backgroundImage = grad;
-    }
+    for (let i = 0; i < lines.length; i++) lines[i].style.backgroundImage = grad;
 }
 window.addEventListener('resize', updateSkeletonGrid);
 
-// --- CHART PLUGIN ---
+// --- CHART PLUGIN & LOGIC ---
 const customChartPlugin = {
   id: 'customChart',
   afterDraw: chart => {
     const ctx = chart.ctx;
     if (!chart.chartArea) return; 
     const { chartArea: {top, bottom, left, right}, scales: {y} } = chart;
-
-    ctx.save();
-    ctx.lineWidth = 1;
-
+    ctx.save(); ctx.lineWidth = 1;
     const gridWidth = right - left;
-    const targetDash = 4;
-    const numDashes = Math.round((gridWidth / targetDash + 1) / 2);
-    const exactDash = gridWidth / (2 * numDashes - 1);
+    const exactDash = gridWidth / (2 * Math.round(((gridWidth / 4) + 1) / 2) - 1);
     ctx.setLineDash([exactDash, exactDash]);
-
     for (let v = 0; v <= 100; v += 10) {
         const yPos = y.getPixelForValue(v);
         let op = 0.1; if (v === 0 || v === 100) op = 0.05; else if (v === 20 || v === 80) op = 0.5; 
-        if (v <= 20) ctx.strokeStyle = `rgba(34, 197, 94, ${op})`; else if (v < 80) ctx.strokeStyle = `rgba(255, 255, 0, ${op})`; else ctx.strokeStyle = `rgba(236, 72, 153, ${op})`;                  
-        
+        ctx.strokeStyle = v <= 20 ? `rgba(34, 197, 94, ${op})` : (v < 80 ? `rgba(255, 255, 0, ${op})` : `rgba(236, 72, 153, ${op})`);
         ctx.beginPath(); ctx.moveTo(left, yPos); ctx.lineTo(right, yPos); ctx.stroke();
     }
     ctx.restore();
@@ -255,90 +355,40 @@ const customChartPlugin = {
     if (activeElements.length > 0) {
       let activePoint = activeElements[0];
       let xPos = activePoint.element.x;
-      
-      ctx.save();
-      ctx.beginPath(); ctx.moveTo(xPos, top); ctx.lineTo(xPos, bottom);
+      ctx.save(); ctx.beginPath(); ctx.moveTo(xPos, top); ctx.lineTo(xPos, bottom);
       ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.stroke();
-
       let xLabel = chart.data.labels[activePoint.index];
-      if (xLabel && xLabel !== "") {
+      if (xLabel) {
           ctx.fillStyle = '#171717'; ctx.font = 'normal 9.6px sans-serif'; 
-          let textWidth = ctx.measureText(xLabel).width;
-          let boxY = bottom + 4; 
-          let boxX = xPos - (textWidth + 16)/2;
-          if (boxX < left) boxX = left;
-          if (boxX + textWidth + 16 > right) boxX = right - textWidth - 16;
-          
-          ctx.fillRect(boxX, boxY, textWidth + 16, 20);
-          ctx.strokeStyle = '#525252'; ctx.strokeRect(boxX, boxY, textWidth + 16, 20);
+          let tw = ctx.measureText(xLabel).width;
+          let bx = Math.max(left, Math.min(right - tw - 16, xPos - (tw + 16)/2));
+          ctx.fillRect(bx, bottom + 4, tw + 16, 20);
+          ctx.strokeStyle = '#525252'; ctx.strokeRect(bx, bottom + 4, tw + 16, 20);
           ctx.fillStyle = '#a3a3a3'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.fillText(xLabel, boxX + (textWidth + 16)/2, boxY + 10);
+          ctx.fillText(xLabel, bx + (tw + 16)/2, bottom + 14);
       }
-
-      let val = activePoint.element.$context.parsed.y;
-      val = Math.max(0, Math.min(100, val)); 
-      let scoreHex = val <= 20 ? "#22c55e" : (val >= 80 ? "#EC4899" : "#FFFF00");
-
-      let scoreDiv = document.getElementById('dynamic-score');
-      let titleDiv = document.getElementById('dynamic-title');
-      if (scoreDiv) {
-          scoreDiv.innerText = val.toFixed(1) + '%';
-          scoreDiv.style.color = scoreHex;
-          scoreDiv.style.textShadow = `0 0 10px ${scoreHex}80`;
-          if (titleDiv) {
-              titleDiv.style.color = scoreHex;
-              titleDiv.style.textShadow = `0 0 10px ${scoreHex}80`;
-          }
-      }
+      let val = Math.max(0, Math.min(100, activePoint.element.$context.parsed.y));
+      let sHex = val <= 20 ? "#22c55e" : (val >= 80 ? "#EC4899" : "#FFFF00");
+      document.getElementById('dynamic-score').innerText = val.toFixed(1) + '%';
+      document.getElementById('dynamic-score').style.color = sHex;
+      document.getElementById('dynamic-score').style.textShadow = `0 0 10px ${sHex}80`;
+      document.getElementById('dynamic-title').style.color = sHex;
+      document.getElementById('dynamic-title').style.textShadow = `0 0 10px ${sHex}80`;
       ctx.restore();
     }
-
-    const datasetMeta = chart.getDatasetMeta(0);
-    let lastValidIndex = -1;
-    if (chart.data.labels) {
-        for (let i = chart.data.labels.length - 1; i >= 0; i--) {
-            if (chart.data.labels[i] !== "") { lastValidIndex = i; break; }
-        }
-    }
-    if (datasetMeta.data && datasetMeta.data.length > 0 && lastValidIndex !== -1) {
-        const lastValidPoint = datasetMeta.data[lastValidIndex];
-        const val = chart.data.datasets[0].data[lastValidIndex];
-        if (val !== null && val !== undefined) {
-            let dotColor = val <= 20 ? '#22c55e' : (val >= 80 ? '#EC4899' : '#FFFF00');
-            ctx.save(); ctx.beginPath(); ctx.arc(lastValidPoint.x, lastValidPoint.y, 4, 0, 2 * Math.PI);
-            ctx.fillStyle = dotColor; ctx.fill(); ctx.restore();
-        }
+    const meta = chart.getDatasetMeta(0);
+    if (meta.data && meta.data.length > 0) {
+        const lastP = meta.data[meta.data.length - 1];
+        const lastV = chart.data.datasets[0].data[meta.data.length - 1];
+        let dotC = lastV <= 20 ? '#22c55e' : (lastV >= 80 ? '#EC4899' : '#FFFF00');
+        ctx.save(); ctx.beginPath(); ctx.arc(lastP.x, lastP.y, 4, 0, 2 * Math.PI); ctx.fillStyle = dotC; ctx.fill(); ctx.restore();
     }
   }
 };
-
 Chart.register(customChartPlugin);
 
-function hideTooltips() {
-    if (scoreChartInstance) { 
-        scoreChartInstance.setActiveElements([]); 
-        scoreChartInstance.update(); 
-        let scoreDiv = document.getElementById('dynamic-score');
-        let titleDiv = document.getElementById('dynamic-title');
-        
-        if (scoreDiv && window.currentScoreData) {
-            scoreDiv.innerText = Number(window.currentScoreData.score).toFixed(1) + '%';
-            scoreDiv.style.color = window.currentScoreData.rawColor;
-            scoreDiv.style.textShadow = `0 0 10px ${window.currentScoreData.rawColor}80`;
-            if (titleDiv) {
-                titleDiv.style.color = window.currentScoreData.rawColor;
-                titleDiv.style.textShadow = `0 0 10px ${window.currentScoreData.rawColor}80`;
-            }
-        }
-    }
-}
-document.addEventListener('touchstart', e => { if (e.target.tagName !== 'CANVAS') hideTooltips(); });
-document.addEventListener('click', e => { if (e.target.tagName !== 'CANVAS') hideTooltips(); });
-
-// VYKRESLENIE GRAFU
 function updateChart(period) {
     if (!window.fullData) return;
-
     if (window.currentMode === 'MACRO') {
         window.currentMacroView = period;
         localStorage.setItem('vbsx_macro_view', period);
@@ -347,152 +397,93 @@ function updateChart(period) {
             if(btn) btn.className = p === period ? "px-3 py-1 rounded-md text-white bg-neutral-800 transition-all duration-300" : "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
         });
     }
-
-    let points = 208; 
+    let pts = 208;
     if (window.currentMode === 'MACRO') {
-        if (period === '1Y') points = 52;
-        if (period === '2Y') points = 104;
-        if (period === '4Y') points = 208;
-        if (period === 'ALL') points = window.fullData.chart_dates.length;
+        if (period === '1Y') pts = 52; else if (period === '2Y') pts = 104; else if (period === 'ALL') pts = window.fullData.chart_dates.length;
     }
-
-    const chartDates = window.fullData.chart_dates.slice(-points);
-    const chartScoreRaw = window.fullData.chart_score.slice(-points);
-
+    const dts = window.fullData.chart_dates.slice(-pts);
+    const scr = window.fullData.chart_score.slice(-pts);
     if (scoreChartInstance) scoreChartInstance.destroy();
-    
-    Chart.defaults.color = '#525252'; 
-    Chart.defaults.font.family = "'Inter', sans-serif";
-    Chart.defaults.font.size = 9.6; 
-
-    let ctxScore = document.getElementById('scoreChart').getContext('2d');
-    scoreChartInstance = new Chart(ctxScore, {
+    Chart.defaults.color = '#525252'; Chart.defaults.font.family = "'Inter', sans-serif"; Chart.defaults.font.size = 9.6;
+    scoreChartInstance = new Chart(document.getElementById('scoreChart').getContext('2d'), {
         type: 'line',
-        data: {
-            labels: chartDates,
-            datasets: [{ 
-                data: chartScoreRaw, 
-                fill: false, borderWidth: 1.5, tension: 0.5, pointRadius: 0, clip: false, 
-                
-                pointHoverRadius: 4, 
-                pointHoverBackgroundColor: '#171717', 
-                pointHoverBorderWidth: 1.5,
-                pointHoverBorderColor: function(context) {
-                    const val = context.parsed.y;
-                    return val <= 20 ? "#22c55e" : (val >= 80 ? "#EC4899" : "#FFFF00");
-                },
-
-                borderColor: function(c) {
-                    const {ctx, chartArea} = c.chart; if (!chartArea) return;
-                    const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                    gradient.addColorStop(0, '#22c55e'); gradient.addColorStop(0.2, '#22c55e'); gradient.addColorStop(0.3, '#FFFF00'); 
-                    gradient.addColorStop(0.7, '#FFFF00'); gradient.addColorStop(0.8, '#EC4899'); gradient.addColorStop(1, '#EC4899');    
-                    return gradient;
-                }
-            }]
-        },
-        options: { 
-            responsive: true, maintainAspectRatio: false,
-            animation: { duration: 1000, easing: 'easeOutQuart' }, 
-            plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            layout: { padding: { left: 8, right: 8, top: 5, bottom: 28 } },
-            interaction: { mode: 'index', intersect: false },
+        data: { labels: dts, datasets: [{ data: scr, fill: false, borderWidth: 1.5, tension: 0.5, pointRadius: 0, 
+            borderColor: function(c) {
+                const {ctx, chartArea} = c.chart; if (!chartArea) return;
+                const g = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                g.addColorStop(0, '#22c55e'); g.addColorStop(0.3, '#FFFF00'); g.addColorStop(0.7, '#FFFF00'); g.addColorStop(1, '#EC4899');    
+                return g;
+            }
+        }]},
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            layout: { padding: { left: 8, right: 8, top: 5, bottom: 28 } }, interaction: { mode: 'index', intersect: false },
             scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } 
         }
     });
+    document.getElementById("chart-skeleton").classList.add("opacity-0");
+    document.getElementById("scoreChart").classList.remove("opacity-0");
 }
 
-// FETCH DÁT
 async function analyze() {
   try {
     const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", { 
-        method: "POST", 
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ 
-            asset: window.currentAsset, 
-            mode: window.currentMode, 
-            interval: window.currentInterval 
-        })
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ asset: window.currentAsset, mode: window.currentMode, interval: window.currentInterval })
     });
-    
     if (!res.ok) throw new Error("Server error");
     const data = await res.json();
     if(data.error) throw new Error(data.error);
 
     window.fullData = data; 
-    const score = data.cycle_score || 0;
-    let scoreHex = score <= 20 ? "#22c55e" : (score >= 80 ? "#EC4899" : "#FFFF00");
-    window.currentScoreData = { score: score, rawColor: scoreHex };
+    const s = data.cycle_score || 0;
+    let sHex = s <= 20 ? "#22c55e" : (s >= 80 ? "#EC4899" : "#FFFF00");
+    window.currentScoreData = { score: s, rawColor: sHex };
 
-    const sign = data.change > 0 ? "+" : "";
-    const colorClass = data.change > 0 ? "text-[#22c55e]" : (data.change < 0 ? "text-pink-500" : "text-neutral-500");
-    const formattedPrice = Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById("badge-name").innerText = `${data.name} (${data.ticker})`;
+    let pBadge = document.getElementById("badge-phase");
+    pBadge.className = `border px-3 py-1.5 rounded-md transition-colors duration-1000 ${s <= 20 ? 'text-[#22c55e] border-[#22c55e]/50' : (s >= 80 ? 'text-[#EC4899] border-[#EC4899]/50' : 'text-[#FFFF00] border-[#FFFF00]/50')}`;
     
-    let dashboardStyle = score <= 20 ? "bg-[#030a05] border-[#22c55e]/30" : (score >= 80 ? "bg-[#EC4899]/5 border-[#EC4899]/30" : "bg-[#FFFF00]/5 border-[#FFFF00]/30"); 
-    let phaseBadgeColor = score <= 20 ? "bg-[#030a05] text-[#22c55e] border-[#22c55e]/50" : (score >= 80 ? "bg-[#EC4899]/10 text-[#EC4899] border-[#EC4899]/50" : "bg-[#FFFF00]/10 text-[#FFFF00] border-[#FFFF00]/50"); 
-
-    document.getElementById("badge-name").innerHTML = `${data.name} (${data.ticker})`;
-
     let displayPhase = data.phase;
     if (window.currentMode === 'TRADING') {
-        if (score <= 20) displayPhase = "LONG";
-        else if (score >= 80) displayPhase = "SHORT";
+        if (s <= 20) displayPhase = "LONG";
+        else if (s >= 80) displayPhase = "SHORT";
         else displayPhase = "HODL";
     }
-    
-    let phaseBadge = document.getElementById("badge-phase");
-    phaseBadge.className = `border px-3 py-1.5 rounded-md transition-colors duration-1000 ${phaseBadgeColor}`;
-    phaseBadge.innerHTML = displayPhase;
+    pBadge.innerText = displayPhase;
 
-    document.getElementById("val-price").innerHTML = `$${formattedPrice}`;
-    
-    let valChange = document.getElementById("val-change");
-    valChange.className = `text-[0.6rem] uppercase tracking-widest mt-2 flex items-center gap-1.5 transition-colors duration-1000 ${colorClass}`;
-    valChange.innerHTML = `${sign}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded">24H</span>`;
+    document.getElementById("val-price").innerText = `$${Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+    let vCh = document.getElementById("val-change");
+    vCh.className = `text-[0.6rem] mt-2 flex items-center gap-1.5 ${data.change >= 0 ? 'text-[#22c55e]' : 'text-pink-500'}`;
+    vCh.innerHTML = `${data.change >= 0 ? '+':''}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded font-normal">24H</span>`;
 
-    let scoreLarge = document.getElementById("val-score-large");
-    scoreLarge.innerHTML = `${score.toFixed(1)}%`;
-    scoreLarge.style.color = scoreHex;
-    scoreLarge.style.textShadow = `0 0 12px ${scoreHex}80`;
+    document.getElementById("val-score-large").innerText = `${s.toFixed(1)}%`;
+    document.getElementById("val-score-large").style.color = sHex;
+    document.getElementById("dynamic-score").innerText = `${s.toFixed(1)}%`;
+    document.getElementById("dynamic-score").style.color = sHex;
+    document.getElementById("dynamic-title").style.color = sHex;
 
-    let dynScore = document.getElementById("dynamic-score");
-    dynScore.innerHTML = `${score.toFixed(1)}%`;
-    dynScore.style.color = scoreHex;
-    dynScore.style.textShadow = `0 0 10px ${scoreHex}80`;
-
-    let dynTitle = document.getElementById("dynamic-title");
-    dynTitle.style.color = scoreHex;
-    dynTitle.style.textShadow = `0 0 10px ${scoreHex}80`;
-
-    document.getElementById("main-card").className = `p-6 rounded-3xl border shadow-2xl shadow-black/50 transition-colors duration-1000 ${dashboardStyle}`;
-    
-    document.getElementById("chart-skeleton").classList.add("opacity-0");
-    document.getElementById("scoreChart").classList.remove("opacity-0");
+    document.getElementById("main-card").className = `p-6 rounded-3xl border shadow-2xl transition-colors duration-1000 ${s <= 20 ? 'bg-[#030a05] border-[#22c55e]/30' : (s >= 80 ? 'bg-[#EC4899]/5 border-[#EC4899]/30' : 'bg-[#FFFF00]/5 border-[#FFFF00]/30')}`;
 
     updateChart(window.currentMode === 'MACRO' ? window.currentMacroView : null);
-
     setTimeout(() => {
         const bar = document.getElementById("animated-score-bar");
-        bar.style.width = `${score}%`;
-        bar.style.backgroundColor = scoreHex;
-        bar.style.boxShadow = `0 0 10px ${scoreHex}`;
+        bar.style.width = `${s}%`;
+        bar.style.backgroundColor = sHex;
+        bar.style.boxShadow = `0 0 10px ${sHex}`;
     }, 50);
-
-  } catch (error) {
-    const eb = document.getElementById("error-box"); 
-    eb.innerText = "❌ SERVER OFFLINE. PLEASE TRY AGAIN."; 
-    eb.classList.remove("hidden");
+  } catch (e) {
+    console.error(e);
+    document.getElementById("error-box").classList.remove("hidden");
   } finally {
-    // Vždy vypnúť animáciu točenia po dokončení požiadavky (aj pri chybe)
-    const refBtn = document.getElementById('btn-refresh-icon');
-    if (refBtn) refBtn.classList.remove('animate-spin');
+    const rIcon = document.getElementById('btn-refresh-icon');
+    if (rIcon) rIcon.classList.remove('animate-spin');
   }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
     updateSkeletonGrid();
-    initUI(); // Načíta uložene dáta a pripraví UI
-    triggerAnalysis(); // Zavolá stiahnutie
+    initUI();
+    triggerAnalysis();
 });
 </script>
 </body>
