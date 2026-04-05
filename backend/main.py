@@ -2,6 +2,7 @@ import os
 import requests
 import asyncio
 from contextlib import asynccontextmanager
+from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 import pandas as pd
 from datetime import datetime
@@ -382,11 +383,45 @@ def analyze(req: AnalyzeRequest = None):
     warning_text = "STANDBY"
     warning_color = "#525252"
     
-    if mode == "TRADING":
-        if curr_score <= 30:
+    if mode == "MACRO":
+        if curr_score <= 20:
+            warning_text = "DCA IN"
+            warning_color = "#22c55e"
+        elif curr_score >= 80:
+            warning_text = "DCA OUT"
+            warning_color = "#EC4899"
+        else:
+            warning_text = "HODL"
+            warning_color = "#FFFF00"
+            
+    elif mode == "TRADING":
+        intervals_to_fetch = ["1d", "4h", "2h", "1h"]
+        
+        def get_score_for_inv(inv):
+            if inv == interval:
+                return curr_score
+            d = get_crypto_data(symbol, inv)
+            if not d.empty:
+                s_series = calculate_trading_score(d)
+                return round(float(s_series.iloc[-1]), 1)
+            return 50.0
+
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            res_scores = list(executor.map(get_score_for_inv, intervals_to_fetch))
+        
+        # Calculate best possible outcome (most extreme score from 50)
+        best_score = 50.0
+        max_dev = -1
+        for s in res_scores:
+            dev = abs(s - 50.0)
+            if dev > max_dev:
+                max_dev = dev
+                best_score = s
+                
+        if best_score <= 30:
             warning_text = "PROBABLE LONG"
             warning_color = "#22c55e"
-        elif curr_score >= 70:
+        elif best_score >= 70:
             warning_text = "PROBABLE SHORT"
             warning_color = "#EC4899"
         else:
