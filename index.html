@@ -74,10 +74,10 @@
         <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000">
             
             <!-- TRADER WARNING BOX -->
-            <div id="top-warning-box" class="mb-4 relative overflow-hidden rounded-md border border-neutral-800 bg-neutral-800 py-1.5 text-center transition-all duration-1000 w-full">
+            <div id="top-warning-box" class="mb-4 relative overflow-hidden rounded-md border border-neutral-800 bg-neutral-800 py-1.5 text-center transition-all duration-1000 w-full animate-pulse">
                 <!-- Pixel perfect alignment placeholder -->
                 <div class="opacity-0 select-none text-[0.6rem] uppercase tracking-widest font-bold">ALIGN</div>
-                <div id="warning-content-wrapper" class="absolute inset-0 flex items-center justify-center gap-2 text-transparent animate-pulse transition-all duration-500">
+                <div id="warning-content-wrapper" class="absolute inset-0 flex items-center justify-center gap-2 text-transparent transition-all duration-500">
                     <svg id="warning-icon" class="w-3 h-3 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
@@ -208,10 +208,11 @@ function triggerAnalysis() {
     pBadge.innerText = '\u00A0'; // non-breaking space
 
     let wBox = document.getElementById("top-warning-box");
-    wBox.className = 'mb-4 relative overflow-hidden rounded-md border border-neutral-800 bg-neutral-800 py-1.5 text-center transition-all duration-1000 w-full';
+    wBox.className = 'mb-4 relative overflow-hidden rounded-md border border-neutral-800 bg-neutral-800 py-1.5 text-center transition-all duration-1000 w-full animate-pulse';
     let wWrap = document.getElementById("warning-content-wrapper");
-    wWrap.className = 'absolute inset-0 flex items-center justify-center gap-2 text-transparent animate-pulse transition-all duration-500';
+    wWrap.className = 'absolute inset-0 flex items-center justify-center gap-2 text-transparent transition-all duration-500';
     document.getElementById("warning-text-display").innerText = '\u00A0';
+    document.getElementById("warning-icon").classList.add("hidden");
 
     document.getElementById("val-price").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded">$00,000.00</span>';
     document.getElementById("val-change").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">+0.00%</span> <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1.5 py-0.5">24H</span>';

@@ -19,7 +19,7 @@ class TelegramBot:
         except Exception as e:
             print(f"Telegram error: {e}")
 
-    def notify_hook(self, signal, score_ema, interval_scores, asset="SOL"):
+    def notify_hook(self, signal, score_ema, interval_scores, asset="BTC"):
         emoji = "🚀 LONG" if signal == "BUY" else "🔻 SHORT"
         msg = f"*{emoji} {asset} SIGNAL CONFIRMED!*\n\n"
         msg += f"MTF Master EMA: `{score_ema}%`\n"
