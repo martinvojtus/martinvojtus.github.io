@@ -23,6 +23,9 @@
         <!-- Pixel perfect alignment placeholder -->
         <div class="opacity-0 select-none text-[0.6rem] uppercase tracking-widest font-bold">ALIGN</div>
         <div class="absolute inset-0 flex items-center justify-center gap-2">
+            <svg id="warning-icon" class="w-3.5 h-3.5 hidden animate-pulse-soft transition-colors duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
             <span id="warning-text-display" class="text-[0.6rem] uppercase tracking-widest font-bold animate-pulse-soft transition-colors duration-500">STANDBY</span>
             <span id="warning-time-display" class="text-[0.55rem] font-normal opacity-60 hidden transition-colors duration-500"></span>
         </div>
@@ -353,16 +356,23 @@ async function analyze() {
     const wBox = document.getElementById("top-warning-box");
     const wTextDisplay = document.getElementById("warning-text-display");
     const wTimeDisplay = document.getElementById("warning-time-display");
+    const wIcon = document.getElementById("warning-icon");
 
     let wText = data.warning_text || "STANDBY";
     let wColor = data.warning_color || "#525252";
     let wTime = "";
+    let showIcon = false;
 
     if (data.last_signal) {
         const isLong = data.last_signal.signal === "LONG";
         wColor = isLong ? "#22c55e" : "#EC4899";
         wText = `${data.last_signal.signal} SIGNAL CONFIRMED`;
         wTime = data.last_signal.time;
+    } else {
+        if (wText.includes("PROBABLE")) {
+            wText += " - WAIT FOR SIGNAL";
+            showIcon = true;
+        }
     }
 
     let boxColors = "bg-neutral-900/40 border-neutral-800";
@@ -376,6 +386,13 @@ async function analyze() {
 
     wTextDisplay.innerText = wText;
     wTextDisplay.style.color = wColor;
+
+    if (showIcon) {
+        wIcon.classList.remove("hidden");
+        wIcon.style.color = wColor;
+    } else {
+        wIcon.classList.add("hidden");
+    }
 
     if (wTime) {
         wTimeDisplay.innerText = wTime;
