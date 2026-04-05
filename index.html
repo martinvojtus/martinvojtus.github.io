@@ -16,6 +16,17 @@
 
 <div class="w-full max-w-xl p-5 relative">
 
+    <!-- TRADER STATUS BAR -->
+    <div id="trader-status-bar" class="hidden mb-6 animate-fade-in">
+        <div id="trader-status-bg" class="border p-2.5 rounded-xl flex items-center justify-between text-[0.6rem] uppercase tracking-widest font-bold transition-colors duration-1000">
+            <div class="flex items-center gap-3">
+                <span class="bg-black/20 px-2 py-1 rounded">TRADER</span>
+                <span id="trader-status-text">WAITING FOR NEXT SIGNAL...</span>
+            </div>
+            <div id="trader-status-time" class="opacity-60 font-normal">--:--</div>
+        </div>
+    </div>
+
     <!-- DASHBOARD CONTROLS -->
     <div id="dashboard-controls" class="flex flex-col gap-3 mb-6">
         <div class="flex gap-2 sm:gap-3 w-full h-[34px]">
@@ -314,6 +325,26 @@ async function analyze() {
     document.getElementById("dynamic-title").style.color = sHex;
 
     document.getElementById("main-card").className = `p-6 rounded-3xl border shadow-2xl transition-colors duration-1000 ${s <= 20 ? 'bg-[#030a05] border-[#22c55e]/30' : (s >= 80 ? 'bg-[#EC4899]/5 border-[#EC4899]/30' : 'bg-[#FFFF00]/5 border-[#FFFF00]/30')}`;
+
+    // --- TRADER STATUS UPDATE ---
+    const tBar = document.getElementById("trader-status-bar");
+    const tBg = document.getElementById("trader-status-bg");
+    const tText = document.getElementById("trader-status-text");
+    const tTime = document.getElementById("trader-status-time");
+
+    if (data.last_signal) {
+        tBar.classList.remove("hidden");
+        const sig = data.last_signal;
+        const isLong = sig.signal === "LONG";
+        tBg.className = `border p-2.5 rounded-xl flex items-center justify-between text-[0.6rem] uppercase tracking-widest font-bold transition-colors duration-1000 ${isLong ? 'bg-[#22c55e]/10 border-[#22c55e]/40 text-[#22c55e]' : 'bg-[#EC4899]/10 border-[#EC4899]/40 text-[#EC4899]'}`;
+        tText.innerText = `${sig.signal} ${data.ticker} WARNING`;
+        tTime.innerText = sig.time;
+    } else {
+        tBar.classList.remove("hidden");
+        tBg.className = "bg-neutral-900/40 border border-neutral-800 p-2.5 rounded-xl flex items-center justify-between text-[0.6rem] uppercase tracking-widest font-bold text-neutral-500";
+        tText.innerText = "TRADER: STANDBY / NO RECENT SIGNAL";
+        tTime.innerText = "--:--";
+    }
 
     updateChart(window.currentMode === 'MACRO' ? window.currentMacroView : null);
     setTimeout(() => {

@@ -4,9 +4,13 @@ import asyncio
 from contextlib import asynccontextmanager
 import numpy as np
 import pandas as pd
+from datetime import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
+# --- GLOBÁLNA PAMÄŤ PRE POSLEDNÉ SIGNÁLY ---
+LAST_TRADER_SIGNALS = {"BTC": None, "SOL": None}
 
 # --- TRADING BOT LOGIC ---
 class TelegramBot:
@@ -27,11 +31,18 @@ class TelegramBot:
 
     def notify_hook(self, signal, score_ema, interval_scores, asset="SOL"):
         emoji = "🚀 LONG" if signal == "BUY" else "🔻 SHORT"
-        msg = f"*{emoji} SIGNAL CONFIRMED!*\n\n"
+        msg = f"*{emoji} {asset} SIGNAL CONFIRMED!*\n\n"
         msg += f"MTF Master EMA: `{score_ema}%`\n"
         msg += f"1d: `{interval_scores.get('1d')}%` | 4h: `{interval_scores.get('4h')}%`\n"
         msg += f"2h: `{interval_scores.get('2h')}%` | 1h: `{interval_scores.get('1h')}%`"
         self.send_message(msg)
+        
+        # Uložíme do globálnej pamäte pre web
+        LAST_TRADER_SIGNALS[asset] = {
+            "signal": "LONG" if signal == "BUY" else "SHORT",
+            "time": datetime.now().strftime("%d %b %H:%M"),
+            "score": score_ema
+        }
 
 class VBSXStrategy:
     def __init__(self, ema_period=12):
@@ -67,32 +78,34 @@ class VBSXStrategy:
 
 async def trading_bot_loop():
     print("Starting background VBSX Bot Loop...")
-    strategy = VBSXStrategy()
+    strategies = {"BTC": VBSXStrategy(), "SOL": VBSXStrategy()}
     tg_bot = TelegramBot()
-    tg_bot.send_message("🤖 *VBSX Bot Active on Render*\nMonitoring: SOL (1d, 4h, 2h, 1h)")
+    tg_bot.send_message("🤖 *VBSX Bot Active on Render*\nMonitoring: BTC & SOL (1d, 4h, 2h, 1h)")
     
-    symbol = "SOLUSDT"
     intervals = ["1d", "4h", "2h", "1h"]
 
     while True:
         try:
-            scores = {}
-            for interval in intervals:
-                df = get_crypto_data(symbol, interval)
-                if not df.empty:
-                    score_series = calculate_trading_score(df)
-                    scores[interval] = round(float(score_series.iloc[-1]), 1)
-                else:
-                    scores[interval] = 50.0
-            
-            master_score = strategy.calculate_weighted_score(scores)
-            ema = strategy.update_ema(master_score)
-            signal = strategy.check_hook()
-            
-            print(f"Bot Loop -> Master: {master_score}, EMA: {ema}")
-            
-            if signal:
-                tg_bot.notify_hook(signal, ema, scores, "SOL")
+            for asset in ["BTC", "SOL"]:
+                symbol = f"{asset}USDT"
+                scores = {}
+                for interval in intervals:
+                    df = get_crypto_data(symbol, interval)
+                    if not df.empty:
+                        score_series = calculate_trading_score(df)
+                        scores[interval] = round(float(score_series.iloc[-1]), 1)
+                    else:
+                        scores[interval] = 50.0
+                
+                strategy = strategies[asset]
+                master_score = strategy.calculate_weighted_score(scores)
+                ema = strategy.update_ema(master_score)
+                signal = strategy.check_hook()
+                
+                print(f"Bot Loop -> {asset} Master: {master_score}, EMA: {ema}")
+                
+                if signal:
+                    tg_bot.notify_hook(signal, ema, scores, asset)
                 
         except Exception as e:
             print(f"Bot Loop Error: {e}")
@@ -374,7 +387,8 @@ def analyze(req: AnalyzeRequest = None):
         "chart_dates": [d.strftime('%d %b %H:%M') if mode == 'TRADING' else d.strftime('%d %b %Y') for d in df.index],
         "chart_score": score_series.values.tolist(),
         "cycle_score": curr_score,
-        "phase": "DCA IN" if curr_score <= 20 else ("HODL" if curr_score <= 79 else "DCA OUT")
+        "phase": "DCA IN" if curr_score <= 20 else ("HODL" if curr_score <= 79 else "DCA OUT"),
+        "last_signal": LAST_TRADER_SIGNALS.get(ticker)
     }
 
 if __name__ == "__main__":
