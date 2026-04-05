@@ -16,13 +16,7 @@
 
 <div class="w-full max-w-xl p-5 relative">
 
-    <!-- DASHBOARD / WALLET TOGGLE (TOP) -->
-    <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex w-full h-[34px] text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center mb-3">
-        <button onclick="toggleView('dashboard')" id="toggle-view-dashboard" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Dashboard</button>
-        <button onclick="toggleView('wallet')" id="toggle-view-wallet" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Wallet</button>
-    </div>
-
-    <!-- DASHBOARD CONTROLS (ONLY IN DASHBOARD) -->
+    <!-- DASHBOARD CONTROLS -->
     <div id="dashboard-controls" class="flex flex-col gap-3 mb-6">
         <div class="flex gap-2 sm:gap-3 w-full h-[34px]">
             <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
@@ -124,65 +118,6 @@
         </div>
     </div>
 
-    <!-- VIEW: WALLET -->
-    <div id="view-wallet-container" class="hidden animate-fade-in">
-        <div class="p-8 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl flex flex-col items-center text-center min-h-[450px] justify-center">
-            
-            <div id="wallet-disconnected" class="w-full">
-                <div class="w-16 h-16 bg-neutral-800 rounded-2xl flex items-center justify-center mb-6 mx-auto shadow-xl">
-                    <svg class="w-8 h-8 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 9l-6 6m0-6l6 6"></path></svg>
-                </div>
-                <h2 class="text-xl font-bold mb-2">Connect Phantom</h2>
-                <p class="text-[0.65rem] text-neutral-500 uppercase tracking-widest mb-10">Access your assets via Deep Link or Manual Load</p>
-                
-                <button onclick="connectWallet()" class="w-full bg-purple-600 text-white px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-purple-500 transition-all mb-4">Connect Phantom App</button>
-                
-                <div class="flex items-center w-full gap-3 mb-6">
-                    <div class="h-[1px] bg-neutral-800 flex-1"></div>
-                    <div class="text-[0.55rem] text-neutral-600 uppercase tracking-widest">Manual Input</div>
-                    <div class="h-[1px] bg-neutral-800 flex-1"></div>
-                </div>
-
-                <div class="w-full relative">
-                    <input type="text" id="manual-address-input" placeholder="Paste Solana Address" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-[0.7rem] font-mono text-neutral-400 outline-none focus:border-purple-900 transition-all">
-                    <button onclick="manualConnect()" class="absolute right-2 top-1/2 -translate-y-1/2 text-[0.55rem] bg-neutral-800 hover:bg-neutral-700 px-4 py-1.5 rounded-lg uppercase tracking-widest font-bold text-white transition-all">Load</button>
-                </div>
-            </div>
-
-            <div id="wallet-connected" class="hidden w-full">
-                <div class="flex items-center gap-3 mb-10 justify-center">
-                    <div class="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center border border-purple-500/30">
-                        <div class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
-                    </div>
-                    <div class="text-left">
-                        <div id="wallet-address-display" class="text-[0.75rem] font-mono text-white tracking-tighter">0x...</div>
-                        <div class="text-[0.55rem] uppercase tracking-widest text-neutral-500">SOLANA MAINNET</div>
-                    </div>
-                </div>
-
-                <div class="flex flex-col gap-3 mb-10 w-full">
-                    <div class="bg-neutral-800/30 p-5 rounded-2xl flex justify-between items-center border border-neutral-800/50">
-                        <div class="text-left">
-                            <div class="text-[0.55rem] text-neutral-500 uppercase tracking-widest mb-1">Solana</div>
-                            <div class="text-[0.7rem] text-white font-medium">SOL</div>
-                        </div>
-                        <div id="wallet-balance" class="text-xl font-bold tracking-tighter text-white">0.000</div>
-                    </div>
-                    
-                    <div class="bg-neutral-800/30 p-5 rounded-2xl flex justify-between items-center border border-neutral-800/50">
-                        <div class="text-left">
-                            <div class="text-[0.55rem] text-neutral-500 uppercase tracking-widest mb-1">USD Coin</div>
-                            <div class="text-[0.7rem] text-white font-medium">USDC</div>
-                        </div>
-                        <div id="wallet-balance-usdc" class="text-xl font-bold tracking-tighter text-white">0.00</div>
-                    </div>
-                </div>
-
-                <button onclick="disconnectWallet()" class="text-[0.6rem] text-neutral-600 uppercase tracking-[0.2em] hover:text-neutral-400 transition-colors">Disconnect Wallet</button>
-            </div>
-        </div>
-    </div>
-
     <div id="error-box" class="hidden mt-4 bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center font-bold">❌ CONNECTION FAILED. PLEASE TRY AGAIN.</div>
 
 </div>
@@ -196,116 +131,8 @@ window.currentAsset = localStorage.getItem('vbsx_asset') || 'BTC';
 window.currentMode = localStorage.getItem('vbsx_mode') || 'MACRO';
 window.currentInterval = localStorage.getItem('vbsx_interval') || '1w'; 
 window.currentMacroView = localStorage.getItem('vbsx_macro_view') || '4Y';
-window.currentView = 'dashboard';
-window.walletAddress = localStorage.getItem('vbsx_wallet') || null;
 
-// --- VIEW SWITCHING ---
-function toggleView(view) {
-    window.currentView = view;
-    const dashBtn = document.getElementById('toggle-view-dashboard');
-    const wallBtn = document.getElementById('toggle-view-wallet');
-    const dashCont = document.getElementById('view-dashboard-container');
-    const wallCont = document.getElementById('view-wallet-container');
-    const subNav = document.getElementById('dashboard-controls');
-
-    if (view === 'dashboard') {
-        dashBtn.className = "flex-1 rounded-md bg-neutral-700 text-white transition-all h-full";
-        wallBtn.className = "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all h-full";
-        dashCont.classList.remove('hidden');
-        wallCont.classList.add('hidden');
-        subNav.classList.remove('hidden');
-    } else {
-        wallBtn.className = "flex-1 rounded-md bg-neutral-700 text-white transition-all h-full";
-        dashBtn.className = "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all h-full";
-        dashCont.classList.add('hidden');
-        wallCont.classList.remove('hidden');
-        subNav.classList.add('hidden');
-        if (window.walletAddress) updateWalletUI();
-    }
-}
-
-// --- SMART WALLET LOGIC ---
-async function connectWallet() {
-    const isPhantomInstalled = window.solana && window.solana.isPhantom;
-    if (!isPhantomInstalled) {
-        const currentUrl = window.location.href;
-        const phantomDeepLink = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}?ref=${encodeURIComponent(currentUrl)}`;
-        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-            window.location.href = phantomDeepLink;
-            return;
-        } else {
-            alert("Phantom extension not found.");
-            return;
-        }
-    }
-    try {
-        const resp = await window.solana.connect();
-        window.walletAddress = resp.publicKey.toString();
-        localStorage.setItem('vbsx_wallet', window.walletAddress);
-        updateWalletUI();
-    } catch (err) { console.error(err); }
-}
-
-function manualConnect() {
-    const input = document.getElementById('manual-address-input');
-    const addr = input.value.trim();
-    if (addr.length >= 32) {
-        window.walletAddress = addr;
-        localStorage.setItem('vbsx_wallet', addr);
-        updateWalletUI();
-    } else { alert("Enter a valid Solana address."); }
-}
-
-function disconnectWallet() {
-    if (window.solana) window.solana.disconnect();
-    window.walletAddress = null;
-    localStorage.removeItem('vbsx_wallet');
-    updateWalletUI();
-}
-
-function updateWalletUI() {
-    const disconnected = document.getElementById('wallet-disconnected');
-    const connected = document.getElementById('wallet-connected');
-    const display = document.getElementById('wallet-address-display');
-    if (window.walletAddress) {
-        disconnected.classList.add('hidden');
-        connected.classList.remove('hidden');
-        display.innerText = window.walletAddress.slice(0, 6) + "..." + window.walletAddress.slice(-6);
-        fetchWalletData();
-    } else {
-        disconnected.classList.remove('hidden');
-        connected.classList.add('hidden');
-    }
-}
-
-async function fetchWalletData() {
-    if (!window.walletAddress) return;
-    const rpc = "https://api.mainnet-beta.solana.com";
-    try {
-        const solRes = await fetch(rpc, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getBalance", params: [window.walletAddress] })
-        });
-        const solData = await solRes.json();
-        document.getElementById('wallet-balance').innerText = (solData.result.value / 1e9).toFixed(3) + " SOL";
-
-        const usdcMint = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
-        const usdcRes = await fetch(rpc, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                jsonrpc: "2.0", id: 1, method: "getTokenAccountsByOwner",
-                params: [window.walletAddress, { mint: usdcMint }, { encoding: "jsonParsed" }]
-            })
-        });
-        const usdcData = await usdcRes.json();
-        const accounts = usdcData.result.value;
-        let usdcBal = 0;
-        if (accounts.length > 0) usdcBal = accounts[0].account.data.parsed.info.tokenAmount.uiAmount;
-        document.getElementById('wallet-balance-usdc').innerText = usdcBal.toLocaleString(undefined, {minimumFractionDigits: 2}) + " USDC";
-    } catch (err) { console.error(err); }
-}
-
-// --- DASHBOARD LOGIC (RESTORED) ---
+// --- DASHBOARD LOGIC ---
 function initUI() {
     document.getElementById('toggle-asset-btc').className = window.currentAsset === 'BTC' ? "flex-1 rounded-md bg-neutral-700 text-white h-full transition-all" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all h-full";
     document.getElementById('toggle-asset-sol').className = window.currentAsset === 'SOL' ? "flex-1 rounded-md bg-neutral-700 text-white h-full transition-all" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all h-full";
@@ -497,7 +324,7 @@ async function analyze() {
   finally { const icon = document.getElementById('btn-refresh-icon'); if (icon) icon.classList.remove('animate-spin'); }
 }
 
-window.addEventListener('DOMContentLoaded', () => { updateSkeletonGrid(); initUI(); triggerAnalysis(); if(window.walletAddress) updateWalletUI(); });
+window.addEventListener('DOMContentLoaded', () => { updateSkeletonGrid(); initUI(); triggerAnalysis(); });
 </script>
 </body>
 </html>
