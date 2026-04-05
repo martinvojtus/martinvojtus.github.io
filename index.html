@@ -16,8 +16,14 @@
 
 <div class="w-full max-w-xl p-5 relative">
 
-    <!-- TOP NAVIGATION / TOGGLES -->
-    <div class="flex flex-col gap-3 mb-6">
+    <!-- DASHBOARD / WALLET TOGGLE (ALWAYS TOP) -->
+    <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex w-full h-[34px] text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center font-bold mb-3">
+        <button onclick="toggleView('dashboard')" id="toggle-view-dashboard" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Dashboard</button>
+        <button onclick="toggleView('wallet')" id="toggle-view-wallet" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Wallet</button>
+    </div>
+
+    <!-- SUB-NAV TOGGLES (ONLY FOR DASHBOARD) -->
+    <div id="dashboard-controls" class="flex flex-col gap-3 mb-6">
         <div class="flex gap-2 sm:gap-3 w-full h-[34px]">
             <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
                 <button onclick="toggleAsset('BTC')" id="toggle-asset-btc" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Bitcoin</button>
@@ -26,13 +32,6 @@
             <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
                 <button onclick="toggleMode('MACRO')" id="toggle-mode-macro" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Macro</button>
                 <button onclick="toggleMode('TRADING')" id="toggle-mode-trading" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Trading</button>
-            </div>
-        </div>
-        
-        <div class="flex gap-2 sm:gap-3 w-full h-[34px]">
-            <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center font-bold">
-                <button onclick="toggleView('dashboard')" id="toggle-view-dashboard" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Dashboard</button>
-                <button onclick="toggleView('wallet')" id="toggle-view-wallet" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Wallet</button>
             </div>
             <button onclick="triggerAnalysis()" class="bg-neutral-900 border border-neutral-800 rounded-lg w-[34px] sm:w-[38px] flex items-center justify-center text-neutral-500 hover:text-white transition-all duration-300 shrink-0 h-full">
                 <svg id="btn-refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -46,7 +45,7 @@
     <div id="view-dashboard-container" class="animate-fade-in">
         <div class="flex justify-between items-center px-1 mb-4 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
             <div class="w-16 text-left">
-                <div id="dynamic-title" class="text-neutral-600 transition-colors duration-500">SCORE</div>
+                <div id="dynamic-title" class="text-neutral-600 transition-colors duration-500 font-bold">SCORE</div>
             </div>
             
             <div id="macro-buttons" class="flex gap-1 absolute left-1/2 -translate-x-1/2">
@@ -65,7 +64,7 @@
 
             <div class="w-16 flex justify-end">
                 <div id="dynamic-score" class="transition-colors duration-500 flex items-center h-full">
-                    <span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">00.0%</span>
+                    <span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5 font-bold">00.0%</span>
                 </div>
             </div>
         </div>
@@ -101,9 +100,9 @@
                 <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-4 relative"><div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: transparent;"></div></div>
                 <table class="w-full text-left text-[0.6rem] text-neutral-400 uppercase tracking-widest border border-neutral-800 rounded-lg overflow-hidden border-separate [border-spacing:0]">
                     <tbody>
-                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#22c55e] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap w-24 text-center">0 – 20 (%)</td><td id="legend-low" class="py-2.5 pl-5 border-b border-l border-neutral-800">VALUE ZONE (DCA IN)</td></tr>
-                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#FFFF00] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">21 – 79 (%)</td><td id="legend-mid" class="py-2.5 pl-5 border-b border-l border-neutral-800">NEUTRAL ZONE (HODL)</td></tr>
-                        <tr><td class="py-2.5 px-0 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#EC4899] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">80 – 100 (%)</td><td id="legend-high" class="py-2.5 pl-5 border-l border-neutral-800">EXIT ZONE (DCA OUT)</td></tr>
+                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#22c55e] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap w-24 text-center">0 – 20 (%)</td><td id="legend-low" class="py-2.5 pl-5 border-b border-l border-neutral-800 font-bold uppercase tracking-widest">VALUE ZONE (DCA IN)</td></tr>
+                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#FFFF00] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">21 – 79 (%)</td><td id="legend-mid" class="py-2.5 pl-5 border-b border-l border-neutral-800 font-bold uppercase tracking-widest">NEUTRAL ZONE (HODL)</td></tr>
+                        <tr><td class="py-2.5 px-0 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#EC4899] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">80 – 100 (%)</td><td id="legend-high" class="py-2.5 pl-5 border-l border-neutral-800 font-bold uppercase tracking-widest">EXIT ZONE (DCA OUT)</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -112,14 +111,26 @@
 
     <!-- VIEW: WALLET -->
     <div id="view-wallet-container" class="hidden animate-fade-in">
-        <div class="p-8 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl flex flex-col items-center text-center min-h-[350px] justify-center text-white">
+        <div class="p-8 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl flex flex-col items-center text-center min-h-[400px] justify-center text-white">
             <div id="wallet-disconnected">
                 <div class="w-16 h-16 bg-neutral-800 rounded-2xl flex items-center justify-center mb-6 mx-auto">
                     <svg class="w-8 h-8 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 9l-6 6m0-6l6 6"></path></svg>
                 </div>
-                <h2 class="text-xl font-bold mb-2">Connect Phantom</h2>
-                <p class="text-[0.65rem] text-neutral-500 uppercase tracking-widest mb-8">Access your Solana assets directly</p>
-                <button onclick="connectWallet()" class="bg-white text-black px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-neutral-200 transition-all">Connect Wallet</button>
+                <h2 class="text-xl font-bold mb-2">Wallet Terminal</h2>
+                <p class="text-[0.65rem] text-neutral-500 uppercase tracking-widest mb-8">Connect phantom or enter address manually</p>
+                
+                <button onclick="connectWallet()" class="w-full bg-white text-black px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-neutral-200 transition-all mb-4">Connect Phantom</button>
+                
+                <div class="flex items-center w-full gap-2 mb-4">
+                    <div class="h-[1px] bg-neutral-800 flex-1"></div>
+                    <div class="text-[0.5rem] text-neutral-600 uppercase tracking-widest">OR</div>
+                    <div class="h-[1px] bg-neutral-800 flex-1"></div>
+                </div>
+
+                <div class="w-full relative">
+                    <input type="text" id="manual-address-input" placeholder="Paste Solana Address" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-[0.7rem] font-mono text-neutral-400 placeholder:text-neutral-700 outline-none focus:border-neutral-600 transition-colors">
+                    <button onclick="manualConnect()" class="absolute right-2 top-1/2 -translate-y-1/2 text-[0.5rem] bg-neutral-800 hover:bg-neutral-700 px-3 py-1.5 rounded-lg uppercase tracking-widest font-bold">Load</button>
+                </div>
             </div>
 
             <div id="wallet-connected" class="hidden w-full">
@@ -129,18 +140,18 @@
                     </div>
                     <div class="text-left">
                         <div id="wallet-address-display" class="text-[0.7rem] font-mono text-neutral-400 tracking-tighter">0x...</div>
-                        <div class="text-[0.5rem] uppercase tracking-widest text-neutral-600 font-bold">Phantom Wallet Active</div>
+                        <div class="text-[0.5rem] uppercase tracking-widest text-neutral-600 font-bold">Active Connection</div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 gap-4 mb-8">
-                    <div class="bg-neutral-800/50 p-6 rounded-2xl border border-neutral-700/30 shadow-inner">
-                        <div class="text-[0.55rem] text-neutral-500 uppercase tracking-widest mb-1 text-center font-bold">Current SOL Balance</div>
-                        <div id="wallet-balance" class="text-3xl font-bold text-center tracking-tight">0.00 SOL</div>
+                    <div class="bg-neutral-800/50 p-8 rounded-2xl border border-neutral-700/30 shadow-inner">
+                        <div class="text-[0.55rem] text-neutral-500 uppercase tracking-widest mb-2 text-center font-bold">Current Balance</div>
+                        <div id="wallet-balance" class="text-4xl font-bold text-center tracking-tight">0.00 SOL</div>
                     </div>
                 </div>
 
-                <button onclick="disconnectWallet()" class="text-[0.55rem] text-neutral-600 uppercase tracking-widest hover:text-neutral-400 transition-colors font-bold">Disconnect Wallet</button>
+                <button onclick="disconnectWallet()" class="text-[0.55rem] text-neutral-600 uppercase tracking-widest hover:text-neutral-400 transition-colors font-bold tracking-[0.2em]">Disconnect Wallet</button>
             </div>
         </div>
     </div>
@@ -168,28 +179,30 @@ function toggleView(view) {
     const wallBtn = document.getElementById('toggle-view-wallet');
     const dashCont = document.getElementById('view-dashboard-container');
     const wallCont = document.getElementById('view-wallet-container');
+    const subNav = document.getElementById('dashboard-controls');
 
     if (view === 'dashboard') {
         dashBtn.className = "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full";
         wallBtn.className = "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
         dashCont.classList.remove('hidden');
         wallCont.classList.add('hidden');
+        subNav.classList.remove('hidden');
     } else {
         wallBtn.className = "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full";
         dashBtn.className = "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
         dashCont.classList.add('hidden');
         wallCont.classList.remove('hidden');
+        subNav.classList.add('hidden');
         checkExistingConnection();
     }
 }
 
-// --- PHANTOM WALLET LOGIC ---
+// --- PHANTOM WALLET & MANUAL LOGIC ---
 async function connectWallet() {
     try {
         const isPhantomInstalled = window.solana && window.solana.isPhantom;
         if (!isPhantomInstalled) {
-            alert("Phantom Wallet is not installed!");
-            window.open("https://phantom.app/", "_blank");
+            alert("Phantom Wallet is not installed in this browser.");
             return;
         }
         const resp = await window.solana.connect();
@@ -198,6 +211,18 @@ async function connectWallet() {
         fetchSolBalance();
     } catch (err) {
         console.error("Wallet connection failed", err);
+    }
+}
+
+function manualConnect() {
+    const input = document.getElementById('manual-address-input');
+    const addr = input.value.trim();
+    if (addr.length >= 32) {
+        window.walletAddress = addr;
+        updateWalletUI();
+        fetchSolBalance();
+    } else {
+        alert("Please enter a valid Solana address.");
     }
 }
 
@@ -213,11 +238,9 @@ async function checkExistingConnection() {
 }
 
 function disconnectWallet() {
-    if (window.solana) {
-        window.solana.disconnect();
-        window.walletAddress = null;
-        updateWalletUI();
-    }
+    if (window.solana) window.solana.disconnect();
+    window.walletAddress = null;
+    updateWalletUI();
 }
 
 function updateWalletUI() {
@@ -254,7 +277,7 @@ async function fetchSolBalance() {
     }
 }
 
-// --- DASHBOARD LOGIC ---
+// --- DASHBOARD LOGIC (PÔVODNÁ) ---
 function initUI() {
     document.getElementById('toggle-asset-btc').className = window.currentAsset === 'BTC' ? "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
     document.getElementById('toggle-asset-sol').className = window.currentAsset === 'SOL' ? "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
@@ -264,16 +287,10 @@ function initUI() {
     if (window.currentMode === 'MACRO') {
         document.getElementById('macro-buttons').classList.remove('hidden');
         document.getElementById('trading-buttons').classList.add('hidden');
-        document.getElementById('legend-low').innerText = "VALUE ZONE (DCA IN)";
-        document.getElementById('legend-mid').innerText = "NEUTRAL ZONE (HODL)";
-        document.getElementById('legend-high').innerText = "EXIT ZONE (DCA OUT)";
         window.currentInterval = '1w';
     } else {
         document.getElementById('macro-buttons').classList.add('hidden');
         document.getElementById('trading-buttons').classList.remove('hidden');
-        document.getElementById('legend-low').innerText = "VALUE ZONE (LONG)";
-        document.getElementById('legend-mid').innerText = "NEUTRAL ZONE (HODL)";
-        document.getElementById('legend-high').innerText = "EXIT ZONE (SHORT)";
         if (window.currentInterval === '1w') window.currentInterval = '1d';
         highlightTradingButton(window.currentInterval);
     }
@@ -332,7 +349,7 @@ function updateSkeletonGrid() {
 }
 window.addEventListener('resize', updateSkeletonGrid);
 
-// --- CHART PLUGIN & LOGIC ---
+// --- CHART PLUGIN ---
 const customChartPlugin = {
   id: 'customChart',
   afterDraw: chart => {
@@ -411,7 +428,13 @@ function updateChart(period) {
             borderColor: function(c) {
                 const {ctx, chartArea} = c.chart; if (!chartArea) return;
                 const g = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                g.addColorStop(0, '#22c55e'); g.addColorStop(0.3, '#FFFF00'); g.addColorStop(0.7, '#FFFF00'); g.addColorStop(1, '#EC4899');    
+                // PÔVODNÝ GRADIENT STOPS
+                g.addColorStop(0, '#22c55e');
+                g.addColorStop(0.2, '#22c55e');
+                g.addColorStop(0.3, '#FFFF00');
+                g.addColorStop(0.7, '#FFFF00');
+                g.addColorStop(0.8, '#EC4899');
+                g.addColorStop(1, '#EC4899');    
                 return g;
             }
         }]},
@@ -430,10 +453,7 @@ async function analyze() {
         method: "POST", headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ asset: window.currentAsset, mode: window.currentMode, interval: window.currentInterval })
     });
-    if (!res.ok) throw new Error("Server error");
     const data = await res.json();
-    if(data.error) throw new Error(data.error);
-
     window.fullData = data; 
     const s = data.cycle_score || 0;
     let sHex = s <= 20 ? "#22c55e" : (s >= 80 ? "#EC4899" : "#FFFF00");
