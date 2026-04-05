@@ -85,7 +85,7 @@
                     <svg id="warning-icon" class="w-3 h-3 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    <span id="warning-text-display" class="text-[0.6rem] uppercase tracking-widest font-bold">LOADING</span>
+                    <span id="warning-text-display" class="text-[0.6rem] uppercase tracking-widest font-bold">&nbsp;</span>
                     <span id="warning-time-display" class="text-[0.55rem] font-bold opacity-60 hidden"></span>
                 </div>
             </div>
@@ -95,7 +95,7 @@
                     Bitcoin (BTC)
                 </div>
                 <div id="badge-phase" class="border border-neutral-800 bg-neutral-800 px-3 py-1.5 rounded-md transition-all duration-1000 text-transparent animate-pulse font-bold">
-                    LOADING ZONE
+                    &nbsp;
                 </div>
             </div>
             
@@ -213,13 +213,13 @@ function triggerAnalysis() {
     
     let pBadge = document.getElementById("badge-phase");
     pBadge.className = 'border border-neutral-800 bg-neutral-800 px-3 py-1.5 rounded-md transition-all duration-1000 text-transparent animate-pulse font-bold';
-    pBadge.innerText = 'LOADING ZONE';
+    pBadge.innerText = '\u00A0'; // non-breaking space
 
     let wBox = document.getElementById("top-warning-box");
     wBox.className = 'mb-4 relative overflow-hidden rounded-md border border-neutral-800 bg-neutral-800 py-1.5 text-center transition-all duration-1000 w-full';
     let wWrap = document.getElementById("warning-content-wrapper");
     wWrap.className = 'absolute inset-0 flex items-center justify-center gap-2 text-transparent animate-pulse transition-all duration-500';
-    document.getElementById("warning-text-display").innerText = 'LOADING';
+    document.getElementById("warning-text-display").innerText = '\u00A0';
 
     document.getElementById("val-price").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded">$00,000.00</span>';
     document.getElementById("val-change").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">+0.00%</span> <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1.5 py-0.5">24H</span>';
