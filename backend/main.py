@@ -1,12 +1,113 @@
 import os
 import requests
+import asyncio
+from contextlib import asynccontextmanager
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-app = FastAPI()
+# --- TRADING BOT LOGIC ---
+class TelegramBot:
+    def __init__(self):
+        self.token = os.environ.get("TELEGRAM_TOKEN")
+        self.chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+        self.base_url = f"https://api.telegram.org/bot{self.token}"
+
+    def send_message(self, text):
+        if not self.token or not self.chat_id:
+            return
+        try:
+            url = f"{self.base_url}/sendMessage"
+            payload = {"chat_id": self.chat_id, "text": text, "parse_mode": "Markdown"}
+            requests.post(url, json=payload, timeout=5)
+        except Exception as e:
+            print(f"Telegram error: {e}")
+
+    def notify_hook(self, signal, score_ema, interval_scores):
+        emoji = "🚀 LONG" if signal == "BUY" else "🔻 SHORT"
+        msg = f"*{emoji} SIGNAL CONFIRMED!*\n\n"
+        msg += f"MTF Master EMA: `{score_ema}%`\n"
+        msg += f"1d: `{interval_scores.get('1d')}%` | 4h: `{interval_scores.get('4h')}%`\n"
+        msg += f"2h: `{interval_scores.get('2h')}%` | 1h: `{interval_scores.get('1h')}%`"
+        self.send_message(msg)
+
+class VBSXStrategy:
+    def __init__(self, ema_period=12):
+        self.ema_period = ema_period
+        self.ema_value = None
+        self.k = 2 / (ema_period + 1)
+        self.history = []
+
+    def calculate_weighted_score(self, scores):
+        w1d = scores.get("1d", 50.0) * 0.4
+        w4h = scores.get("4h", 50.0) * 0.3
+        w2h = scores.get("2h", 50.0) * 0.2
+        w1h = scores.get("1h", 50.0) * 0.1
+        return round(w1d + w4h + w2h + w1h, 2)
+
+    def update_ema(self, new_score):
+        if self.ema_value is None:
+            self.ema_value = new_score
+        else:
+            self.ema_value = (new_score * self.k) + (self.ema_value * (1 - self.k))
+        self.ema_value = round(self.ema_value, 2)
+        self.history.append(self.ema_value)
+        if len(self.history) > 50: self.history.pop(0)
+        return self.ema_value
+
+    def check_hook(self):
+        if len(self.history) < 2: return None
+        prev_ema = self.history[-2]
+        curr_ema = self.history[-1]
+        if prev_ema < 20 and curr_ema > prev_ema: return "BUY"
+        if prev_ema > 80 and curr_ema < prev_ema: return "SELL"
+        return None
+
+async def trading_bot_loop():
+    print("Starting background VBSX Bot Loop...")
+    strategy = VBSXStrategy()
+    tg_bot = TelegramBot()
+    tg_bot.send_message("🤖 *VBSX Bot Active on Render*\nMonitoring: SOL (1d, 4h, 2h, 1h)")
+    
+    symbol = "SOLUSDT"
+    intervals = ["1d", "4h", "2h", "1h"]
+
+    while True:
+        try:
+            scores = {}
+            for interval in intervals:
+                df = get_crypto_data(symbol, interval)
+                if not df.empty:
+                    score_series = calculate_trading_score(df)
+                    scores[interval] = round(float(score_series.iloc[-1]), 1)
+                else:
+                    scores[interval] = 50.0
+            
+            master_score = strategy.calculate_weighted_score(scores)
+            ema = strategy.update_ema(master_score)
+            signal = strategy.check_hook()
+            
+            print(f"Bot Loop -> Master: {master_score}, EMA: {ema}")
+            
+            if signal:
+                tg_bot.notify_hook(signal, ema, scores)
+                
+        except Exception as e:
+            print(f"Bot Loop Error: {e}")
+            
+        await asyncio.sleep(3600)  # Check every 1 hour
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    task = asyncio.create_task(trading_bot_loop())
+    yield
+    # Shutdown
+    task.cancel()
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
