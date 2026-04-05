@@ -379,18 +379,18 @@ def analyze(req: AnalyzeRequest = None):
     curr_score = round(float(score_series.iloc[-1]), 1)
     
     # Calculate Warning Label for Trader
-    warning_text = "STANDBY / ČAKANIE NA SIGNÁL"
+    warning_text = "STANDBY"
     warning_color = "#525252"
     
     if mode == "TRADING":
         if curr_score <= 30:
-            warning_text = f"PRAVDEPODOBNOSŤ LONGU {ticker} V NAJBLIŽŠÍCH HODINÁCH"
+            warning_text = "PROBABLE LONG"
             warning_color = "#22c55e"
         elif curr_score >= 70:
-            warning_text = f"PRAVDEPODOBNOSŤ SHORTU {ticker} V NAJBLIŽŠÍCH HODINÁCH"
+            warning_text = "PROBABLE SHORT"
             warning_color = "#EC4899"
         else:
-            warning_text = f"BUĎ PRIPRAVENÝ: {ticker} JE V NEUTRÁLNEJ ZÓNE"
+            warning_text = "NEUTRAL ZONE"
             warning_color = "#FFFF00"
     
     return {

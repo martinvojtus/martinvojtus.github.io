@@ -18,22 +18,13 @@
 
 <div class="w-full max-w-xl p-5 relative">
 
-    <!-- NEW TOP WARNING LABEL (PULSING) -->
-    <div id="top-warning-label" class="mb-4 animate-fade-in relative overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900/20 py-2.5 text-center">
+    <!-- TRADER WARNING BOX -->
+    <div id="top-warning-box" class="mb-6 animate-fade-in relative overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900/40 py-3 text-center transition-colors duration-1000">
         <!-- Pixel perfect alignment placeholder -->
-        <div class="opacity-0 select-none text-[0.6rem] uppercase tracking-widest font-bold">PIXEL PERFECT ALIGNMENT</div>
-        <div class="absolute inset-0 flex items-center justify-center">
-            <span id="warning-text-display" class="text-[0.6rem] uppercase tracking-widest font-bold animate-pulse-soft transition-colors duration-500">STANDBY / ČAKANIE NA SIGNÁL</span>
-        </div>
-    </div>
-
-    <!-- TRADER STATUS BAR -->
-    <div id="trader-status-bar" class="hidden mb-6 animate-fade-in">
-        <div id="trader-status-bg" class="border p-2.5 rounded-xl flex items-center justify-between text-[0.6rem] uppercase tracking-widest font-bold transition-colors duration-1000">
-            <div class="flex items-center gap-3">
-                <span id="trader-status-text">WAITING FOR NEXT SIGNAL...</span>
-            </div>
-            <div id="trader-status-time" class="opacity-60 font-normal">--:--</div>
+        <div class="opacity-0 select-none text-[0.6rem] uppercase tracking-widest font-bold">ALIGN</div>
+        <div class="absolute inset-0 flex items-center justify-center gap-2">
+            <span id="warning-text-display" class="text-[0.6rem] uppercase tracking-widest font-bold animate-pulse-soft transition-colors duration-500">STANDBY</span>
+            <span id="warning-time-display" class="text-[0.55rem] font-normal opacity-60 hidden transition-colors duration-500"></span>
         </div>
     </div>
 
@@ -345,11 +336,6 @@ async function analyze() {
     pBadge.className = `border px-3 py-1.5 rounded-md transition-all duration-1000 ${s <= 20 ? 'text-[#22c55e] border-[#22c55e]/50' : (s >= 80 ? 'text-[#EC4899] border-[#EC4899]/50' : 'text-[#FFFF00] border-[#FFFF00]/50')}`;
     pBadge.innerText = (window.currentMode === 'TRADING') ? (s <= 20 ? "LONG" : (s >= 80 ? "SHORT" : "HODL")) : data.phase;
 
-    // Update Top Warning Label
-    const wTextDisplay = document.getElementById("warning-text-display");
-    wTextDisplay.innerText = data.warning_text || "STANDBY / ČAKANIE NA SIGNÁL";
-    wTextDisplay.style.color = data.warning_color || "#525252";
-
     document.getElementById("val-price").innerText = `$${Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
     let vCh = document.getElementById("val-change");
     vCh.className = `text-[0.6rem] mt-2 flex items-center gap-1.5 font-bold ${data.change >= 0 ? 'text-[#22c55e]' : 'text-pink-500'}`;
@@ -363,24 +349,41 @@ async function analyze() {
 
     document.getElementById("main-card").className = `p-6 rounded-3xl border shadow-2xl transition-colors duration-1000 ${s <= 20 ? 'bg-[#030a05] border-[#22c55e]/30' : (s >= 80 ? 'bg-[#EC4899]/5 border-[#EC4899]/30' : 'bg-[#FFFF00]/5 border-[#FFFF00]/30')}`;
 
-    // --- TRADER STATUS UPDATE ---
-    const tBar = document.getElementById("trader-status-bar");
-    const tBg = document.getElementById("trader-status-bg");
-    const tText = document.getElementById("trader-status-text");
-    const tTime = document.getElementById("trader-status-time");
+    // --- UNIFIED TRADER WARNING BOX ---
+    const wBox = document.getElementById("top-warning-box");
+    const wTextDisplay = document.getElementById("warning-text-display");
+    const wTimeDisplay = document.getElementById("warning-time-display");
+
+    let wBg = "rgba(23, 23, 23, 0.4)"; // Default neutral-900/40
+    let wBorder = "rgba(38, 38, 38, 1)"; // Default neutral-800
+    let wText = data.warning_text || "STANDBY";
+    let wColor = data.warning_color || "#525252";
+    let wTime = "";
 
     if (data.last_signal) {
-        tBar.classList.remove("hidden");
-        const sig = data.last_signal;
-        const isLong = sig.signal === "LONG";
-        tBg.className = `border p-2.5 rounded-xl flex items-center justify-between text-[0.6rem] uppercase tracking-widest font-bold transition-colors duration-1000 ${isLong ? 'bg-[#22c55e]/10 border-[#22c55e]/40 text-[#22c55e]' : 'bg-[#EC4899]/10 border-[#EC4899]/40 text-[#EC4899]'}`;
-        tText.innerText = `${sig.signal} ${data.ticker} WARNING`;
-        tTime.innerText = sig.time;
+        const isLong = data.last_signal.signal === "LONG";
+        wColor = isLong ? "#22c55e" : "#EC4899";
+        wBg = isLong ? "rgba(34, 197, 94, 0.15)" : "rgba(236, 72, 153, 0.15)";
+        wBorder = isLong ? "rgba(34, 197, 94, 0.4)" : "rgba(236, 72, 153, 0.4)";
+        wText = `${data.last_signal.signal} SIGNAL CONFIRMED`;
+        wTime = data.last_signal.time;
     } else {
-        tBar.classList.remove("hidden");
-        tBg.className = "bg-neutral-900/40 border border-neutral-800 p-2.5 rounded-xl flex items-center justify-between text-[0.6rem] uppercase tracking-widest font-bold text-neutral-500";
-        tText.innerText = "TRADER: STANDBY / NO RECENT SIGNAL";
-        tTime.innerText = "--:--";
+        if (wColor === "#22c55e") { wBg = "rgba(34, 197, 94, 0.15)"; wBorder = "rgba(34, 197, 94, 0.4)"; }
+        else if (wColor === "#EC4899") { wBg = "rgba(236, 72, 153, 0.15)"; wBorder = "rgba(236, 72, 153, 0.4)"; }
+        else if (wColor === "#FFFF00") { wBg = "rgba(255, 255, 0, 0.1)"; wBorder = "rgba(255, 255, 0, 0.2)"; }
+    }
+
+    wBox.style.backgroundColor = wBg;
+    wBox.style.borderColor = wBorder;
+    wTextDisplay.innerText = wText;
+    wTextDisplay.style.color = wColor;
+
+    if (wTime) {
+        wTimeDisplay.innerText = wTime;
+        wTimeDisplay.style.color = wColor;
+        wTimeDisplay.classList.remove("hidden");
+    } else {
+        wTimeDisplay.classList.add("hidden");
     }
 
     updateChart(window.currentMode === 'MACRO' ? window.currentMacroView : null);
