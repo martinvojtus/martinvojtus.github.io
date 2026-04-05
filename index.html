@@ -10,33 +10,33 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        .wallet-card { background: rgba(38, 38, 38, 0.4); border: 1px solid rgba(82, 82, 82, 0.2); transition: all 0.3s ease; }
+        .wallet-card:hover { border-color: rgba(168, 85, 247, 0.4); background: rgba(38, 38, 38, 0.6); }
     </style>    
 </head>
 <body class="font-['Inter'] bg-black text-white flex justify-center min-h-screen items-start pt-6 pb-10 overflow-x-hidden">
 
 <div class="w-full max-w-xl p-5 relative">
 
-    <!-- DASHBOARD / WALLET TOGGLE (ALWAYS TOP) -->
+    <!-- DASHBOARD / WALLET TOGGLE -->
     <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex w-full h-[34px] text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center font-bold mb-3">
         <button onclick="toggleView('dashboard')" id="toggle-view-dashboard" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Dashboard</button>
         <button onclick="toggleView('wallet')" id="toggle-view-wallet" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Wallet</button>
     </div>
 
-    <!-- SUB-NAV TOGGLES (ONLY FOR DASHBOARD) -->
+    <!-- SUB-NAV TOGGLES (ONLY DASHBOARD) -->
     <div id="dashboard-controls" class="flex flex-col gap-3 mb-6">
         <div class="flex gap-2 sm:gap-3 w-full h-[34px]">
-            <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
+            <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center font-medium">
                 <button onclick="toggleAsset('BTC')" id="toggle-asset-btc" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Bitcoin</button>
                 <button onclick="toggleAsset('SOL')" id="toggle-asset-sol" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Solana</button>
             </div>
-            <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
+            <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center font-medium">
                 <button onclick="toggleMode('MACRO')" id="toggle-mode-macro" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Macro</button>
                 <button onclick="toggleMode('TRADING')" id="toggle-mode-trading" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Trading</button>
             </div>
             <button onclick="triggerAnalysis()" class="bg-neutral-900 border border-neutral-800 rounded-lg w-[34px] sm:w-[38px] flex items-center justify-center text-neutral-500 hover:text-white transition-all duration-300 shrink-0 h-full">
-                <svg id="btn-refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                </svg>
+                <svg id="btn-refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
             </button>
         </div>
     </div>
@@ -44,135 +44,131 @@
     <!-- VIEW: DASHBOARD -->
     <div id="view-dashboard-container" class="animate-fade-in">
         <div class="flex justify-between items-center px-1 mb-4 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
-            <div class="w-16 text-left">
-                <div id="dynamic-title" class="text-neutral-600 transition-colors duration-500 font-bold">SCORE</div>
-            </div>
-            
+            <div class="w-16 text-left font-bold" id="dynamic-title" style="color: #666;">SCORE</div>
             <div id="macro-buttons" class="flex gap-1 absolute left-1/2 -translate-x-1/2">
-                <button onclick="updateChart('1Y')" id="btn-1Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1Y</button>
-                <button onclick="updateChart('2Y')" id="btn-2Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">2Y</button>
-                <button onclick="updateChart('4Y')" id="btn-4Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">4Y</button>
-                <button onclick="updateChart('ALL')" id="btn-ALL" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">ALL</button>
+                <button onclick="updateChart('1Y')" id="btn-1Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all">1Y</button>
+                <button onclick="updateChart('2Y')" id="btn-2Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all">2Y</button>
+                <button onclick="updateChart('4Y')" id="btn-4Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all font-bold">4Y</button>
+                <button onclick="updateChart('ALL')" id="btn-ALL" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all">ALL</button>
             </div>
-            
             <div id="trading-buttons" class="hidden flex gap-1 absolute left-1/2 -translate-x-1/2">
-                <button onclick="changeTradingInterval('1d')" id="btn-1d" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1D</button>
-                <button onclick="changeTradingInterval('4h')" id="btn-4h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">4H</button>
-                <button onclick="changeTradingInterval('2h')" id="btn-2h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">2H</button>
-                <button onclick="changeTradingInterval('1h')" id="btn-1h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1H</button>
+                <button onclick="changeTradingInterval('1d')" id="btn-1d" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all">1D</button>
+                <button onclick="changeTradingInterval('4h')" id="btn-4h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all">4H</button>
+                <button onclick="changeTradingInterval('2h')" id="btn-2h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all">2H</button>
+                <button onclick="changeTradingInterval('1h')" id="btn-1h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all">1H</button>
             </div>
-
-            <div class="w-16 flex justify-end">
-                <div id="dynamic-score" class="transition-colors duration-500 flex items-center h-full">
-                    <span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5 font-bold">00.0%</span>
-                </div>
-            </div>
+            <div class="w-16 flex justify-end font-bold" id="dynamic-score">--.-%</div>
         </div>
 
         <div class="h-60 w-full relative mb-4">
-            <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
+            <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] flex flex-col justify-between transition-opacity duration-1000">
                 <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
             </div>
-            
-            <div class="absolute top-0 bottom-0 -left-[8px] w-[calc(100%+16px)] pointer-events-none">
-                <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000 pointer-events-auto"></canvas>
+            <div class="absolute top-0 bottom-0 -left-[8px] w-[calc(100%+16px)]">
+                <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000"></canvas>
             </div>
         </div>
 
-        <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000">
+        <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl transition-all duration-1000">
             <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
-                <div id="badge-name" class="border border-neutral-600/50 px-3 py-1.5 rounded-md text-neutral-400">Bitcoin (BTC)</div>
-                <div id="badge-phase" class="border border-neutral-800 px-3 py-1.5 rounded-md transition-colors duration-1000 text-transparent bg-neutral-800 animate-pulse">LOADING ZONE</div>
+                <div id="badge-name" class="border border-neutral-600/50 px-3 py-1.5 rounded-md text-neutral-400">BITCOIN (BTC)</div>
+                <div id="badge-phase" class="border border-neutral-800 px-3 py-1.5 rounded-md font-bold transition-all">LOADING...</div>
             </div>
-            
-            <div class="flex justify-between items-start mb-4 gap-4 px-1">
+            <div class="flex justify-between items-start mb-6 gap-4 px-1">
                 <div>
-                    <div id="val-price" class="text-[1.8rem] font-bold leading-none tracking-tight text-white"><span class="bg-neutral-800 text-transparent animate-pulse rounded">$00,000.00</span></div>
-                    <div id="val-change" class="text-[0.6rem] uppercase tracking-widest mt-2 flex items-center gap-1.5"><span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">+0.00%</span><span class="bg-neutral-800 text-transparent animate-pulse rounded px-1.5 py-0.5">24H</span></div>
+                    <div id="val-price" class="text-[1.8rem] font-bold leading-none tracking-tight">$00,000.00</div>
+                    <div id="val-change" class="text-[0.6rem] mt-2 flex items-center gap-1.5 font-bold uppercase tracking-widest">+0.00% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded font-normal">24H</span></div>
                 </div>
                 <div class="text-right flex flex-col items-end">
-                    <div id="val-score-large" class="text-[1.8rem] font-bold leading-none"><span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">00.0%</span></div>
-                    <div class="text-[0.6rem] text-neutral-500 uppercase tracking-widest mt-2">SCORE</div>
+                    <div id="val-score-large" class="text-[1.8rem] font-bold leading-none">00.0%</div>
+                    <div class="text-[0.6rem] text-neutral-500 uppercase tracking-widest mt-2 font-bold">SCORE</div>
                 </div>
             </div>
-            
-            <div>
-                <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-4 relative"><div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: transparent;"></div></div>
-                <table class="w-full text-left text-[0.6rem] text-neutral-400 uppercase tracking-widest border border-neutral-800 rounded-lg overflow-hidden border-separate [border-spacing:0]">
-                    <tbody>
-                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#22c55e] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap w-24 text-center">0 – 20 (%)</td><td id="legend-low" class="py-2.5 pl-5 border-b border-l border-neutral-800 font-bold uppercase tracking-widest">VALUE ZONE (DCA IN)</td></tr>
-                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#FFFF00] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">21 – 79 (%)</td><td id="legend-mid" class="py-2.5 pl-5 border-b border-l border-neutral-800 font-bold uppercase tracking-widest">NEUTRAL ZONE (HODL)</td></tr>
-                        <tr><td class="py-2.5 px-0 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#EC4899] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">80 – 100 (%)</td><td id="legend-high" class="py-2.5 pl-5 border-l border-neutral-800 font-bold uppercase tracking-widest">EXIT ZONE (DCA OUT)</td></tr>
-                    </tbody>
-                </table>
-            </div>
+            <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-6 relative"><div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out w-0"></div></div>
+            <table class="w-full text-left text-[0.6rem] text-neutral-400 uppercase tracking-widest border border-neutral-800 rounded-lg overflow-hidden border-separate [border-spacing:0]">
+                <tbody>
+                    <tr><td class="py-2.5 px-0 border-b border-neutral-800 text-center w-10"><div class="w-2 h-2 rounded-full bg-[#22c55e] inline-block"></div></td><td class="py-2.5 px-4 border-b border-l border-neutral-800 text-white font-bold w-24">0 – 20 (%)</td><td id="legend-low" class="py-2.5 pl-5 border-b border-l border-neutral-800">VALUE ZONE (DCA IN)</td></tr>
+                    <tr><td class="py-2.5 px-0 border-b border-neutral-800 text-center w-10"><div class="w-2 h-2 rounded-full bg-[#FFFF00] inline-block"></div></td><td class="py-2.5 px-4 border-b border-l border-neutral-800 text-white font-bold w-24">21 – 79 (%)</td><td id="legend-mid" class="py-2.5 pl-5 border-b border-l border-neutral-800">NEUTRAL ZONE (HODL)</td></tr>
+                    <tr><td class="py-2.5 px-0 text-center w-10"><div class="w-2 h-2 rounded-full bg-[#EC4899] inline-block"></div></td><td class="py-2.5 px-4 border-l border-neutral-800 text-white font-bold w-24">80 – 100 (%)</td><td id="legend-high" class="py-2.5 pl-5 border-l border-neutral-800">EXIT ZONE (DCA OUT)</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
     <!-- VIEW: WALLET -->
     <div id="view-wallet-container" class="hidden animate-fade-in">
-        <div class="p-8 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl flex flex-col items-center text-center min-h-[400px] justify-center text-white">
-            <div id="wallet-disconnected">
-                <div class="w-16 h-16 bg-neutral-800 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+        <div class="p-8 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl flex flex-col items-center text-center min-h-[450px] justify-center">
+            
+            <div id="wallet-disconnected" class="w-full">
+                <div class="w-16 h-16 bg-neutral-800 rounded-2xl flex items-center justify-center mb-6 mx-auto shadow-xl">
                     <svg class="w-8 h-8 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 9l-6 6m0-6l6 6"></path></svg>
                 </div>
-                <h2 class="text-xl font-bold mb-2">Wallet Terminal</h2>
-                <p class="text-[0.65rem] text-neutral-500 uppercase tracking-widest mb-8">Connect phantom or enter address manually</p>
+                <h2 class="text-xl font-bold mb-2">Connect Phantom</h2>
+                <p class="text-[0.65rem] text-neutral-500 uppercase tracking-widest mb-10 font-medium">Access your assets via Deep Link or Manual Load</p>
                 
-                <button onclick="connectWallet()" class="w-full bg-white text-black px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-neutral-200 transition-all mb-4">Connect Phantom</button>
+                <button onclick="connectWallet()" class="w-full bg-purple-600 text-white px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-purple-500 transition-all mb-4 shadow-lg shadow-purple-900/20">Connect Phantom App</button>
                 
-                <div class="flex items-center w-full gap-2 mb-4">
+                <div class="flex items-center w-full gap-3 mb-6">
                     <div class="h-[1px] bg-neutral-800 flex-1"></div>
-                    <div class="text-[0.5rem] text-neutral-600 uppercase tracking-widest">OR</div>
+                    <div class="text-[0.55rem] text-neutral-600 uppercase font-bold tracking-widest">Manual Input</div>
                     <div class="h-[1px] bg-neutral-800 flex-1"></div>
                 </div>
 
                 <div class="w-full relative">
-                    <input type="text" id="manual-address-input" placeholder="Paste Solana Address" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-[0.7rem] font-mono text-neutral-400 placeholder:text-neutral-700 outline-none focus:border-neutral-600 transition-colors">
-                    <button onclick="manualConnect()" class="absolute right-2 top-1/2 -translate-y-1/2 text-[0.5rem] bg-neutral-800 hover:bg-neutral-700 px-3 py-1.5 rounded-lg uppercase tracking-widest font-bold">Load</button>
+                    <input type="text" id="manual-address-input" placeholder="Paste Solana Address" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-[0.7rem] font-mono text-neutral-400 outline-none focus:border-purple-900 transition-all">
+                    <button onclick="manualConnect()" class="absolute right-2 top-1/2 -translate-y-1/2 text-[0.55rem] bg-neutral-800 hover:bg-neutral-700 px-4 py-1.5 rounded-lg uppercase tracking-widest font-bold text-white transition-all">Load</button>
                 </div>
             </div>
 
             <div id="wallet-connected" class="hidden w-full">
-                <div class="flex items-center gap-3 mb-8 justify-center">
+                <div class="flex items-center gap-3 mb-10 justify-center">
                     <div class="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center border border-purple-500/30">
                         <div class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
                     </div>
                     <div class="text-left">
-                        <div id="wallet-address-display" class="text-[0.7rem] font-mono text-neutral-400 tracking-tighter">0x...</div>
-                        <div class="text-[0.5rem] uppercase tracking-widest text-neutral-600 font-bold">Active Connection</div>
+                        <div id="wallet-address-display" class="text-[0.75rem] font-mono text-white tracking-tighter font-bold">0x...</div>
+                        <div class="text-[0.55rem] uppercase tracking-widest text-neutral-500 font-bold">SOLANA MAINNET</div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-4 mb-8">
-                    <div class="bg-neutral-800/50 p-8 rounded-2xl border border-neutral-700/30 shadow-inner">
-                        <div class="text-[0.55rem] text-neutral-500 uppercase tracking-widest mb-2 text-center font-bold">Current Balance</div>
-                        <div id="wallet-balance" class="text-4xl font-bold text-center tracking-tight">0.00 SOL</div>
+                <div class="flex flex-col gap-3 mb-10 w-full">
+                    <div class="wallet-card p-5 rounded-2xl flex justify-between items-center">
+                        <div class="text-left">
+                            <div class="text-[0.55rem] text-neutral-500 uppercase font-bold tracking-widest mb-1">Solana</div>
+                            <div class="text-[0.7rem] text-white font-bold tracking-widest">SOL</div>
+                        </div>
+                        <div id="wallet-balance" class="text-xl font-bold tracking-tighter text-white">0.000</div>
+                    </div>
+                    
+                    <div class="wallet-card p-5 rounded-2xl flex justify-between items-center">
+                        <div class="text-left">
+                            <div class="text-[0.55rem] text-neutral-500 uppercase font-bold tracking-widest mb-1">USD Coin</div>
+                            <div class="text-[0.7rem] text-white font-bold tracking-widest">USDC</div>
+                        </div>
+                        <div id="wallet-balance-usdc" class="text-xl font-bold tracking-tighter text-white">0.00</div>
                     </div>
                 </div>
 
-                <button onclick="disconnectWallet()" class="text-[0.55rem] text-neutral-600 uppercase tracking-widest hover:text-neutral-400 transition-colors font-bold tracking-[0.2em]">Disconnect Wallet</button>
+                <button onclick="disconnectWallet()" class="text-[0.6rem] text-neutral-600 uppercase tracking-[0.2em] font-bold hover:text-neutral-400 transition-colors">Disconnect Wallet</button>
             </div>
         </div>
     </div>
 
-    <div id="error-box" class="hidden mt-4 bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center font-bold">❌ SERVER OFFLINE. PLEASE TRY AGAIN.</div>
+    <div id="error-box" class="hidden mt-4 bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center font-bold">❌ CONNECTION FAILED. PLEASE TRY AGAIN.</div>
 
 </div>
 
 <script>
-// --- GLOBALS & STATE ---
+// --- CORE STATE ---
 let scoreChartInstance = null;
-window.currentScoreData = { score: 0, colorClass: "" };
-window.fullData = null; 
 window.currentAsset = localStorage.getItem('vbsx_asset') || 'BTC'; 
 window.currentMode = localStorage.getItem('vbsx_mode') || 'MACRO';
 window.currentInterval = localStorage.getItem('vbsx_interval') || '1w'; 
 window.currentMacroView = localStorage.getItem('vbsx_macro_view') || '4Y';
 window.currentView = 'dashboard';
-window.walletAddress = null;
+window.walletAddress = localStorage.getItem('vbsx_wallet') || null;
 
-// --- VIEW SWITCHING ---
+// --- VIEW NAVIGATION ---
 function toggleView(view) {
     window.currentView = view;
     const dashBtn = document.getElementById('toggle-view-dashboard');
@@ -182,35 +178,48 @@ function toggleView(view) {
     const subNav = document.getElementById('dashboard-controls');
 
     if (view === 'dashboard') {
-        dashBtn.className = "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full";
-        wallBtn.className = "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
+        dashBtn.className = "flex-1 rounded-md bg-neutral-700 text-white transition-all h-full";
+        wallBtn.className = "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all h-full";
         dashCont.classList.remove('hidden');
         wallCont.classList.add('hidden');
         subNav.classList.remove('hidden');
     } else {
-        wallBtn.className = "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full";
-        dashBtn.className = "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
+        wallBtn.className = "flex-1 rounded-md bg-neutral-700 text-white transition-all h-full";
+        dashBtn.className = "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all h-full";
         dashCont.classList.add('hidden');
         wallCont.classList.remove('hidden');
         subNav.classList.add('hidden');
-        checkExistingConnection();
+        if (window.walletAddress) updateWalletUI();
     }
 }
 
-// --- PHANTOM WALLET & MANUAL LOGIC ---
+// --- SMART WALLET LOGIC (DEEP LINKS & RPC) ---
 async function connectWallet() {
-    try {
-        const isPhantomInstalled = window.solana && window.solana.isPhantom;
-        if (!isPhantomInstalled) {
-            alert("Phantom Wallet is not installed in this browser.");
+    // 1. Skúsime či sme v browseri s Phantom extension
+    const isPhantomInstalled = window.solana && window.solana.isPhantom;
+    
+    if (!isPhantomInstalled) {
+        // 2. Ak nie sme, skúsime Deep Link pre mobil (Phantom Browser)
+        const currentUrl = window.location.href;
+        const phantomDeepLink = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}?ref=${encodeURIComponent(currentUrl)}`;
+        
+        // Ak sme na mobile, otvoríme Phantom appku
+        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+            window.location.href = phantomDeepLink;
+            return;
+        } else {
+            alert("Phantom extension not found. Please use manual input or Phantom Mobile.");
             return;
         }
+    }
+
+    try {
         const resp = await window.solana.connect();
         window.walletAddress = resp.publicKey.toString();
+        localStorage.setItem('vbsx_wallet', window.walletAddress);
         updateWalletUI();
-        fetchSolBalance();
     } catch (err) {
-        console.error("Wallet connection failed", err);
+        console.error("Connection failed", err);
     }
 }
 
@@ -219,186 +228,142 @@ function manualConnect() {
     const addr = input.value.trim();
     if (addr.length >= 32) {
         window.walletAddress = addr;
+        localStorage.setItem('vbsx_wallet', addr);
         updateWalletUI();
-        fetchSolBalance();
     } else {
-        alert("Please enter a valid Solana address.");
-    }
-}
-
-async function checkExistingConnection() {
-    if (window.solana && window.solana.isPhantom) {
-        try {
-            const resp = await window.solana.connect({ onlyIfTrusted: true });
-            window.walletAddress = resp.publicKey.toString();
-            updateWalletUI();
-            fetchSolBalance();
-        } catch (err) { /* Not trusted */ }
+        alert("Enter a valid Solana address.");
     }
 }
 
 function disconnectWallet() {
     if (window.solana) window.solana.disconnect();
     window.walletAddress = null;
+    localStorage.removeItem('vbsx_wallet');
     updateWalletUI();
 }
 
 function updateWalletUI() {
-    const disconnectedDiv = document.getElementById('wallet-disconnected');
-    const connectedDiv = document.getElementById('wallet-connected');
-    const addrDisplay = document.getElementById('wallet-address-display');
+    const disconnected = document.getElementById('wallet-disconnected');
+    const connected = document.getElementById('wallet-connected');
+    const display = document.getElementById('wallet-address-display');
+    
     if (window.walletAddress) {
-        disconnectedDiv.classList.add('hidden');
-        connectedDiv.classList.remove('hidden');
-        addrDisplay.innerText = window.walletAddress.slice(0, 4) + "..." + window.walletAddress.slice(-4);
+        disconnected.classList.add('hidden');
+        connected.classList.remove('hidden');
+        display.innerText = window.walletAddress.slice(0, 6) + "..." + window.walletAddress.slice(-6);
+        fetchWalletData();
     } else {
-        disconnectedDiv.classList.remove('hidden');
-        connectedDiv.classList.add('hidden');
+        disconnected.classList.remove('hidden');
+        connected.classList.add('hidden');
     }
 }
 
-async function fetchSolBalance() {
+async function fetchWalletData() {
     if (!window.walletAddress) return;
+    const rpc = "https://api.mainnet-beta.solana.com";
+    
     try {
-        const response = await fetch("https://api.mainnet-beta.solana.com", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+        // 1. Fetch SOL Balance
+        const solRes = await fetch(rpc, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getBalance", params: [window.walletAddress] })
+        });
+        const solData = await solRes.json();
+        document.getElementById('wallet-balance').innerText = (solData.result.value / 1e9).toFixed(3) + " SOL";
+
+        // 2. Fetch USDC (SPL Token) Balance
+        const usdcMint = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+        const usdcRes = await fetch(rpc, {
+            method: "POST", headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                jsonrpc: "2.0", id: 1,
-                method: "getBalance",
-                params: [window.walletAddress]
+                jsonrpc: "2.0", id: 1, method: "getTokenAccountsByOwner",
+                params: [window.walletAddress, { mint: usdcMint }, { encoding: "jsonParsed" }]
             })
         });
-        const data = await response.json();
-        const sol = data.result.value / 1000000000;
-        document.getElementById('wallet-balance').innerText = sol.toFixed(3) + " SOL";
+        const usdcData = await usdcRes.json();
+        const accounts = usdcData.result.value;
+        let usdcBal = 0;
+        if (accounts.length > 0) {
+            usdcBal = accounts[0].account.data.parsed.info.tokenAmount.uiAmount;
+        }
+        document.getElementById('wallet-balance-usdc').innerText = usdcBal.toLocaleString(undefined, {minimumFractionDigits: 2}) + " USDC";
+        
     } catch (err) {
-        console.error("Balance fetch error", err);
+        console.error("Data fetch error", err);
     }
 }
 
-// --- DASHBOARD LOGIC (PÔVODNÁ) ---
+// --- DASHBOARD LOGIC (STRICT ORIGINAL) ---
 function initUI() {
-    document.getElementById('toggle-asset-btc').className = window.currentAsset === 'BTC' ? "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
-    document.getElementById('toggle-asset-sol').className = window.currentAsset === 'SOL' ? "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
-    document.getElementById('toggle-mode-macro').className = window.currentMode === 'MACRO' ? "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
-    document.getElementById('toggle-mode-trading').className = window.currentMode === 'TRADING' ? "flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full";
+    const assetButtons = ['btc', 'sol'];
+    assetButtons.forEach(a => {
+        document.getElementById(`toggle-asset-${a}`).className = window.currentAsset === a.toUpperCase() ? "flex-1 rounded-md bg-neutral-700 text-white h-full" : "flex-1 rounded-md text-neutral-500 h-full hover:text-neutral-300";
+    });
+    const modeButtons = ['macro', 'trading'];
+    modeButtons.forEach(m => {
+        document.getElementById(`toggle-mode-${m}`).className = window.currentMode === m.toUpperCase() ? "flex-1 rounded-md bg-neutral-700 text-white h-full" : "flex-1 rounded-md text-neutral-500 h-full hover:text-neutral-300";
+    });
 
     if (window.currentMode === 'MACRO') {
         document.getElementById('macro-buttons').classList.remove('hidden');
         document.getElementById('trading-buttons').classList.add('hidden');
         window.currentInterval = '1w';
+        document.getElementById('legend-low').innerText = "VALUE ZONE (DCA IN)";
+        document.getElementById('legend-high').innerText = "EXIT ZONE (DCA OUT)";
     } else {
         document.getElementById('macro-buttons').classList.add('hidden');
         document.getElementById('trading-buttons').classList.remove('hidden');
         if (window.currentInterval === '1w') window.currentInterval = '1d';
+        document.getElementById('legend-low').innerText = "VALUE ZONE (LONG)";
+        document.getElementById('legend-high').innerText = "EXIT ZONE (SHORT)";
         highlightTradingButton(window.currentInterval);
     }
 }
 
-function toggleAsset(asset) {
-    if (window.currentAsset === asset) return;
-    window.currentAsset = asset;
-    localStorage.setItem('vbsx_asset', asset);
-    initUI();
-    triggerAnalysis();
-}
-
-function toggleMode(mode) {
-    if (window.currentMode === mode) return;
-    window.currentMode = mode;
-    localStorage.setItem('vbsx_mode', mode);
-    initUI();
-    triggerAnalysis();
-}
-
-function changeTradingInterval(interval) {
-    if (window.currentInterval === interval && window.currentMode === 'TRADING') return;
-    window.currentInterval = interval;
-    localStorage.setItem('vbsx_interval', interval);
-    highlightTradingButton(interval);
-    triggerAnalysis();
-}
-
-function highlightTradingButton(interval) {
-    ['1d', '4h', '2h', '1h'].forEach(p => {
+function toggleAsset(a) { if(window.currentAsset!==a){window.currentAsset=a; localStorage.setItem('vbsx_asset',a); initUI(); triggerAnalysis();} }
+function toggleMode(m) { if(window.currentMode!==m){window.currentMode=m; localStorage.setItem('vbsx_mode',m); initUI(); triggerAnalysis();} }
+function highlightTradingButton(i) {
+    ['1d','4h','2h','1h'].forEach(p => {
         const btn = document.getElementById(`btn-${p}`);
-        if(btn) btn.className = p === interval ? "px-3 py-1 rounded-md text-white bg-neutral-800 transition-all duration-300" : "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
+        if(btn) btn.className = p===i ? "px-3 py-1 rounded-md text-white bg-neutral-800 font-bold" : "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all";
     });
 }
+function changeTradingInterval(i) { window.currentInterval=i; localStorage.setItem('vbsx_interval',i); highlightTradingButton(i); triggerAnalysis(); }
 
 function triggerAnalysis() {
-    const refBtn = document.getElementById('btn-refresh-icon');
-    if (refBtn) refBtn.classList.add('animate-spin');
+    const icon = document.getElementById('btn-refresh-icon');
+    if(icon) icon.classList.add('animate-spin');
     document.getElementById("scoreChart").classList.add("opacity-0");
     document.getElementById("chart-skeleton").classList.remove("opacity-0");
     analyze();
 }
 
-function updateSkeletonGrid() {
-    const skeleton = document.getElementById('chart-skeleton');
-    if (!skeleton) return;
-    const width = skeleton.clientWidth;
-    if (width === 0) return;
-    const targetDash = 4;
-    const numDashes = Math.round((width / targetDash + 1) / 2);
-    const exactDash = width / (2 * numDashes - 1);
-    const grad = `repeating-linear-gradient(to right, #525252 0, #525252 ${exactDash}px, transparent ${exactDash}px, transparent ${exactDash * 2}px)`;
-    const lines = skeleton.children;
-    for (let i = 0; i < lines.length; i++) lines[i].style.backgroundImage = grad;
-}
-window.addEventListener('resize', updateSkeletonGrid);
-
-// --- CHART PLUGIN ---
+// --- CHART RENDERING (STRICT GRADIENT RESTORED) ---
 const customChartPlugin = {
   id: 'customChart',
   afterDraw: chart => {
-    const ctx = chart.ctx;
-    if (!chart.chartArea) return; 
+    const ctx = chart.ctx; if (!chart.chartArea) return;
     const { chartArea: {top, bottom, left, right}, scales: {y} } = chart;
     ctx.save(); ctx.lineWidth = 1;
-    const gridWidth = right - left;
-    const exactDash = gridWidth / (2 * Math.round(((gridWidth / 4) + 1) / 2) - 1);
-    ctx.setLineDash([exactDash, exactDash]);
+    const gridW = right - left;
+    const dash = gridW / (2 * Math.round(((gridW / 4) + 1) / 2) - 1);
+    ctx.setLineDash([dash, dash]);
     for (let v = 0; v <= 100; v += 10) {
         const yPos = y.getPixelForValue(v);
-        let op = 0.1; if (v === 0 || v === 100) op = 0.05; else if (v === 20 || v === 80) op = 0.5; 
+        let op = 0.1; if (v === 0 || v === 100) op = 0.05; else if (v === 20 || v === 80) op = 0.5;
         ctx.strokeStyle = v <= 20 ? `rgba(34, 197, 94, ${op})` : (v < 80 ? `rgba(255, 255, 0, ${op})` : `rgba(236, 72, 153, ${op})`);
         ctx.beginPath(); ctx.moveTo(left, yPos); ctx.lineTo(right, yPos); ctx.stroke();
     }
     ctx.restore();
-
-    const activeElements = chart.getActiveElements();
-    if (activeElements.length > 0) {
-      let activePoint = activeElements[0];
-      let xPos = activePoint.element.x;
-      ctx.save(); ctx.beginPath(); ctx.moveTo(xPos, top); ctx.lineTo(xPos, bottom);
-      ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.stroke();
-      let xLabel = chart.data.labels[activePoint.index];
-      if (xLabel) {
-          ctx.fillStyle = '#171717'; ctx.font = 'normal 9.6px sans-serif'; 
-          let tw = ctx.measureText(xLabel).width;
-          let bx = Math.max(left, Math.min(right - tw - 16, xPos - (tw + 16)/2));
-          ctx.fillRect(bx, bottom + 4, tw + 16, 20);
-          ctx.strokeStyle = '#525252'; ctx.strokeRect(bx, bottom + 4, tw + 16, 20);
-          ctx.fillStyle = '#a3a3a3'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.fillText(xLabel, bx + (tw + 16)/2, bottom + 14);
-      }
-      let val = Math.max(0, Math.min(100, activePoint.element.$context.parsed.y));
-      let sHex = val <= 20 ? "#22c55e" : (val >= 80 ? "#EC4899" : "#FFFF00");
-      document.getElementById('dynamic-score').innerText = val.toFixed(1) + '%';
-      document.getElementById('dynamic-score').style.color = sHex;
-      document.getElementById('dynamic-score').style.textShadow = `0 0 10px ${sHex}80`;
-      document.getElementById('dynamic-title').style.color = sHex;
-      document.getElementById('dynamic-title').style.textShadow = `0 0 10px ${sHex}80`;
-      ctx.restore();
-    }
+    
+    // Last point dot
     const meta = chart.getDatasetMeta(0);
     if (meta.data && meta.data.length > 0) {
-        const lastP = meta.data[meta.data.length - 1];
-        const lastV = chart.data.datasets[0].data[meta.data.length - 1];
-        let dotC = lastV <= 20 ? '#22c55e' : (lastV >= 80 ? '#EC4899' : '#FFFF00');
-        ctx.save(); ctx.beginPath(); ctx.arc(lastP.x, lastP.y, 4, 0, 2 * Math.PI); ctx.fillStyle = dotC; ctx.fill(); ctx.restore();
+        const lp = meta.data[meta.data.length - 1];
+        const lv = chart.data.datasets[0].data[meta.data.length - 1];
+        ctx.save(); ctx.beginPath(); ctx.arc(lp.x, lp.y, 4, 0, 2*Math.PI);
+        ctx.fillStyle = lv <= 20 ? '#22c55e' : (lv >= 80 ? '#EC4899' : '#FFFF00');
+        ctx.fill(); ctx.restore();
     }
   }
 };
@@ -411,7 +376,7 @@ function updateChart(period) {
         localStorage.setItem('vbsx_macro_view', period);
         ['1Y', '2Y', '4Y', 'ALL'].forEach(p => {
             const btn = document.getElementById(`btn-${p}`);
-            if(btn) btn.className = p === period ? "px-3 py-1 rounded-md text-white bg-neutral-800 transition-all duration-300" : "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300";
+            if(btn) btn.className = p === period ? "px-3 py-1 rounded-md text-white bg-neutral-800 font-bold" : "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all";
         });
     }
     let pts = 208;
@@ -421,26 +386,22 @@ function updateChart(period) {
     const dts = window.fullData.chart_dates.slice(-pts);
     const scr = window.fullData.chart_score.slice(-pts);
     if (scoreChartInstance) scoreChartInstance.destroy();
-    Chart.defaults.color = '#525252'; Chart.defaults.font.family = "'Inter', sans-serif"; Chart.defaults.font.size = 9.6;
+    
     scoreChartInstance = new Chart(document.getElementById('scoreChart').getContext('2d'), {
         type: 'line',
-        data: { labels: dts, datasets: [{ data: scr, fill: false, borderWidth: 1.5, tension: 0.5, pointRadius: 0, 
+        data: { labels: dts, datasets: [{ data: scr, fill: false, borderWidth: 1.5, tension: 0.5, pointRadius: 0,
             borderColor: function(c) {
-                const {ctx, chartArea} = c.chart; if (!chartArea) return;
+                const {ctx, chartArea} = c.chart; if(!chartArea) return;
                 const g = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                // PÔVODNÝ GRADIENT STOPS
-                g.addColorStop(0, '#22c55e');
-                g.addColorStop(0.2, '#22c55e');
-                g.addColorStop(0.3, '#FFFF00');
-                g.addColorStop(0.7, '#FFFF00');
-                g.addColorStop(0.8, '#EC4899');
-                g.addColorStop(1, '#EC4899');    
+                g.addColorStop(0, '#22c55e'); g.addColorStop(0.2, '#22c55e');
+                g.addColorStop(0.3, '#FFFF00'); g.addColorStop(0.7, '#FFFF00');
+                g.addColorStop(0.8, '#EC4899'); g.addColorStop(1, '#EC4899');
                 return g;
             }
         }]},
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } },
             layout: { padding: { left: 8, right: 8, top: 5, bottom: 28 } }, interaction: { mode: 'index', intersect: false },
-            scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } 
+            scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } }
         }
     });
     document.getElementById("chart-skeleton").classList.add("opacity-0");
@@ -448,63 +409,43 @@ function updateChart(period) {
 }
 
 async function analyze() {
-  try {
-    const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", { 
-        method: "POST", headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ asset: window.currentAsset, mode: window.currentMode, interval: window.currentInterval })
-    });
-    const data = await res.json();
-    window.fullData = data; 
-    const s = data.cycle_score || 0;
-    let sHex = s <= 20 ? "#22c55e" : (s >= 80 ? "#EC4899" : "#FFFF00");
-    window.currentScoreData = { score: s, rawColor: sHex };
+    try {
+        const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", {
+            method: "POST", headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ asset: window.currentAsset, mode: window.currentMode, interval: window.currentInterval })
+        });
+        const data = await res.json(); window.fullData = data;
+        const s = data.cycle_score;
+        let sHex = s <= 20 ? "#22c55e" : (s >= 80 ? "#EC4899" : "#FFFF00");
+        
+        document.getElementById("badge-name").innerText = `${data.name} (${data.ticker})`;
+        let pB = document.getElementById("badge-phase");
+        pB.className = `border px-3 py-1.5 rounded-md transition-all ${s <= 20 ? 'text-[#22c55e] border-[#22c55e]/50' : (s >= 80 ? 'text-[#EC4899] border-[#EC4899]/50' : 'text-[#FFFF00] border-[#FFFF00]/50')}`;
+        pB.innerText = (window.currentMode==='TRADING') ? (s<=20?"LONG":(s>=80?"SHORT":"HODL")) : data.phase;
 
-    document.getElementById("badge-name").innerText = `${data.name} (${data.ticker})`;
-    let pBadge = document.getElementById("badge-phase");
-    pBadge.className = `border px-3 py-1.5 rounded-md transition-colors duration-1000 ${s <= 20 ? 'text-[#22c55e] border-[#22c55e]/50' : (s >= 80 ? 'text-[#EC4899] border-[#EC4899]/50' : 'text-[#FFFF00] border-[#FFFF00]/50')}`;
-    
-    let displayPhase = data.phase;
-    if (window.currentMode === 'TRADING') {
-        if (s <= 20) displayPhase = "LONG";
-        else if (s >= 80) displayPhase = "SHORT";
-        else displayPhase = "HODL";
-    }
-    pBadge.innerText = displayPhase;
+        document.getElementById("val-price").innerText = `$${Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+        let vC = document.getElementById("val-change");
+        vC.className = `text-[0.6rem] mt-2 flex items-center gap-1.5 font-bold ${data.change >= 0 ? 'text-[#22c55e]' : 'text-pink-500'}`;
+        vC.innerHTML = `${data.change>=0?'+':''}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded font-normal">24H</span>`;
 
-    document.getElementById("val-price").innerText = `$${Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-    let vCh = document.getElementById("val-change");
-    vCh.className = `text-[0.6rem] mt-2 flex items-center gap-1.5 ${data.change >= 0 ? 'text-[#22c55e]' : 'text-pink-500'}`;
-    vCh.innerHTML = `${data.change >= 0 ? '+':''}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded font-normal">24H</span>`;
+        document.getElementById("val-score-large").innerText = `${s.toFixed(1)}%`;
+        document.getElementById("val-score-large").style.color = sHex;
+        document.getElementById("dynamic-score").innerText = `${s.toFixed(1)}%`;
+        document.getElementById("dynamic-score").style.color = sHex;
+        document.getElementById("dynamic-title").style.color = sHex;
+        document.getElementById("main-card").style.borderColor = sHex + "30";
 
-    document.getElementById("val-score-large").innerText = `${s.toFixed(1)}%`;
-    document.getElementById("val-score-large").style.color = sHex;
-    document.getElementById("dynamic-score").innerText = `${s.toFixed(1)}%`;
-    document.getElementById("dynamic-score").style.color = sHex;
-    document.getElementById("dynamic-title").style.color = sHex;
-
-    document.getElementById("main-card").className = `p-6 rounded-3xl border shadow-2xl transition-colors duration-1000 ${s <= 20 ? 'bg-[#030a05] border-[#22c55e]/30' : (s >= 80 ? 'bg-[#EC4899]/5 border-[#EC4899]/30' : 'bg-[#FFFF00]/5 border-[#FFFF00]/30')}`;
-
-    updateChart(window.currentMode === 'MACRO' ? window.currentMacroView : null);
-    setTimeout(() => {
-        const bar = document.getElementById("animated-score-bar");
-        bar.style.width = `${s}%`;
-        bar.style.backgroundColor = sHex;
-        bar.style.boxShadow = `0 0 10px ${sHex}`;
-    }, 50);
-  } catch (e) {
-    console.error(e);
-    document.getElementById("error-box").classList.remove("hidden");
-  } finally {
-    const rIcon = document.getElementById('btn-refresh-icon');
-    if (rIcon) rIcon.classList.remove('animate-spin');
-  }
+        updateChart(window.currentMode === 'MACRO' ? window.currentMacroView : null);
+        setTimeout(() => {
+            const bar = document.getElementById("animated-score-bar");
+            bar.style.width = `${s}%`; bar.style.backgroundColor = sHex;
+            bar.style.boxShadow = `0 0 10px ${sHex}80`;
+        }, 50);
+    } catch(e) { document.getElementById("error-box").classList.remove("hidden"); }
+    finally { const i = document.getElementById('btn-refresh-icon'); if(i) i.classList.remove('animate-spin'); }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-    updateSkeletonGrid();
-    initUI();
-    triggerAnalysis();
-});
+window.addEventListener('DOMContentLoaded', () => { initUI(); triggerAnalysis(); if(window.walletAddress) updateWalletUI(); });
 </script>
 </body>
 </html>
