@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 # --- GLOBÁLNA PAMÄŤ PRE POSLEDNÉ SIGNÁLY ---
-LAST_TRADER_SIGNALS = {"BTC": None, "SOL": None}
+LAST_TRADER_SIGNALS = {"BTC": None}
 
 # --- TRADING BOT LOGIC ---
 class TelegramBot:
@@ -30,7 +30,7 @@ class TelegramBot:
         except Exception as e:
             print(f"Telegram error: {e}")
 
-    def notify_hook(self, signal, score_ema, interval_scores, asset="SOL"):
+    def notify_hook(self, signal, score_ema, interval_scores, asset="BTC"):
         emoji = "🚀 LONG" if signal == "BUY" else "🔻 SHORT"
         msg = f"*{emoji} {asset} SIGNAL CONFIRMED!*\n\n"
         msg += f"MTF Master EMA: `{score_ema}%`\n"
@@ -79,15 +79,15 @@ class VBSXStrategy:
 
 async def trading_bot_loop():
     print("Starting background VBSX Bot Loop...")
-    strategies = {"BTC": VBSXStrategy(), "SOL": VBSXStrategy()}
+    strategies = {"BTC": VBSXStrategy()}
     tg_bot = TelegramBot()
-    tg_bot.send_message("🤖 *VBSX Bot Active on Render*\nMonitoring: BTC & SOL (1d, 4h, 2h, 1h)")
+    tg_bot.send_message("🤖 *VBSX Bot Active on Render*\nMonitoring: BTC (1d, 4h, 2h, 1h)")
     
     intervals = ["1d", "4h", "2h", "1h"]
 
     while True:
         try:
-            for asset in ["BTC", "SOL"]:
+            for asset in ["BTC"]:
                 symbol = f"{asset}USDT"
                 scores = {}
                 for interval in intervals:
@@ -132,7 +132,6 @@ app.add_middleware(
 )
 
 class AnalyzeRequest(BaseModel):
-    asset: str = "BTC"
     mode: str = "MACRO"
     interval: str = "1w"
 
@@ -356,13 +355,12 @@ def calculate_trading_score(df):
 
 @app.post("/analyze")
 def analyze(req: AnalyzeRequest = None):
-    asset = req.asset.upper() if req else "BTC"
     mode = req.mode.upper() if req else "MACRO"
     interval = req.interval.lower() if req else "1w"
     
-    symbol = "SOLUSDT" if asset == "SOL" else "BTCUSDT"
-    name = "Solana" if asset == "SOL" else "Bitcoin"
-    ticker = "SOL" if asset == "SOL" else "BTC"
+    symbol = "BTCUSDT"
+    name = "Bitcoin"
+    ticker = "BTC"
 
     df = get_crypto_data(symbol, interval)
     if df.empty:

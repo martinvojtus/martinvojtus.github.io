@@ -22,10 +22,6 @@
     <div id="dashboard-controls" class="flex flex-col gap-3 mb-6">
         <div class="flex gap-2 sm:gap-3 w-full h-[34px]">
             <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
-                <button onclick="toggleAsset('BTC')" id="toggle-asset-btc" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Bitcoin</button>
-                <button onclick="toggleAsset('SOL')" id="toggle-asset-sol" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Solana</button>
-            </div>
-            <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
                 <button onclick="toggleMode('MACRO')" id="toggle-mode-macro" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Macro</button>
                 <button onclick="toggleMode('TRADING')" id="toggle-mode-trading" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Trading</button>
             </div>
@@ -142,15 +138,12 @@
 let scoreChartInstance = null;
 window.currentScoreData = { score: 0, colorClass: "" };
 window.fullData = null; 
-window.currentAsset = localStorage.getItem('vbsx_asset') || 'BTC'; 
 window.currentMode = localStorage.getItem('vbsx_mode') || 'MACRO';
 window.currentInterval = localStorage.getItem('vbsx_interval') || (window.currentMode === 'MACRO' ? '1w' : '2h'); 
 window.currentMacroView = localStorage.getItem('vbsx_macro_view') || '4Y';
 
 // --- DASHBOARD LOGIC ---
 function initUI() {
-    document.getElementById('toggle-asset-btc').className = window.currentAsset === 'BTC' ? "flex-1 rounded-md bg-neutral-700 text-white h-full transition-all" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all h-full";
-    document.getElementById('toggle-asset-sol').className = window.currentAsset === 'SOL' ? "flex-1 rounded-md bg-neutral-700 text-white h-full transition-all" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all h-full";
     document.getElementById('toggle-mode-macro').className = window.currentMode === 'MACRO' ? "flex-1 rounded-md bg-neutral-700 text-white h-full transition-all" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all h-full";
     document.getElementById('toggle-mode-trading').className = window.currentMode === 'TRADING' ? "flex-1 rounded-md bg-neutral-700 text-white h-full transition-all" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all h-full";
 
@@ -180,7 +173,6 @@ function updateMacroButtonsUI(period) {
     });
 }
 
-function toggleAsset(asset) { if (window.currentAsset === asset) return; window.currentAsset = asset; localStorage.setItem('vbsx_asset', asset); initUI(); triggerAnalysis(); }
 function toggleMode(mode) { 
     if (window.currentMode === mode) return; 
     window.currentMode = mode; 
@@ -337,7 +329,7 @@ async function analyze() {
   try {
     const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", { 
         method: "POST", headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ asset: window.currentAsset, mode: window.currentMode, interval: window.currentInterval })
+        body: JSON.stringify({ mode: window.currentMode, interval: window.currentInterval })
     });
     const data = await res.json(); window.fullData = data; 
     const s = data.cycle_score || 0;

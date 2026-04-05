@@ -17,7 +17,7 @@ class VBSXClient:
             print(f"Error fetching {interval}: {e}")
             return 50.0
 
-    def get_mtf_scores(self, asset="SOL"):
+    def get_mtf_scores(self, asset="BTC"):
         """Fetches scores for 1d, 4h, 2h, 1h in parallel."""
         intervals = ["1d", "4h", "2h", "1h"]
         scores = {}
