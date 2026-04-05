@@ -18,19 +18,6 @@
 
 <div class="w-full max-w-xl p-5 relative">
 
-    <!-- TRADER WARNING BOX -->
-    <div id="top-warning-box" class="mb-6 animate-fade-in relative overflow-hidden rounded-md border border-neutral-800 bg-neutral-900/40 py-1.5 text-center transition-colors duration-1000">
-        <!-- Pixel perfect alignment placeholder -->
-        <div class="opacity-0 select-none text-[0.6rem] uppercase tracking-widest font-bold">ALIGN</div>
-        <div class="absolute inset-0 flex items-center justify-center gap-2">
-            <svg id="warning-icon" class="w-3 h-3 hidden animate-pulse-soft transition-colors duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <span id="warning-text-display" class="text-[0.6rem] uppercase tracking-widest font-bold animate-pulse-soft transition-colors duration-500">STANDBY</span>
-            <span id="warning-time-display" class="text-[0.55rem] font-normal opacity-60 hidden transition-colors duration-500"></span>
-        </div>
-    </div>
-
     <!-- DASHBOARD CONTROLS -->
     <div id="dashboard-controls" class="flex flex-col gap-3 mb-6">
         <div class="flex gap-2 sm:gap-3 w-full h-[34px]">
@@ -90,6 +77,19 @@
 
         <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000">
             
+            <!-- TRADER WARNING BOX -->
+            <div id="top-warning-box" class="mb-4 relative overflow-hidden rounded-md border border-neutral-800 bg-neutral-900/40 py-1.5 text-center transition-colors duration-1000 w-full">
+                <!-- Pixel perfect alignment placeholder -->
+                <div class="opacity-0 select-none text-[0.6rem] uppercase tracking-widest font-bold">ALIGN</div>
+                <div id="warning-content-wrapper" class="absolute inset-0 flex items-center justify-center gap-2 animate-pulse-soft transition-colors duration-500">
+                    <svg id="warning-icon" class="w-3 h-3 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span id="warning-text-display" class="text-[0.6rem] uppercase tracking-widest font-bold">STANDBY</span>
+                    <span id="warning-time-display" class="text-[0.55rem] font-bold opacity-60 hidden"></span>
+                </div>
+            </div>
+
             <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
                 <div id="badge-name" class="border border-neutral-600/50 px-3 py-1.5 rounded-md text-neutral-400">
                     Bitcoin (BTC)
@@ -380,7 +380,7 @@ async function analyze() {
     else if (wColor === "#EC4899") { boxColors = "bg-[#EC4899]/5 border-[#EC4899]/30"; }
     else if (wColor === "#FFFF00") { boxColors = "bg-[#FFFF00]/5 border-[#FFFF00]/30"; }
 
-    wBox.className = `mb-6 animate-fade-in relative overflow-hidden rounded-md border py-1.5 text-center transition-colors duration-1000 ${boxColors}`;
+    wBox.className = `mb-4 relative overflow-hidden rounded-md border py-1.5 text-center transition-colors duration-1000 w-full ${boxColors}`;
     wBox.style.backgroundColor = "";
     wBox.style.borderColor = "";
 

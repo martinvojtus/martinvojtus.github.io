@@ -385,13 +385,13 @@ def analyze(req: AnalyzeRequest = None):
     
     if mode == "MACRO":
         if curr_score <= 20:
-            warning_text = "DCA IN"
+            warning_text = "DCA BUYING OPPORTUNITY"
             warning_color = "#22c55e"
         elif curr_score >= 80:
-            warning_text = "DCA OUT"
+            warning_text = "DCA EXIT OPPORTUNITY"
             warning_color = "#EC4899"
         else:
-            warning_text = "HODL"
+            warning_text = "HOLDING PHASE"
             warning_color = "#FFFF00"
             
     elif mode == "TRADING":
