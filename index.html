@@ -10,17 +10,27 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .animate-pulse-soft { animation: pulse-soft 2s infinite ease-in-out; }
     </style>    
 </head>
 <body class="font-['Inter'] bg-black text-white flex justify-center min-h-screen items-start pt-6 pb-10 overflow-x-hidden">
 
 <div class="w-full max-w-xl p-5 relative">
 
+    <!-- NEW TOP WARNING LABEL (PULSING) -->
+    <div id="top-warning-label" class="mb-4 animate-fade-in relative overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900/20 py-2.5 text-center">
+        <!-- Pixel perfect alignment placeholder -->
+        <div class="opacity-0 select-none text-[0.6rem] uppercase tracking-widest font-bold">PIXEL PERFECT ALIGNMENT</div>
+        <div class="absolute inset-0 flex items-center justify-center">
+            <span id="warning-text-display" class="text-[0.6rem] uppercase tracking-widest font-bold animate-pulse-soft transition-colors duration-500">STANDBY / ČAKANIE NA SIGNÁL</span>
+        </div>
+    </div>
+
     <!-- TRADER STATUS BAR -->
     <div id="trader-status-bar" class="hidden mb-6 animate-fade-in">
         <div id="trader-status-bg" class="border p-2.5 rounded-xl flex items-center justify-between text-[0.6rem] uppercase tracking-widest font-bold transition-colors duration-1000">
             <div class="flex items-center gap-3">
-                
                 <span id="trader-status-text">WAITING FOR NEXT SIGNAL...</span>
             </div>
             <div id="trader-status-time" class="opacity-60 font-normal">--:--</div>
@@ -74,7 +84,7 @@
             </div>
         </div>
 
-        <div class="h-60 w-full relative mb-4">
+        <div class="h-48 w-full relative mb-4">
             <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
                 <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
             </div>
@@ -90,7 +100,7 @@
                 <div id="badge-name" class="border border-neutral-600/50 px-3 py-1.5 rounded-md text-neutral-400">
                     Bitcoin (BTC)
                 </div>
-                <div id="badge-phase" class="border border-neutral-800 px-3 py-1.5 rounded-md transition-colors duration-1000 text-transparent bg-neutral-800 animate-pulse">
+                <div id="badge-phase" class="border border-neutral-800 px-3 py-1.5 rounded-md transition-all duration-1000 text-transparent bg-neutral-800 animate-pulse">
                     LOADING ZONE
                 </div>
             </div>
@@ -140,7 +150,7 @@ window.currentScoreData = { score: 0, colorClass: "" };
 window.fullData = null; 
 window.currentAsset = localStorage.getItem('vbsx_asset') || 'BTC'; 
 window.currentMode = localStorage.getItem('vbsx_mode') || 'MACRO';
-window.currentInterval = localStorage.getItem('vbsx_interval') || '1w'; 
+window.currentInterval = localStorage.getItem('vbsx_interval') || (window.currentMode === 'MACRO' ? '1w' : '2h'); 
 window.currentMacroView = localStorage.getItem('vbsx_macro_view') || '4Y';
 
 // --- DASHBOARD LOGIC ---
@@ -157,19 +167,38 @@ function initUI() {
         document.getElementById('legend-mid').innerText = "NEUTRAL ZONE (HODL)";
         document.getElementById('legend-high').innerText = "EXIT ZONE (DCA OUT)";
         window.currentInterval = '1w';
+        updateMacroButtonsUI(window.currentMacroView);
     } else {
         document.getElementById('macro-buttons').classList.add('hidden');
         document.getElementById('trading-buttons').classList.remove('hidden');
         document.getElementById('legend-low').innerText = "VALUE ZONE (LONG)";
         document.getElementById('legend-mid').innerText = "NEUTRAL ZONE (HODL)";
         document.getElementById('legend-high').innerText = "EXIT ZONE (SHORT)";
-        if (window.currentInterval === '1w') window.currentInterval = '1d';
+        if (window.currentInterval === '1w') window.currentInterval = '2h';
         highlightTradingButton(window.currentInterval);
     }
 }
 
+function updateMacroButtonsUI(period) {
+    ['1Y', '2Y', '4Y', 'ALL'].forEach(p => {
+        const btn = document.getElementById(`btn-${p}`);
+        if(btn) btn.className = p === period ? "px-3 py-1 rounded-md text-white bg-neutral-800 transition-all" : "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all";
+    });
+}
+
 function toggleAsset(asset) { if (window.currentAsset === asset) return; window.currentAsset = asset; localStorage.setItem('vbsx_asset', asset); initUI(); triggerAnalysis(); }
-function toggleMode(mode) { if (window.currentMode === mode) return; window.currentMode = mode; localStorage.setItem('vbsx_mode', mode); initUI(); triggerAnalysis(); }
+function toggleMode(mode) { 
+    if (window.currentMode === mode) return; 
+    window.currentMode = mode; 
+    localStorage.setItem('vbsx_mode', mode); 
+    if (mode === 'TRADING') {
+        window.currentInterval = localStorage.getItem('vbsx_interval') || '2h';
+    } else {
+        window.currentInterval = '1w';
+    }
+    initUI(); 
+    triggerAnalysis(); 
+}
 function changeTradingInterval(interval) { if (window.currentInterval === interval && window.currentMode === 'TRADING') return; window.currentInterval = interval; localStorage.setItem('vbsx_interval', interval); highlightTradingButton(interval); triggerAnalysis(); }
 
 function highlightTradingButton(interval) {
@@ -187,7 +216,7 @@ function triggerAnalysis() {
     
     // Set Skeletons
     document.getElementById("dynamic-score").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">00.0%</span>';
-    document.getElementById("badge-phase").className = 'border border-neutral-800 px-3 py-1.5 rounded-md transition-colors duration-1000 text-transparent bg-neutral-800 animate-pulse';
+    document.getElementById("badge-phase").className = 'border border-neutral-800 px-3 py-1.5 rounded-md transition-all duration-300 text-white bg-neutral-800 animate-pulse';
     document.getElementById("badge-phase").innerText = 'LOADING ZONE';
     document.getElementById("val-price").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded">$00,000.00</span>';
     document.getElementById("val-change").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">+0.00%</span> <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1.5 py-0.5">24H</span>';
@@ -264,10 +293,7 @@ function updateChart(period) {
     if (window.currentMode === 'MACRO') {
         window.currentMacroView = period;
         localStorage.setItem('vbsx_macro_view', period);
-        ['1Y', '2Y', '4Y', 'ALL'].forEach(p => {
-            const btn = document.getElementById(`btn-${p}`);
-            if(btn) btn.className = p === period ? "px-3 py-1 rounded-md text-white bg-neutral-800 transition-all" : "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all";
-        });
+        updateMacroButtonsUI(period);
     }
     let pts = 208;
     if (window.currentMode === 'MACRO') {
@@ -291,7 +317,13 @@ function updateChart(period) {
         }]},
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } },
             layout: { padding: { left: 8, right: 8, top: 5, bottom: 28 } }, interaction: { mode: 'index', intersect: false },
-            scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } 
+            scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } },
+            events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'],
+            onHover: (event, activeElements) => {
+                if (!activeElements.length) {
+                    if (scoreChartInstance) scoreChartInstance.draw();
+                }
+            }
         }
     });
     document.getElementById("chart-skeleton").classList.add("opacity-0");
@@ -310,8 +342,13 @@ async function analyze() {
     
     document.getElementById("badge-name").innerText = `${data.name} (${data.ticker})`;
     let pBadge = document.getElementById("badge-phase");
-    pBadge.className = `border px-3 py-1.5 rounded-md transition-colors duration-1000 ${s <= 20 ? 'text-[#22c55e] border-[#22c55e]/50' : (s >= 80 ? 'text-[#EC4899] border-[#EC4899]/50' : 'text-[#FFFF00] border-[#FFFF00]/50')}`;
+    pBadge.className = `border px-3 py-1.5 rounded-md transition-all duration-1000 ${s <= 20 ? 'text-[#22c55e] border-[#22c55e]/50' : (s >= 80 ? 'text-[#EC4899] border-[#EC4899]/50' : 'text-[#FFFF00] border-[#FFFF00]/50')}`;
     pBadge.innerText = (window.currentMode === 'TRADING') ? (s <= 20 ? "LONG" : (s >= 80 ? "SHORT" : "HODL")) : data.phase;
+
+    // Update Top Warning Label
+    const wTextDisplay = document.getElementById("warning-text-display");
+    wTextDisplay.innerText = data.warning_text || "STANDBY / ČAKANIE NA SIGNÁL";
+    wTextDisplay.style.color = data.warning_color || "#525252";
 
     document.getElementById("val-price").innerText = `$${Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
     let vCh = document.getElementById("val-change");
@@ -349,11 +386,18 @@ async function analyze() {
     updateChart(window.currentMode === 'MACRO' ? window.currentMacroView : null);
     setTimeout(() => {
         const bar = document.getElementById("animated-score-bar");
-        bar.style.width = `${s}%`; bar.style.backgroundColor = sHex; bar.style.boxShadow = `0 0 10px ${sHex}`;
+        if(bar) { bar.style.width = `${s}%`; bar.style.backgroundColor = sHex; bar.style.boxShadow = `0 0 10px ${sHex}`; }
     }, 50);
   } catch (e) { document.getElementById("error-box").classList.remove("hidden"); }
   finally { const icon = document.getElementById('btn-refresh-icon'); if (icon) icon.classList.remove('animate-spin'); }
 }
+
+window.addEventListener('click', (e) => {
+    if (scoreChartInstance && !e.target.closest('#scoreChart')) {
+        scoreChartInstance.setActiveElements([]);
+        scoreChartInstance.draw();
+    }
+});
 
 window.addEventListener('DOMContentLoaded', () => { updateSkeletonGrid(); initUI(); triggerAnalysis(); });
 </script>

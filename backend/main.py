@@ -378,6 +378,21 @@ def analyze(req: AnalyzeRequest = None):
 
     curr_score = round(float(score_series.iloc[-1]), 1)
     
+    # Calculate Warning Label for Trader
+    warning_text = "STANDBY / ČAKANIE NA SIGNÁL"
+    warning_color = "#525252"
+    
+    if mode == "TRADING":
+        if curr_score <= 30:
+            warning_text = f"PRAVDEPODOBNOSŤ LONGU {ticker} V NAJBLIŽŠÍCH HODINÁCH"
+            warning_color = "#22c55e"
+        elif curr_score >= 70:
+            warning_text = f"PRAVDEPODOBNOSŤ SHORTU {ticker} V NAJBLIŽŠÍCH HODINÁCH"
+            warning_color = "#EC4899"
+        else:
+            warning_text = f"BUĎ PRIPRAVENÝ: {ticker} JE V NEUTRÁLNEJ ZÓNE"
+            warning_color = "#FFFF00"
+    
     return {
         "price": float(df['Close'].iloc[-1]),
         "change": round(get_24h_change(symbol), 2),
@@ -388,7 +403,9 @@ def analyze(req: AnalyzeRequest = None):
         "chart_score": score_series.values.tolist(),
         "cycle_score": curr_score,
         "phase": "DCA IN" if curr_score <= 20 else ("HODL" if curr_score <= 79 else "DCA OUT"),
-        "last_signal": LAST_TRADER_SIGNALS.get(ticker)
+        "last_signal": LAST_TRADER_SIGNALS.get(ticker),
+        "warning_text": warning_text,
+        "warning_color": warning_color
     }
 
 if __name__ == "__main__":
