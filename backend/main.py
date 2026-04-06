@@ -123,7 +123,7 @@ async def trading_bot_loop():
                 ema = strategy.update_ema(master_score)
                 signal = strategy.check_hook()
                 
-                print(f"Bot Loop -> {asset} Master: {master_score}, EMA: {ema}")
+                print(f"[{datetime.now().strftime('%H:%M:%S')}] Bot Loop -> {asset} Master: {master_score}, EMA: {ema}")
                 
                 if signal:
                     tg_bot.notify_hook(signal, ema, scores, asset)
@@ -131,7 +131,7 @@ async def trading_bot_loop():
         except Exception as e:
             print(f"Bot Loop Error: {e}")
             
-        await asyncio.sleep(3600)  # Check every 1 hour
+        await asyncio.sleep(300)  # Check every 5 minutes (300 seconds)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -161,7 +161,9 @@ def keep_alive():
 
 def get_crypto_data(symbol="BTCUSDT", interval="1w"):
     try:
-        url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit=1000"
+        import time
+        cache_buster = int(time.time())
+        url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit=1000&cb={cache_buster}"
         r = requests.get(url, timeout=10)
         df = pd.DataFrame(r.json(), columns=['Time', 'Open', 'High', 'Low', 'Close', 'Vol', 'CloseTime', 'QuoteVol', 'Trades', 'TakerBuyVol', 'TakerBuyQuoteVol', 'Ignore'])
         for col in ['Open', 'High', 'Low', 'Close', 'Vol']:
@@ -452,7 +454,7 @@ def analyze(req: AnalyzeRequest = None):
         "analysis": analysis_tag,
         "name": name,
         "ticker": ticker,
-        "chart_dates": [d.strftime('%d %b %H:%M') if mode == 'TRADING' else d.strftime('%d %b %Y') for d in df.index],
+        "chart_dates": (df.index.view(np.int64) // 10**6).tolist(),
         "chart_score": score_series.values.tolist(),
         "cycle_score": curr_score,
         "phase": "DCA IN" if curr_score <= 20 else ("HODL" if curr_score <= 79 else "DCA OUT"),

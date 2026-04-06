@@ -21,7 +21,7 @@
     <!-- DASHBOARD CONTROLS -->
     <div id="dashboard-controls" class="flex flex-col gap-3 mb-6">
         <div class="flex gap-2 sm:gap-3 w-full h-[34px]">
-            <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-center">
+            <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.6rem] uppercase tracking-widest text-center">
                 <button onclick="toggleMode('MACRO')" id="toggle-mode-macro" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Macro</button>
                 <button onclick="toggleMode('TRADING')" id="toggle-mode-trading" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Trading</button>
             </div>
@@ -76,13 +76,13 @@
             <!-- TRADER WARNING BOX -->
             <div id="top-warning-box" class="mb-4 relative overflow-hidden rounded-md border border-neutral-800 bg-neutral-800 py-1.5 text-center transition-all duration-1000 w-full animate-pulse">
                 <!-- Pixel perfect alignment placeholder -->
-                <div class="opacity-0 select-none text-[0.6rem] uppercase tracking-widest font-bold">ALIGN</div>
+                <div class="opacity-0 select-none text-[0.6rem] uppercase tracking-widest">ALIGN</div>
                 <div id="warning-content-wrapper" class="absolute inset-0 flex items-center justify-center gap-2 text-transparent transition-all duration-500">
                     <svg id="warning-icon" class="w-3 h-3 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    <span id="warning-text-display" class="text-[0.6rem] uppercase tracking-widest font-bold">&nbsp;</span>
-                    <span id="warning-time-display" class="text-[0.55rem] font-bold opacity-60 hidden"></span>
+                    <span id="warning-text-display" class="text-[0.6rem] uppercase tracking-widest">&nbsp;</span>
+                    <span id="warning-time-display" class="text-[0.6rem] opacity-60 hidden"></span>
                 </div>
             </div>
 
@@ -90,7 +90,7 @@
                 <div id="badge-name" class="border border-neutral-600/50 px-3 py-1.5 rounded-md text-neutral-400">
                     Bitcoin (BTC)
                 </div>
-                <div id="badge-phase" class="border border-neutral-800 bg-neutral-800 px-3 py-1.5 rounded-md transition-all duration-1000 text-transparent animate-pulse font-bold">
+                <div id="badge-phase" class="border border-neutral-800 bg-neutral-800 px-3 py-1.5 rounded-md transition-all duration-1000 text-transparent animate-pulse">
                     &nbsp;
                 </div>
             </div>
@@ -120,16 +120,16 @@
                 
                 <table class="w-full text-left text-[0.6rem] text-neutral-400 uppercase tracking-widest border border-neutral-800 rounded-lg overflow-hidden border-separate [border-spacing:0]">
                     <tbody>
-                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#22c55e] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap w-24 text-center">0 – 20 (%)</td><td id="legend-low" class="py-2.5 pl-5 border-b border-l border-neutral-800">VALUE ZONE (DCA IN)</td></tr>
-                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#FFFF00] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">21 – 79 (%)</td><td id="legend-mid" class="py-2.5 pl-5 border-b border-l border-neutral-800">NEUTRAL ZONE (HODL)</td></tr>
-                        <tr><td class="py-2.5 px-0 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#EC4899] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-white font-medium whitespace-nowrap text-center">80 – 100 (%)</td><td id="legend-high" class="py-2.5 pl-5 border-l border-neutral-800">EXIT ZONE (DCA OUT)</td></tr>
+                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#22c55e] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white whitespace-nowrap w-24 text-center">0 – 20 (%)</td><td id="legend-low" class="py-2.5 pl-5 border-b border-l border-neutral-800">VALUE ZONE (DCA IN)</td></tr>
+                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#FFFF00] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white whitespace-nowrap text-center">21 – 79 (%)</td><td id="legend-mid" class="py-2.5 pl-5 border-b border-l border-neutral-800">NEUTRAL ZONE (HODL)</td></tr>
+                        <tr><td class="py-2.5 px-0 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#EC4899] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-white whitespace-nowrap text-center">80 – 100 (%)</td><td id="legend-high" class="py-2.5 pl-5 border-l border-neutral-800">EXIT ZONE (DCA OUT)</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <div id="error-box" class="hidden mt-4 bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center font-bold">❌ CONNECTION FAILED. PLEASE TRY AGAIN.</div>
+    <div id="error-box" class="hidden mt-4 bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center">❌ CONNECTION FAILED. PLEASE TRY AGAIN.</div>
 
 </div>
 
@@ -204,7 +204,7 @@ function triggerAnalysis() {
     document.getElementById("dynamic-score").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">00.0%</span>';
     
     let pBadge = document.getElementById("badge-phase");
-    pBadge.className = 'border border-neutral-800 bg-neutral-800 px-3 py-1.5 rounded-md transition-all duration-1000 text-transparent animate-pulse font-bold';
+    pBadge.className = 'border border-neutral-800 bg-neutral-800 px-3 py-1.5 rounded-md transition-all duration-1000 text-transparent animate-pulse';
     pBadge.innerText = '\u00A0'; // non-breaking space
 
     let wBox = document.getElementById("top-warning-box");
@@ -212,6 +212,8 @@ function triggerAnalysis() {
     let wWrap = document.getElementById("warning-content-wrapper");
     wWrap.className = 'absolute inset-0 flex items-center justify-center gap-2 text-transparent transition-all duration-500';
     document.getElementById("warning-text-display").innerText = '\u00A0';
+    document.getElementById("warning-time-display").innerText = '';
+    document.getElementById("warning-time-display").classList.add("hidden");
     document.getElementById("warning-icon").classList.add("hidden");
 
     document.getElementById("val-price").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded">$00,000.00</span>';
@@ -295,7 +297,17 @@ function updateChart(period) {
     if (window.currentMode === 'MACRO') {
         if (period === '1Y') pts = 52; else if (period === '2Y') pts = 104; else if (period === 'ALL') pts = window.fullData.chart_dates.length;
     }
-    const dts = window.fullData.chart_dates.slice(-pts);
+    
+    // Format raw timestamps to local date strings
+    const dts = window.fullData.chart_dates.slice(-pts).map(ts => {
+        const d = new Date(ts);
+        if (window.currentMode === 'TRADING') {
+            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        } else {
+            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+    });
+    
     const scr = window.fullData.chart_score.slice(-pts);
     if (scoreChartInstance) scoreChartInstance.destroy();
     Chart.defaults.color = '#525252'; Chart.defaults.font.family = "'Inter', sans-serif"; Chart.defaults.font.size = 9.6;
@@ -346,12 +358,12 @@ async function analyze() {
     else { badgeBgColor = "bg-[#FFFF00]/10"; badgeBorderColor = "border-[#FFFF00]/40"; badgeTextColor = "text-[#FFFF00]"; }
 
     let pBadge = document.getElementById("badge-phase");
-    pBadge.className = `border px-3 py-1.5 rounded-md transition-all duration-1000 font-bold ${badgeBgColor} ${badgeBorderColor} ${badgeTextColor}`;
+    pBadge.className = `border px-3 py-1.5 rounded-md transition-all duration-1000 ${badgeBgColor} ${badgeBorderColor} ${badgeTextColor}`;
     pBadge.innerText = (window.currentMode === 'TRADING') ? (s <= 20 ? "LONG" : (s >= 80 ? "SHORT" : "HODL")) : data.phase;
 
     document.getElementById("val-price").innerText = `$${Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
     let vCh = document.getElementById("val-change");
-    vCh.className = `text-[0.6rem] mt-2 flex items-center gap-1.5 font-bold ${data.change >= 0 ? 'text-[#22c55e]' : 'text-pink-500'}`;
+    vCh.className = `text-[0.6rem] mt-2 flex items-center gap-1.5 ${data.change >= 0 ? 'text-[#22c55e]' : 'text-pink-500'}`;
     vCh.innerHTML = `${data.change >= 0 ? '+':''}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded font-normal">24H</span>`;
 
     document.getElementById("val-score-large").innerText = `${s.toFixed(1)}%`;
@@ -374,7 +386,7 @@ async function analyze() {
     let wTime = "";
     let showIcon = false;
 
-    if (data.last_signal) {
+    if (data.last_signal && window.currentMode === 'TRADING') {
         const isLong = data.last_signal.signal === "LONG";
         wColor = isLong ? "#22c55e" : "#EC4899";
         wText = `${data.last_signal.signal} SIGNAL CONFIRMED`;
