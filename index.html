@@ -344,7 +344,15 @@ async function analyze() {
         method: "POST", headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ mode: window.currentMode, interval: window.currentInterval })
     });
-    const data = await res.json(); window.fullData = data; 
+    const data = await res.json(); 
+    console.log("Data from backend:", data);
+    window.fullData = data; 
+    if (data.error) {
+        console.error("Backend error:", data.error);
+        document.getElementById("error-box").innerText = "❌ " + data.error;
+        document.getElementById("error-box").classList.remove("hidden");
+        return;
+    }
     const s = data.cycle_score || 0;
     let sHex = s <= 20 ? "#22c55e" : (s >= 80 ? "#EC4899" : "#FFFF00");
     
