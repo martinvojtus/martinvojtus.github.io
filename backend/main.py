@@ -163,7 +163,7 @@ def get_crypto_data(symbol="BTCUSDT", interval="1w"):
     try:
         import time
         cache_buster = int(time.time())
-        url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit=1000&cb={cache_buster}"
+        url = f"https://data-api.binance.vision/api/v3/klines?symbol={symbol}&interval={interval}&limit=1000&cb={cache_buster}"
         r = requests.get(url, timeout=10)
         df = pd.DataFrame(r.json(), columns=['Time', 'Open', 'High', 'Low', 'Close', 'Vol', 'CloseTime', 'QuoteVol', 'Trades', 'TakerBuyVol', 'TakerBuyQuoteVol', 'Ignore'])
         for col in ['Open', 'High', 'Low', 'Close', 'Vol']:
@@ -176,7 +176,7 @@ def get_crypto_data(symbol="BTCUSDT", interval="1w"):
 
 def get_24h_change(symbol="BTCUSDT"):
     try:
-        r = requests.get(f"https://api.binance.com/api/v3/ticker/24hr?symbol={symbol}", timeout=5)
+        r = requests.get(f"https://data-api.binance.vision/api/v3/ticker/24hr?symbol={symbol}", timeout=5)
         return float(r.json()['priceChangePercent'])
     except:
         return 0.0
