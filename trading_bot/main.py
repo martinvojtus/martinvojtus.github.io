@@ -33,14 +33,14 @@ def run_bot():
                 ema = strategy.update_ema(master_score)
                 
                 # 4. Check for Hook Signal
-                signal = strategy.check_hook()
+                signal, leverage = strategy.check_hook()
                 
                 print(f"{asset} Master Score: {master_score} | EMA: {ema}")
                 print(f"Scores: {scores}")
 
                 if signal:
-                    bot.notify_hook(signal, ema, scores, asset=asset)
-                    print(f"!!! {asset} SIGNAL: {signal} !!!")
+                    bot.notify_hook(signal, leverage, ema, scores, asset=asset)
+                    print(f"!!! {asset} SIGNAL: {signal} ({leverage}x) !!!")
 
                 # 5. Periodic status update every 6 hours (if no signal)
                 if time.localtime().tm_hour % 6 == 0 and time.localtime().tm_min < 5:

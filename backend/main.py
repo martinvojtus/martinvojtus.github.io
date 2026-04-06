@@ -1,8 +1,6 @@
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from trading_bot.bybit_executor import BybitExecutor
-import os
 import requests
 import asyncio
 from contextlib import asynccontextmanager
@@ -14,104 +12,17 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from trading_bot.strategy import VBSXStrategy
+from trading_bot.notifications import TelegramBot
+
 # --- GLOBÁLNA PAMÄŤ PRE POSLEDNÉ SIGNÁLY ---
 LAST_TRADER_SIGNALS = {"BTC": None, "SOL": None}
 
-# --- TRADING BOT LOGIC ---
-class TelegramBot:
-    def __init__(self):
-        self.token = os.environ.get("TELEGRAM_TOKEN")
-        self.chat_id = os.environ.get("TELEGRAM_CHAT_ID")
-        self.base_url = f"https://api.telegram.org/bot{self.token}"
-
-    def send_message(self, text):
-        if not self.token or not self.chat_id:
-            return
-        try:
-            url = f"{self.base_url}/sendMessage"
-            payload = {"chat_id": self.chat_id, "text": text, "parse_mode": "Markdown"}
-            requests.post(url, json=payload, timeout=5)
-        except Exception as e:
-            print(f"Telegram error: {e}")
-
-    def notify_hook(self, signal, leverage, score_ema, interval_scores, asset="SOL"):
-        emoji = "🚀 LONG" if signal == "BUY" else "🔻 SHORT"
-        msg = f"*{emoji} {asset} SIGNAL CONFIRMED!* (Leverage: {leverage}x)\n\n"
-        msg += f"MTF Master EMA: `{score_ema}%`\n"
-        msg += f"1d: `{interval_scores.get('1d')}%` | 4h: `{interval_scores.get('4h')}%`\n"
-        msg += f"2h: `{interval_scores.get('2h')}%` | 1h: `{interval_scores.get('1h')}%`"
-        self.send_message(msg)
-        
-        # Uložíme do globálnej pamäte pre web
-        LAST_TRADER_SIGNALS[asset] = {
-            "signal": "LONG" if signal == "BUY" else "SHORT",
-            "time": datetime.now().strftime("%d %b %H:%M"),
-            "score": score_ema
-        }
-
-class VBSXStrategy:
-    def __init__(self, ema_period=5):
-        self.ema_period = ema_period
-        self.ema_value = None
-        self.k = 2 / (ema_period + 1)
-        self.history = []
-        self.raw_history = []
-
-    def calculate_weighted_score(self, scores):
-        w1d = scores.get("1d", 50.0) * 0.4
-        w4h = scores.get("4h", 50.0) * 0.3
-        w2h = scores.get("2h", 50.0) * 0.2
-        w1h = scores.get("1h", 50.0) * 0.1
-        return round(w1d + w4h + w2h + w1h, 2)
-
-    def update_ema(self, new_score):
-        # Save raw score for emergency signals
-        self.raw_history.append(new_score)
-        if len(self.raw_history) > 50: self.raw_history.pop(0)
-
-        # Update EMA
-        if self.ema_value is None:
-            self.ema_value = new_score
-        else:
-            self.ema_value = (new_score * self.k) + (self.ema_value * (1 - self.k))
-        self.ema_value = round(self.ema_value, 2)
-        self.history.append(self.ema_value)
-        if len(self.history) > 50: self.history.pop(0)
-        return self.ema_value
-
-    def check_hook(self):
-        if len(self.history) < 2 or len(self.raw_history) < 2: return None, None
-        
-        prev_raw = self.raw_history[-2]
-        curr_raw = self.raw_history[-1]
-        
-        # 1. EMERGENCY SIGNALS (3x Leverage) - Absolute Extremes
-        if prev_raw >= 95 and curr_raw < prev_raw:
-            return "SELL", 3.0
-        if prev_raw <= 5 and curr_raw > prev_raw:
-            return "BUY", 3.0
-
-        # 2. STANDARD SWING SIGNALS (2x Leverage) - EMA Hooks
-        prev_ema = self.history[-2]
-        curr_ema = self.history[-1]
-        
-        if prev_ema < 20 and curr_ema > prev_ema:
-            # Check if it was very deep for 3x
-            lev = 3.0 if prev_ema < 10 else 2.0
-            return "BUY", lev
-            
-        if prev_ema > 80 and curr_ema < prev_ema:
-            lev = 3.0 if prev_ema > 90 else 2.0
-            return "SELL", lev
-        
-        return None, None
-
 async def trading_bot_loop():
-    print("Starting background VBSX Bot Loop...")
+    print("Starting background VBSX Bot Signal Loop...")
     strategies = {"SOL": VBSXStrategy()}
-    executor = BybitExecutor()
     tg_bot = TelegramBot()
-    tg_bot.send_message("🤖 *VBSX Bot Active on Render*\nMonitoring: SOL (1d, 4h, 2h, 1h)")
+    tg_bot.send_message("🤖 *VBSX Signal Bot Active*\nMonitoring: SOL (1d, 4h, 2h, 1h)")
     
     intervals = ["1d", "4h", "2h", "1h"]
 
@@ -133,24 +44,19 @@ async def trading_bot_loop():
                 ema = strategy.update_ema(master_score)
                 signal, leverage = strategy.check_hook()
                 
-                print(f"[{datetime.now().strftime('%H:%M:%S')}] Bot Loop -> {asset} Master: {master_score}, EMA: {ema}")
+                print(f"[{datetime.now().strftime('%H:%M:%S')}] Signal Loop -> {asset} Master: {master_score}, EMA: {ema}")
                 
                 if signal:
                     tg_bot.notify_hook(signal, leverage, ema, scores, asset)
-                    # EXECUTE ON BYBIT
-                    try:
-                        executor.execute_signal(signal, leverage)
-                    except Exception as e:
-                        print(f"Bybit Execution Error: {e}")
-                
-                # Check for scale-in (Momentum Trigger) every loop
-                try:
-                    executor.check_scale_in()
-                except Exception as e:
-                    print(f"Bybit Scale-in Check Error: {e}")
+                    # Uložíme do globálnej pamäte pre web
+                    LAST_TRADER_SIGNALS[asset] = {
+                        "signal": "LONG" if signal == "BUY" else "SHORT",
+                        "time": datetime.now().strftime("%d %b %H:%M"),
+                        "score": ema
+                    }
                 
         except Exception as e:
-            print(f"Bot Loop Error: {e}")
+            print(f"Signal Loop Error: {e}")
             
         await asyncio.sleep(300)  # Check every 5 minutes (300 seconds)
 

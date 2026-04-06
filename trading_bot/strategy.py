@@ -35,30 +35,31 @@ class VBSXStrategy:
     def check_hook(self):
         """
         Checks for the 'Hook' (reversal) after burnout.
-        Returns: 'BUY', 'SELL', or None
+        Returns: (signal, leverage) or (None, None)
         """
-        if len(self.history) < 2 or len(self.raw_history) < 2: return None
+        if len(self.history) < 2 or len(self.raw_history) < 2: return None, None
         
-        # 1. EMERGENCY SIGNALS (Raw Score Spikes)
+        # 1. EMERGENCY SIGNALS (3x Leverage) - Absolute Extremes
         prev_raw = self.raw_history[-2]
         curr_raw = self.raw_history[-1]
         
         if prev_raw >= 95 and curr_raw < prev_raw:
-            return "SELL" # Emergency SHORT
+            return "SELL", 3.0
             
         if prev_raw <= 5 and curr_raw > prev_raw:
-            return "BUY" # Emergency LONG
+            return "BUY", 3.0
 
-        # 2. STANDARD SWING SIGNALS (EMA 5 Hook)
+        # 2. STANDARD SWING SIGNALS (2x Leverage) - EMA Hooks
         prev_ema = self.history[-2]
         curr_ema = self.history[-1]
 
-        # DCA IN (BUY/LONG Hook): Prev was low (<20) and now increasing
         if prev_ema < 20 and curr_ema > prev_ema:
-            return "BUY"
+            # Check if it was very deep for 3x
+            lev = 3.0 if prev_ema < 10 else 2.0
+            return "BUY", lev
             
-        # DCA OUT (SELL/SHORT Hook): Prev was high (>80) and now decreasing
         if prev_ema > 80 and curr_ema < prev_ema:
-            return "SELL"
+            lev = 3.0 if prev_ema > 90 else 2.0
+            return "SELL", lev
             
-        return None
+        return None, None

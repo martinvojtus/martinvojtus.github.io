@@ -5,4 +5,3 @@ pandas
 numpy
 pydantic
 python-dotenv
-ccxt
