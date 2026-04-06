@@ -12,6 +12,8 @@
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .animate-pulse-soft { animation: pulse-soft 2s infinite ease-in-out; }
+        @keyframes spin-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+        .animate-spin-reverse { animation: spin-reverse 1s linear infinite; }
     </style>    
 </head>
 <body class="font-['Inter'] bg-black text-white flex justify-center min-h-screen items-start pt-6 pb-10 overflow-x-hidden">
@@ -196,7 +198,7 @@ function highlightTradingButton(interval) {
 
 function triggerAnalysis() {
     const refBtn = document.getElementById('btn-refresh-icon');
-    if (refBtn) refBtn.classList.add('animate-spin');
+    if (refBtn) refBtn.classList.add('animate-spin-reverse');
     document.getElementById("scoreChart").classList.add("opacity-0");
     document.getElementById("chart-skeleton").classList.remove("opacity-0");
     
@@ -467,7 +469,7 @@ async function analyze() {
         if(bar) { bar.style.width = `${s}%`; bar.style.backgroundColor = sHex; bar.style.boxShadow = `0 0 10px ${sHex}`; }
     }, 50);
   } catch (e) { document.getElementById("error-box").classList.remove("hidden"); }
-  finally { const icon = document.getElementById('btn-refresh-icon'); if (icon) icon.classList.remove('animate-spin'); }
+  finally { const icon = document.getElementById('btn-refresh-icon'); if (icon) icon.classList.remove('animate-spin-reverse'); }
 }
 
 window.addEventListener('click', (e) => {
