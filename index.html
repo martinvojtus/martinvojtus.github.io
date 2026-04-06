@@ -223,6 +223,19 @@ function triggerAnalysis() {
     document.getElementById("val-price").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded">88,888.88</span>';
     document.getElementById("val-change").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-1 inline-block h-[12px]">+0.00%</span> <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1.5 py-0.5">24H</span>';
     document.getElementById("val-score-large").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">88.8%</span>';
+    
+    // Reset main card to neutral
+    document.getElementById("main-card").className = "p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000";
+    
+    // Reset score bar
+    const bar = document.getElementById("animated-score-bar");
+    if(bar) { bar.style.width = "0%"; bar.style.backgroundColor = "transparent"; bar.style.boxShadow = "none"; }
+
+    // Reset dynamic colors
+    document.getElementById("dynamic-title").style.color = "#525252";
+    document.getElementById("dynamic-title").style.textShadow = "none";
+    document.getElementById("dynamic-score").style.color = "#525252";
+    document.getElementById("dynamic-score").style.textShadow = "none";
 
     analyze();
 }
