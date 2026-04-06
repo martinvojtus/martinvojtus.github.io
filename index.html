@@ -236,6 +236,9 @@ function triggerAnalysis() {
     document.getElementById("dynamic-title").style.textShadow = "none";
     document.getElementById("dynamic-score").style.color = "#525252";
     document.getElementById("dynamic-score").style.textShadow = "none";
+    
+    // Hide error box when refreshing
+    document.getElementById("error-box").classList.add("hidden");
 
     analyze();
 }
