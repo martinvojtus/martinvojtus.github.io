@@ -406,19 +406,21 @@ async function analyze() {
   finally { const icon = document.getElementById('btn-refresh-icon'); if (icon) icon.classList.remove('animate-spin-reverse'); }
 }
 
-window.addEventListener('click', (e) => {
-    if (scoreChartInstance && !e.target.closest('#scoreChart')) {
-        scoreChartInstance.setActiveElements([]);
-        scoreChartInstance.update();
-        // Reset dynamic labels to current score
-        const s = window.fullData ? window.fullData.cycle_score : 0;
-        let sHex = s <= 20 ? "#22c55e" : (s >= 80 ? "#EC4899" : "#FFFF00");
-        document.getElementById('dynamic-score').innerText = s.toFixed(1) + '%';
-        document.getElementById('dynamic-score').style.color = sHex;
-        document.getElementById('dynamic-score').style.textShadow = `0 0 10px ${sHex}80`;
-        document.getElementById('dynamic-title').style.color = sHex;
-        document.getElementById('dynamic-title').style.textShadow = `0 0 10px ${sHex}80`;
-    }
+['click', 'touchstart'].forEach(evt => {
+    window.addEventListener(evt, (e) => {
+        if (scoreChartInstance && !e.target.closest('#scoreChart')) {
+            scoreChartInstance.setActiveElements([]);
+            scoreChartInstance.update();
+            // Reset dynamic labels to current score
+            const s = window.fullData ? window.fullData.cycle_score : 0;
+            let sHex = s <= 20 ? "#22c55e" : (s >= 80 ? "#EC4899" : "#FFFF00");
+            document.getElementById('dynamic-score').innerText = s.toFixed(1) + '%';
+            document.getElementById('dynamic-score').style.color = sHex;
+            document.getElementById('dynamic-score').style.textShadow = `0 0 10px ${sHex}80`;
+            document.getElementById('dynamic-title').style.color = sHex;
+            document.getElementById('dynamic-title').style.textShadow = `0 0 10px ${sHex}80`;
+        }
+    }, { passive: true });
 });
 
 window.addEventListener('DOMContentLoaded', () => { updateSkeletonGrid(); initUI(); triggerAnalysis(); });
