@@ -161,9 +161,7 @@ def keep_alive():
 
 def get_crypto_data(symbol="BTCUSDT", interval="1w"):
     try:
-        import time
-        cache_buster = int(time.time())
-        url = f"https://data-api.binance.vision/api/v3/klines?symbol={symbol}&interval={interval}&limit=1000&cb={cache_buster}"
+        url = f"https://data-api.binance.vision/api/v3/klines?symbol={symbol}&interval={interval}&limit=1000"
         r = requests.get(url, timeout=10)
         df = pd.DataFrame(r.json(), columns=['Time', 'Open', 'High', 'Low', 'Close', 'Vol', 'CloseTime', 'QuoteVol', 'Trades', 'TakerBuyVol', 'TakerBuyQuoteVol', 'Ignore'])
         for col in ['Open', 'High', 'Low', 'Close', 'Vol']:
