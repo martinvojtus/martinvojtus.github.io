@@ -2,8 +2,6 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import requests
-import asyncio
-from contextlib import asynccontextmanager
 from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 import pandas as pd
@@ -12,63 +10,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from trading_bot.strategy import VBSXStrategy
-from trading_bot.notifications import TelegramBot
-
-# --- GLOBÁLNA PAMÄŤ PRE POSLEDNÉ SIGNÁLY ---
-LAST_TRADER_SIGNALS = {"BTC": None, "SOL": None}
-
-async def trading_bot_loop():
-    print("Starting background VBSX Bot Signal Loop...")
-    strategies = {"SOL": VBSXStrategy()}
-    tg_bot = TelegramBot()
-    tg_bot.send_message("🤖 *VBSX Signal Bot Active*\nMonitoring: SOL (1d, 4h, 2h, 1h)")
-    
-    intervals = ["1d", "4h", "2h", "1h"]
-
-    while True:
-        try:
-            for asset in ["SOL"]:
-                symbol = f"{asset}USDT"
-                scores = {}
-                for interval in intervals:
-                    df = get_crypto_data(symbol, interval)
-                    if not df.empty:
-                        score_series = calculate_trading_score(df)
-                        scores[interval] = round(float(score_series.iloc[-1]), 1)
-                    else:
-                        scores[interval] = 50.0
-                
-                strategy = strategies[asset]
-                master_score = strategy.calculate_weighted_score(scores)
-                ema = strategy.update_ema(master_score)
-                signal, leverage = strategy.check_hook()
-                
-                print(f"[{datetime.now().strftime('%H:%M:%S')}] Signal Loop -> {asset} Master: {master_score}, EMA: {ema}")
-                
-                if signal:
-                    tg_bot.notify_hook(signal, leverage, ema, scores, asset)
-                    # Uložíme do globálnej pamäte pre web
-                    LAST_TRADER_SIGNALS[asset] = {
-                        "signal": "LONG" if signal == "BUY" else "SHORT",
-                        "time": datetime.now().strftime("%d %b %H:%M"),
-                        "score": ema
-                    }
-                
-        except Exception as e:
-            print(f"Signal Loop Error: {e}")
-            
-        await asyncio.sleep(300)  # Check every 5 minutes (300 seconds)
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup
-    task = asyncio.create_task(trading_bot_loop())
-    yield
-    # Shutdown
-    task.cancel()
-
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -329,55 +271,6 @@ def analyze(req: AnalyzeRequest = None):
 
     curr_score = round(float(score_series.iloc[-1]), 1)
     
-    # Calculate Warning Label for Trader
-    warning_text = "STANDBY"
-    warning_color = "#525252"
-    
-    if mode == "MACRO":
-        if curr_score <= 20:
-            warning_text = "DCA BUYING OPPORTUNITY"
-            warning_color = "#22c55e"
-        elif curr_score >= 80:
-            warning_text = "DCA EXIT OPPORTUNITY"
-            warning_color = "#EC4899"
-        else:
-            warning_text = "HOLDING PHASE"
-            warning_color = "#FFFF00"
-            
-    elif mode == "TRADING":
-        intervals_to_fetch = ["1d", "4h", "2h", "1h"]
-        
-        def get_score_for_inv(inv):
-            if inv == interval:
-                return curr_score
-            d = get_crypto_data(symbol, inv)
-            if not d.empty:
-                s_series = calculate_trading_score(d)
-                return round(float(s_series.iloc[-1]), 1)
-            return 50.0
-
-        with ThreadPoolExecutor(max_workers=4) as executor:
-            res_scores = list(executor.map(get_score_for_inv, intervals_to_fetch))
-        
-        # Calculate best possible outcome (most extreme score from 50)
-        best_score = 50.0
-        max_dev = -1
-        for s in res_scores:
-            dev = abs(s - 50.0)
-            if dev > max_dev:
-                max_dev = dev
-                best_score = s
-                
-        if best_score <= 30:
-            warning_text = "INCOMING LONG"
-            warning_color = "#22c55e"
-        elif best_score >= 70:
-            warning_text = "INCOMING SHORT"
-            warning_color = "#EC4899"
-        else:
-            warning_text = "NEUTRAL ZONE"
-            warning_color = "#FFFF00"
-    
     return {
         "price": float(df['Close'].iloc[-1]),
         "change": round(get_24h_change(symbol), 2),
@@ -387,10 +280,7 @@ def analyze(req: AnalyzeRequest = None):
         "chart_dates": [int(d.timestamp() * 1000) for d in df.index],
         "chart_score": score_series.values.tolist(),
         "cycle_score": curr_score,
-        "phase": "DCA IN" if curr_score <= 20 else ("HODL" if curr_score <= 79 else "DCA OUT"),
-        "last_signal": LAST_TRADER_SIGNALS.get(ticker),
-        "warning_text": warning_text,
-        "warning_color": warning_color
+        "phase": "DCA IN" if curr_score <= 20 else ("HODL" if curr_score <= 79 else "DCA OUT")
     }
 
 if __name__ == "__main__":
