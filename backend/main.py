@@ -1,3 +1,4 @@
+from trading_bot.bybit_executor import BybitExecutor
 import os
 import requests
 import asyncio
@@ -11,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 # --- GLOBÁLNA PAMÄŤ PRE POSLEDNÉ SIGNÁLY ---
-LAST_TRADER_SIGNALS = {"BTC": None}
+LAST_TRADER_SIGNALS = {"BTC": None, "SOL": None}
 
 # --- TRADING BOT LOGIC ---
 class TelegramBot:
@@ -30,9 +31,9 @@ class TelegramBot:
         except Exception as e:
             print(f"Telegram error: {e}")
 
-    def notify_hook(self, signal, score_ema, interval_scores, asset="BTC"):
+    def notify_hook(self, signal, leverage, score_ema, interval_scores, asset="SOL"):
         emoji = "🚀 LONG" if signal == "BUY" else "🔻 SHORT"
-        msg = f"*{emoji} {asset} SIGNAL CONFIRMED!*\n\n"
+        msg = f"*{emoji} {asset} SIGNAL CONFIRMED!* (Leverage: {leverage}x)\n\n"
         msg += f"MTF Master EMA: `{score_ema}%`\n"
         msg += f"1d: `{interval_scores.get('1d')}%` | 4h: `{interval_scores.get('4h')}%`\n"
         msg += f"2h: `{interval_scores.get('2h')}%` | 1h: `{interval_scores.get('1h')}%`"
@@ -76,38 +77,44 @@ class VBSXStrategy:
         return self.ema_value
 
     def check_hook(self):
-        if len(self.history) < 2 or len(self.raw_history) < 2: return None
+        if len(self.history) < 2 or len(self.raw_history) < 2: return None, None
         
-        # 1. EMERGENCY SIGNALS (Raw Score Spikes)
         prev_raw = self.raw_history[-2]
         curr_raw = self.raw_history[-1]
         
+        # 1. EMERGENCY SIGNALS (3x Leverage) - Absolute Extremes
         if prev_raw >= 95 and curr_raw < prev_raw:
-            return "SELL" # Emergency SHORT
-            
+            return "SELL", 3.0
         if prev_raw <= 5 and curr_raw > prev_raw:
-            return "BUY" # Emergency LONG
+            return "BUY", 3.0
 
-        # 2. STANDARD SWING SIGNALS (EMA 5 Hook)
+        # 2. STANDARD SWING SIGNALS (2x Leverage) - EMA Hooks
         prev_ema = self.history[-2]
         curr_ema = self.history[-1]
         
-        if prev_ema < 20 and curr_ema > prev_ema: return "BUY"
-        if prev_ema > 80 and curr_ema < prev_ema: return "SELL"
+        if prev_ema < 20 and curr_ema > prev_ema:
+            # Check if it was very deep for 3x
+            lev = 3.0 if prev_ema < 10 else 2.0
+            return "BUY", lev
+            
+        if prev_ema > 80 and curr_ema < prev_ema:
+            lev = 3.0 if prev_ema > 90 else 2.0
+            return "SELL", lev
         
-        return None
+        return None, None
 
 async def trading_bot_loop():
     print("Starting background VBSX Bot Loop...")
-    strategies = {"BTC": VBSXStrategy()}
+    strategies = {"SOL": VBSXStrategy()}
+    executor = BybitExecutor()
     tg_bot = TelegramBot()
-    tg_bot.send_message("🤖 *VBSX Bot Active on Render*\nMonitoring: BTC (1d, 4h, 2h, 1h)")
+    tg_bot.send_message("🤖 *VBSX Bot Active on Render*\nMonitoring: SOL (1d, 4h, 2h, 1h)")
     
     intervals = ["1d", "4h", "2h", "1h"]
 
     while True:
         try:
-            for asset in ["BTC"]:
+            for asset in ["SOL"]:
                 symbol = f"{asset}USDT"
                 scores = {}
                 for interval in intervals:
@@ -121,12 +128,23 @@ async def trading_bot_loop():
                 strategy = strategies[asset]
                 master_score = strategy.calculate_weighted_score(scores)
                 ema = strategy.update_ema(master_score)
-                signal = strategy.check_hook()
+                signal, leverage = strategy.check_hook()
                 
                 print(f"[{datetime.now().strftime('%H:%M:%S')}] Bot Loop -> {asset} Master: {master_score}, EMA: {ema}")
                 
                 if signal:
-                    tg_bot.notify_hook(signal, ema, scores, asset)
+                    tg_bot.notify_hook(signal, leverage, ema, scores, asset)
+                    # EXECUTE ON BYBIT
+                    try:
+                        executor.execute_signal(signal, leverage)
+                    except Exception as e:
+                        print(f"Bybit Execution Error: {e}")
+                
+                # Check for scale-in (Momentum Trigger) every loop
+                try:
+                    executor.check_scale_in()
+                except Exception as e:
+                    print(f"Bybit Scale-in Check Error: {e}")
                 
         except Exception as e:
             print(f"Bot Loop Error: {e}")
@@ -378,9 +396,14 @@ def analyze(req: AnalyzeRequest = None):
     mode = req.mode.upper() if req else "MACRO"
     interval = req.interval.lower() if req else "1w"
     
-    symbol = "BTCUSDT"
-    name = "Bitcoin"
-    ticker = "BTC"
+    if mode == "MACRO":
+        symbol = "BTCUSDT"
+        name = "Bitcoin"
+        ticker = "BTC"
+    else:
+        symbol = "SOLUSDT"
+        name = "Solana"
+        ticker = "SOL"
 
     df = get_crypto_data(symbol, interval)
     if df.empty:

@@ -88,7 +88,7 @@
 
             <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
                 <div id="badge-name" class="border border-neutral-600/50 px-3 py-1.5 rounded-md text-neutral-400">
-                    Bitcoin (BTC)
+                    Načítavam...
                 </div>
                 <div id="badge-phase" class="border border-neutral-800 bg-neutral-800 px-3 py-1.5 rounded-md transition-all duration-1000 text-transparent animate-pulse">
                     &nbsp;
@@ -356,7 +356,15 @@ async function analyze() {
     const s = data.cycle_score || 0;
     let sHex = s <= 20 ? "#22c55e" : (s >= 80 ? "#EC4899" : "#FFFF00");
     
-    document.getElementById("badge-name").innerText = `${data.name} (${data.ticker})`;
+    if (window.currentMode === "MACRO") {
+        document.getElementById("badge-name").innerText = "Bitcoin (BTC)";
+    } else {
+        document.getElementById("badge-name").innerText = "Solana (SOL)";
+    }
+    // Použijeme data z backendu ak prichádzajú správne, inak fallback hore
+    if(data.name && data.ticker) {
+        document.getElementById("badge-name").innerText = `${data.name} (${data.ticker})`;
+    }
     let badgeBgColor = "bg-neutral-900/40";
     let badgeBorderColor = "border-neutral-800";
     let badgeTextColor = "text-neutral-500";

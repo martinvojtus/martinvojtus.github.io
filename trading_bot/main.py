@@ -12,14 +12,14 @@ from trading_bot.notifications import TelegramBot
 def run_bot():
     print("VBSX Trading Bot Starting...")
     client = VBSXClient()
-    strategies = {"BTC": VBSXStrategy()}
+    strategies = {"SOL": VBSXStrategy()}
     bot = TelegramBot()
     
-    bot.send_message("🤖 *VBSX Bot Active*\nMonitoring: BTC (1d, 4h, 2h, 1h)")
+    bot.send_message("🤖 *VBSX Bot Active*\nMonitoring: SOL (1d, 4h, 2h, 1h)")
 
     while True:
         try:
-            for asset in ["BTC"]:
+            for asset in ["SOL"]:
                 print(f"\n[{time.strftime('%Y-%m-%d %H:%M:%S')}] Checking scores for {asset}...")
                 
                 # 1. Fetch MTF Scores
