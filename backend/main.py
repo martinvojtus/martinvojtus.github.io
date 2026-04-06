@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from trading_bot.bybit_executor import BybitExecutor
 import os
 import requests
