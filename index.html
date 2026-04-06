@@ -203,9 +203,13 @@ function triggerAnalysis() {
     // Set Skeletons
     document.getElementById("dynamic-score").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">00.0%</span>';
     
+    let badgeName = document.getElementById("badge-name");
+    badgeName.className = "border border-neutral-600/50 px-3 py-1.5 rounded-md text-neutral-400";
+    badgeName.innerText = window.currentMode === "MACRO" ? "Bitcoin (BTC)" : "Solana (SOL)";
+
     let pBadge = document.getElementById("badge-phase");
-    pBadge.className = 'border border-neutral-800 bg-neutral-800 px-3 py-1.5 rounded-md transition-all duration-1000 text-transparent animate-pulse';
-    pBadge.innerText = '\u00A0'; // non-breaking space
+    pBadge.className = 'border border-neutral-800 bg-neutral-800 px-3 py-1.5 rounded-md transition-all duration-1000 text-transparent animate-pulse min-h-[34px] min-w-[60px]';
+    pBadge.innerHTML = '&nbsp;';
 
     let wBox = document.getElementById("top-warning-box");
     wBox.className = 'mb-4 relative overflow-hidden rounded-md border border-neutral-800 bg-neutral-800 py-1.5 text-center transition-all duration-1000 w-full animate-pulse';
