@@ -454,7 +454,7 @@ def analyze(req: AnalyzeRequest = None):
         "analysis": analysis_tag,
         "name": name,
         "ticker": ticker,
-        "chart_dates": (df.index.view(np.int64) // 10**6).tolist(),
+        "chart_dates": [int(d.timestamp() * 1000) for d in df.index],
         "chart_score": score_series.values.tolist(),
         "cycle_score": curr_score,
         "phase": "DCA IN" if curr_score <= 20 else ("HODL" if curr_score <= 79 else "DCA OUT"),
