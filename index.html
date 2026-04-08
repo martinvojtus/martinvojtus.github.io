@@ -401,7 +401,7 @@ async function analyze() {
     document.getElementById("val-price").innerText = `$${Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
 
     let vCh = document.getElementById("val-change");
-    vCh.className = `text-[0.6rem] mt-2 flex items-center h-[16px] gap-1.5 ${data.change >= 0 ? 'text-[#22c55e]' : 'text-pink-500'}`;
+    vCh.className = `text-[0.6rem] uppercase tracking-widest mt-2 flex items-center h-[16px] gap-1.5 ${data.change >= 0 ? 'text-[#22c55e]' : 'text-pink-500'}`;
     vCh.innerHTML = `${data.change >= 0 ? '+':''}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded font-normal">24H</span>`;
 
     document.getElementById("val-score-large").innerText = `${s.toFixed(1)}%`;
@@ -410,10 +410,10 @@ async function analyze() {
 
     const dScore = document.getElementById("dynamic-score");
     dScore.innerText = `${s.toFixed(1)}%`;
-    dScore.style.color = "#525252";
-    dScore.style.textShadow = "none";
-    document.getElementById("dynamic-title").style.color = "#525252";
-    document.getElementById("dynamic-title").style.textShadow = "none";
+    dScore.style.color = sHex;
+    dScore.style.textShadow = `0 0 10px ${sHex}80`;
+    document.getElementById("dynamic-title").style.color = sHex;
+    document.getElementById("dynamic-title").style.textShadow = `0 0 10px ${sHex}80`;
 
     document.getElementById("main-card").className = `p-6 rounded-3xl border shadow-2xl transition-colors duration-1000 ${s <= 20 ? 'bg-[#030a05] border-[#22c55e]/30' : (s >= 80 ? 'bg-[#EC4899]/5 border-[#EC4899]/30' : 'bg-[#FFFF00]/5 border-[#FFFF00]/30')}`;
 
@@ -432,11 +432,12 @@ async function analyze() {
             scoreChartInstance.setActiveElements([]);
             scoreChartInstance.update();
             const s = window.fullData ? window.fullData.cycle_score : 0;
+            let sHex = s <= 20 ? "#22c55e" : (s >= 80 ? "#EC4899" : "#FFFF00");
             document.getElementById('dynamic-score').innerText = s.toFixed(1) + '%';
-            document.getElementById('dynamic-score').style.color = "#525252";
-            document.getElementById('dynamic-score').style.textShadow = "none";
-            document.getElementById('dynamic-title').style.color = "#525252";
-            document.getElementById('dynamic-title').style.textShadow = "none";
+            document.getElementById('dynamic-score').style.color = sHex;
+            document.getElementById('dynamic-score').style.textShadow = `0 0 10px ${sHex}80`;
+            document.getElementById('dynamic-title').style.color = sHex;
+            document.getElementById('dynamic-title').style.textShadow = `0 0 10px ${sHex}80`;
         }
     }, { passive: true });
 });
@@ -444,4 +445,5 @@ async function analyze() {
 window.addEventListener('DOMContentLoaded', () => { updateSkeletonGrid(); initUI(); triggerAnalysis(); });
 </script>
 </body>
+</html>
 </html>
