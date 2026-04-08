@@ -382,9 +382,7 @@ async function analyze() {
     pBadge.className = `border w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 ${badgeBgColor} ${badgeBorderColor} ${badgeTextColor}`;
     pBadge.innerText = (window.currentMode === 'TRADING') ? (s <= 20 ? "LONG" : (s >= 80 ? "SHORT" : "HODL")) : data.phase;
 
-    const priceEl = document.getElementById("val-price");
-    priceEl.innerText = `$${Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-    priceEl.style.textShadow = `0 0 15px ${sHex}80`;
+    document.getElementById("val-price").innerText = `$${Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
 
     let vCh = document.getElementById("val-change");
     vCh.className = `text-[0.6rem] mt-2 flex items-center h-[16px] gap-1.5 ${data.change >= 0 ? 'text-[#22c55e]' : 'text-pink-500'}`;
@@ -421,6 +419,9 @@ async function analyze() {
 });
 
 window.addEventListener('DOMContentLoaded', () => { updateSkeletonGrid(); initUI(); triggerAnalysis(); });
+</script>
+</body>
+</html>I(); triggerAnalysis(); });
 </script>
 </body>
 </html>
