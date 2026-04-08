@@ -272,22 +272,46 @@ def analyze(req: AnalyzeRequest = None):
         if df_1h.empty or df_2h.empty or df_4h.empty or df_1d.empty:
             return {"error": "API Error: Binance unreachable for H-LINE."}
 
-        # Calculate isolated scores
+        # Calculate isolated scores for each timeframe
         s_1h = calculate_trading_score(df_1h)
         s_2h = calculate_trading_score(df_2h)
         s_4h = calculate_trading_score(df_4h)
         s_1d = calculate_trading_score(df_1d)
 
-        # Align to the 1h timeframe resolution
-        s_2h_aligned = s_2h.reindex(df_1h.index, method='ffill')
-        s_4h_aligned = s_4h.reindex(df_1h.index, method='ffill')
-        s_1d_aligned = s_1d.reindex(df_1h.index, method='ffill')
+        # Align all timeframes to the 1h resolution
+        s_2h_a = s_2h.reindex(df_1h.index, method='ffill').fillna(50)
+        s_4h_a = s_4h.reindex(df_1h.index, method='ffill').fillna(50)
+        s_1d_a = s_1d.reindex(df_1h.index, method='ffill').fillna(50)
 
-        # Hybrid Score Formula: Immediate momentum weighted towards higher trend anchors
-        score_series = (s_1h * 0.40) + (s_2h_aligned.fillna(50) * 0.30) + (s_4h_aligned.fillna(50) * 0.20) + (s_1d_aligned.fillna(50) * 0.10)
+        # === ADVANCED CONFLUENCE SYNERGY MODEL (ISM v1.0) ===
+        # Base Weighted Score (35/25/25/15) - Strong focus on 1h/4h synergy
+        base_h_score = (s_1h * 0.35) + (s_2h_a * 0.25) + (s_4h_a * 0.25) + (s_1d_a * 0.15)
         
-        df = df_1h # Use 1h price data as the timeline anchor
-        analysis_tag = "VBSX TRADING (H-LINE)"
+        final_h_scores = []
+        for i in range(len(df_1h)):
+            score = base_h_score.iloc[i]
+            
+            # --- CONFLUENCE BOOSTER: If 1H & 4H agree on direction, amplify signal ---
+            # BULLISH CONFLUENCE (Both 1H and 4H are oversold)
+            if s_1h.iloc[i] < 30 and s_4h_a.iloc[i] < 35:
+                # Accelerate towards 0% (Strong Buy Signal)
+                score *= 0.80 
+            
+            # BEARISH CONFLUENCE (Both 1H and 4H are overbought)
+            if s_1h.iloc[i] > 70 and s_4h_a.iloc[i] > 65:
+                # Accelerate towards 100% (Strong Sell Signal)
+                score += (100 - score) * 0.35
+
+            # --- CONFLICT DAMPENING (Safety Lock) ---
+            # If 1D is strongly against 1H, pull score towards Neutral (50)
+            if (s_1d_a.iloc[i] > 75 and s_1h.iloc[i] < 30) or (s_1d_a.iloc[i] < 25 and s_1h.iloc[i] > 70):
+                score = (score + 50) / 2 # Pull to neutral to prevent fakeouts
+
+            final_h_scores.append(max(0.0, min(100.0, score)))
+
+        score_series = pd.Series(final_h_scores, index=df_1h.index)
+        df = df_1h # 1h price as the baseline
+        analysis_tag = "VBSX TRADING (H-LINE ISM)"
     else:
         df = get_crypto_data(symbol, interval)
         if df.empty:
