@@ -184,6 +184,7 @@ function highlightTradingButton(interval) {
 }
 
 function triggerAnalysis() {
+    window.isAnalyzing = true;
     const refBtn = document.getElementById('btn-refresh-icon');
     if (refBtn) refBtn.classList.add('animate-spin-reverse');
     document.getElementById("scoreChart").classList.add("opacity-0");
@@ -343,6 +344,7 @@ function updateChart(period) {
             scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } },
             events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'],
             onHover: (event, activeElements) => {
+                if (window.isAnalyzing) return;
                 if (!activeElements.length) {
                     if (scoreChartInstance) scoreChartInstance.update();
                     const s = window.fullData ? window.fullData.cycle_score : 0;
@@ -423,11 +425,16 @@ async function analyze() {
         if(bar) { bar.style.width = `${s}%`; bar.style.backgroundColor = sHex; bar.style.boxShadow = `0 0 10px ${sHex}`; }
     }, 50);
   } catch (e) { document.getElementById("error-box").classList.remove("hidden"); }
-  finally { const icon = document.getElementById('btn-refresh-icon'); if (icon) icon.classList.remove('animate-spin-reverse'); }
+  finally { 
+    window.isAnalyzing = false;
+    const icon = document.getElementById('btn-refresh-icon'); 
+    if (icon) icon.classList.remove('animate-spin-reverse'); 
+  }
 }
 
 ['click', 'touchstart'].forEach(evt => {
     window.addEventListener(evt, (e) => {
+        if (window.isAnalyzing) return;
         if (scoreChartInstance && !e.target.closest('#scoreChart')) {
             scoreChartInstance.setActiveElements([]);
             scoreChartInstance.update();
