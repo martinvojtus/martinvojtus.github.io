@@ -80,7 +80,7 @@
                     Načítavam...
                 </div>
                 <div id="badge-phase" class="border border-neutral-800 bg-neutral-800 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse">
-                    &nbsp;
+                    HODL
                 </div>
             </div>
             
@@ -190,7 +190,9 @@ function triggerAnalysis() {
     document.getElementById("chart-skeleton").classList.remove("opacity-0");
     
     // Set Skeletons
-    document.getElementById("dynamic-score").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">88.8%</span>';
+    const dScore = document.getElementById("dynamic-score");
+    dScore.style.transition = "none";
+    dScore.innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">88.8%</span>';
     
     let badgeName = document.getElementById("badge-name");
     badgeName.className = "border border-neutral-600/50 px-3 py-1.5 rounded-md text-neutral-400";
@@ -198,11 +200,16 @@ function triggerAnalysis() {
 
     let pBadge = document.getElementById("badge-phase");
     pBadge.className = 'border border-neutral-800 bg-neutral-800 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse';
-    pBadge.innerHTML = '&nbsp;';
+    pBadge.innerHTML = 'HODL';
 
     document.getElementById("val-price").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded">88,888.88</span>';
     document.getElementById("val-change").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-1 inline-block h-[12px]">+0.00%</span> <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1.5 py-0.5">24H</span>';
-    document.getElementById("val-score-large").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">88.8%</span>';
+    
+    const vScoreLarge = document.getElementById("val-score-large");
+    vScoreLarge.style.transition = "none";
+    vScoreLarge.innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">88.8%</span>';
+    vScoreLarge.style.color = "inherit";
+    vScoreLarge.style.textShadow = "none";
     
     // Reset main card to neutral
     document.getElementById("main-card").className = "p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000";
@@ -212,10 +219,18 @@ function triggerAnalysis() {
     if(bar) { bar.style.width = "0%"; bar.style.backgroundColor = "transparent"; bar.style.boxShadow = "none"; }
 
     // Reset dynamic colors
-    document.getElementById("dynamic-title").style.color = "#525252";
-    document.getElementById("dynamic-title").style.textShadow = "none";
-    document.getElementById("dynamic-score").style.color = "#525252";
-    document.getElementById("dynamic-score").style.textShadow = "none";
+    const dTitle = document.getElementById("dynamic-title");
+    dTitle.style.transition = "none";
+    dTitle.style.color = "#525252";
+    dTitle.style.textShadow = "none";
+    dScore.style.color = "#525252";
+    dScore.style.textShadow = "none";
+    
+    // Force reflow and restore transitions
+    void dScore.offsetWidth;
+    dScore.style.transition = "";
+    vScoreLarge.style.transition = "";
+    dTitle.style.transition = "";
     
     // Hide error box when refreshing
     document.getElementById("error-box").classList.add("hidden");
@@ -330,7 +345,8 @@ function updateChart(period) {
             onHover: (event, activeElements) => {
                 if (!activeElements.length) {
                     if (scoreChartInstance) scoreChartInstance.update();
-                    document.getElementById('dynamic-score').innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">88.8%</span>';
+                    const s = window.fullData ? window.fullData.cycle_score : 0;
+                    document.getElementById('dynamic-score').innerText = s.toFixed(1) + '%';
                     document.getElementById('dynamic-score').style.color = "#525252";
                     document.getElementById('dynamic-score').style.textShadow = "none";
                     document.getElementById('dynamic-title').style.color = "#525252";
