@@ -76,7 +76,7 @@
         <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000">
             
             <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
-                <div id="badge-name" class="border border-neutral-600/50 px-3 py-1.5 rounded-md text-neutral-400">
+                <div id="badge-name" class="border border-neutral-600/50 px-3 h-8 flex items-center rounded-md text-neutral-400">
                     Načítavam...
                 </div>
                 <div id="badge-phase" class="border border-neutral-800 bg-neutral-800 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse">
@@ -89,9 +89,9 @@
                     <div id="val-price" class="text-[1.8rem] font-bold h-9 flex items-center leading-none tracking-tight text-white transition-all duration-1000">
                         <span class="bg-neutral-800 text-transparent animate-pulse rounded">$00,000.00</span>
                     </div>
-                    <div id="val-change" class="text-[0.6rem] uppercase tracking-widest mt-2 flex items-center gap-1.5">
-                        <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1 inline-block h-[12px]">+0.00%</span> 
-                        <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1.5 py-0.5">24H</span>
+                    <div id="val-change" class="text-[0.6rem] uppercase tracking-widest mt-2 flex items-center gap-1.5 h-4">
+                        <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1 inline-block h-3">+0.00%</span> 
+                        <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1.5 h-4 flex items-center">24H</span>
                     </div>
                 </div>
                 <div class="text-right flex flex-col items-end">
@@ -196,7 +196,7 @@ function triggerAnalysis() {
     dScore.innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">88.8%</span>';
     
     let badgeName = document.getElementById("badge-name");
-    badgeName.className = "border border-neutral-600/50 px-3 py-1.5 rounded-md text-neutral-400";
+    badgeName.className = "border border-neutral-600/50 px-3 h-8 flex items-center rounded-md text-neutral-400";
     badgeName.innerText = window.currentMode === "MACRO" ? "Bitcoin (BTC)" : "Solana (SOL)";
 
     let pBadge = document.getElementById("badge-phase");
@@ -204,7 +204,7 @@ function triggerAnalysis() {
     pBadge.innerHTML = 'HODL';
 
     document.getElementById("val-price").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded">88,888.88</span>';
-    document.getElementById("val-change").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-1 inline-block h-[12px]">+0.00%</span> <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1.5 py-0.5">24H</span>';
+    document.getElementById("val-change").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-1 inline-block h-3">+0.00%</span> <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1.5 h-4 flex items-center">24H</span>';
     
     const vScoreLarge = document.getElementById("val-score-large");
     vScoreLarge.style.transition = "none";
@@ -403,7 +403,7 @@ async function analyze() {
     document.getElementById("val-price").innerText = `$${Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
 
     let vCh = document.getElementById("val-change");
-    vCh.className = `text-[0.6rem] uppercase tracking-widest mt-2 flex items-center h-[16px] gap-1.5 ${data.change >= 0 ? 'text-[#22c55e]' : 'text-pink-500'}`;
+    vCh.className = `text-[0.6rem] uppercase tracking-widest mt-2 flex items-center h-4 gap-1.5 ${data.change >= 0 ? 'text-[#22c55e]' : 'text-pink-500'}`;
     vCh.innerHTML = `${data.change >= 0 ? '+':''}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded font-normal">24H</span>`;
 
     document.getElementById("val-score-large").innerText = `${s.toFixed(1)}%`;
