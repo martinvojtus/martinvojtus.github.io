@@ -283,35 +283,53 @@ def analyze(req: AnalyzeRequest = None):
         s_4h_a = s_4h.reindex(df_1h.index, method='ffill').fillna(50)
         s_1d_a = s_1d.reindex(df_1h.index, method='ffill').fillna(50)
 
-        # === ADVANCED CONFLUENCE SYNERGY MODEL (ISM v1.0) ===
-        # Base Weighted Score (35/25/25/15) - Strong focus on 1h/4h synergy
-        base_h_score = (s_1h * 0.35) + (s_2h_a * 0.25) + (s_4h_a * 0.25) + (s_1d_a * 0.15)
-        
+        # === ADVANCED CONFLUENCE SYNERGY MODEL (ISM v2.0) ===
         final_h_scores = []
         for i in range(len(df_1h)):
-            score = base_h_score.iloc[i]
-            
-            # --- CONFLUENCE BOOSTER: If 1H & 4H agree on direction, amplify signal ---
-            # BULLISH CONFLUENCE (Both 1H and 4H are oversold)
-            if s_1h.iloc[i] < 30 and s_4h_a.iloc[i] < 35:
-                # Accelerate towards 0% (Strong Buy Signal)
-                score *= 0.80 
-            
-            # BEARISH CONFLUENCE (Both 1H and 4H are overbought)
-            if s_1h.iloc[i] > 70 and s_4h_a.iloc[i] > 65:
-                # Accelerate towards 100% (Strong Sell Signal)
-                score += (100 - score) * 0.35
+            sc_1 = s_1h.iloc[i]
+            sc_2 = s_2h_a.iloc[i]
+            sc_4 = s_4h_a.iloc[i]
+            sc_1d = s_1d_a.iloc[i]
 
-            # --- CONFLICT DAMPENING (Safety Lock) ---
-            # If 1D is strongly against 1H, pull score towards Neutral (50)
-            if (s_1d_a.iloc[i] > 75 and s_1h.iloc[i] < 30) or (s_1d_a.iloc[i] < 25 and s_1h.iloc[i] > 70):
-                score = (score + 50) / 2 # Pull to neutral to prevent fakeouts
+            # 1. Non-Linear Extremity Gravity (Dynamic Weighting)
+            # The closer a timeframe is to 0 or 100, the stronger its pull.
+            w_1 = 0.35 + (abs(sc_1 - 50) / 50) * 0.15
+            w_2 = 0.25 + (abs(sc_2 - 50) / 50) * 0.05
+            w_4 = 0.25
+            w_1d = 0.15
+            
+            total_weight = w_1 + w_2 + w_4 + w_1d
+            
+            # Base Gravitational Score
+            score = ((sc_1 * w_1) + (sc_2 * w_2) + (sc_4 * w_4) + (sc_1d * w_1d)) / total_weight
+            
+            # 2. Multiplicative Confluence (The Accelerator)
+            # When multiple frames agree, we aggressively push the score towards the extreme.
+            
+            # STRONG BUY CONFLUENCE
+            if sc_1 < 30 and sc_2 < 35 and sc_4 < 40:
+                # Accelerate deep into the Value Zone (under 20)
+                score = score * 0.65
+                if sc_1 < 20: score = score * 0.70 # Turbo boost for panic lows
+
+            # STRONG SELL CONFLUENCE
+            elif sc_1 > 70 and sc_2 > 65 and sc_4 > 60:
+                # Accelerate deep into the Exit Zone (over 80)
+                score = score + ((100 - score) * 0.50)
+                if sc_1 > 80: score = score + ((100 - score) * 0.30) # Turbo boost for euphoria peaks
+
+            # 3. Conflict Dampening (Anti-Whipsaw)
+            # If 1D is violently against the short-term trend, soften the 1H fakeout
+            elif (sc_1d > 70 and sc_1 < 30):
+                score = (score * 0.7) + (50 * 0.3)
+            elif (sc_1d < 30 and sc_1 > 70):
+                score = (score * 0.7) + (50 * 0.3)
 
             final_h_scores.append(max(0.0, min(100.0, score)))
 
         score_series = pd.Series(final_h_scores, index=df_1h.index)
         df = df_1h # 1h price as the baseline
-        analysis_tag = "VBSX TRADING (H-LINE ISM)"
+        analysis_tag = "VBSX TRADING (H-LINE ISM v2.0)"
     else:
         df = get_crypto_data(symbol, interval)
         if df.empty:
