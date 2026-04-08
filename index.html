@@ -408,11 +408,26 @@ async function analyze() {
         if (scoreChartInstance && !e.target.closest('#scoreChart')) {
             scoreChartInstance.setActiveElements([]);
             scoreChartInstance.update();
-            // Reset dynamic labels to neutral state
-            document.getElementById('dynamic-score').innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">88.8%</span>';
+            const s = window.fullData ? window.fullData.cycle_score : 0;
+            document.getElementById('dynamic-score').innerText = s.toFixed(1) + '%';
             document.getElementById('dynamic-score').style.color = "#525252";
             document.getElementById('dynamic-score').style.textShadow = "none";
             document.getElementById('dynamic-title').style.color = "#525252";
+            document.getElementById('dynamic-title').style.textShadow = "none";
+        }
+    }, { passive: true });
+});
+
+window.addEventListener('DOMContentLoaded', () => { updateSkeletonGrid(); initUI(); triggerAnalysis(); });
+</script>
+</body>
+</html> triggerAnalysis(); });
+</script>
+</body>
+</html>I(); triggerAnalysis(); });
+</script>
+</body>
+</html>or = "#525252";
             document.getElementById('dynamic-title').style.textShadow = "none";
         }
     }, { passive: true });
