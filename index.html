@@ -330,13 +330,11 @@ function updateChart(period) {
             onHover: (event, activeElements) => {
                 if (!activeElements.length) {
                     if (scoreChartInstance) scoreChartInstance.update();
-                    const s = window.fullData ? window.fullData.cycle_score : 0;
-                    let sHex = s <= 20 ? "#22c55e" : (s >= 80 ? "#EC4899" : "#FFFF00");
-                    document.getElementById('dynamic-score').innerText = s.toFixed(1) + '%';
-                    document.getElementById('dynamic-score').style.color = sHex;
-                    document.getElementById('dynamic-score').style.textShadow = `0 0 10px ${sHex}80`;
-                    document.getElementById('dynamic-title').style.color = sHex;
-                    document.getElementById('dynamic-title').style.textShadow = `0 0 10px ${sHex}80`;
+                    document.getElementById('dynamic-score').innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">88.8%</span>';
+                    document.getElementById('dynamic-score').style.color = "#525252";
+                    document.getElementById('dynamic-score').style.textShadow = "none";
+                    document.getElementById('dynamic-title').style.color = "#525252";
+                    document.getElementById('dynamic-title').style.textShadow = "none";
                 }
             }
         }
@@ -391,9 +389,7 @@ async function analyze() {
 
     document.getElementById("val-score-large").innerText = `${s.toFixed(1)}%`;
     document.getElementById("val-score-large").style.color = sHex;
-    document.getElementById("dynamic-score").innerText = `${s.toFixed(1)}%`;
-    document.getElementById("dynamic-score").style.color = sHex;
-    document.getElementById("dynamic-title").style.color = sHex;
+    document.getElementById("val-score-large").style.textShadow = `0 0 15px ${sHex}80`;
 
     document.getElementById("main-card").className = `p-6 rounded-3xl border shadow-2xl transition-colors duration-1000 ${s <= 20 ? 'bg-[#030a05] border-[#22c55e]/30' : (s >= 80 ? 'bg-[#EC4899]/5 border-[#EC4899]/30' : 'bg-[#FFFF00]/5 border-[#FFFF00]/30')}`;
 
@@ -411,14 +407,20 @@ async function analyze() {
         if (scoreChartInstance && !e.target.closest('#scoreChart')) {
             scoreChartInstance.setActiveElements([]);
             scoreChartInstance.update();
-            // Reset dynamic labels to current score
-            const s = window.fullData ? window.fullData.cycle_score : 0;
-            let sHex = s <= 20 ? "#22c55e" : (s >= 80 ? "#EC4899" : "#FFFF00");
-            document.getElementById('dynamic-score').innerText = s.toFixed(1) + '%';
-            document.getElementById('dynamic-score').style.color = sHex;
-            document.getElementById('dynamic-score').style.textShadow = `0 0 10px ${sHex}80`;
-            document.getElementById('dynamic-title').style.color = sHex;
-            document.getElementById('dynamic-title').style.textShadow = `0 0 10px ${sHex}80`;
+            // Reset dynamic labels to neutral state
+            document.getElementById('dynamic-score').innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">88.8%</span>';
+            document.getElementById('dynamic-score').style.color = "#525252";
+            document.getElementById('dynamic-score').style.textShadow = "none";
+            document.getElementById('dynamic-title').style.color = "#525252";
+            document.getElementById('dynamic-title').style.textShadow = "none";
+        }
+    }, { passive: true });
+});
+
+window.addEventListener('DOMContentLoaded', () => { updateSkeletonGrid(); initUI(); triggerAnalysis(); });
+</script>
+</body>
+</html>Hex}80`;
         }
     }, { passive: true });
 });
