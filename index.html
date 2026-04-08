@@ -408,6 +408,13 @@ async function analyze() {
     document.getElementById("val-score-large").style.color = sHex;
     document.getElementById("val-score-large").style.textShadow = `0 0 15px ${sHex}80`;
 
+    const dScore = document.getElementById("dynamic-score");
+    dScore.innerText = `${s.toFixed(1)}%`;
+    dScore.style.color = "#525252";
+    dScore.style.textShadow = "none";
+    document.getElementById("dynamic-title").style.color = "#525252";
+    document.getElementById("dynamic-title").style.textShadow = "none";
+
     document.getElementById("main-card").className = `p-6 rounded-3xl border shadow-2xl transition-colors duration-1000 ${s <= 20 ? 'bg-[#030a05] border-[#22c55e]/30' : (s >= 80 ? 'bg-[#EC4899]/5 border-[#EC4899]/30' : 'bg-[#FFFF00]/5 border-[#FFFF00]/30')}`;
 
     updateChart(window.currentMode === 'MACRO' ? window.currentMacroView : null);
