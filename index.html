@@ -54,6 +54,7 @@
                 <button onclick="changeTradingInterval('4h')" id="btn-4h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">4H</button>
                 <button onclick="changeTradingInterval('2h')" id="btn-2h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">2H</button>
                 <button onclick="changeTradingInterval('1h')" id="btn-1h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1H</button>
+                <button onclick="changeTradingInterval('h-line')" id="btn-h-line" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">H-LINE</button>
             </div>
 
             <div class="w-16 flex justify-end">
@@ -109,9 +110,9 @@
                 
                 <table class="w-full text-left text-[0.6rem] text-neutral-400 uppercase tracking-widest border border-neutral-800 rounded-lg overflow-hidden border-separate [border-spacing:0]">
                     <tbody>
-                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#22c55e] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white whitespace-nowrap w-24 text-center">0 – 20 (%)</td><td id="legend-low" class="py-2.5 pl-5 border-b border-l border-neutral-800">VALUE ZONE (DCA IN)</td></tr>
-                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#FFFF00] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white whitespace-nowrap text-center">21 – 79 (%)</td><td id="legend-mid" class="py-2.5 pl-5 border-b border-l border-neutral-800">NEUTRAL ZONE (HODL)</td></tr>
-                        <tr><td class="py-2.5 px-0 align-middle text-center"><div class="w-2 h-2 rounded-full bg-[#EC4899] inline-block mt-[2px]"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-white whitespace-nowrap text-center">80 – 100 (%)</td><td id="legend-high" class="py-2.5 pl-5 border-l border-neutral-800">EXIT ZONE (DCA OUT)</td></tr>
+                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div id="legend-dot-low" class="w-2 h-2 rounded-full bg-[#22c55e] inline-block mt-[2px] transition-colors duration-500"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white whitespace-nowrap w-24 text-center">0 – 20 (%)</td><td id="legend-low" class="py-2.5 pl-5 border-b border-l border-neutral-800">VALUE ZONE (DCA IN)</td></tr>
+                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div id="legend-dot-mid" class="w-2 h-2 rounded-full bg-[#FFFF00] inline-block mt-[2px] transition-colors duration-500"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white whitespace-nowrap text-center">21 – 79 (%)</td><td id="legend-mid" class="py-2.5 pl-5 border-b border-l border-neutral-800">NEUTRAL ZONE (HODL)</td></tr>
+                        <tr><td class="py-2.5 px-0 align-middle text-center"><div id="legend-dot-high" class="w-2 h-2 rounded-full bg-[#EC4899] inline-block mt-[2px] transition-colors duration-500"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-white whitespace-nowrap text-center">80 – 100 (%)</td><td id="legend-high" class="py-2.5 pl-5 border-l border-neutral-800">EXIT ZONE (DCA OUT)</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -130,6 +131,28 @@ window.fullData = null;
 window.currentMode = localStorage.getItem('vbsx_mode') || 'MACRO';
 window.currentInterval = localStorage.getItem('vbsx_interval') || (window.currentMode === 'MACRO' ? '1w' : '2h'); 
 window.currentMacroView = localStorage.getItem('vbsx_macro_view') || '4Y';
+
+function getTheme() {
+    if (window.currentInterval === 'h-line') {
+        return {
+            low: '#14F195', lowRgb: '20, 241, 149',
+            mid: '#00C2FF', midRgb: '0, 194, 255',
+            high: '#9945FF', highRgb: '153, 69, 255'
+        };
+    }
+    return {
+        low: '#22c55e', lowRgb: '34, 197, 94',
+        mid: '#FFFF00', midRgb: '255, 255, 0',
+        high: '#EC4899', highRgb: '236, 72, 153'
+    };
+}
+
+function updateThemeUI() {
+    const theme = getTheme();
+    document.getElementById('legend-dot-low').style.backgroundColor = theme.low;
+    document.getElementById('legend-dot-mid').style.backgroundColor = theme.mid;
+    document.getElementById('legend-dot-high').style.backgroundColor = theme.high;
+}
 
 // --- DASHBOARD LOGIC ---
 function initUI() {
@@ -177,7 +200,7 @@ function toggleMode(mode) {
 function changeTradingInterval(interval) { if (window.currentInterval === interval && window.currentMode === 'TRADING') return; window.currentInterval = interval; localStorage.setItem('vbsx_interval', interval); highlightTradingButton(interval); triggerAnalysis(); }
 
 function highlightTradingButton(interval) {
-    ['1d', '4h', '2h', '1h'].forEach(p => {
+    ['1d', '4h', '2h', '1h', 'h-line'].forEach(p => {
         const btn = document.getElementById(`btn-${p}`);
         if(btn) btn.className = p === interval ? "px-3 py-1 rounded-md text-white bg-neutral-800 transition-all" : "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all";
     });
@@ -236,6 +259,7 @@ function triggerAnalysis() {
     // Hide error box when refreshing
     document.getElementById("error-box").classList.add("hidden");
 
+    updateThemeUI();
     analyze();
 }
 
@@ -255,6 +279,7 @@ const customChartPlugin = {
   afterDraw: chart => {
     const ctx = chart.ctx; if (!chart.chartArea) return; 
     const { chartArea: {top, bottom, left, right}, scales: {y} } = chart;
+    const theme = getTheme();
     ctx.save(); ctx.lineWidth = 1;
     const gridWidth = right - left;
     const exactDash = gridWidth / (2 * Math.round(((gridWidth / 4) + 1) / 2) - 1);
@@ -262,7 +287,7 @@ const customChartPlugin = {
     for (let v = 0; v <= 100; v += 10) {
         const yPos = y.getPixelForValue(v);
         let op = 0.1; if (v === 0 || v === 100) op = 0.05; else if (v === 20 || v === 80) op = 0.5; 
-        ctx.strokeStyle = v <= 20 ? `rgba(34, 197, 94, ${op})` : (v < 80 ? `rgba(255, 255, 0, ${op})` : `rgba(236, 72, 153, ${op})`);
+        ctx.strokeStyle = v <= 20 ? `rgba(${theme.lowRgb}, ${op})` : (v < 80 ? `rgba(${theme.midRgb}, ${op})` : `rgba(${theme.highRgb}, ${op})`);
         ctx.beginPath(); ctx.moveTo(left, yPos); ctx.lineTo(right, yPos); ctx.stroke();
     }
     ctx.restore();
@@ -283,7 +308,7 @@ const customChartPlugin = {
           ctx.fillText(xLabel, bx + (tw + 16)/2, bottom + 14);
       }
       let val = Math.max(0, Math.min(100, activePoint.element.$context.parsed.y));
-      let sHex = val <= 20 ? "#22c55e" : (val >= 80 ? "#EC4899" : "#FFFF00");
+      let sHex = val <= 20 ? theme.low : (val >= 80 ? theme.high : theme.mid);
       document.getElementById('dynamic-score').innerText = val.toFixed(1) + '%';
       document.getElementById('dynamic-score').style.color = sHex;
       document.getElementById('dynamic-score').style.textShadow = `0 0 10px ${sHex}80`;
@@ -295,7 +320,7 @@ const customChartPlugin = {
     if (meta.data && meta.data.length > 0) {
         const lastP = meta.data[meta.data.length - 1];
         const lastV = chart.data.datasets[0].data[meta.data.length - 1];
-        let dotC = lastV <= 20 ? '#22c55e' : (lastV >= 80 ? '#EC4899' : '#FFFF00');
+        let dotC = lastV <= 20 ? theme.low : (lastV >= 80 ? theme.high : theme.mid);
         ctx.save(); ctx.beginPath(); ctx.arc(lastP.x, lastP.y, 4, 0, 2 * Math.PI); ctx.fillStyle = dotC; ctx.fill(); ctx.restore();
     }
   }
@@ -327,15 +352,16 @@ function updateChart(period) {
     const scr = window.fullData.chart_score.slice(-pts);
     if (scoreChartInstance) scoreChartInstance.destroy();
     Chart.defaults.color = '#525252'; Chart.defaults.font.family = "'Inter', sans-serif"; Chart.defaults.font.size = 9.6;
+    const theme = getTheme();
     scoreChartInstance = new Chart(document.getElementById('scoreChart').getContext('2d'), {
         type: 'line',
         data: { labels: dts, datasets: [{ data: scr, fill: false, borderWidth: 1.5, tension: 0.5, pointRadius: 0, 
             borderColor: function(c) {
                 const {ctx, chartArea} = c.chart; if (!chartArea) return;
                 const g = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                g.addColorStop(0, '#22c55e'); g.addColorStop(0.2, '#22c55e');
-                g.addColorStop(0.3, '#FFFF00'); g.addColorStop(0.7, '#FFFF00');
-                g.addColorStop(0.8, '#EC4899'); g.addColorStop(1, '#EC4899');    
+                g.addColorStop(0, theme.low); g.addColorStop(0.2, theme.low);
+                g.addColorStop(0.3, theme.mid); g.addColorStop(0.7, theme.mid);
+                g.addColorStop(0.8, theme.high); g.addColorStop(1, theme.high);    
                 return g;
             }
         }]},
@@ -377,7 +403,8 @@ async function analyze() {
         return;
     }
     const s = data.cycle_score || 0;
-    let sHex = s <= 20 ? "#22c55e" : (s >= 80 ? "#EC4899" : "#FFFF00");
+    const theme = getTheme();
+    let sHex = s <= 20 ? theme.low : (s >= 80 ? theme.high : theme.mid);
     
     if (window.currentMode === "MACRO") {
         document.getElementById("badge-name").innerText = "Bitcoin (BTC)";
@@ -388,13 +415,17 @@ async function analyze() {
     if(data.name && data.ticker) {
         document.getElementById("badge-name").innerText = `${data.name} (${data.ticker})`;
     }
-    let badgeBgColor = "bg-neutral-900/40";
-    let badgeBorderColor = "border-neutral-800";
-    let badgeTextColor = "text-neutral-500";
     
-    if (s <= 20) { badgeBgColor = "bg-[#22c55e]/10"; badgeBorderColor = "border-[#22c55e]/40"; badgeTextColor = "text-[#22c55e]"; }
-    else if (s >= 80) { badgeBgColor = "bg-[#EC4899]/10"; badgeBorderColor = "border-[#EC4899]/40"; badgeTextColor = "text-[#EC4899]"; }
-    else { badgeBgColor = "bg-[#FFFF00]/10"; badgeBorderColor = "border-[#FFFF00]/40"; badgeTextColor = "text-[#FFFF00]"; }
+    let badgeBgColor, badgeBorderColor, badgeTextColor, mcBg, mcBorder;
+    if (window.currentInterval === 'h-line') {
+        if (s <= 20) { badgeBgColor="bg-[#14F195]/10"; badgeBorderColor="border-[#14F195]/40"; badgeTextColor="text-[#14F195]"; mcBg="bg-[#14F195]/5"; mcBorder="border-[#14F195]/30"; }
+        else if (s >= 80) { badgeBgColor="bg-[#9945FF]/10"; badgeBorderColor="border-[#9945FF]/40"; badgeTextColor="text-[#9945FF]"; mcBg="bg-[#9945FF]/5"; mcBorder="border-[#9945FF]/30"; }
+        else { badgeBgColor="bg-[#00C2FF]/10"; badgeBorderColor="border-[#00C2FF]/40"; badgeTextColor="text-[#00C2FF]"; mcBg="bg-[#00C2FF]/5"; mcBorder="border-[#00C2FF]/30"; }
+    } else {
+        if (s <= 20) { badgeBgColor="bg-[#22c55e]/10"; badgeBorderColor="border-[#22c55e]/40"; badgeTextColor="text-[#22c55e]"; mcBg="bg-[#030a05]"; mcBorder="border-[#22c55e]/30"; }
+        else if (s >= 80) { badgeBgColor="bg-[#EC4899]/10"; badgeBorderColor="border-[#EC4899]/40"; badgeTextColor="text-[#EC4899]"; mcBg="bg-[#EC4899]/5"; mcBorder="border-[#EC4899]/30"; }
+        else { badgeBgColor="bg-[#FFFF00]/10"; badgeBorderColor="border-[#FFFF00]/40"; badgeTextColor="text-[#FFFF00]"; mcBg="bg-[#FFFF00]/5"; mcBorder="border-[#FFFF00]/30"; }
+    }
 
     let pBadge = document.getElementById("badge-phase");
     pBadge.className = `border w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 ${badgeBgColor} ${badgeBorderColor} ${badgeTextColor}`;
@@ -417,7 +448,7 @@ async function analyze() {
     document.getElementById("dynamic-title").style.color = sHex;
     document.getElementById("dynamic-title").style.textShadow = `0 0 10px ${sHex}80`;
 
-    document.getElementById("main-card").className = `p-6 rounded-3xl border shadow-2xl transition-colors duration-1000 ${s <= 20 ? 'bg-[#030a05] border-[#22c55e]/30' : (s >= 80 ? 'bg-[#EC4899]/5 border-[#EC4899]/30' : 'bg-[#FFFF00]/5 border-[#FFFF00]/30')}`;
+    document.getElementById("main-card").className = `p-6 rounded-3xl border shadow-2xl transition-colors duration-1000 ${mcBg} ${mcBorder}`;
 
     updateChart(window.currentMode === 'MACRO' ? window.currentMacroView : null);
     setTimeout(() => {
@@ -439,7 +470,8 @@ async function analyze() {
             scoreChartInstance.setActiveElements([]);
             scoreChartInstance.update();
             const s = window.fullData ? window.fullData.cycle_score : 0;
-            let sHex = s <= 20 ? "#22c55e" : (s >= 80 ? "#EC4899" : "#FFFF00");
+            const theme = getTheme();
+            let sHex = s <= 20 ? theme.low : (s >= 80 ? theme.high : theme.mid);
             document.getElementById('dynamic-score').innerText = s.toFixed(1) + '%';
             document.getElementById('dynamic-score').style.color = sHex;
             document.getElementById('dynamic-score').style.textShadow = `0 0 10px ${sHex}80`;

@@ -256,18 +256,51 @@ def analyze(req: AnalyzeRequest = None):
         name = "Solana"
         ticker = "SOL"
 
-    df = get_crypto_data(symbol, interval)
-    if df.empty:
-        return {"error": "API Error: Binance unreachable."}
+    if interval == "h-line":
+        # Fetch multiple intervals in parallel for the Hybrid calculation
+        with ThreadPoolExecutor() as executor:
+            f1 = executor.submit(get_crypto_data, symbol, "1h")
+            f2 = executor.submit(get_crypto_data, symbol, "2h")
+            f4 = executor.submit(get_crypto_data, symbol, "4h")
+            f24 = executor.submit(get_crypto_data, symbol, "1d")
+        
+        df_1h = f1.result()
+        df_2h = f2.result()
+        df_4h = f4.result()
+        df_1d = f24.result()
 
-    # SEPARÁTNE SMEROVANIE LOGIKY
-    if mode == "TRADING":
-        score_series = calculate_trading_score(df)
-        analysis_tag = f"VBSX TRADING ({interval.upper()})"
+        if df_1h.empty or df_2h.empty or df_4h.empty or df_1d.empty:
+            return {"error": "API Error: Binance unreachable for H-LINE."}
+
+        # Calculate isolated scores
+        s_1h = calculate_trading_score(df_1h)
+        s_2h = calculate_trading_score(df_2h)
+        s_4h = calculate_trading_score(df_4h)
+        s_1d = calculate_trading_score(df_1d)
+
+        # Align to the 1h timeframe resolution
+        s_2h_aligned = s_2h.reindex(df_1h.index, method='ffill')
+        s_4h_aligned = s_4h.reindex(df_1h.index, method='ffill')
+        s_1d_aligned = s_1d.reindex(df_1h.index, method='ffill')
+
+        # Hybrid Score Formula: Immediate momentum weighted towards higher trend anchors
+        score_series = (s_1h * 0.40) + (s_2h_aligned.fillna(50) * 0.30) + (s_4h_aligned.fillna(50) * 0.20) + (s_1d_aligned.fillna(50) * 0.10)
+        
+        df = df_1h # Use 1h price data as the timeline anchor
+        analysis_tag = "VBSX TRADING (H-LINE)"
     else:
-        prices = df['Close']
-        score_series = calculate_macro_score(prices)
-        analysis_tag = "VBSX MACRO (1W)"
+        df = get_crypto_data(symbol, interval)
+        if df.empty:
+            return {"error": "API Error: Binance unreachable."}
+
+        # SEPARÁTNE SMEROVANIE LOGIKY
+        if mode == "TRADING":
+            score_series = calculate_trading_score(df)
+            analysis_tag = f"VBSX TRADING ({interval.upper()})"
+        else:
+            prices = df['Close']
+            score_series = calculate_macro_score(prices)
+            analysis_tag = "VBSX MACRO (1W)"
 
     curr_score = round(float(score_series.iloc[-1]), 1)
     
