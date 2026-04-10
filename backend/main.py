@@ -20,7 +20,16 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from dotenv import load_dotenv
-from cdp import Cdp, Wallet
+
+# Pokus o import Coinbase SDK s ošetrením konfliktov
+try:
+    from cdp import Cdp, Wallet
+except (ImportError, AttributeError):
+    try:
+        from coinbase.sdk import Cdp, Wallet
+    except:
+        Cdp, Wallet = None, None
+        logging.error("Nepodarilo sa importovať Coinbase SDK. Skontrolujte nainštalované balíky.")
 
 load_dotenv()
 
