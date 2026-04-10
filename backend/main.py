@@ -22,9 +22,15 @@ import matplotlib.dates as mdates
 from dotenv import load_dotenv
 
 try:
-    from cdp import Cdp, Wallet
-except ImportError:
-    logging.error("Kritická chyba: Balík 'cdp' neobsahuje Coinbase SDK. Skúste 'Clear Build Cache' v Renderi.")
+    import cdp
+    # Kontrola, či importované 'cdp' má metódu 'Cdp' (Coinbase štýl)
+    if hasattr(cdp, 'Cdp'):
+        from cdp import Cdp, Wallet
+    else:
+        # Ak nie, skúsime to cez vnútro balíka
+        from cdp.cdp import Cdp, Wallet
+except Exception as e:
+    logging.error(f"Kritická chyba pri importe Coinbase SDK: {e}")
     Cdp, Wallet = None, None
 
 load_dotenv()
@@ -40,12 +46,14 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 CB_API_KEY_NAME = os.getenv("COINBASE_API_KEY_NAME")
 CB_API_KEY_PRIVATE_KEY = os.getenv("COINBASE_API_KEY_PRIVATE_KEY")
 
-if CB_API_KEY_NAME and CB_API_KEY_PRIVATE_KEY:
+if Cdp and CB_API_KEY_NAME and CB_API_KEY_PRIVATE_KEY:
     try:
         Cdp.configure(CB_API_KEY_NAME, CB_API_KEY_PRIVATE_KEY.replace('\\n', '\n'))
         logger.info("Coinbase CDP configured successfully.")
     except Exception as e:
         logger.error(f"Coinbase CDP Config Error: {e}")
+else:
+    logger.warning("Coinbase SDK nie je k dispozícii alebo chýbajú kľúče.")
 
 def execute_coinbase_trade(side: str, asset_id: str, amount: float = 5.0):
     """
