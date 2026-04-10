@@ -4,6 +4,7 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from typing import Dict
+import io
 
 import requests
 import numpy as np
@@ -13,6 +14,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 load_dotenv()
 
@@ -42,7 +48,7 @@ class AnalyzeRequest(BaseModel):
 
 @app.get("/")
 def keep_alive():
-    return {"status": "VBSX Engine V2.7 - Bot Active!"}
+    return {"status": "Trading Engine - Bot Active!"}
 
 def get_crypto_data(symbol="BTCUSDT", interval="1w"):
     try:
@@ -257,13 +263,52 @@ def calculate_h_line_synergy(symbol):
 
     return df_1h, pd.Series(final_h_scores, index=df_1h.index)
 
-# --- BOT LOGIC ---
+# --- BOT LOGIC & CHARTS ---
+def generate_chart_image(df, scores, symbol):
+    plt.figure(figsize=(9, 4), facecolor='#000000')
+    ax = plt.gca()
+    ax.set_facecolor('#000000')
+    
+    dates = df.index[-150:]
+    plot_scores = scores.iloc[-150:]
+    
+    # Kreslenie hlavnej čiary
+    plt.plot(dates, plot_scores, color='#00C2FF', linewidth=1.5)
+    
+    # 80, 50, 20 úrovne
+    plt.axhline(y=80, color='#9945FF', linestyle='--', alpha=0.5)
+    plt.axhline(y=50, color='#525252', linestyle='-', alpha=0.3)
+    plt.axhline(y=20, color='#14F195', linestyle='--', alpha=0.5)
+    
+    plt.ylim(0, 100)
+    plt.title(f"{symbol} H-LINE Score (Last 150h)", color='white', pad=10)
+    
+    ax.tick_params(colors='#a3a3a3', labelsize=8)
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%d. %b'))
+    for spine in ax.spines.values():
+        spine.set_edgecolor('#525252')
+        
+    plt.tight_layout()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight', dpi=120)
+    plt.close()
+    buf.seek(0)
+    return buf
+
 def send_telegram_msg(message):
     if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID: return
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}
     try: requests.post(url, json=payload, timeout=10)
     except Exception as e: logger.error(f"Telegram Error: {e}")
+
+def send_telegram_photo(caption, photo_buf):
+    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID: return
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto"
+    data = {"chat_id": TELEGRAM_CHAT_ID, "caption": caption, "parse_mode": "Markdown"}
+    files = {"photo": ("chart.png", photo_buf, "image/png")}
+    try: requests.post(url, data=data, files=files, timeout=15)
+    except Exception as e: logger.error(f"Telegram Photo Error: {e}")
 
 def check_market_signals():
     logger.info("Checking market signals...")
@@ -274,7 +319,6 @@ def check_market_signals():
         if df is None: continue
         
         curr_score = scores.iloc[-1]
-        prev_score = scores.iloc[-2]
         price = df['Close'].iloc[-1]
         
         # EMA200 filter (1h timeframe)
@@ -284,30 +328,28 @@ def check_market_signals():
         state_key = f"{symbol}_HLINE"
         if state_key not in bot_state: bot_state[state_key] = {"state": "NORMAL", "in_zone_since": None}
         
-        # LOGIKA SIGNÁLOV S POTVRDENÍM NÁVRATU
-        # 1. LONG: Bol pod 20 a teraz vyšiel nad 20 + Trend Filter
         if bot_state[state_key]["state"] == "OVERSOLD" and curr_score > 20:
-            if trend == "UP": # Len do trendu
+            if trend == "UP": 
                 msg = f"🚀 *LONG SIGNAL: {symbol}*\n\n" \
                       f"Score: {round(curr_score, 1)}% (Návrat z prepredania)\n" \
                       f"Price: ${price:,.2f}\n" \
                       f"Trend: 🟢 UPTREND (nad EMA200)\n" \
                       f"Mode: H-LINE SYNERGY"
-                send_telegram_msg(msg)
+                chart_buf = generate_chart_image(df, scores, symbol)
+                send_telegram_photo(msg, chart_buf)
             bot_state[state_key]["state"] = "NORMAL"
             
-        # 2. SHORT: Bol nad 80 a teraz klesol pod 80 + Trend Filter
         elif bot_state[state_key]["state"] == "OVERBOUGHT" and curr_score < 80:
-            if trend == "DOWN": # Len do trendu
+            if trend == "DOWN": 
                 msg = f"🔻 *SHORT SIGNAL: {symbol}*\n\n" \
                       f"Score: {round(curr_score, 1)}% (Návrat z prekúpenia)\n" \
                       f"Price: ${price:,.2f}\n" \
                       f"Trend: 🔴 DOWNTREND (pod EMA200)\n" \
                       f"Mode: H-LINE SYNERGY"
-                send_telegram_msg(msg)
+                chart_buf = generate_chart_image(df, scores, symbol)
+                send_telegram_photo(msg, chart_buf)
             bot_state[state_key]["state"] = "NORMAL"
             
-        # Nastavenie stavu zóny
         if curr_score <= 20: bot_state[state_key]["state"] = "OVERSOLD"
         elif curr_score >= 80: bot_state[state_key]["state"] = "OVERBOUGHT"
 
@@ -318,8 +360,7 @@ def startup_event():
     scheduler.start()
     app.state.scheduler = scheduler
     
-    # Uvítacia správa po úspešnom nasadení
-    send_telegram_msg("🤖 *VBSX Engine Online*\nBot bol úspešne aktivovaný a každých 5 minút skenuje H-LINE signály pre BTC a SOL.")
+    send_telegram_msg("🤖 *Trading Engine Online*\nBot bol úspešne aktivovaný a každých 5 minút skenuje H-LINE signály pre Solanu.")
 
 @app.post("/analyze")
 def analyze(req: AnalyzeRequest = None):
@@ -332,16 +373,16 @@ def analyze(req: AnalyzeRequest = None):
     if interval == "h-line":
         df, score_series = calculate_h_line_synergy(symbol)
         if df is None: return {"error": "API Error: Binance unreachable for H-LINE."}
-        analysis_tag = "VBSX TRADING (H-LINE ISM v2.0)"
+        analysis_tag = "TRADING (H-LINE ISM v2.0)"
     else:
         df = get_crypto_data(symbol, interval)
         if df.empty: return {"error": "API Error: Binance unreachable."}
         if mode == "TRADING":
             score_series = calculate_trading_score(df)
-            analysis_tag = f"VBSX TRADING ({interval.upper()})"
+            analysis_tag = f"TRADING ({interval.upper()})"
         else:
             score_series = calculate_macro_score(df['Close'])
-            analysis_tag = "VBSX MACRO (1W)"
+            analysis_tag = "MACRO (1W)"
 
     curr_score = round(float(score_series.iloc[-1]), 1)
     return {

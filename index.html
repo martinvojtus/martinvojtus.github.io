@@ -128,9 +128,9 @@
 let scoreChartInstance = null;
 window.currentScoreData = { score: 0, colorClass: "" };
 window.fullData = null; 
-window.currentMode = localStorage.getItem('vbsx_mode') || 'MACRO';
-window.currentInterval = localStorage.getItem('vbsx_interval') || (window.currentMode === 'MACRO' ? '1w' : '2h'); 
-window.currentMacroView = localStorage.getItem('vbsx_macro_view') || '4Y';
+window.currentMode = localStorage.getItem('trading_mode') || 'MACRO';
+window.currentInterval = localStorage.getItem('trading_interval') || (window.currentMode === 'MACRO' ? '1w' : '2h'); 
+window.currentMacroView = localStorage.getItem('trading_macro_view') || '4Y';
 
 function getTheme() {
     if (window.currentInterval === 'h-line') {
@@ -188,16 +188,16 @@ function updateMacroButtonsUI(period) {
 function toggleMode(mode) { 
     if (window.currentMode === mode) return; 
     window.currentMode = mode; 
-    localStorage.setItem('vbsx_mode', mode); 
+    localStorage.setItem('trading_mode', mode); 
     if (mode === 'TRADING') {
-        window.currentInterval = localStorage.getItem('vbsx_interval') || '2h';
+        window.currentInterval = localStorage.getItem('trading_interval') || '2h';
     } else {
         window.currentInterval = '1w';
     }
     initUI(); 
     triggerAnalysis(); 
 }
-function changeTradingInterval(interval) { if (window.currentInterval === interval && window.currentMode === 'TRADING') return; window.currentInterval = interval; localStorage.setItem('vbsx_interval', interval); highlightTradingButton(interval); triggerAnalysis(); }
+function changeTradingInterval(interval) { if (window.currentInterval === interval && window.currentMode === 'TRADING') return; window.currentInterval = interval; localStorage.setItem('trading_interval', interval); highlightTradingButton(interval); triggerAnalysis(); }
 
 function highlightTradingButton(interval) {
     ['1d', '4h', '2h', '1h', 'h-line'].forEach(p => {
@@ -331,7 +331,7 @@ function updateChart(period) {
     if (!window.fullData) return;
     if (window.currentMode === 'MACRO') {
         window.currentMacroView = period;
-        localStorage.setItem('vbsx_macro_view', period);
+        localStorage.setItem('trading_macro_view', period);
         updateMacroButtonsUI(period);
     }
     let pts = 208;

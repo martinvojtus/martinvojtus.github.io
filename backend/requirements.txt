@@ -6,3 +6,4 @@ numpy
 pydantic
 python-dotenv
 apscheduler
+matplotlib
