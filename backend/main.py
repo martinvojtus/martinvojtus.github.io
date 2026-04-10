@@ -21,15 +21,11 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from dotenv import load_dotenv
 
-# Pokus o import Coinbase SDK s ošetrením konfliktov
 try:
     from cdp import Cdp, Wallet
-except (ImportError, AttributeError):
-    try:
-        from coinbase.sdk import Cdp, Wallet
-    except:
-        Cdp, Wallet = None, None
-        logging.error("Nepodarilo sa importovať Coinbase SDK. Skontrolujte nainštalované balíky.")
+except ImportError:
+    logging.error("Kritická chyba: Balík 'cdp' neobsahuje Coinbase SDK. Skúste 'Clear Build Cache' v Renderi.")
+    Cdp, Wallet = None, None
 
 load_dotenv()
 
