@@ -7,4 +7,3 @@ pydantic
 python-dotenv
 apscheduler
 matplotlib
-cdp-sdk
