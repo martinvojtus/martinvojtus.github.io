@@ -267,7 +267,7 @@ def send_telegram_msg(message):
 
 def check_market_signals():
     logger.info("Checking market signals...")
-    symbols = ["BTCUSDT", "SOLUSDT"]
+    symbols = ["SOLUSDT"]
     
     for symbol in symbols:
         df, scores = calculate_h_line_synergy(symbol)
