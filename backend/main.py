@@ -19,6 +19,8 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+from dotenv import load_dotenv
+from cdp import Cdp, Wallet
 
 load_dotenv()
 
@@ -29,7 +31,59 @@ logger = logging.getLogger(__name__)
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
+# Coinbase CDP Config
+CB_API_KEY_NAME = os.getenv("COINBASE_API_KEY_NAME")
+CB_API_KEY_PRIVATE_KEY = os.getenv("COINBASE_API_KEY_PRIVATE_KEY")
+
+if CB_API_KEY_NAME and CB_API_KEY_PRIVATE_KEY:
+    try:
+        Cdp.configure(CB_API_KEY_NAME, CB_API_KEY_PRIVATE_KEY.replace('\\n', '\n'))
+        logger.info("Coinbase CDP configured successfully.")
+    except Exception as e:
+        logger.error(f"Coinbase CDP Config Error: {e}")
+
+def execute_coinbase_trade(side: str, asset_id: str, amount: float = 5.0):
+    """
+    Vykoná obchod na Coinbase pomocou CDP SDK.
+    side: 'buy' alebo 'sell'
+    asset_id: napr. 'sol' alebo 'eth'
+    amount: suma v USD pre buy, alebo množstvo assetu pre sell
+    """
+    if not CB_API_KEY_NAME or not CB_API_KEY_PRIVATE_KEY:
+        logger.warning("Coinbase API keys missing. Skipping trade execution.")
+        return None
+
+    try:
+        # Tu načítame vašu existujúcu peňaženku (id by ste mali mať v .env)
+        wallet_id = os.getenv("COINBASE_WALLET_ID")
+        if wallet_id:
+            wallet = Wallet.fetch(wallet_id)
+        else:
+            # Ak nemáte peňaženku, môžeme ju vytvoriť (len pre demo účely, v produkcii ju chcete fixnú)
+            logger.info("No wallet ID found, creating a new server-side wallet...")
+            wallet = Wallet.create(network_id="base-mainnet")
+            logger.info(f"New wallet created! ID: {wallet.id} - PLEASE SAVE THIS TO .env AS COINBASE_WALLET_ID")
+
+        if side == "buy":
+            # Nákup assetu za USD na Base sieti (Coinbase L2)
+            trade = wallet.create_trade(amount=amount, from_asset_id="usd", to_asset_id=asset_id)
+            trade.wait()
+            logger.info(f"Coinbase Buy Order Executed: {trade.transaction.transaction_hash}")
+            return trade.transaction.transaction_hash
+
+        elif side == "sell":
+            # Predaj assetu späť do USD
+            trade = wallet.create_trade(amount=amount, from_asset_id=asset_id, to_asset_id="usd")
+            trade.wait()
+            logger.info(f"Coinbase Sell Order Executed: {trade.transaction.transaction_hash}")
+            return trade.transaction.transaction_hash
+
+    except Exception as e:
+        logger.error(f"Coinbase Trade Error: {e}")
+        return None
+
 # Stavová pamäť pre bota: { "SYMBOL_INTERVAL": {"state": "NORMAL", "in_zone_since": None} }
+
 bot_state: Dict[str, dict] = {}
 
 app = FastAPI()
@@ -49,6 +103,29 @@ class AnalyzeRequest(BaseModel):
 @app.get("/")
 def keep_alive():
     return {"status": "Trading Engine - Bot Active!"}
+
+@app.get("/wallet-info")
+def get_wallet_info():
+    if not CB_API_KEY_NAME or not CB_API_KEY_PRIVATE_KEY:
+        return {"error": "Coinbase API keys are missing in .env"}
+    
+    wallet_id = os.getenv("COINBASE_WALLET_ID")
+    if not wallet_id:
+        return {"error": "COINBASE_WALLET_ID is missing in .env"}
+        
+    try:
+        wallet = Wallet.fetch(wallet_id)
+        # Fetch default address for the wallet
+        address = wallet.default_address
+        return {
+            "status": "success",
+            "wallet_id": wallet.id,
+            "network": wallet.network_id,
+            "deposit_address": address.address_id,
+            "message": "Zašlite USDC alebo ETH (na poplatky) na túto adresu prostredníctvom siete Base."
+        }
+    except Exception as e:
+        return {"error": str(e)}
 
 def get_crypto_data(symbol="BTCUSDT", interval="1w"):
     try:
@@ -335,6 +412,12 @@ def check_market_signals():
                       f"Price: ${price:,.2f}\n" \
                       f"Trend: 🟢 UPTREND (nad EMA200)\n" \
                       f"Mode: H-LINE SYNERGY"
+                
+                # Automatický nákup na Coinbase (napr. za 10 USD)
+                tx_hash = execute_coinbase_trade("buy", "sol", 10.0)
+                if tx_hash:
+                    msg += f"\n\n✅ *Coinbase Trade Executed*\nTX: `{tx_hash[:10]}...`"
+
                 chart_buf = generate_chart_image(df, scores, symbol)
                 send_telegram_photo(msg, chart_buf)
             bot_state[state_key]["state"] = "NORMAL"
@@ -346,6 +429,12 @@ def check_market_signals():
                       f"Price: ${price:,.2f}\n" \
                       f"Trend: 🔴 DOWNTREND (pod EMA200)\n" \
                       f"Mode: H-LINE SYNERGY"
+
+                # Automatický predaj na Coinbase (množstvo závisí od vašej stratégie)
+                tx_hash = execute_coinbase_trade("sell", "sol", 0.1) # Predá 0.1 SOL
+                if tx_hash:
+                    msg += f"\n\n✅ *Coinbase Trade Executed*\nTX: `{tx_hash[:10]}...`"
+
                 chart_buf = generate_chart_image(df, scores, symbol)
                 send_telegram_photo(msg, chart_buf)
             bot_state[state_key]["state"] = "NORMAL"
