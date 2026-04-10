@@ -1,9 +1,9 @@
 fastapi
 uvicorn
 requests
-pandas
-numpy
+pandas==2.2.0
+numpy==1.26.4
 pydantic
 python-dotenv
 apscheduler
-matplotlib
+matplotlib==3.8.3
