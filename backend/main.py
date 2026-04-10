@@ -1,14 +1,30 @@
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import requests
+import logging
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
+from typing import Dict
+
+import requests
 import numpy as np
 import pandas as pd
-from datetime import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from apscheduler.schedulers.background import BackgroundScheduler
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# --- CONFIG & LOGGING ---
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
+# Stavová pamäť pre bota: { "SYMBOL_INTERVAL": {"state": "NORMAL", "in_zone_since": None} }
+bot_state: Dict[str, dict] = {}
 
 app = FastAPI()
 
@@ -26,7 +42,7 @@ class AnalyzeRequest(BaseModel):
 
 @app.get("/")
 def keep_alive():
-    return {"status": "VBSX Engine V2.7 - Macro & Advanced Swing Trading Active!"}
+    return {"status": "VBSX Engine V2.7 - Bot Active!"}
 
 def get_crypto_data(symbol="BTCUSDT", interval="1w"):
     try:
@@ -38,7 +54,7 @@ def get_crypto_data(symbol="BTCUSDT", interval="1w"):
         df['Time'] = pd.to_datetime(df['Time'], unit='ms')
         return df.set_index('Time')
     except Exception as e:
-        print(f"Data Fetch Error: {e}")
+        logger.error(f"Data Fetch Error: {e}")
         return pd.DataFrame()
 
 def get_24h_change(symbol="BTCUSDT"):
@@ -65,7 +81,6 @@ def calculate_stoch_rsi(rsi, window=14, smooth_k=3, smooth_d=3):
     d = k.rolling(window=smooth_d).mean()
     return k, d
 
-# === PÔVODNÝ MACRO ENGINE (TÝŽDENNÝ GRAF - STRICTLY UNTOUCHED) ===
 def calculate_macro_score(prices):
     if len(prices) < 200: return pd.Series([50]*len(prices), index=prices.index)
     
@@ -105,7 +120,7 @@ def calculate_macro_score(prices):
         if not fib_slice.empty:
             f_max = fib_slice.max(); f_min = fib_slice.min()
             if p_curr >= f_max + ((f_max - f_min) * 1.618): score += (100 - score) * 0.20
-            elif p_curr >= f_max + ((f_max - f_min) * 0.618): score += (100 - score) * 0.08
+            elif p_curr >= f_max + ((f_max - f_min) * 0.08): score += (100 - score) * 0.08
 
         if p_curr > ma200.iloc[i] and drawdown.iloc[i] <= -20 and k_curr < 20: score *= 0.60 
 
@@ -137,8 +152,6 @@ def calculate_macro_score(prices):
 
     return pd.Series(final_scores, index=prices.index).bfill().fillna(50)
 
-
-# === SOFISTIKOVANÝ SWING TRADING ENGINE (V2.7) ===
 def calculate_trading_score(df):
     if len(df) < 200: return pd.Series([50]*len(df), index=df.index)
     
@@ -148,18 +161,15 @@ def calculate_trading_score(df):
     l = df['Low']
     v = df['Vol']
 
-    # 1. Momentum & Oscilátory
     rsi = calculate_rsi(c, 14)
     stoch_k, _ = calculate_stoch_rsi(rsi, 14, 3, 3)
     
-    # 2. Volatilita a Bollinger Bands
     sma20 = c.rolling(20, min_periods=10).mean()
     std20 = c.rolling(20, min_periods=10).std()
     upper_bb = sma20 + (2 * std20)
     lower_bb = sma20 - (2 * std20)
     bb_pct = ((c - lower_bb) / (upper_bb - lower_bb + 1e-8) * 100).clip(0, 100).fillna(50)
     
-    # 3. MACD Normalizované Momentum
     ema12 = c.ewm(span=12, adjust=False).mean()
     ema26 = c.ewm(span=26, adjust=False).mean()
     macd = ema12 - ema26
@@ -170,11 +180,9 @@ def calculate_trading_score(df):
     macd_max = macd_hist.rolling(100, min_periods=10).max()
     macd_norm = ((macd_hist - macd_min) / (macd_max - macd_min + 1e-8) * 100).clip(0, 100).fillna(50)
     
-    # 4. Trend Filtre (EMA)
     ema50 = c.ewm(span=50, adjust=False).mean()
     ema200 = c.ewm(span=200, adjust=False).mean()
     
-    # 5. ATR (Average True Range) a Volume MA pre detekciu anomálií
     prev_c = c.shift(1)
     tr1 = h - l
     tr2 = (h - prev_c).abs()
@@ -183,169 +191,159 @@ def calculate_trading_score(df):
     atr = tr.rolling(14, min_periods=1).mean().bfill()
     vol_sma = v.rolling(20, min_periods=1).mean().bfill()
 
-    # ZÁKLADNÉ TRADING SKÓRE (Kombinácia štruktúry)
     base_score = (0.35 * rsi) + (0.20 * stoch_k.fillna(50)) + (0.25 * bb_pct) + (0.20 * macd_norm)
-    
     final_scores = []
     
     for i in range(len(df)):
         if i < 200:
             final_scores.append(base_score.iloc[i])
             continue
-            
         score = base_score.iloc[i]
-        
-        curr_c = c.iloc[i]
-        curr_o = o.iloc[i]
-        curr_h = h.iloc[i]
-        curr_l = l.iloc[i]
-        curr_v = v.iloc[i]
-        
+        curr_c = c.iloc[i]; curr_o = o.iloc[i]; curr_h = h.iloc[i]; curr_l = l.iloc[i]; curr_v = v.iloc[i]
         upper_wick = curr_h - max(curr_o, curr_c)
         lower_wick = min(curr_o, curr_c) - curr_l
+        curr_atr = atr.iloc[i]; curr_vol_sma = vol_sma.iloc[i]
         
-        curr_atr = atr.iloc[i]
-        curr_vol_sma = vol_sma.iloc[i]
-        
-        # --- SWING TRADING MODIFIKÁTORY ---
-        
-        # 1. INSTITUTIONAL LIQUIDITY GRAB (BUY)
-        # Sviečka prepichla Lower BB, objem je nadpriemerný a spodný chvost je dlhší ako 80% ATR
-        if curr_l < lower_bb.iloc[i] and lower_wick > (0.8 * curr_atr) and curr_v > curr_vol_sma:
-            score *= 0.40 
+        if curr_l < lower_bb.iloc[i] and lower_wick > (0.8 * curr_atr) and curr_v > curr_vol_sma: score *= 0.40 
+        if curr_h > upper_bb.iloc[i] and upper_wick > (0.8 * curr_atr) and curr_v > curr_vol_sma: score += (100 - score) * 0.60 
 
-        # 2. INSTITUTIONAL EXHAUSTION (SELL)
-        # Sviečka prepichla Upper BB, objem je nadpriemerný a horný chvost je dlhší ako 80% ATR
-        if curr_h > upper_bb.iloc[i] and upper_wick > (0.8 * curr_atr) and curr_v > curr_vol_sma:
-            score += (100 - score) * 0.60 
-
-        # 3. TREND PULLBACK (Golden Swing Buy)
-        # Sme v Uptrende (EMA50 > EMA200). Cena klesla k EMA50 (vzdialenosť < 1 ATR) a indikátory sú prepredané
         if ema50.iloc[i] > ema200.iloc[i] and curr_c > ema200.iloc[i]:
-            if abs(curr_l - ema50.iloc[i]) < curr_atr and stoch_k.iloc[i] < 30:
-                score *= 0.75
+            if abs(curr_l - ema50.iloc[i]) < curr_atr and stoch_k.iloc[i] < 30: score *= 0.75
         
-        # 4. TREND EXHAUSTION (Swing Sell)
-        # Sme v Downtrende (EMA50 < EMA200). Cena vyskočila k EMA50 a indikátory sú prekúpené
         if ema50.iloc[i] < ema200.iloc[i] and curr_c < ema200.iloc[i]:
-            if abs(curr_h - ema50.iloc[i]) < curr_atr and stoch_k.iloc[i] > 70:
-                score += (100 - score) * 0.30
+            if abs(curr_h - ema50.iloc[i]) < curr_atr and stoch_k.iloc[i] > 70: score += (100 - score) * 0.30
 
-        # 5. MACD CROSSOVER REAKCIA NA OBJEME
-        if macd_hist.iloc[i] > 0 and macd_hist.iloc[i-1] <= 0 and curr_v > curr_vol_sma:
-            score *= 0.85 # Potvrdený nákupný setup
-        elif macd_hist.iloc[i] < 0 and macd_hist.iloc[i-1] >= 0 and curr_v > curr_vol_sma:
-            score += (100 - score) * 0.20 # Potvrdený výpredajný setup
+        if macd_hist.iloc[i] > 0 and macd_hist.iloc[i-1] <= 0 and curr_v > curr_vol_sma: score *= 0.85
+        elif macd_hist.iloc[i] < 0 and macd_hist.iloc[i-1] >= 0 and curr_v > curr_vol_sma: score += (100 - score) * 0.20
 
         final_scores.append(max(0.0, min(100.0, score)))
 
     return pd.Series(final_scores, index=df.index).bfill().fillna(50)
 
+def calculate_h_line_synergy(symbol):
+    with ThreadPoolExecutor() as executor:
+        f1 = executor.submit(get_crypto_data, symbol, "1h")
+        f2 = executor.submit(get_crypto_data, symbol, "2h")
+        f4 = executor.submit(get_crypto_data, symbol, "4h")
+        f24 = executor.submit(get_crypto_data, symbol, "1d")
+    
+    df_1h, df_2h, df_4h, df_1d = f1.result(), f2.result(), f4.result(), f24.result()
+    if df_1h.empty or df_2h.empty or df_4h.empty or df_1d.empty:
+        return None, None
+
+    s_1h = calculate_trading_score(df_1h)
+    s_2h_a = calculate_trading_score(df_2h).reindex(df_1h.index, method='ffill').fillna(50)
+    s_4h_a = calculate_trading_score(df_4h).reindex(df_1h.index, method='ffill').fillna(50)
+    s_1d_a = calculate_trading_score(df_1d).reindex(df_1h.index, method='ffill').fillna(50)
+
+    final_h_scores = []
+    for i in range(len(df_1h)):
+        sc_1, sc_2, sc_4, sc_1d = s_1h.iloc[i], s_2h_a.iloc[i], s_4h_a.iloc[i], s_1d_a.iloc[i]
+        w_1 = 0.35 + (abs(sc_1 - 50) / 50) * 0.15
+        w_2 = 0.25 + (abs(sc_2 - 50) / 50) * 0.05
+        w_4, w_1d = 0.25, 0.15
+        score = ((sc_1 * w_1) + (sc_2 * w_2) + (sc_4 * w_4) + (sc_1d * w_1d)) / (w_1 + w_2 + w_4 + w_1d)
+        
+        if sc_1 < 30 and sc_2 < 35 and sc_4 < 40:
+            score *= 0.65
+            if sc_1 < 20: score *= 0.70
+        elif sc_1 > 70 and sc_2 > 65 and sc_4 > 60:
+            score += (100 - score) * 0.50
+            if sc_1 > 80: score += (100 - score) * 0.30
+        elif (sc_1d > 70 and sc_1 < 30) or (sc_1d < 30 and sc_1 > 70):
+            score = (score * 0.7) + (50 * 0.3)
+
+        final_h_scores.append(max(0.0, min(100.0, score)))
+
+    return df_1h, pd.Series(final_h_scores, index=df_1h.index)
+
+# --- BOT LOGIC ---
+def send_telegram_msg(message):
+    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID: return
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+    payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}
+    try: requests.post(url, json=payload, timeout=10)
+    except Exception as e: logger.error(f"Telegram Error: {e}")
+
+def check_market_signals():
+    logger.info("Checking market signals...")
+    symbols = ["BTCUSDT", "SOLUSDT"]
+    
+    for symbol in symbols:
+        df, scores = calculate_h_line_synergy(symbol)
+        if df is None: continue
+        
+        curr_score = scores.iloc[-1]
+        prev_score = scores.iloc[-2]
+        price = df['Close'].iloc[-1]
+        
+        # EMA200 filter (1h timeframe)
+        ema200 = df['Close'].ewm(span=200, adjust=False).mean().iloc[-1]
+        trend = "UP" if price > ema200 else "DOWN"
+        
+        state_key = f"{symbol}_HLINE"
+        if state_key not in bot_state: bot_state[state_key] = {"state": "NORMAL", "in_zone_since": None}
+        
+        # LOGIKA SIGNÁLOV S POTVRDENÍM NÁVRATU
+        # 1. LONG: Bol pod 20 a teraz vyšiel nad 20 + Trend Filter
+        if bot_state[state_key]["state"] == "OVERSOLD" and curr_score > 20:
+            if trend == "UP": # Len do trendu
+                msg = f"🚀 *LONG SIGNAL: {symbol}*\n\n" \
+                      f"Score: {round(curr_score, 1)}% (Návrat z prepredania)\n" \
+                      f"Price: ${price:,.2f}\n" \
+                      f"Trend: 🟢 UPTREND (nad EMA200)\n" \
+                      f"Mode: H-LINE SYNERGY"
+                send_telegram_msg(msg)
+            bot_state[state_key]["state"] = "NORMAL"
+            
+        # 2. SHORT: Bol nad 80 a teraz klesol pod 80 + Trend Filter
+        elif bot_state[state_key]["state"] == "OVERBOUGHT" and curr_score < 80:
+            if trend == "DOWN": # Len do trendu
+                msg = f"🔻 *SHORT SIGNAL: {symbol}*\n\n" \
+                      f"Score: {round(curr_score, 1)}% (Návrat z prekúpenia)\n" \
+                      f"Price: ${price:,.2f}\n" \
+                      f"Trend: 🔴 DOWNTREND (pod EMA200)\n" \
+                      f"Mode: H-LINE SYNERGY"
+                send_telegram_msg(msg)
+            bot_state[state_key]["state"] = "NORMAL"
+            
+        # Nastavenie stavu zóny
+        if curr_score <= 20: bot_state[state_key]["state"] = "OVERSOLD"
+        elif curr_score >= 80: bot_state[state_key]["state"] = "OVERBOUGHT"
+
+@app.on_event("startup")
+def startup_event():
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(check_market_signals, 'interval', minutes=5)
+    scheduler.start()
+    app.state.scheduler = scheduler
+    
+    # Uvítacia správa po úspešnom nasadení
+    send_telegram_msg("🤖 *VBSX Engine Online*\nBot bol úspešne aktivovaný a každých 5 minút skenuje H-LINE signály pre BTC a SOL.")
 
 @app.post("/analyze")
 def analyze(req: AnalyzeRequest = None):
     mode = req.mode.upper() if req else "MACRO"
     interval = req.interval.lower() if req else "1w"
-    
-    if mode == "MACRO":
-        symbol = "BTCUSDT"
-        name = "Bitcoin"
-        ticker = "BTC"
-    else:
-        symbol = "SOLUSDT"
-        name = "Solana"
-        ticker = "SOL"
+    symbol = "BTCUSDT" if mode == "MACRO" else "SOLUSDT"
+    name = "Bitcoin" if mode == "MACRO" else "Solana"
+    ticker = "BTC" if mode == "MACRO" else "SOL"
 
     if interval == "h-line":
-        # Fetch multiple intervals in parallel for the Hybrid calculation
-        with ThreadPoolExecutor() as executor:
-            f1 = executor.submit(get_crypto_data, symbol, "1h")
-            f2 = executor.submit(get_crypto_data, symbol, "2h")
-            f4 = executor.submit(get_crypto_data, symbol, "4h")
-            f24 = executor.submit(get_crypto_data, symbol, "1d")
-        
-        df_1h = f1.result()
-        df_2h = f2.result()
-        df_4h = f4.result()
-        df_1d = f24.result()
-
-        if df_1h.empty or df_2h.empty or df_4h.empty or df_1d.empty:
-            return {"error": "API Error: Binance unreachable for H-LINE."}
-
-        # Calculate isolated scores for each timeframe
-        s_1h = calculate_trading_score(df_1h)
-        s_2h = calculate_trading_score(df_2h)
-        s_4h = calculate_trading_score(df_4h)
-        s_1d = calculate_trading_score(df_1d)
-
-        # Align all timeframes to the 1h resolution
-        s_2h_a = s_2h.reindex(df_1h.index, method='ffill').fillna(50)
-        s_4h_a = s_4h.reindex(df_1h.index, method='ffill').fillna(50)
-        s_1d_a = s_1d.reindex(df_1h.index, method='ffill').fillna(50)
-
-        # === ADVANCED CONFLUENCE SYNERGY MODEL (ISM v2.0) ===
-        final_h_scores = []
-        for i in range(len(df_1h)):
-            sc_1 = s_1h.iloc[i]
-            sc_2 = s_2h_a.iloc[i]
-            sc_4 = s_4h_a.iloc[i]
-            sc_1d = s_1d_a.iloc[i]
-
-            # 1. Non-Linear Extremity Gravity (Dynamic Weighting)
-            # The closer a timeframe is to 0 or 100, the stronger its pull.
-            w_1 = 0.35 + (abs(sc_1 - 50) / 50) * 0.15
-            w_2 = 0.25 + (abs(sc_2 - 50) / 50) * 0.05
-            w_4 = 0.25
-            w_1d = 0.15
-            
-            total_weight = w_1 + w_2 + w_4 + w_1d
-            
-            # Base Gravitational Score
-            score = ((sc_1 * w_1) + (sc_2 * w_2) + (sc_4 * w_4) + (sc_1d * w_1d)) / total_weight
-            
-            # 2. Multiplicative Confluence (The Accelerator)
-            # When multiple frames agree, we aggressively push the score towards the extreme.
-            
-            # STRONG BUY CONFLUENCE
-            if sc_1 < 30 and sc_2 < 35 and sc_4 < 40:
-                # Accelerate deep into the Value Zone (under 20)
-                score = score * 0.65
-                if sc_1 < 20: score = score * 0.70 # Turbo boost for panic lows
-
-            # STRONG SELL CONFLUENCE
-            elif sc_1 > 70 and sc_2 > 65 and sc_4 > 60:
-                # Accelerate deep into the Exit Zone (over 80)
-                score = score + ((100 - score) * 0.50)
-                if sc_1 > 80: score = score + ((100 - score) * 0.30) # Turbo boost for euphoria peaks
-
-            # 3. Conflict Dampening (Anti-Whipsaw)
-            # If 1D is violently against the short-term trend, soften the 1H fakeout
-            elif (sc_1d > 70 and sc_1 < 30):
-                score = (score * 0.7) + (50 * 0.3)
-            elif (sc_1d < 30 and sc_1 > 70):
-                score = (score * 0.7) + (50 * 0.3)
-
-            final_h_scores.append(max(0.0, min(100.0, score)))
-
-        score_series = pd.Series(final_h_scores, index=df_1h.index)
-        df = df_1h # 1h price as the baseline
+        df, score_series = calculate_h_line_synergy(symbol)
+        if df is None: return {"error": "API Error: Binance unreachable for H-LINE."}
         analysis_tag = "VBSX TRADING (H-LINE ISM v2.0)"
     else:
         df = get_crypto_data(symbol, interval)
-        if df.empty:
-            return {"error": "API Error: Binance unreachable."}
-
-        # SEPARÁTNE SMEROVANIE LOGIKY
+        if df.empty: return {"error": "API Error: Binance unreachable."}
         if mode == "TRADING":
             score_series = calculate_trading_score(df)
             analysis_tag = f"VBSX TRADING ({interval.upper()})"
         else:
-            prices = df['Close']
-            score_series = calculate_macro_score(prices)
+            score_series = calculate_macro_score(df['Close'])
             analysis_tag = "VBSX MACRO (1W)"
 
     curr_score = round(float(score_series.iloc[-1]), 1)
-    
     return {
         "price": float(df['Close'].iloc[-1]),
         "change": round(get_24h_change(symbol), 2),
@@ -358,6 +356,10 @@ def analyze(req: AnalyzeRequest = None):
         "phase": "DCA IN" if curr_score <= 20 else ("HODL" if curr_score <= 79 else "DCA OUT")
     }
 
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 10000))
