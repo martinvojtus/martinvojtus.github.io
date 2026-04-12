@@ -402,7 +402,7 @@ def startup_event():
     scheduler.start()
     app.state.scheduler = scheduler
     
-    send_telegram_msg("🤖 *Trading Engine Online*\nBot bol úspešne aktivovaný a každých 5 minút skenuje H-LINE signály pre BTC a SOL.")
+    send_telegram_msg("🤖 *Trading Engine Online*\nBot bol úspešne aktivovaný a každých 5 minút skenuje H-LINE signály pre SOL.")
 
 @app.post("/analyze")
 def analyze(req: AnalyzeRequest = None):
