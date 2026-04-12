@@ -328,7 +328,7 @@ def send_telegram_photo(caption, photo_buf):
 
 def check_market_signals():
     logger.info(f"--- Checking market signals at {datetime.now()} ---")
-    symbols = ["BTCUSDT", "SOLUSDT"]
+    symbols = ["SOLUSDT"]
     
     for symbol in symbols:
         try:
