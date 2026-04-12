@@ -19,7 +19,6 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -31,7 +30,6 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 # Stavová pamäť pre bota: { "SYMBOL_INTERVAL": {"state": "NORMAL", "in_zone_since": None} }
-
 bot_state: Dict[str, dict] = {}
 
 app = FastAPI()
@@ -441,6 +439,10 @@ def analyze(req: AnalyzeRequest = None):
         "phase": "DCA IN" if curr_score <= 20 else ("HODL" if curr_score <= 79 else "DCA OUT")
     }
 
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 10000))
