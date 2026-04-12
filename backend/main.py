@@ -298,73 +298,113 @@ def generate_chart_image(df, scores, symbol):
     return buf
 
 def send_telegram_msg(message):
-    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID: return
+    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
+        logger.error("Telegram credentials missing (TOKEN or CHAT_ID)!")
+        return
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}
-    try: requests.post(url, json=payload, timeout=10)
-    except Exception as e: logger.error(f"Telegram Error: {e}")
+    try:
+        r = requests.post(url, json=payload, timeout=10)
+        r.raise_for_status()
+        logger.info("Telegram message sent successfully.")
+    except Exception as e:
+        logger.error(f"Telegram Error: {e}")
+        if 'r' in locals():
+            logger.error(f"Telegram Response: {r.text}")
 
 def send_telegram_photo(caption, photo_buf):
-    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID: return
+    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
+        logger.error("Telegram credentials missing (TOKEN or CHAT_ID)!")
+        return
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto"
     data = {"chat_id": TELEGRAM_CHAT_ID, "caption": caption, "parse_mode": "Markdown"}
     files = {"photo": ("chart.png", photo_buf, "image/png")}
-    try: requests.post(url, data=data, files=files, timeout=15)
-    except Exception as e: logger.error(f"Telegram Photo Error: {e}")
+    try:
+        r = requests.post(url, data=data, files=files, timeout=15)
+        r.raise_for_status()
+        logger.info("Telegram photo sent successfully.")
+    except Exception as e:
+        logger.error(f"Telegram Photo Error: {e}")
+        if 'r' in locals():
+            logger.error(f"Telegram Response: {r.text}")
 
 def check_market_signals():
-    logger.info("Checking market signals...")
-    symbols = ["SOLUSDT"]
+    logger.info(f"--- Checking market signals at {datetime.now()} ---")
+    symbols = ["BTCUSDT", "SOLUSDT"]
     
     for symbol in symbols:
-        df, scores = calculate_h_line_synergy(symbol)
-        if df is None: continue
-        
-        curr_score = scores.iloc[-1]
-        price = df['Close'].iloc[-1]
-        
-        # EMA200 filter (1h timeframe)
-        ema200 = df['Close'].ewm(span=200, adjust=False).mean().iloc[-1]
-        trend = "UP" if price > ema200 else "DOWN"
-        
-        state_key = f"{symbol}_HLINE"
-        if state_key not in bot_state: bot_state[state_key] = {"state": "NORMAL", "in_zone_since": None}
-        
-        if bot_state[state_key]["state"] == "OVERSOLD" and curr_score > 20:
-            if trend == "UP": 
-                msg = f"🚀 *LONG SIGNAL: {symbol}*\n\n" \
-                      f"Score: {round(curr_score, 1)}% (Návrat z prepredania)\n" \
-                      f"Price: ${price:,.2f}\n" \
-                      f"Trend: 🟢 UPTREND (nad EMA200)\n" \
-                      f"Mode: H-LINE SYNERGY"
-                
-                chart_buf = generate_chart_image(df, scores, symbol)
-                send_telegram_photo(msg, chart_buf)
-            bot_state[state_key]["state"] = "NORMAL"
+        try:
+            logger.info(f"Analyzing {symbol}...")
+            df, scores = calculate_h_line_synergy(symbol)
+            if df is None or scores is None or len(scores) == 0:
+                logger.warning(f"No data or scores for {symbol}")
+                continue
             
-        elif bot_state[state_key]["state"] == "OVERBOUGHT" and curr_score < 80:
-            if trend == "DOWN": 
-                msg = f"🔻 *SHORT SIGNAL: {symbol}*\n\n" \
-                      f"Score: {round(curr_score, 1)}% (Návrat z prekúpenia)\n" \
-                      f"Price: ${price:,.2f}\n" \
-                      f"Trend: 🔴 DOWNTREND (pod EMA200)\n" \
-                      f"Mode: H-LINE SYNERGY"
+            curr_score = scores.iloc[-1]
+            price = df['Close'].iloc[-1]
+            
+            # EMA200 filter (1h timeframe)
+            ema200 = df['Close'].ewm(span=200, adjust=False).mean().iloc[-1]
+            trend = "UP" if price > ema200 else "DOWN"
+            
+            state_key = f"{symbol}_HLINE"
+            if state_key not in bot_state: 
+                bot_state[state_key] = {"state": "NORMAL", "in_zone_since": None}
+            
+            prev_state = bot_state[state_key]["state"]
+            logger.info(f"{symbol}: Score={round(curr_score,1)}, Trend={trend}, PrevState={prev_state}")
 
-                chart_buf = generate_chart_image(df, scores, symbol)
-                send_telegram_photo(msg, chart_buf)
-            bot_state[state_key]["state"] = "NORMAL"
-            
-        if curr_score <= 20: bot_state[state_key]["state"] = "OVERSOLD"
-        elif curr_score >= 80: bot_state[state_key]["state"] = "OVERBOUGHT"
+            if prev_state == "OVERSOLD" and curr_score > 20:
+                if trend == "UP": 
+                    msg = f"🚀 *LONG SIGNAL: {symbol}*\n\n" \
+                          f"Score: {round(curr_score, 1)}% (Návrat z prepredania)\n" \
+                          f"Price: ${price:,.2f}\n" \
+                          f"Trend: 🟢 UPTREND (nad EMA200)\n" \
+                          f"Mode: H-LINE SYNERGY"
+                    
+                    chart_buf = generate_chart_image(df, scores, symbol)
+                    send_telegram_photo(msg, chart_buf)
+                else:
+                    logger.info(f"Signal ignored: {symbol} OVERSOLD recovery but trend is DOWN")
+                bot_state[state_key]["state"] = "NORMAL"
+                
+            elif prev_state == "OVERBOUGHT" and curr_score < 80:
+                if trend == "DOWN": 
+                    msg = f"🔻 *SHORT SIGNAL: {symbol}*\n\n" \
+                          f"Score: {round(curr_score, 1)}% (Návrat z prekúpenia)\n" \
+                          f"Price: ${price:,.2f}\n" \
+                          f"Trend: 🔴 DOWNTREND (pod EMA200)\n" \
+                          f"Mode: H-LINE SYNERGY"
+
+                    chart_buf = generate_chart_image(df, scores, symbol)
+                    send_telegram_photo(msg, chart_buf)
+                else:
+                    logger.info(f"Signal ignored: {symbol} OVERBOUGHT recovery but trend is UP")
+                bot_state[state_key]["state"] = "NORMAL"
+                
+            if curr_score <= 20: 
+                if bot_state[state_key]["state"] != "OVERSOLD":
+                    logger.info(f"{symbol} entered OVERSOLD zone")
+                bot_state[state_key]["state"] = "OVERSOLD"
+            elif curr_score >= 80: 
+                if bot_state[state_key]["state"] != "OVERBOUGHT":
+                    logger.info(f"{symbol} entered OVERBOUGHT zone")
+                bot_state[state_key]["state"] = "OVERBOUGHT"
+        except Exception as e:
+            logger.error(f"Error checking signals for {symbol}: {e}")
 
 @app.on_event("startup")
 def startup_event():
+    logger.info("Application starting up...")
+    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
+        logger.error("CRITICAL: Telegram credentials missing in environment variables!")
+    
     scheduler = BackgroundScheduler()
     scheduler.add_job(check_market_signals, 'interval', minutes=5)
     scheduler.start()
     app.state.scheduler = scheduler
     
-    send_telegram_msg("🤖 *Trading Engine Online*\nBot bol úspešne aktivovaný a každých 5 minút skenuje H-LINE signály pre Solanu.")
+    send_telegram_msg("🤖 *Trading Engine Online*\nBot bol úspešne aktivovaný a každých 5 minút skenuje H-LINE signály pre BTC a SOL.")
 
 @app.post("/analyze")
 def analyze(req: AnalyzeRequest = None):
