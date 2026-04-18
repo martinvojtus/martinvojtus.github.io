@@ -338,10 +338,16 @@ def check_market_signals():
                 logger.warning(f"No data or scores for {symbol}")
                 continue
             
+            if len(scores) < 3:
+                logger.warning(f"Insufficient historical data for {symbol}")
+                continue
+
             curr_score = scores.iloc[-1]
+            prev_score_1h = scores.iloc[-2]  # Posledná ukončená hodina
+            prev_score_2h = scores.iloc[-3]  # Predchádzajúca ukončená hodina
             price = df['Close'].iloc[-1]
             
-            # EMA200 filter (1h timeframe)
+            # EMA200 filter pre určenie globálneho trendu
             ema200 = df['Close'].ewm(span=200, adjust=False).mean().iloc[-1]
             trend = "UP" if price > ema200 else "DOWN"
             
@@ -352,34 +358,47 @@ def check_market_signals():
             prev_state = bot_state[state_key]["state"]
             logger.info(f"{symbol}: Score={round(curr_score,1)}, Trend={trend}, PrevState={prev_state}")
 
-            if prev_state == "OVERSOLD" and curr_score > 20:
+            # Definícia potvrdených extrémov (vyžadujeme 2 ukončené hodiny)
+            is_oversold_confirmed = prev_score_1h <= 20 and prev_score_2h <= 20
+            is_overbought_confirmed = prev_score_1h >= 80 and prev_score_2h >= 80
+
+            # Podmienka pre LONG: Návrat z prepredania (zóny pod 20%)
+            if prev_state == "OVERSOLD" and curr_score >= 21 and is_oversold_confirmed:
                 if trend == "UP": 
-                    msg = f"🚀 *LONG SIGNAL: {symbol}*\n\n" \
-                          f"Score: {round(curr_score, 1)}% (Návrat z prepredania)\n" \
-                          f"Price: ${price:,.2f}\n" \
-                          f"Trend: 🟢 UPTREND (nad EMA200)\n" \
-                          f"Mode: H-LINE SYNERGY"
+                    msg = f"🚀 *STRATEGICKÝ LONG SIGNÁL: {symbol}*\n\n" \
+                          f"Skóre: {round(curr_score, 1)}% (Potvrdený odraz z prepredania)\n" \
+                          f"Cena: ${price:,.2f}\n" \
+                          f"Trend: 🟢 BULLISH (nad EMA200)\n" \
+                          f"Analýza: Dve ukončené hodiny pod 20% potvrdené, nárast do HODL zóny.\n" \
+                          f"Mode: H-LINE SYNERGY ISM v2.1"
                     
                     chart_buf = generate_chart_image(df, scores, symbol)
                     send_telegram_photo(msg, chart_buf)
                 else:
-                    logger.info(f"Signal ignored: {symbol} OVERSOLD recovery but trend is DOWN")
+                    logger.info(f"Signal ignored: {symbol} OVERSOLD recovery confirmed but trend is DOWN")
                 bot_state[state_key]["state"] = "NORMAL"
                 
-            elif prev_state == "OVERBOUGHT" and curr_score < 80:
+            # Podmienka pre SHORT: Návrat z prekúpenia (zóny nad 80%)
+            elif prev_state == "OVERBOUGHT" and curr_score <= 79 and is_overbought_confirmed:
                 if trend == "DOWN": 
-                    msg = f"🔻 *SHORT SIGNAL: {symbol}*\n\n" \
-                          f"Score: {round(curr_score, 1)}% (Návrat z prekúpenia)\n" \
-                          f"Price: ${price:,.2f}\n" \
-                          f"Trend: 🔴 DOWNTREND (pod EMA200)\n" \
-                          f"Mode: H-LINE SYNERGY"
+                    msg = f"🔻 *STRATEGICKÝ SHORT SIGNÁL: {symbol}*\n\n" \
+                          f"Skóre: {round(curr_score, 1)}% (Potvrdený pokles z prekúpenia)\n" \
+                          f"Cena: ${price:,.2f}\n" \
+                          f"Trend: 🔴 BEARISH (pod EMA200)\n" \
+                          f"Analýza: Dve ukončené hodiny nad 80% potvrdené, pokles do HODL zóny.\n" \
+                          f"Mode: H-LINE SYNERGY ISM v2.1"
 
                     chart_buf = generate_chart_image(df, scores, symbol)
                     send_telegram_photo(msg, chart_buf)
                 else:
-                    logger.info(f"Signal ignored: {symbol} OVERBOUGHT recovery but trend is UP")
+                    logger.info(f"Signal ignored: {symbol} OVERBOUGHT recovery confirmed but trend is UP")
+                bot_state[state_key]["state"] = "NORMAL"
+            
+            # Reset state ak sme v HODL zóne a neprišiel signál (napr. neboli 2 body v zóne)
+            elif prev_state != "NORMAL" and 21 <= curr_score <= 79:
                 bot_state[state_key]["state"] = "NORMAL"
                 
+            # Aktualizácia stavu pri vstupe do extrémnych zón
             if curr_score <= 20: 
                 if bot_state[state_key]["state"] != "OVERSOLD":
                     logger.info(f"{symbol} entered OVERSOLD zone")
