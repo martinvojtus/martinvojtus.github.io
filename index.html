@@ -411,24 +411,51 @@ function updateChart(period) {
 function calculateHLineStrength(data) {
     if (!data || !data.chart_score || window.currentInterval !== 'h-line') return { strength: 0, type: "" };
     const scores = data.chart_score;
+    if (scores.length < 2) return { strength: 0, type: "" };
+    
     const currentScore = scores[scores.length - 1];
-    let totalIntensity = 0;
+    const prevScore = scores[scores.length - 2];
     let type = "";
+    let strength = 0;
+    
     if (currentScore <= 20) {
         type = "LONG";
-        for (let i = scores.length - 1; i >= 0; i--) {
-            if (scores[i] <= 20) totalIntensity += (20 - scores[i]);
+        // 1. Čas v zóne (Base)
+        let streak = 0;
+        for (let i = scores.length - 2; i >= 0; i--) {
+            if (scores[i] <= 20) streak++;
             else break;
         }
+        let base = Math.min(streak * 25, 50); // max 50% za výdrž
+        
+        // 2. Blízkosť k odrazu (čím bližšie k 20, tým lepšie)
+        let closeness = (currentScore / 20) * 30; // max 30%
+        
+        // 3. Momentum potvrdenia (začalo to stúpať?)
+        let momentum = (currentScore > prevScore) ? 20 : 0; // bonus 20%
+        
+        strength = base + closeness + momentum;
+        
     } else if (currentScore >= 80) {
         type = "SHORT";
-        for (let i = scores.length - 1; i >= 0; i--) {
-            if (scores[i] >= 80) totalIntensity += (scores[i] - 80);
+        // 1. Čas v zóne (Base)
+        let streak = 0;
+        for (let i = scores.length - 2; i >= 0; i--) {
+            if (scores[i] >= 80) streak++;
             else break;
         }
+        let base = Math.min(streak * 25, 50); // max 50% za výdrž
+        
+        // 2. Blízkosť k prepadu (čím bližšie k 80 zhora, tým lepšie)
+        let closeness = ((100 - currentScore) / 20) * 30; // max 30%
+        
+        // 3. Momentum potvrdenia (začalo to klesať?)
+        let momentum = (currentScore < prevScore) ? 20 : 0; // bonus 20%
+        
+        strength = base + closeness + momentum;
     }
-    const strength = Math.min(100, (totalIntensity / 150) * 100);
-    return { strength: Math.round(strength), type };
+    
+    return { strength: Math.min(100, Math.round(strength)), type };
 }
 
 async function analyze() {
