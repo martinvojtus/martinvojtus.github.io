@@ -80,8 +80,8 @@
                 <div id="strength-label">SIGNAL STRENGTH</div>
                 <div id="strength-percent" class="font-bold">0%</div>
             </div>
-            <div class="w-full bg-neutral-900 border border-neutral-800 h-2 rounded-full overflow-hidden relative">
-                <div id="strength-bar" class="h-full transition-all duration-1000 ease-out" style="width: 100%; clip-path: inset(0 100% 0 0); background: linear-gradient(to right, #EC4899, #FFFF00, #14F195);"></div>
+            <div class="w-full bg-neutral-900 border border-neutral-800 h-2 rounded-full relative">
+                <div id="strength-bar" class="h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%; background-image: linear-gradient(to right, #EC4899, #FFFF00, #14F195);"></div>
             </div>
         </div>
 
@@ -255,7 +255,7 @@ function triggerAnalysis() {
 
     // Reset H-LINE strength bar
     const sBar = document.getElementById("strength-bar");
-    if(sBar) { sBar.style.clipPath = "inset(0 100% 0 0)"; }
+    if(sBar) { sBar.style.width = "0%"; }
     document.getElementById("strength-percent").innerText = "0%";
     if (window.currentInterval === 'h-line') {
         document.getElementById("h-line-strength-container").classList.remove("hidden");
@@ -501,8 +501,24 @@ async function analyze() {
         if (hLineData.type) {
             sLabel.innerText = `${hLineData.type} STRENGTH`;
             sPercent.innerText = `${hLineData.strength}%`;
-            sBar.style.clipPath = `inset(0 ${100 - hLineData.strength}% 0 0)`;
-            sBar.style.boxShadow = "0 0 15px rgba(236, 72, 153, 0.4)";
+            
+            const strength = hLineData.strength;
+            sBar.style.width = `${strength}%`;
+            
+            // CSS Mágia: Uzamknutie gradientu na celkovú šírku kontajnera (bez orezania a deformácie)
+            sBar.style.backgroundSize = strength > 0 ? `${10000 / strength}% 100%` : "100% 100%";
+            
+            let gradient, shadowColor;
+            if (hLineData.type === "LONG") {
+                gradient = "linear-gradient(to right, #EC4899, #FFFF00, #14F195)"; // LONG končí na Zelenej
+                shadowColor = strength < 40 ? "rgba(236,72,153,0.5)" : (strength < 75 ? "rgba(255,255,0,0.5)" : "rgba(20,241,149,0.5)");
+            } else { // SHORT
+                gradient = "linear-gradient(to right, #14F195, #FFFF00, #EC4899)"; // SHORT končí na Ružovej
+                shadowColor = strength < 40 ? "rgba(20,241,149,0.5)" : (strength < 75 ? "rgba(255,255,0,0.5)" : "rgba(236,72,153,0.5)");
+            }
+            
+            sBar.style.backgroundImage = gradient;
+            sBar.style.boxShadow = `0 0 15px ${shadowColor}`;
             document.getElementById("h-line-strength-container").classList.remove("hidden");
         } else {
             sLabel.innerText = "SIGNAL STRENGTH";
