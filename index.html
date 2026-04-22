@@ -49,19 +49,19 @@
             </div>
         </div>
 
-        <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000">
-            
-            <!-- MAIN SCORE CHART -->
-            <div class="h-48 w-full relative mb-4">
-                <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
-                    <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
-                </div>
-                
-                <div class="absolute top-0 bottom-0 -left-[8px] w-[calc(100%+16px)] pointer-events-none">
-                    <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000 pointer-events-auto"></canvas>
-                </div>
+        <!-- MAIN SCORE CHART (ABOVE MAIN CARD) -->
+        <div id="main-chart-container" class="h-48 w-full relative mb-8 px-1">
+            <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
+                <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
             </div>
+            
+            <div class="absolute top-0 bottom-0 -left-[8px] w-[calc(100%+16px)] pointer-events-none">
+                <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000 pointer-events-auto"></canvas>
+            </div>
+        </div>
 
+        <!-- MAIN CARD -->
+        <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000 mb-10">
             <!-- SCORE LOADING BAR -->
             <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-6 relative">
                 <div id="animated-score-bar" class="h-full rounded-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: transparent;"></div>
@@ -76,7 +76,7 @@
                 </div>
             </div>
             
-            <div class="flex justify-between items-start mb-4 gap-4 px-1">
+            <div class="flex justify-between items-start gap-4 px-1">
                 <div>
                     <div id="val-price" class="text-[1.8rem] font-bold h-9 flex items-center leading-none tracking-tight text-white transition-all duration-1000">
                         <span class="bg-neutral-800 text-transparent animate-pulse rounded">$00,000.00</span>
@@ -93,22 +93,23 @@
                     <div class="text-[0.6rem] text-neutral-500 uppercase tracking-widest mt-2">SCORE</div>
                 </div>
             </div>
-            
-            <div>
-                <!-- H-LINE STRENGTH SECTION INSIDE MAIN CARD -->
-                <div id="h-line-strength-container" class="hidden animate-fade-in border-t border-neutral-800/50 pt-6 mt-2">
-                    <!-- STRENGTH CHART -->
-                    <div class="h-28 w-full relative mb-4">
-                        <canvas id="strengthChart" class="w-full h-full"></canvas>
-                    </div>
+        </div>
 
-                    <div class="flex justify-between items-center mb-2 text-[0.6rem] uppercase tracking-widest text-neutral-500">
-                        <div id="strength-label">SIGNAL STRENGTH</div>
-                        <div id="strength-percent" class="font-bold">0%</div>
-                    </div>
-                    <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-2 relative">
-                        <div id="strength-bar" class="h-full rounded-full transition-all duration-1000 ease-out bg-neutral-600" style="width: 0%;"></div>
-                    </div>
+        <!-- H-LINE STRENGTH SECTION (GRAPH THEN CARD) -->
+        <div id="h-line-strength-section" class="hidden animate-fade-in">
+            <!-- STRENGTH CHART (ABOVE STRENGTH CARD) -->
+            <div class="h-32 w-full relative mb-8 px-1">
+                <canvas id="strengthChart" class="w-full h-full"></canvas>
+            </div>
+
+            <!-- STRENGTH CARD -->
+            <div id="strength-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000 mb-10">
+                <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest text-neutral-500">
+                    <div id="strength-label">SIGNAL STRENGTH</div>
+                    <div id="strength-percent" class="font-bold text-white">0%</div>
+                </div>
+                <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden relative">
+                    <div id="strength-bar" class="h-full rounded-full transition-all duration-1000 ease-out bg-neutral-600" style="width: 0%;"></div>
                 </div>
             </div>
         </div>
@@ -249,9 +250,9 @@ function triggerAnalysis() {
     if(sBar) { sBar.style.width = "0%"; }
     document.getElementById("strength-percent").innerText = "0%";
     if (window.currentInterval === 'h-line') {
-        document.getElementById("h-line-strength-container").classList.remove("hidden");
+        document.getElementById("h-line-strength-section").classList.remove("hidden");
     } else {
-        document.getElementById("h-line-strength-container").classList.add("hidden");
+        document.getElementById("h-line-strength-section").classList.add("hidden");
     }
 
     // Reset dynamic colors
@@ -399,11 +400,11 @@ function updateChart(period) {
     document.getElementById("scoreChart").classList.remove("opacity-0");
 
     // STRENGTH CHART UPDATE
-    updateStrengthChart(dts, data);
+    updateStrengthChart(dts, window.fullData);
 }
 
 function updateStrengthChart(labels, data) {
-    if (window.currentInterval !== 'h-line') return;
+    if (window.currentInterval !== 'h-line' || !data) return;
     
     // We need strength history. For now let's calculate it from score history
     const strengthHistory = data.chart_score.slice(-labels.length).map((s, i, arr) => {
@@ -508,15 +509,15 @@ async function analyze() {
             sLabel.innerText = `${hLineData.type} STRENGTH`;
             sPercent.innerText = `${hLineData.strength}%`;
             sBar.style.width = `${hLineData.strength}%`;
-            document.getElementById("h-line-strength-container").classList.remove("hidden");
+            document.getElementById("h-line-strength-section").classList.remove("hidden");
         } else {
-            document.getElementById("h-line-strength-container").classList.add("hidden");
+            document.getElementById("h-line-strength-section").classList.add("hidden");
         }
     } else {
         if (s <= 20) { badgeBgColor="bg-[#22c55e]/10"; badgeBorderColor="border-[#22c55e]/40"; badgeTextColor="text-[#22c55e]"; mcBg="bg-[#030a05]"; mcBorder="border-[#22c55e]/30"; }
         else if (s >= 80) { badgeBgColor="bg-[#EC4899]/10"; badgeBorderColor="border-[#EC4899]/40"; badgeTextColor="text-[#EC4899]"; mcBg="bg-[#EC4899]/5"; mcBorder="border-[#EC4899]/30"; }
         else { badgeBgColor="bg-[#FFFF00]/10"; badgeBorderColor="border-[#FFFF00]/40"; badgeTextColor="text-[#FFFF00]"; mcBg="bg-[#FFFF00]/5"; mcBorder="border-[#FFFF00]/30"; }
-        document.getElementById("h-line-strength-container").classList.add("hidden");
+        document.getElementById("h-line-strength-section").classList.add("hidden");
     }
 
     let pBadge = document.getElementById("badge-phase");
@@ -541,6 +542,8 @@ async function analyze() {
     document.getElementById("dynamic-title").style.textShadow = `0 0 10px ${sHex}80`;
 
     document.getElementById("main-card").className = `p-6 rounded-3xl border shadow-2xl transition-colors duration-1000 ${mcBg} ${mcBorder}`;
+    const sCard = document.getElementById("strength-card");
+    if (sCard) sCard.className = `p-6 rounded-3xl border shadow-2xl transition-colors duration-1000 ${mcBg} ${mcBorder}`;
 
     updateChart(window.currentMode === 'MACRO' ? window.currentMacroView : null);
     setTimeout(() => {
