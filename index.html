@@ -475,13 +475,8 @@ async function analyze() {
             sLabel.innerText = `${hLineData.type} STRENGTH`;
             sPercent.innerText = `${hLineData.strength}%`;
             sBar.style.width = `${hLineData.strength}%`;
-            if (hLineData.type === "LONG") {
-                sBar.style.background = "linear-gradient(to right, rgba(20,241,149,0.1), #14F195)";
-                sBar.style.boxShadow = "0 0 10px rgba(20,241,149,0.5)";
-            } else {
-                sBar.style.background = "linear-gradient(to right, rgba(153,69,255,0.1), #9945FF)";
-                sBar.style.boxShadow = "0 0 10px rgba(153,69,255,0.5)";
-            }
+            sBar.style.background = "linear-gradient(to right, #EC4899, #FFFF00, #EC4899)";
+            sBar.style.boxShadow = "0 0 15px rgba(236, 72, 153, 0.4)";
             document.getElementById("h-line-strength-container").classList.remove("hidden");
         } else {
             sLabel.innerText = "SIGNAL STRENGTH";
