@@ -20,6 +20,21 @@
 
 <div class="w-full max-w-xl p-5 relative">
 
+    <!-- DASHBOARD CONTROLS -->
+    <div id="dashboard-controls" class="flex flex-col gap-3 mb-6">
+        <div class="flex gap-2 sm:gap-3 w-full h-[34px]">
+            <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.6rem] uppercase tracking-widest text-center">
+                <button onclick="toggleMode('MACRO')" id="toggle-mode-macro" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Macro</button>
+                <button onclick="toggleMode('TRADING')" id="toggle-mode-trading" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Trading</button>
+            </div>
+            <button onclick="triggerAnalysis()" class="bg-neutral-900 border border-neutral-800 rounded-lg w-[34px] sm:w-[38px] flex items-center justify-center text-neutral-500 hover:text-white transition-all duration-300 shrink-0 h-full">
+                <svg id="btn-refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
     <!-- VIEW: DASHBOARD -->
     <div id="view-dashboard-container" class="animate-fade-in">
         <div class="flex justify-between items-center px-1 mb-4 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
@@ -49,8 +64,7 @@
             </div>
         </div>
 
-        <!-- MAIN SCORE CHART (ABOVE MAIN CARD) -->
-        <div id="main-chart-container" class="h-48 w-full relative mb-8 px-1">
+        <div class="h-48 w-full relative mb-4">
             <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
                 <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
             </div>
@@ -60,13 +74,19 @@
             </div>
         </div>
 
-        <!-- MAIN CARD -->
-        <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000 mb-10">
-            <!-- SCORE LOADING BAR -->
-            <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-6 relative">
-                <div id="animated-score-bar" class="h-full rounded-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: transparent;"></div>
+        <!-- H-LINE STRENGTH BAR -->
+        <div id="h-line-strength-container" class="hidden mb-6 animate-fade-in px-1">
+            <div class="flex justify-between items-center mb-2 text-[0.6rem] uppercase tracking-widest text-neutral-500">
+                <div id="strength-label">SIGNAL STRENGTH</div>
+                <div id="strength-percent" class="font-bold">0%</div>
             </div>
+            <div class="w-full bg-neutral-900 border border-neutral-800 h-2 rounded-full relative">
+                <div id="strength-bar" class="h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%; background-image: linear-gradient(to right, #EC4899, #FFFF00, #14F195);"></div>
+            </div>
+        </div>
 
+        <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000">
+            
             <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
                 <div id="badge-name" class="border border-neutral-600/50 px-3 h-8 flex items-center rounded-md text-neutral-400">
                     Načítavam...
@@ -76,7 +96,7 @@
                 </div>
             </div>
             
-            <div class="flex justify-between items-start gap-4 px-1">
+            <div class="flex justify-between items-start mb-4 gap-4 px-1">
                 <div>
                     <div id="val-price" class="text-[1.8rem] font-bold h-9 flex items-center leading-none tracking-tight text-white transition-all duration-1000">
                         <span class="bg-neutral-800 text-transparent animate-pulse rounded">$00,000.00</span>
@@ -93,40 +113,20 @@
                     <div class="text-[0.6rem] text-neutral-500 uppercase tracking-widest mt-2">SCORE</div>
                 </div>
             </div>
-        </div>
-
-        <!-- H-LINE STRENGTH SECTION (GRAPH THEN CARD) -->
-        <div id="h-line-strength-section" class="hidden animate-fade-in">
-            <!-- STRENGTH CHART (ABOVE STRENGTH CARD) -->
-            <div class="h-32 w-full relative mb-8 px-1">
-                <canvas id="strengthChart" class="w-full h-full"></canvas>
-            </div>
-
-            <!-- STRENGTH CARD -->
-            <div id="strength-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000 mb-10">
-                <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest text-neutral-500">
-                    <div id="strength-label">SIGNAL STRENGTH</div>
-                    <div id="strength-percent" class="font-bold text-white">0%</div>
+            
+            <div>
+                <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-4 relative">
+                    <div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: transparent;"></div>
                 </div>
-                <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden relative">
-                    <div id="strength-bar" class="h-full rounded-full transition-all duration-1000 ease-out bg-neutral-600" style="width: 0%;"></div>
-                </div>
+                
+                <table class="w-full text-left text-[0.6rem] text-neutral-400 uppercase tracking-widest border border-neutral-800 rounded-lg overflow-hidden border-separate [border-spacing:0]">
+                    <tbody>
+                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div id="legend-dot-low" class="w-2 h-2 rounded-full bg-[#22c55e] inline-block mt-[2px] transition-colors duration-500"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white whitespace-nowrap w-24 text-center">0 – 20 (%)</td><td id="legend-low" class="py-2.5 pl-5 border-b border-l border-neutral-800">VALUE ZONE (DCA IN)</td></tr>
+                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div id="legend-dot-mid" class="w-2 h-2 rounded-full bg-[#FFFF00] inline-block mt-[2px] transition-colors duration-500"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white whitespace-nowrap text-center">21 – 79 (%)</td><td id="legend-mid" class="py-2.5 pl-5 border-b border-l border-neutral-800">NEUTRAL ZONE (HODL)</td></tr>
+                        <tr><td class="py-2.5 px-0 align-middle text-center"><div id="legend-dot-high" class="w-2 h-2 rounded-full bg-[#EC4899] inline-block mt-[2px] transition-colors duration-500"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-white whitespace-nowrap text-center">80 – 100 (%)</td><td id="legend-high" class="py-2.5 pl-5 border-l border-neutral-800">EXIT ZONE (DCA OUT)</td></tr>
+                    </tbody>
+                </table>
             </div>
-        </div>
-    </div>
-
-    <!-- DASHBOARD CONTROLS (MOVED TO BOTTOM) -->
-    <div id="dashboard-controls" class="flex flex-col gap-3 mt-8">
-        <div class="flex gap-2 sm:gap-3 w-full h-[34px]">
-            <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.6rem] uppercase tracking-widest text-center">
-                <button onclick="toggleMode('MACRO')" id="toggle-mode-macro" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Macro</button>
-                <button onclick="toggleMode('TRADING')" id="toggle-mode-trading" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Trading</button>
-            </div>
-            <button onclick="triggerAnalysis()" class="bg-neutral-900 border border-neutral-800 rounded-lg w-[34px] sm:w-[38px] flex items-center justify-center text-neutral-500 hover:text-white transition-all duration-300 shrink-0 h-full">
-                <svg id="btn-refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                </svg>
-            </button>
         </div>
     </div>
 
@@ -137,7 +137,6 @@
 <script>
 // --- GLOBALS & STATE ---
 let scoreChartInstance = null;
-let strengthChartInstance = null;
 window.currentScoreData = { score: 0, colorClass: "" };
 window.fullData = null; 
 window.currentMode = localStorage.getItem('trading_mode') || 'MACRO';
@@ -160,7 +159,10 @@ function getTheme() {
 }
 
 function updateThemeUI() {
-    // Legend removed, nothing to update here anymore
+    const theme = getTheme();
+    document.getElementById('legend-dot-low').style.backgroundColor = theme.low;
+    document.getElementById('legend-dot-mid').style.backgroundColor = theme.mid;
+    document.getElementById('legend-dot-high').style.backgroundColor = theme.high;
 }
 
 // --- DASHBOARD LOGIC ---
@@ -171,11 +173,17 @@ function initUI() {
     if (window.currentMode === 'MACRO') {
         document.getElementById('macro-buttons').classList.remove('hidden');
         document.getElementById('trading-buttons').classList.add('hidden');
+        document.getElementById('legend-low').innerText = "VALUE ZONE (DCA IN)";
+        document.getElementById('legend-mid').innerText = "NEUTRAL ZONE (HODL)";
+        document.getElementById('legend-high').innerText = "EXIT ZONE (DCA OUT)";
         window.currentInterval = '1w';
         updateMacroButtonsUI(window.currentMacroView);
     } else {
         document.getElementById('macro-buttons').classList.add('hidden');
         document.getElementById('trading-buttons').classList.remove('hidden');
+        document.getElementById('legend-low').innerText = "VALUE ZONE (LONG)";
+        document.getElementById('legend-mid').innerText = "NEUTRAL ZONE (HODL)";
+        document.getElementById('legend-high').innerText = "EXIT ZONE (SHORT)";
         if (window.currentInterval === '1w') window.currentInterval = '2h';
         highlightTradingButton(window.currentInterval);
     }
@@ -250,9 +258,9 @@ function triggerAnalysis() {
     if(sBar) { sBar.style.width = "0%"; }
     document.getElementById("strength-percent").innerText = "0%";
     if (window.currentInterval === 'h-line') {
-        document.getElementById("h-line-strength-section").classList.remove("hidden");
+        document.getElementById("h-line-strength-container").classList.remove("hidden");
     } else {
-        document.getElementById("h-line-strength-section").classList.add("hidden");
+        document.getElementById("h-line-strength-container").classList.add("hidden");
     }
 
     // Reset dynamic colors
@@ -398,42 +406,6 @@ function updateChart(period) {
     });
     document.getElementById("chart-skeleton").classList.add("opacity-0");
     document.getElementById("scoreChart").classList.remove("opacity-0");
-
-    // STRENGTH CHART UPDATE
-    updateStrengthChart(dts, window.fullData);
-}
-
-function updateStrengthChart(labels, data) {
-    if (window.currentInterval !== 'h-line' || !data) return;
-    
-    // We need strength history. For now let's calculate it from score history
-    const strengthHistory = data.chart_score.slice(-labels.length).map((s, i, arr) => {
-        const prevS = i > 0 ? arr[i-1] : s;
-        return calculateStrengthForValue(s, prevS).strength;
-    });
-
-    if (strengthChartInstance) strengthChartInstance.destroy();
-    
-    strengthChartInstance = new Chart(document.getElementById('strengthChart').getContext('2d'), {
-        type: 'line',
-        data: { labels: labels, datasets: [{ data: strengthHistory, fill: true, borderWidth: 1, tension: 0.4, pointRadius: 0, borderColor: '#525252', backgroundColor: 'rgba(82, 82, 82, 0.1)' }]},
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            layout: { padding: { left: 0, right: 0, top: 5, bottom: 5 } }, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } }
-        }
-    });
-}
-
-function calculateStrengthForValue(currentScore, prevScore) {
-    let type = "";
-    let strength = 0;
-    if (currentScore <= 20) {
-        type = "LONG";
-        strength = Math.min(100, ( (20 - currentScore) / 20 * 50 ) + 50); // Simplified for history
-    } else if (currentScore >= 80) {
-        type = "SHORT";
-        strength = Math.min(100, ( (currentScore - 80) / 20 * 50 ) + 50); // Simplified for history
-    }
-    return { strength: Math.round(strength), type };
 }
 
 function calculateHLineStrength(data) {
@@ -448,25 +420,38 @@ function calculateHLineStrength(data) {
     
     if (currentScore <= 20) {
         type = "LONG";
+        // 1. Čas v zóne (Base)
         let streak = 0;
         for (let i = scores.length - 2; i >= 0; i--) {
             if (scores[i] <= 20) streak++;
             else break;
         }
-        let base = Math.min(streak * 25, 50);
-        let closeness = ((20 - currentScore) / 20) * 30; 
-        let momentum = (currentScore < prevScore) ? 20 : 0; 
+        let base = Math.min(streak * 25, 50); // max 50% za výdrž
+        
+        // 2. Blízkosť k odrazu (čím bližšie k 20, tým lepšie)
+        let closeness = (currentScore / 20) * 30; // max 30%
+        
+        // 3. Momentum potvrdenia (začalo to stúpať?)
+        let momentum = (currentScore > prevScore) ? 20 : 0; // bonus 20%
+        
         strength = base + closeness + momentum;
+        
     } else if (currentScore >= 80) {
         type = "SHORT";
+        // 1. Čas v zóne (Base)
         let streak = 0;
         for (let i = scores.length - 2; i >= 0; i--) {
             if (scores[i] >= 80) streak++;
             else break;
         }
-        let base = Math.min(streak * 25, 50);
-        let closeness = ((currentScore - 80) / 20) * 30;
-        let momentum = (currentScore > prevScore) ? 20 : 0;
+        let base = Math.min(streak * 25, 50); // max 50% za výdrž
+        
+        // 2. Blízkosť k prepadu (čím bližšie k 80 zhora, tým lepšie)
+        let closeness = ((100 - currentScore) / 20) * 30; // max 30%
+        
+        // 3. Momentum potvrdenia (začalo to klesať?)
+        let momentum = (currentScore < prevScore) ? 20 : 0; // bonus 20%
+        
         strength = base + closeness + momentum;
     }
     
@@ -480,8 +465,10 @@ async function analyze() {
         body: JSON.stringify({ mode: window.currentMode, interval: window.currentInterval })
     });
     const data = await res.json(); 
+    console.log("Data from backend:", data);
     window.fullData = data; 
     if (data.error) {
+        console.error("Backend error:", data.error);
         document.getElementById("error-box").innerText = "❌ " + data.error;
         document.getElementById("error-box").classList.remove("hidden");
         return;
@@ -490,6 +477,12 @@ async function analyze() {
     const theme = getTheme();
     let sHex = s <= 20 ? theme.low : (s >= 80 ? theme.high : theme.mid);
     
+    if (window.currentMode === "MACRO") {
+        document.getElementById("badge-name").innerText = "Bitcoin (BTC)";
+    } else {
+        document.getElementById("badge-name").innerText = "Solana (SOL)";
+    }
+    // Použijeme data z backendu ak prichádzajú správne, inak fallback hore
     if(data.name && data.ticker) {
         document.getElementById("badge-name").innerText = `${data.name} (${data.ticker})`;
     }
@@ -508,16 +501,36 @@ async function analyze() {
         if (hLineData.type) {
             sLabel.innerText = `${hLineData.type} STRENGTH`;
             sPercent.innerText = `${hLineData.strength}%`;
-            sBar.style.width = `${hLineData.strength}%`;
-            document.getElementById("h-line-strength-section").classList.remove("hidden");
+            
+            const strength = hLineData.strength;
+            sBar.style.width = `${strength}%`;
+            
+            // CSS Mágia: Uzamknutie gradientu na celkovú šírku kontajnera (bez orezania a deformácie)
+            sBar.style.backgroundSize = strength > 0 ? `${10000 / strength}% 100%` : "100% 100%";
+            
+            let gradient, shadowColor;
+            if (hLineData.type === "LONG") {
+                gradient = "linear-gradient(to right, #EC4899, #FFFF00, #14F195)"; // LONG končí na Zelenej
+                shadowColor = strength < 40 ? "rgba(236,72,153,0.5)" : (strength < 75 ? "rgba(255,255,0,0.5)" : "rgba(20,241,149,0.5)");
+            } else { // SHORT
+                gradient = "linear-gradient(to right, #14F195, #FFFF00, #EC4899)"; // SHORT končí na Ružovej
+                shadowColor = strength < 40 ? "rgba(20,241,149,0.5)" : (strength < 75 ? "rgba(255,255,0,0.5)" : "rgba(236,72,153,0.5)");
+            }
+            
+            sBar.style.backgroundImage = gradient;
+            sBar.style.boxShadow = `0 0 15px ${shadowColor}`;
+            document.getElementById("h-line-strength-container").classList.remove("hidden");
         } else {
-            document.getElementById("h-line-strength-section").classList.add("hidden");
+            sLabel.innerText = "SIGNAL STRENGTH";
+            sPercent.innerText = "0%";
+            sBar.style.width = "0%";
+            document.getElementById("h-line-strength-container").classList.add("hidden");
         }
     } else {
         if (s <= 20) { badgeBgColor="bg-[#22c55e]/10"; badgeBorderColor="border-[#22c55e]/40"; badgeTextColor="text-[#22c55e]"; mcBg="bg-[#030a05]"; mcBorder="border-[#22c55e]/30"; }
         else if (s >= 80) { badgeBgColor="bg-[#EC4899]/10"; badgeBorderColor="border-[#EC4899]/40"; badgeTextColor="text-[#EC4899]"; mcBg="bg-[#EC4899]/5"; mcBorder="border-[#EC4899]/30"; }
         else { badgeBgColor="bg-[#FFFF00]/10"; badgeBorderColor="border-[#FFFF00]/40"; badgeTextColor="text-[#FFFF00]"; mcBg="bg-[#FFFF00]/5"; mcBorder="border-[#FFFF00]/30"; }
-        document.getElementById("h-line-strength-section").classList.add("hidden");
+        document.getElementById("h-line-strength-container").classList.add("hidden");
     }
 
     let pBadge = document.getElementById("badge-phase");
@@ -542,8 +555,6 @@ async function analyze() {
     document.getElementById("dynamic-title").style.textShadow = `0 0 10px ${sHex}80`;
 
     document.getElementById("main-card").className = `p-6 rounded-3xl border shadow-2xl transition-colors duration-1000 ${mcBg} ${mcBorder}`;
-    const sCard = document.getElementById("strength-card");
-    if (sCard) sCard.className = `p-6 rounded-3xl border shadow-2xl transition-colors duration-1000 ${mcBg} ${mcBorder}`;
 
     updateChart(window.currentMode === 'MACRO' ? window.currentMacroView : null);
     setTimeout(() => {
