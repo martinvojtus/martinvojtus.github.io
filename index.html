@@ -81,7 +81,7 @@
                 <div id="strength-percent" class="font-bold">0%</div>
             </div>
             <div class="w-full bg-neutral-900 border border-neutral-800 h-2 rounded-full overflow-hidden relative">
-                <div id="strength-bar" class="h-full transition-all duration-1000 ease-out" style="width: 0%; background: linear-gradient(to right, #14F195, #9945FF);"></div>
+                <div id="strength-bar" class="h-full transition-all duration-1000 ease-out origin-left" style="width: 100%; transform: scaleX(0); background: linear-gradient(to right, #EC4899, #FFFF00, #14F195);"></div>
             </div>
         </div>
 
@@ -255,7 +255,7 @@ function triggerAnalysis() {
 
     // Reset H-LINE strength bar
     const sBar = document.getElementById("strength-bar");
-    if(sBar) { sBar.style.width = "0%"; }
+    if(sBar) { sBar.style.transform = "scaleX(0)"; }
     document.getElementById("strength-percent").innerText = "0%";
     if (window.currentInterval === 'h-line') {
         document.getElementById("h-line-strength-container").classList.remove("hidden");
@@ -474,8 +474,7 @@ async function analyze() {
         if (hLineData.type) {
             sLabel.innerText = `${hLineData.type} STRENGTH`;
             sPercent.innerText = `${hLineData.strength}%`;
-            sBar.style.width = `${hLineData.strength}%`;
-            sBar.style.background = "linear-gradient(to right, #EC4899, #FFFF00, #14F195)";
+            sBar.style.transform = `scaleX(${hLineData.strength / 100})`;
             sBar.style.boxShadow = "0 0 15px rgba(236, 72, 153, 0.4)";
             document.getElementById("h-line-strength-container").classList.remove("hidden");
         } else {
