@@ -49,18 +49,24 @@
             </div>
         </div>
 
-        <div class="h-48 w-full relative mb-4">
-            <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
-                <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
-            </div>
-            
-            <div class="absolute top-0 bottom-0 -left-[8px] w-[calc(100%+16px)] pointer-events-none">
-                <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000 pointer-events-auto"></canvas>
-            </div>
-        </div>
-
         <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000">
             
+            <!-- MAIN SCORE CHART -->
+            <div class="h-48 w-full relative mb-4">
+                <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
+                    <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
+                </div>
+                
+                <div class="absolute top-0 bottom-0 -left-[8px] w-[calc(100%+16px)] pointer-events-none">
+                    <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000 pointer-events-auto"></canvas>
+                </div>
+            </div>
+
+            <!-- SCORE LOADING BAR -->
+            <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-6 relative">
+                <div id="animated-score-bar" class="h-full rounded-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: transparent;"></div>
+            </div>
+
             <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
                 <div id="badge-name" class="border border-neutral-600/50 px-3 h-8 flex items-center rounded-md text-neutral-400">
                     Načítavam...
@@ -89,23 +95,19 @@
             </div>
             
             <div>
-                <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-6 relative">
-                    <div id="animated-score-bar" class="h-full rounded-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: transparent;"></div>
-                </div>
-
                 <!-- H-LINE STRENGTH SECTION INSIDE MAIN CARD -->
-                <div id="h-line-strength-container" class="hidden animate-fade-in">
+                <div id="h-line-strength-container" class="hidden animate-fade-in border-t border-neutral-800/50 pt-6 mt-2">
+                    <!-- STRENGTH CHART -->
+                    <div class="h-28 w-full relative mb-4">
+                        <canvas id="strengthChart" class="w-full h-full"></canvas>
+                    </div>
+
                     <div class="flex justify-between items-center mb-2 text-[0.6rem] uppercase tracking-widest text-neutral-500">
                         <div id="strength-label">SIGNAL STRENGTH</div>
                         <div id="strength-percent" class="font-bold">0%</div>
                     </div>
-                    <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-4 relative">
+                    <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-2 relative">
                         <div id="strength-bar" class="h-full rounded-full transition-all duration-1000 ease-out bg-neutral-600" style="width: 0%;"></div>
-                    </div>
-                    
-                    <!-- STRENGTH CHART -->
-                    <div class="h-24 w-full relative mb-2">
-                        <canvas id="strengthChart" class="w-full h-full"></canvas>
                     </div>
                 </div>
             </div>
