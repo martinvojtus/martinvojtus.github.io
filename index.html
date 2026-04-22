@@ -74,17 +74,6 @@
             </div>
         </div>
 
-        <!-- H-LINE STRENGTH BAR -->
-        <div id="h-line-strength-container" class="hidden mb-6 animate-fade-in px-1">
-            <div class="flex justify-between items-center mb-2 text-[0.6rem] uppercase tracking-widest text-neutral-500">
-                <div id="strength-label">SIGNAL STRENGTH</div>
-                <div id="strength-percent" class="font-bold">0%</div>
-            </div>
-            <div class="w-full bg-neutral-900 border border-neutral-800 h-2 rounded-full relative">
-                <div id="strength-bar" class="h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%; background-image: linear-gradient(to right, #EC4899, #FFFF00, #14F195);"></div>
-            </div>
-        </div>
-
         <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000">
             
             <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
@@ -253,16 +242,6 @@ function triggerAnalysis() {
     const bar = document.getElementById("animated-score-bar");
     if(bar) { bar.style.width = "0%"; bar.style.backgroundColor = "transparent"; bar.style.boxShadow = "none"; }
 
-    // Reset H-LINE strength bar
-    const sBar = document.getElementById("strength-bar");
-    if(sBar) { sBar.style.width = "0%"; }
-    document.getElementById("strength-percent").innerText = "0%";
-    if (window.currentInterval === 'h-line') {
-        document.getElementById("h-line-strength-container").classList.remove("hidden");
-    } else {
-        document.getElementById("h-line-strength-container").classList.add("hidden");
-    }
-
     // Reset dynamic colors
     const dTitle = document.getElementById("dynamic-title");
     dTitle.style.transition = "none";
@@ -408,56 +387,6 @@ function updateChart(period) {
     document.getElementById("scoreChart").classList.remove("opacity-0");
 }
 
-function calculateHLineStrength(data) {
-    if (!data || !data.chart_score || window.currentInterval !== 'h-line') return { strength: 0, type: "" };
-    const scores = data.chart_score;
-    if (scores.length < 2) return { strength: 0, type: "" };
-    
-    const currentScore = scores[scores.length - 1];
-    const prevScore = scores[scores.length - 2];
-    let type = "";
-    let strength = 0;
-    
-    if (currentScore <= 20) {
-        type = "LONG";
-        // 1. Čas v zóne (Base)
-        let streak = 0;
-        for (let i = scores.length - 2; i >= 0; i--) {
-            if (scores[i] <= 20) streak++;
-            else break;
-        }
-        let base = Math.min(streak * 25, 50); // max 50% za výdrž
-        
-        // 2. Blízkosť k odrazu (čím bližšie k 20, tým lepšie)
-        let closeness = (currentScore / 20) * 30; // max 30%
-        
-        // 3. Momentum potvrdenia (začalo to stúpať?)
-        let momentum = (currentScore > prevScore) ? 20 : 0; // bonus 20%
-        
-        strength = base + closeness + momentum;
-        
-    } else if (currentScore >= 80) {
-        type = "SHORT";
-        // 1. Čas v zóne (Base)
-        let streak = 0;
-        for (let i = scores.length - 2; i >= 0; i--) {
-            if (scores[i] >= 80) streak++;
-            else break;
-        }
-        let base = Math.min(streak * 25, 50); // max 50% za výdrž
-        
-        // 2. Blízkosť k prepadu (čím bližšie k 80 zhora, tým lepšie)
-        let closeness = ((100 - currentScore) / 20) * 30; // max 30%
-        
-        // 3. Momentum potvrdenia (začalo to klesať?)
-        let momentum = (currentScore < prevScore) ? 20 : 0; // bonus 20%
-        
-        strength = base + closeness + momentum;
-    }
-    
-    return { strength: Math.min(100, Math.round(strength)), type };
-}
-
 async function analyze() {
   try {
     const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", { 
@@ -492,45 +421,10 @@ async function analyze() {
         if (s <= 20) { badgeBgColor="bg-[#14F195]/10"; badgeBorderColor="border-[#14F195]/40"; badgeTextColor="text-[#14F195]"; mcBg="bg-[#14F195]/5"; mcBorder="border-[#14F195]/30"; }
         else if (s >= 80) { badgeBgColor="bg-[#9945FF]/10"; badgeBorderColor="border-[#9945FF]/40"; badgeTextColor="text-[#9945FF]"; mcBg="bg-[#9945FF]/5"; mcBorder="border-[#9945FF]/30"; }
         else { badgeBgColor="bg-[#00C2FF]/10"; badgeBorderColor="border-[#00C2FF]/40"; badgeTextColor="text-[#00C2FF]"; mcBg="bg-[#00C2FF]/5"; mcBorder="border-[#00C2FF]/30"; }
-        
-        // H-LINE STRENGTH LOGIC
-        const hLineData = calculateHLineStrength(data);
-        const sBar = document.getElementById("strength-bar");
-        const sPercent = document.getElementById("strength-percent");
-        const sLabel = document.getElementById("strength-label");
-        if (hLineData.type) {
-            sLabel.innerText = `${hLineData.type} STRENGTH`;
-            sPercent.innerText = `${hLineData.strength}%`;
-            
-            const strength = hLineData.strength;
-            sBar.style.width = `${strength}%`;
-            
-            // CSS Mágia: Uzamknutie gradientu na celkovú šírku kontajnera (bez orezania a deformácie)
-            sBar.style.backgroundSize = strength > 0 ? `${10000 / strength}% 100%` : "100% 100%";
-            
-            let gradient, shadowColor;
-            if (hLineData.type === "LONG") {
-                gradient = "linear-gradient(to right, #EC4899, #FFFF00, #14F195)"; // LONG končí na Zelenej
-                shadowColor = strength < 40 ? "rgba(236,72,153,0.5)" : (strength < 75 ? "rgba(255,255,0,0.5)" : "rgba(20,241,149,0.5)");
-            } else { // SHORT
-                gradient = "linear-gradient(to right, #14F195, #FFFF00, #EC4899)"; // SHORT končí na Ružovej
-                shadowColor = strength < 40 ? "rgba(20,241,149,0.5)" : (strength < 75 ? "rgba(255,255,0,0.5)" : "rgba(236,72,153,0.5)");
-            }
-            
-            sBar.style.backgroundImage = gradient;
-            sBar.style.boxShadow = `0 0 15px ${shadowColor}`;
-            document.getElementById("h-line-strength-container").classList.remove("hidden");
-        } else {
-            sLabel.innerText = "SIGNAL STRENGTH";
-            sPercent.innerText = "0%";
-            sBar.style.width = "0%";
-            document.getElementById("h-line-strength-container").classList.add("hidden");
-        }
     } else {
         if (s <= 20) { badgeBgColor="bg-[#22c55e]/10"; badgeBorderColor="border-[#22c55e]/40"; badgeTextColor="text-[#22c55e]"; mcBg="bg-[#030a05]"; mcBorder="border-[#22c55e]/30"; }
         else if (s >= 80) { badgeBgColor="bg-[#EC4899]/10"; badgeBorderColor="border-[#EC4899]/40"; badgeTextColor="text-[#EC4899]"; mcBg="bg-[#EC4899]/5"; mcBorder="border-[#EC4899]/30"; }
         else { badgeBgColor="bg-[#FFFF00]/10"; badgeBorderColor="border-[#FFFF00]/40"; badgeTextColor="text-[#FFFF00]"; mcBg="bg-[#FFFF00]/5"; mcBorder="border-[#FFFF00]/30"; }
-        document.getElementById("h-line-strength-container").classList.add("hidden");
     }
 
     let pBadge = document.getElementById("badge-phase");
