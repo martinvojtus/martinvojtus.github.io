@@ -74,6 +74,17 @@
             </div>
         </div>
 
+        <!-- H-LINE STRENGTH BAR -->
+        <div id="h-line-strength-container" class="hidden mb-6 animate-fade-in px-1">
+            <div class="flex justify-between items-center mb-2 text-[0.6rem] uppercase tracking-widest text-neutral-500">
+                <div id="strength-label">SIGNAL STRENGTH</div>
+                <div id="strength-percent" class="font-bold">0%</div>
+            </div>
+            <div class="w-full bg-neutral-900 border border-neutral-800 h-2 rounded-full overflow-hidden relative">
+                <div id="strength-bar" class="h-full transition-all duration-1000 ease-out" style="width: 0%; background: linear-gradient(to right, #14F195, #9945FF);"></div>
+            </div>
+        </div>
+
         <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000">
             
             <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
@@ -242,6 +253,16 @@ function triggerAnalysis() {
     const bar = document.getElementById("animated-score-bar");
     if(bar) { bar.style.width = "0%"; bar.style.backgroundColor = "transparent"; bar.style.boxShadow = "none"; }
 
+    // Reset H-LINE strength bar
+    const sBar = document.getElementById("strength-bar");
+    if(sBar) { sBar.style.width = "0%"; }
+    document.getElementById("strength-percent").innerText = "0%";
+    if (window.currentInterval === 'h-line') {
+        document.getElementById("h-line-strength-container").classList.remove("hidden");
+    } else {
+        document.getElementById("h-line-strength-container").classList.add("hidden");
+    }
+
     // Reset dynamic colors
     const dTitle = document.getElementById("dynamic-title");
     dTitle.style.transition = "none";
@@ -387,6 +408,29 @@ function updateChart(period) {
     document.getElementById("scoreChart").classList.remove("opacity-0");
 }
 
+function calculateHLineStrength(data) {
+    if (!data || !data.chart_score || window.currentInterval !== 'h-line') return { strength: 0, type: "" };
+    const scores = data.chart_score;
+    const currentScore = scores[scores.length - 1];
+    let totalIntensity = 0;
+    let type = "";
+    if (currentScore <= 20) {
+        type = "LONG";
+        for (let i = scores.length - 1; i >= 0; i--) {
+            if (scores[i] <= 20) totalIntensity += (20 - scores[i]);
+            else break;
+        }
+    } else if (currentScore >= 80) {
+        type = "SHORT";
+        for (let i = scores.length - 1; i >= 0; i--) {
+            if (scores[i] >= 80) totalIntensity += (scores[i] - 80);
+            else break;
+        }
+    }
+    const strength = Math.min(100, (totalIntensity / 150) * 100);
+    return { strength: Math.round(strength), type };
+}
+
 async function analyze() {
   try {
     const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", { 
@@ -421,10 +465,35 @@ async function analyze() {
         if (s <= 20) { badgeBgColor="bg-[#14F195]/10"; badgeBorderColor="border-[#14F195]/40"; badgeTextColor="text-[#14F195]"; mcBg="bg-[#14F195]/5"; mcBorder="border-[#14F195]/30"; }
         else if (s >= 80) { badgeBgColor="bg-[#9945FF]/10"; badgeBorderColor="border-[#9945FF]/40"; badgeTextColor="text-[#9945FF]"; mcBg="bg-[#9945FF]/5"; mcBorder="border-[#9945FF]/30"; }
         else { badgeBgColor="bg-[#00C2FF]/10"; badgeBorderColor="border-[#00C2FF]/40"; badgeTextColor="text-[#00C2FF]"; mcBg="bg-[#00C2FF]/5"; mcBorder="border-[#00C2FF]/30"; }
+        
+        // H-LINE STRENGTH LOGIC
+        const hLineData = calculateHLineStrength(data);
+        const sBar = document.getElementById("strength-bar");
+        const sPercent = document.getElementById("strength-percent");
+        const sLabel = document.getElementById("strength-label");
+        if (hLineData.type) {
+            sLabel.innerText = `${hLineData.type} STRENGTH`;
+            sPercent.innerText = `${hLineData.strength}%`;
+            sBar.style.width = `${hLineData.strength}%`;
+            if (hLineData.type === "LONG") {
+                sBar.style.background = "linear-gradient(to right, rgba(20,241,149,0.1), #14F195)";
+                sBar.style.boxShadow = "0 0 10px rgba(20,241,149,0.5)";
+            } else {
+                sBar.style.background = "linear-gradient(to right, rgba(153,69,255,0.1), #9945FF)";
+                sBar.style.boxShadow = "0 0 10px rgba(153,69,255,0.5)";
+            }
+            document.getElementById("h-line-strength-container").classList.remove("hidden");
+        } else {
+            sLabel.innerText = "SIGNAL STRENGTH";
+            sPercent.innerText = "0%";
+            sBar.style.width = "0%";
+            document.getElementById("h-line-strength-container").classList.add("hidden");
+        }
     } else {
         if (s <= 20) { badgeBgColor="bg-[#22c55e]/10"; badgeBorderColor="border-[#22c55e]/40"; badgeTextColor="text-[#22c55e]"; mcBg="bg-[#030a05]"; mcBorder="border-[#22c55e]/30"; }
         else if (s >= 80) { badgeBgColor="bg-[#EC4899]/10"; badgeBorderColor="border-[#EC4899]/40"; badgeTextColor="text-[#EC4899]"; mcBg="bg-[#EC4899]/5"; mcBorder="border-[#EC4899]/30"; }
         else { badgeBgColor="bg-[#FFFF00]/10"; badgeBorderColor="border-[#FFFF00]/40"; badgeTextColor="text-[#FFFF00]"; mcBg="bg-[#FFFF00]/5"; mcBorder="border-[#FFFF00]/30"; }
+        document.getElementById("h-line-strength-container").classList.add("hidden");
     }
 
     let pBadge = document.getElementById("badge-phase");
