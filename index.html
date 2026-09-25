@@ -21,18 +21,12 @@
 <div class="w-full max-w-xl p-5 relative">
 
     <!-- DASHBOARD CONTROLS -->
-    <div id="dashboard-controls" class="flex flex-col gap-3 mb-6">
-        <div class="flex gap-2 sm:gap-3 w-full h-[34px]">
-            <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex flex-1 text-[0.6rem] uppercase tracking-widest text-center">
-                <button onclick="toggleMode('MACRO')" id="toggle-mode-macro" class="flex-1 rounded-md bg-neutral-700 text-white transition-all duration-300 h-full">Macro</button>
-                <button onclick="toggleMode('TRADING')" id="toggle-mode-trading" class="flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 h-full">Trading</button>
-            </div>
-            <button onclick="triggerAnalysis()" class="bg-neutral-900 border border-neutral-800 rounded-lg w-[34px] sm:w-[38px] flex items-center justify-center text-neutral-500 hover:text-white transition-all duration-300 shrink-0 h-full">
-                <svg id="btn-refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                </svg>
-            </button>
-        </div>
+    <div id="dashboard-controls" class="flex justify-end mb-6">
+        <button onclick="triggerAnalysis()" class="bg-neutral-900 border border-neutral-800 rounded-lg w-[34px] sm:w-[38px] h-[34px] flex items-center justify-center text-neutral-500 hover:text-white transition-all duration-300 shrink-0">
+            <svg id="btn-refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+        </button>
     </div>
 
     <!-- VIEW: DASHBOARD -->
@@ -47,14 +41,6 @@
                 <button onclick="updateChart('2Y')" id="btn-2Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">2Y</button>
                 <button onclick="updateChart('4Y')" id="btn-4Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">4Y</button>
                 <button onclick="updateChart('ALL')" id="btn-ALL" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">ALL</button>
-            </div>
-            
-            <div id="trading-buttons" class="hidden flex gap-1 absolute left-1/2 -translate-x-1/2">
-                <button onclick="changeTradingInterval('1d')" id="btn-1d" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1D</button>
-                <button onclick="changeTradingInterval('4h')" id="btn-4h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">4H</button>
-                <button onclick="changeTradingInterval('2h')" id="btn-2h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">2H</button>
-                <button onclick="changeTradingInterval('1h')" id="btn-1h" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1H</button>
-                <button onclick="changeTradingInterval('h-line')" id="btn-h-line" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300 font-bold"><span style="background: linear-gradient(to bottom, #9945FF, #14F195); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">HL</span></button>
             </div>
 
             <div class="w-16 flex justify-end">
@@ -128,18 +114,9 @@
 let scoreChartInstance = null;
 window.currentScoreData = { score: 0, colorClass: "" };
 window.fullData = null; 
-window.currentMode = localStorage.getItem('trading_mode') || 'MACRO';
-window.currentInterval = localStorage.getItem('trading_interval') || (window.currentMode === 'MACRO' ? '1w' : '2h'); 
 window.currentMacroView = localStorage.getItem('trading_macro_view') || '4Y';
 
 function getTheme() {
-    if (window.currentInterval === 'h-line') {
-        return {
-            low: '#14F195', lowRgb: '20, 241, 149',
-            mid: '#00C2FF', midRgb: '0, 194, 255',
-            high: '#9945FF', highRgb: '153, 69, 255'
-        };
-    }
     return {
         low: '#22c55e', lowRgb: '34, 197, 94',
         mid: '#FFFF00', midRgb: '255, 255, 0',
@@ -156,53 +133,13 @@ function updateThemeUI() {
 
 // --- DASHBOARD LOGIC ---
 function initUI() {
-    document.getElementById('toggle-mode-macro').className = window.currentMode === 'MACRO' ? "flex-1 rounded-md bg-neutral-700 text-white h-full transition-all" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all h-full";
-    document.getElementById('toggle-mode-trading').className = window.currentMode === 'TRADING' ? "flex-1 rounded-md bg-neutral-700 text-white h-full transition-all" : "flex-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all h-full";
-
-    if (window.currentMode === 'MACRO') {
-        document.getElementById('macro-buttons').classList.remove('hidden');
-        document.getElementById('trading-buttons').classList.add('hidden');
-        document.getElementById('legend-low').innerText = "VALUE ZONE (DCA IN)";
-        document.getElementById('legend-mid').innerText = "NEUTRAL ZONE (HODL)";
-        document.getElementById('legend-high').innerText = "EXIT ZONE (DCA OUT)";
-        window.currentInterval = '1w';
-        updateMacroButtonsUI(window.currentMacroView);
-    } else {
-        document.getElementById('macro-buttons').classList.add('hidden');
-        document.getElementById('trading-buttons').classList.remove('hidden');
-        document.getElementById('legend-low').innerText = "VALUE ZONE (LONG)";
-        document.getElementById('legend-mid').innerText = "NEUTRAL ZONE (HODL)";
-        document.getElementById('legend-high').innerText = "EXIT ZONE (SHORT)";
-        if (window.currentInterval === '1w') window.currentInterval = '2h';
-        highlightTradingButton(window.currentInterval);
-    }
+    updateMacroButtonsUI(window.currentMacroView);
 }
 
 function updateMacroButtonsUI(period) {
     ['1Y', '2Y', '4Y', 'ALL'].forEach(p => {
         const btn = document.getElementById(`btn-${p}`);
         if(btn) btn.className = p === period ? "px-3 py-1 rounded-md text-white bg-neutral-800 transition-all" : "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all";
-    });
-}
-
-function toggleMode(mode) { 
-    if (window.currentMode === mode) return; 
-    window.currentMode = mode; 
-    localStorage.setItem('trading_mode', mode); 
-    if (mode === 'TRADING') {
-        window.currentInterval = localStorage.getItem('trading_interval') || '2h';
-    } else {
-        window.currentInterval = '1w';
-    }
-    initUI(); 
-    triggerAnalysis(); 
-}
-function changeTradingInterval(interval) { if (window.currentInterval === interval && window.currentMode === 'TRADING') return; window.currentInterval = interval; localStorage.setItem('trading_interval', interval); highlightTradingButton(interval); triggerAnalysis(); }
-
-function highlightTradingButton(interval) {
-    ['1d', '4h', '2h', '1h', 'h-line'].forEach(p => {
-        const btn = document.getElementById(`btn-${p}`);
-        if(btn) btn.className = p === interval ? "px-3 py-1 rounded-md text-white bg-neutral-800 transition-all" : "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all";
     });
 }
 
@@ -220,7 +157,7 @@ function triggerAnalysis() {
     
     let badgeName = document.getElementById("badge-name");
     badgeName.className = "border border-neutral-600/50 px-3 h-8 flex items-center rounded-md text-neutral-400";
-    badgeName.innerText = window.currentMode === "MACRO" ? "Bitcoin (BTC)" : "Solana (SOL)";
+    badgeName.innerText = "Bitcoin (BTC)";
 
     let pBadge = document.getElementById("badge-phase");
     pBadge.className = 'border border-neutral-800 bg-neutral-800 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse';
@@ -329,24 +266,20 @@ Chart.register(customChartPlugin);
 
 function updateChart(period) {
     if (!window.fullData) return;
-    if (window.currentMode === 'MACRO') {
+    if (period) {
         window.currentMacroView = period;
         localStorage.setItem('trading_macro_view', period);
         updateMacroButtonsUI(period);
     }
     let pts = 208;
-    if (window.currentMode === 'MACRO') {
-        if (period === '1Y') pts = 52; else if (period === '2Y') pts = 104; else if (period === 'ALL') pts = window.fullData.chart_dates.length;
-    }
+    if (window.currentMacroView === '1Y') pts = 52;
+    else if (window.currentMacroView === '2Y') pts = 104;
+    else if (window.currentMacroView === 'ALL') pts = window.fullData.chart_dates.length;
     
     // Format raw timestamps to local date strings
     const dts = window.fullData.chart_dates.slice(-pts).map(ts => {
         const d = new Date(ts);
-        if (window.currentMode === 'TRADING') {
-            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-        } else {
-            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-        }
+        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     });
     
     const scr = window.fullData.chart_score.slice(-pts);
@@ -391,7 +324,7 @@ async function analyze() {
   try {
     const res = await fetch("https://mv-backend-ak8l.onrender.com/analyze", { 
         method: "POST", headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ mode: window.currentMode, interval: window.currentInterval })
+        body: JSON.stringify({ mode: "MACRO", interval: "1w" })
     });
     const data = await res.json(); 
     console.log("Data from backend:", data);
@@ -406,30 +339,20 @@ async function analyze() {
     const theme = getTheme();
     let sHex = s <= 20 ? theme.low : (s >= 80 ? theme.high : theme.mid);
     
-    if (window.currentMode === "MACRO") {
-        document.getElementById("badge-name").innerText = "Bitcoin (BTC)";
-    } else {
-        document.getElementById("badge-name").innerText = "Solana (SOL)";
-    }
-    // Použijeme data z backendu ak prichádzajú správne, inak fallback hore
-    if(data.name && data.ticker) {
+    if (data.name && data.ticker) {
         document.getElementById("badge-name").innerText = `${data.name} (${data.ticker})`;
+    } else {
+        document.getElementById("badge-name").innerText = "Bitcoin (BTC)";
     }
     
     let badgeBgColor, badgeBorderColor, badgeTextColor, mcBg, mcBorder;
-    if (window.currentInterval === 'h-line') {
-        if (s <= 20) { badgeBgColor="bg-[#14F195]/10"; badgeBorderColor="border-[#14F195]/40"; badgeTextColor="text-[#14F195]"; mcBg="bg-[#14F195]/5"; mcBorder="border-[#14F195]/30"; }
-        else if (s >= 80) { badgeBgColor="bg-[#9945FF]/10"; badgeBorderColor="border-[#9945FF]/40"; badgeTextColor="text-[#9945FF]"; mcBg="bg-[#9945FF]/5"; mcBorder="border-[#9945FF]/30"; }
-        else { badgeBgColor="bg-[#00C2FF]/10"; badgeBorderColor="border-[#00C2FF]/40"; badgeTextColor="text-[#00C2FF]"; mcBg="bg-[#00C2FF]/5"; mcBorder="border-[#00C2FF]/30"; }
-    } else {
-        if (s <= 20) { badgeBgColor="bg-[#22c55e]/10"; badgeBorderColor="border-[#22c55e]/40"; badgeTextColor="text-[#22c55e]"; mcBg="bg-[#030a05]"; mcBorder="border-[#22c55e]/30"; }
-        else if (s >= 80) { badgeBgColor="bg-[#EC4899]/10"; badgeBorderColor="border-[#EC4899]/40"; badgeTextColor="text-[#EC4899]"; mcBg="bg-[#EC4899]/5"; mcBorder="border-[#EC4899]/30"; }
-        else { badgeBgColor="bg-[#FFFF00]/10"; badgeBorderColor="border-[#FFFF00]/40"; badgeTextColor="text-[#FFFF00]"; mcBg="bg-[#FFFF00]/5"; mcBorder="border-[#FFFF00]/30"; }
-    }
+    if (s <= 20) { badgeBgColor="bg-[#22c55e]/10"; badgeBorderColor="border-[#22c55e]/40"; badgeTextColor="text-[#22c55e]"; mcBg="bg-[#030a05]"; mcBorder="border-[#22c55e]/30"; }
+    else if (s >= 80) { badgeBgColor="bg-[#EC4899]/10"; badgeBorderColor="border-[#EC4899]/40"; badgeTextColor="text-[#EC4899]"; mcBg="bg-[#EC4899]/5"; mcBorder="border-[#EC4899]/30"; }
+    else { badgeBgColor="bg-[#FFFF00]/10"; badgeBorderColor="border-[#FFFF00]/40"; badgeTextColor="text-[#FFFF00]"; mcBg="bg-[#FFFF00]/5"; mcBorder="border-[#FFFF00]/30"; }
 
     let pBadge = document.getElementById("badge-phase");
     pBadge.className = `border w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 ${badgeBgColor} ${badgeBorderColor} ${badgeTextColor}`;
-    pBadge.innerText = (window.currentMode === 'TRADING') ? (s <= 20 ? "LONG" : (s >= 80 ? "SHORT" : "HODL")) : data.phase;
+    pBadge.innerText = data.phase || "HODL";
 
     document.getElementById("val-price").innerText = `$${Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
 
@@ -450,7 +373,7 @@ async function analyze() {
 
     document.getElementById("main-card").className = `p-6 rounded-3xl border shadow-2xl transition-colors duration-1000 ${mcBg} ${mcBorder}`;
 
-    updateChart(window.currentMode === 'MACRO' ? window.currentMacroView : null);
+    updateChart(window.currentMacroView);
     setTimeout(() => {
         const bar = document.getElementById("animated-score-bar");
         if(bar) { bar.style.width = `${s}%`; bar.style.backgroundColor = sHex; bar.style.boxShadow = `0 0 10px ${sHex}`; }
@@ -484,5 +407,4 @@ async function analyze() {
 window.addEventListener('DOMContentLoaded', () => { updateSkeletonGrid(); initUI(); triggerAnalysis(); });
 </script>
 </body>
-</html>
 </html>

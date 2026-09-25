@@ -1,36 +1,18 @@
-import sys
 import os
 import logging
-from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
-from typing import Dict
-import io
-
 import requests
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
-
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 
 load_dotenv()
 
 # --- CONFIG & LOGGING ---
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-
-# Stavová pamäť pre bota: { "SYMBOL_INTERVAL": {"state": "NORMAL", "in_zone_since": None} }
-bot_state: Dict[str, dict] = {}
 
 app = FastAPI()
 
@@ -158,298 +140,24 @@ def calculate_macro_score(prices):
 
     return pd.Series(final_scores, index=prices.index).bfill().fillna(50)
 
-def calculate_trading_score(df):
-    if len(df) < 200: return pd.Series([50]*len(df), index=df.index)
-    
-    c = df['Close']
-    o = df['Open']
-    h = df['High']
-    l = df['Low']
-    v = df['Vol']
-
-    rsi = calculate_rsi(c, 14)
-    stoch_k, _ = calculate_stoch_rsi(rsi, 14, 3, 3)
-    
-    sma20 = c.rolling(20, min_periods=10).mean()
-    std20 = c.rolling(20, min_periods=10).std()
-    upper_bb = sma20 + (2 * std20)
-    lower_bb = sma20 - (2 * std20)
-    bb_pct = ((c - lower_bb) / (upper_bb - lower_bb + 1e-8) * 100).clip(0, 100).fillna(50)
-    
-    ema12 = c.ewm(span=12, adjust=False).mean()
-    ema26 = c.ewm(span=26, adjust=False).mean()
-    macd = ema12 - ema26
-    macd_signal = macd.ewm(span=9, adjust=False).mean()
-    macd_hist = macd - macd_signal
-    
-    macd_min = macd_hist.rolling(100, min_periods=10).min()
-    macd_max = macd_hist.rolling(100, min_periods=10).max()
-    macd_norm = ((macd_hist - macd_min) / (macd_max - macd_min + 1e-8) * 100).clip(0, 100).fillna(50)
-    
-    ema50 = c.ewm(span=50, adjust=False).mean()
-    ema200 = c.ewm(span=200, adjust=False).mean()
-    
-    prev_c = c.shift(1)
-    tr1 = h - l
-    tr2 = (h - prev_c).abs()
-    tr3 = (l - prev_c).abs()
-    tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
-    atr = tr.rolling(14, min_periods=1).mean().bfill()
-    vol_sma = v.rolling(20, min_periods=1).mean().bfill()
-
-    base_score = (0.35 * rsi) + (0.20 * stoch_k.fillna(50)) + (0.25 * bb_pct) + (0.20 * macd_norm)
-    final_scores = []
-    
-    for i in range(len(df)):
-        if i < 200:
-            final_scores.append(base_score.iloc[i])
-            continue
-        score = base_score.iloc[i]
-        curr_c = c.iloc[i]; curr_o = o.iloc[i]; curr_h = h.iloc[i]; curr_l = l.iloc[i]; curr_v = v.iloc[i]
-        upper_wick = curr_h - max(curr_o, curr_c)
-        lower_wick = min(curr_o, curr_c) - curr_l
-        curr_atr = atr.iloc[i]; curr_vol_sma = vol_sma.iloc[i]
-        
-        if curr_l < lower_bb.iloc[i] and lower_wick > (0.8 * curr_atr) and curr_v > curr_vol_sma: score *= 0.40 
-        if curr_h > upper_bb.iloc[i] and upper_wick > (0.8 * curr_atr) and curr_v > curr_vol_sma: score += (100 - score) * 0.60 
-
-        if ema50.iloc[i] > ema200.iloc[i] and curr_c > ema200.iloc[i]:
-            if abs(curr_l - ema50.iloc[i]) < curr_atr and stoch_k.iloc[i] < 30: score *= 0.75
-        
-        if ema50.iloc[i] < ema200.iloc[i] and curr_c < ema200.iloc[i]:
-            if abs(curr_h - ema50.iloc[i]) < curr_atr and stoch_k.iloc[i] > 70: score += (100 - score) * 0.30
-
-        if macd_hist.iloc[i] > 0 and macd_hist.iloc[i-1] <= 0 and curr_v > curr_vol_sma: score *= 0.85
-        elif macd_hist.iloc[i] < 0 and macd_hist.iloc[i-1] >= 0 and curr_v > curr_vol_sma: score += (100 - score) * 0.20
-
-        final_scores.append(max(0.0, min(100.0, score)))
-
-    return pd.Series(final_scores, index=df.index).bfill().fillna(50)
-
-def calculate_h_line_synergy(symbol):
-    with ThreadPoolExecutor() as executor:
-        f1 = executor.submit(get_crypto_data, symbol, "1h")
-        f2 = executor.submit(get_crypto_data, symbol, "2h")
-        f4 = executor.submit(get_crypto_data, symbol, "4h")
-        f24 = executor.submit(get_crypto_data, symbol, "1d")
-    
-    df_1h, df_2h, df_4h, df_1d = f1.result(), f2.result(), f4.result(), f24.result()
-    if df_1h.empty or df_2h.empty or df_4h.empty or df_1d.empty:
-        return None, None
-
-    s_1h = calculate_trading_score(df_1h)
-    s_2h_a = calculate_trading_score(df_2h).reindex(df_1h.index, method='ffill').fillna(50)
-    s_4h_a = calculate_trading_score(df_4h).reindex(df_1h.index, method='ffill').fillna(50)
-    s_1d_a = calculate_trading_score(df_1d).reindex(df_1h.index, method='ffill').fillna(50)
-
-    final_h_scores = []
-    for i in range(len(df_1h)):
-        sc_1, sc_2, sc_4, sc_1d = s_1h.iloc[i], s_2h_a.iloc[i], s_4h_a.iloc[i], s_1d_a.iloc[i]
-        w_1 = 0.35 + (abs(sc_1 - 50) / 50) * 0.15
-        w_2 = 0.25 + (abs(sc_2 - 50) / 50) * 0.05
-        w_4, w_1d = 0.25, 0.15
-        score = ((sc_1 * w_1) + (sc_2 * w_2) + (sc_4 * w_4) + (sc_1d * w_1d)) / (w_1 + w_2 + w_4 + w_1d)
-        
-        if sc_1 < 30 and sc_2 < 35 and sc_4 < 40:
-            score *= 0.65
-            if sc_1 < 20: score *= 0.70
-        elif sc_1 > 70 and sc_2 > 65 and sc_4 > 60:
-            score += (100 - score) * 0.50
-            if sc_1 > 80: score += (100 - score) * 0.30
-        elif (sc_1d > 70 and sc_1 < 30) or (sc_1d < 30 and sc_1 > 70):
-            score = (score * 0.7) + (50 * 0.3)
-
-        final_h_scores.append(max(0.0, min(100.0, score)))
-
-    return df_1h, pd.Series(final_h_scores, index=df_1h.index)
-
-# --- BOT LOGIC & CHARTS ---
-def generate_chart_image(df, scores, symbol):
-    plt.figure(figsize=(9, 4), facecolor='#000000')
-    ax = plt.gca()
-    ax.set_facecolor('#000000')
-    
-    dates = df.index[-150:]
-    plot_scores = scores.iloc[-150:]
-    
-    # Kreslenie hlavnej čiary
-    plt.plot(dates, plot_scores, color='#00C2FF', linewidth=1.5)
-    
-    # 80, 50, 20 úrovne
-    plt.axhline(y=80, color='#9945FF', linestyle='--', alpha=0.5)
-    plt.axhline(y=50, color='#525252', linestyle='-', alpha=0.3)
-    plt.axhline(y=20, color='#14F195', linestyle='--', alpha=0.5)
-    
-    plt.ylim(0, 100)
-    plt.title(f"{symbol} H-LINE Score (Last 150h)", color='white', pad=10)
-    
-    ax.tick_params(colors='#a3a3a3', labelsize=8)
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%d. %b'))
-    for spine in ax.spines.values():
-        spine.set_edgecolor('#525252')
-        
-    plt.tight_layout()
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png', bbox_inches='tight', dpi=120)
-    plt.close()
-    buf.seek(0)
-    return buf
-
-def send_telegram_msg(message):
-    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
-        logger.error("Telegram credentials missing (TOKEN or CHAT_ID)!")
-        return
-    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}
-    try:
-        r = requests.post(url, json=payload, timeout=10)
-        r.raise_for_status()
-        logger.info("Telegram message sent successfully.")
-    except Exception as e:
-        logger.error(f"Telegram Error: {e}")
-        if 'r' in locals():
-            logger.error(f"Telegram Response: {r.text}")
-
-def send_telegram_photo(caption, photo_buf):
-    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
-        logger.error("Telegram credentials missing (TOKEN or CHAT_ID)!")
-        return
-    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto"
-    data = {"chat_id": TELEGRAM_CHAT_ID, "caption": caption, "parse_mode": "Markdown"}
-    files = {"photo": ("chart.png", photo_buf, "image/png")}
-    try:
-        r = requests.post(url, data=data, files=files, timeout=15)
-        r.raise_for_status()
-        logger.info("Telegram photo sent successfully.")
-    except Exception as e:
-        logger.error(f"Telegram Photo Error: {e}")
-        if 'r' in locals():
-            logger.error(f"Telegram Response: {r.text}")
-
-def check_market_signals():
-    logger.info(f"--- Checking market signals at {datetime.now()} ---")
-    symbols = ["SOLUSDT"]
-    
-    for symbol in symbols:
-        try:
-            logger.info(f"Analyzing {symbol}...")
-            df, scores = calculate_h_line_synergy(symbol)
-            if df is None or scores is None or len(scores) == 0:
-                logger.warning(f"No data or scores for {symbol}")
-                continue
-            
-            if len(scores) < 3:
-                logger.warning(f"Insufficient historical data for {symbol}")
-                continue
-
-            curr_score = scores.iloc[-1]
-            prev_score_1h = scores.iloc[-2]  # Posledná ukončená hodina
-            prev_score_2h = scores.iloc[-3]  # Predchádzajúca ukončená hodina
-            price = df['Close'].iloc[-1]
-            
-            # EMA200 filter pre určenie globálneho trendu
-            ema200 = df['Close'].ewm(span=200, adjust=False).mean().iloc[-1]
-            trend = "UP" if price > ema200 else "DOWN"
-            
-            state_key = f"{symbol}_HLINE"
-            if state_key not in bot_state: 
-                bot_state[state_key] = {"state": "NORMAL", "in_zone_since": None}
-            
-            prev_state = bot_state[state_key]["state"]
-            logger.info(f"{symbol}: Score={round(curr_score,1)}, Trend={trend}, PrevState={prev_state}")
-
-            # Definícia potvrdených extrémov (vyžadujeme 2 ukončené hodiny)
-            is_oversold_confirmed = prev_score_1h <= 20 and prev_score_2h <= 20
-            is_overbought_confirmed = prev_score_1h >= 80 and prev_score_2h >= 80
-
-            # Podmienka pre LONG: Návrat z prepredania (zóny pod 20%)
-            if prev_state == "OVERSOLD" and curr_score >= 21 and is_oversold_confirmed:
-                if trend == "UP": 
-                    msg = f"🚀 *STRATEGICKÝ LONG SIGNÁL: {symbol}*\n\n" \
-                          f"Skóre: {round(curr_score, 1)}% (Potvrdený odraz z prepredania)\n" \
-                          f"Cena: ${price:,.2f}\n" \
-                          f"Trend: 🟢 BULLISH (nad EMA200)\n" \
-                          f"Analýza: Dve ukončené hodiny pod 20% potvrdené, nárast do HODL zóny.\n" \
-                          f"Mode: H-LINE SYNERGY ISM v2.1"
-                    
-                    chart_buf = generate_chart_image(df, scores, symbol)
-                    send_telegram_photo(msg, chart_buf)
-                else:
-                    logger.info(f"Signal ignored: {symbol} OVERSOLD recovery confirmed but trend is DOWN")
-                bot_state[state_key]["state"] = "NORMAL"
-                
-            # Podmienka pre SHORT: Návrat z prekúpenia (zóny nad 80%)
-            elif prev_state == "OVERBOUGHT" and curr_score <= 79 and is_overbought_confirmed:
-                if trend == "DOWN": 
-                    msg = f"🔻 *STRATEGICKÝ SHORT SIGNÁL: {symbol}*\n\n" \
-                          f"Skóre: {round(curr_score, 1)}% (Potvrdený pokles z prekúpenia)\n" \
-                          f"Cena: ${price:,.2f}\n" \
-                          f"Trend: 🔴 BEARISH (pod EMA200)\n" \
-                          f"Analýza: Dve ukončené hodiny nad 80% potvrdené, pokles do HODL zóny.\n" \
-                          f"Mode: H-LINE SYNERGY ISM v2.1"
-
-                    chart_buf = generate_chart_image(df, scores, symbol)
-                    send_telegram_photo(msg, chart_buf)
-                else:
-                    logger.info(f"Signal ignored: {symbol} OVERBOUGHT recovery confirmed but trend is UP")
-                bot_state[state_key]["state"] = "NORMAL"
-            
-            # Reset state ak sme v HODL zóne a neprišiel signál (napr. neboli 2 body v zóne)
-            elif prev_state != "NORMAL" and 21 <= curr_score <= 79:
-                bot_state[state_key]["state"] = "NORMAL"
-                
-            # Aktualizácia stavu pri vstupe do extrémnych zón
-            if curr_score <= 20: 
-                if bot_state[state_key]["state"] != "OVERSOLD":
-                    logger.info(f"{symbol} entered OVERSOLD zone")
-                bot_state[state_key]["state"] = "OVERSOLD"
-            elif curr_score >= 80: 
-                if bot_state[state_key]["state"] != "OVERBOUGHT":
-                    logger.info(f"{symbol} entered OVERBOUGHT zone")
-                bot_state[state_key]["state"] = "OVERBOUGHT"
-        except Exception as e:
-            logger.error(f"Error checking signals for {symbol}: {e}")
-
-@app.on_event("startup")
-def startup_event():
-    logger.info("Application starting up...")
-    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
-        logger.error("CRITICAL: Telegram credentials missing in environment variables!")
-    
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(check_market_signals, 'interval', minutes=5)
-    scheduler.start()
-    app.state.scheduler = scheduler
-    
-    send_telegram_msg("🤖 *Trading Engine Online*\nBot bol úspešne aktivovaný a každých 5 minút skenuje H-LINE signály pre SOL.")
-
 @app.post("/analyze")
 def analyze(req: AnalyzeRequest = None):
-    mode = req.mode.upper() if req else "MACRO"
-    interval = req.interval.lower() if req else "1w"
-    symbol = "BTCUSDT" if mode == "MACRO" else "SOLUSDT"
-    name = "Bitcoin" if mode == "MACRO" else "Solana"
-    ticker = "BTC" if mode == "MACRO" else "SOL"
+    symbol = "BTCUSDT"
+    interval = "1w"
+    name = "Bitcoin"
+    ticker = "BTC"
 
-    if interval == "h-line":
-        df, score_series = calculate_h_line_synergy(symbol)
-        if df is None: return {"error": "API Error: Binance unreachable for H-LINE."}
-        analysis_tag = "TRADING (H-LINE ISM v2.0)"
-    else:
-        df = get_crypto_data(symbol, interval)
-        if df.empty: return {"error": "API Error: Binance unreachable."}
-        if mode == "TRADING":
-            score_series = calculate_trading_score(df)
-            analysis_tag = f"TRADING ({interval.upper()})"
-        else:
-            score_series = calculate_macro_score(df['Close'])
-            analysis_tag = "MACRO (1W)"
+    df = get_crypto_data(symbol, interval)
+    if df.empty:
+        return {"error": "API Error: Binance unreachable."}
 
+    score_series = calculate_macro_score(df['Close'])
     curr_score = round(float(score_series.iloc[-1]), 1)
+
     return {
         "price": float(df['Close'].iloc[-1]),
         "change": round(get_24h_change(symbol), 2),
-        "analysis": analysis_tag,
+        "analysis": "MACRO (1W)",
         "name": name,
         "ticker": ticker,
         "chart_dates": [int(d.timestamp() * 1000) for d in df.index],
@@ -458,10 +166,6 @@ def analyze(req: AnalyzeRequest = None):
         "phase": "DCA IN" if curr_score <= 20 else ("HODL" if curr_score <= 79 else "DCA OUT")
     }
 
-if __name__ == "__main__":
-    import uvicorn
-    port = int(os.environ.get("PORT", 10000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 10000))
