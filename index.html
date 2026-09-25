@@ -44,14 +44,14 @@
     <div id="view-dashboard-container" class="animate-fade-in">
         <div class="flex justify-between items-center px-1 mb-4 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
             <div class="w-16 text-left">
-                <div id="dynamic-title" class="text-neutral-600 transition-colors duration-500">SCORE</div>
+                <div id="dynamic-title" class="text-neutral-500 transition-colors duration-500">SCORE</div>
             </div>
             
             <div id="macro-buttons" class="flex gap-1 absolute left-1/2 -translate-x-1/2">
-                <button onclick="updateChart('1Y')" id="btn-1Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">1Y</button>
-                <button onclick="updateChart('2Y')" id="btn-2Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">2Y</button>
-                <button onclick="updateChart('4Y')" id="btn-4Y" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">4Y</button>
-                <button onclick="updateChart('ALL')" id="btn-ALL" class="px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all duration-300">ALL</button>
+                <button onclick="updateChart('1Y')" id="btn-1Y" class="px-3 py-1 rounded-md text-neutral-400 hover:text-white transition-all duration-300">1Y</button>
+                <button onclick="updateChart('2Y')" id="btn-2Y" class="px-3 py-1 rounded-md text-neutral-400 hover:text-white transition-all duration-300">2Y</button>
+                <button onclick="updateChart('4Y')" id="btn-4Y" class="px-3 py-1 rounded-md text-neutral-400 hover:text-white transition-all duration-300">4Y</button>
+                <button onclick="updateChart('ALL')" id="btn-ALL" class="px-3 py-1 rounded-md text-neutral-400 hover:text-white transition-all duration-300">ALL</button>
             </div>
 
             <div class="w-16 flex justify-end">
@@ -74,10 +74,10 @@
         <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000">
             
             <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
-                <div id="badge-name" class="border border-neutral-600/50 px-3 h-8 flex items-center rounded-md text-neutral-400">
+                <div id="badge-name" class="border border-neutral-800/60 bg-neutral-900/40 px-3 h-8 flex items-center rounded-md text-neutral-400">
                     Načítavam...
                 </div>
-                <div id="badge-phase" class="border border-neutral-800 bg-neutral-800 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse">
+                <div id="badge-phase" class="border border-neutral-800/60 bg-neutral-800/40 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse">
                     HODL
                 </div>
             </div>
@@ -101,7 +101,7 @@
             </div>
             
             <div>
-                <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden relative">
+                <div class="w-full bg-neutral-800/60 h-1.5 rounded-full overflow-hidden relative">
                     <div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: transparent;"></div>
                 </div>
             </div>
@@ -111,7 +111,7 @@
     <div id="error-box" class="hidden mt-4 bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center">❌ CONNECTION FAILED. PLEASE TRY AGAIN.</div>
 
     <!-- BOTTOM FULL-WIDTH REFRESH BUTTON -->
-    <button id="btn-refresh" onclick="triggerAnalysis(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="w-full mt-6 py-3.5 bg-neutral-900/60 [@media(hover:hover)]:hover:bg-neutral-800/80 border border-neutral-800 [@media(hover:hover)]:hover:border-neutral-700 rounded-2xl flex items-center justify-center gap-2 text-neutral-400 [@media(hover:hover)]:hover:text-white text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 active:scale-[0.99] focus:outline-none focus:ring-0 shadow-lg shadow-black/40 select-none">
+    <button id="btn-refresh" onclick="triggerAnalysis(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="w-full mt-6 py-3.5 bg-neutral-900/40 [@media(hover:hover)]:hover:bg-neutral-800/40 border border-neutral-800/50 [@media(hover:hover)]:hover:border-neutral-700/50 rounded-2xl flex items-center justify-center gap-2 text-neutral-400 [@media(hover:hover)]:hover:text-white text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 active:scale-[0.99] focus:outline-none focus:ring-0 shadow-2xl shadow-black/50 select-none">
         <svg id="btn-refresh-icon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
         </svg>
@@ -143,7 +143,7 @@ function initUI() {
 function updateMacroButtonsUI(period) {
     ['1Y', '2Y', '4Y', 'ALL'].forEach(p => {
         const btn = document.getElementById(`btn-${p}`);
-        if(btn) btn.className = p === period ? "px-3 py-1 rounded-md text-white bg-neutral-800 transition-all" : "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-300 transition-all";
+        if(btn) btn.className = p === period ? "px-3 py-1 rounded-md text-white bg-neutral-800/80 transition-all" : "px-3 py-1 rounded-md text-neutral-400 hover:text-white transition-all";
     });
 }
 
@@ -160,11 +160,11 @@ function triggerAnalysis() {
     dScore.innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">88.8%</span>';
     
     let badgeName = document.getElementById("badge-name");
-    badgeName.className = "border border-neutral-600/50 px-3 h-8 flex items-center rounded-md text-neutral-400";
+    badgeName.className = "border border-neutral-800/60 bg-neutral-900/40 px-3 h-8 flex items-center rounded-md text-neutral-400";
     badgeName.innerText = "Bitcoin (BTC)";
 
     let pBadge = document.getElementById("badge-phase");
-    pBadge.className = 'border border-neutral-800 bg-neutral-800 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse';
+    pBadge.className = 'border border-neutral-800/60 bg-neutral-800/40 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse';
     pBadge.innerHTML = 'HODL';
 
     document.getElementById("val-price").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded">88,888.88</span>';
@@ -186,9 +186,9 @@ function triggerAnalysis() {
     // Reset dynamic colors
     const dTitle = document.getElementById("dynamic-title");
     dTitle.style.transition = "none";
-    dTitle.style.color = "#525252";
+    dTitle.style.color = "#737373";
     dTitle.style.textShadow = "none";
-    dScore.style.color = "#525252";
+    dScore.style.color = "#737373";
     dScore.style.textShadow = "none";
     
     // Force reflow and restore transitions
@@ -287,7 +287,7 @@ function updateChart(period) {
     
     const scr = window.fullData.chart_score.slice(-pts);
     if (scoreChartInstance) scoreChartInstance.destroy();
-    Chart.defaults.color = '#525252'; Chart.defaults.font.family = "'Inter', sans-serif"; Chart.defaults.font.size = 9.6;
+    Chart.defaults.color = '#737373'; Chart.defaults.font.family = "'Inter', sans-serif"; Chart.defaults.font.size = 9.6;
     const theme = getTheme();
     scoreChartInstance = new Chart(document.getElementById('scoreChart').getContext('2d'), {
         type: 'line',
@@ -311,9 +311,9 @@ function updateChart(period) {
                     if (scoreChartInstance) scoreChartInstance.update();
                     const s = window.fullData ? window.fullData.cycle_score : 0;
                     document.getElementById('dynamic-score').innerText = s.toFixed(1) + '%';
-                    document.getElementById('dynamic-score').style.color = "#525252";
+                    document.getElementById('dynamic-score').style.color = "#737373";
                     document.getElementById('dynamic-score').style.textShadow = "none";
-                    document.getElementById('dynamic-title').style.color = "#525252";
+                    document.getElementById('dynamic-title').style.color = "#737373";
                     document.getElementById('dynamic-title').style.textShadow = "none";
                 }
             }
