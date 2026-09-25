@@ -101,17 +101,9 @@
             </div>
             
             <div>
-                <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden mb-4 relative">
+                <div class="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden relative">
                     <div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: transparent;"></div>
                 </div>
-                
-                <table class="w-full text-left text-[0.6rem] text-neutral-400 uppercase tracking-widest border border-neutral-800 rounded-lg overflow-hidden border-separate [border-spacing:0]">
-                    <tbody>
-                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 w-10 align-middle text-center"><div id="legend-dot-low" class="w-2 h-2 rounded-full bg-[#A88468] inline-block mt-[2px] transition-colors duration-500"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white whitespace-nowrap w-24 text-center">0 – 20 (%)</td><td id="legend-low" class="py-2.5 pl-5 border-b border-l border-neutral-800">VALUE ZONE (DCA IN)</td></tr>
-                        <tr><td class="py-2.5 px-0 border-b border-neutral-800 align-middle text-center"><div id="legend-dot-mid" class="w-2 h-2 rounded-full bg-[#F7931A] inline-block mt-[2px] transition-colors duration-500"></div></td><td class="py-2.5 px-0 border-b border-l border-neutral-800 text-white whitespace-nowrap text-center">21 – 79 (%)</td><td id="legend-mid" class="py-2.5 pl-5 border-b border-l border-neutral-800">NEUTRAL ZONE (HODL)</td></tr>
-                        <tr><td class="py-2.5 px-0 align-middle text-center"><div id="legend-dot-high" class="w-2 h-2 rounded-full bg-[#FF4500] inline-block mt-[2px] transition-colors duration-500"></div></td><td class="py-2.5 px-0 border-l border-neutral-800 text-white whitespace-nowrap text-center">80 – 100 (%)</td><td id="legend-high" class="py-2.5 pl-5 border-l border-neutral-800">EXIT ZONE (DCA OUT)</td></tr>
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
@@ -133,13 +125,6 @@ function getTheme() {
         mid: '#F7931A', midRgb: '247, 147, 26',
         high: '#FF4500', highRgb: '255, 69, 0'
     };
-}
-
-function updateThemeUI() {
-    const theme = getTheme();
-    document.getElementById('legend-dot-low').style.backgroundColor = theme.low;
-    document.getElementById('legend-dot-mid').style.backgroundColor = theme.mid;
-    document.getElementById('legend-dot-high').style.backgroundColor = theme.high;
 }
 
 // --- DASHBOARD LOGIC ---
@@ -207,7 +192,6 @@ function triggerAnalysis() {
     // Hide error box when refreshing
     document.getElementById("error-box").classList.add("hidden");
 
-    updateThemeUI();
     analyze();
 }
 
