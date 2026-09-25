@@ -110,8 +110,24 @@
 
     <div id="error-box" class="hidden mt-4 bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center">❌ CONNECTION FAILED. PLEASE TRY AGAIN.</div>
 
+    <!-- MINI CHART LEGEND -->
+    <div class="flex justify-center items-center gap-5 sm:gap-7 mt-5 text-[0.6rem] uppercase tracking-widest text-neutral-400 select-none">
+        <div class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#A88468] inline-block"></span>
+            <span>DCA IN</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#F7931A] inline-block"></span>
+            <span>HODL</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#FF4500] inline-block"></span>
+            <span>DCA OUT</span>
+        </div>
+    </div>
+
     <!-- BOTTOM FULL-WIDTH REFRESH BUTTON -->
-    <button id="btn-refresh" onclick="triggerAnalysis(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="w-full mt-6 py-3.5 bg-neutral-900/40 [@media(hover:hover)]:hover:bg-neutral-800/40 border border-neutral-800/50 [@media(hover:hover)]:hover:border-neutral-700/50 rounded-2xl flex items-center justify-center gap-2 text-neutral-400 [@media(hover:hover)]:hover:text-white text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 active:scale-[0.99] focus:outline-none focus:ring-0 shadow-2xl shadow-black/50 select-none">
+    <button id="btn-refresh" onclick="triggerAnalysis(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="w-full mt-4 py-3.5 bg-neutral-900/40 [@media(hover:hover)]:hover:bg-neutral-800/40 border border-neutral-800/50 [@media(hover:hover)]:hover:border-neutral-700/50 rounded-2xl flex items-center justify-center gap-2 text-neutral-400 [@media(hover:hover)]:hover:text-white text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 active:scale-[0.99] focus:outline-none focus:ring-0 shadow-2xl shadow-black/50 select-none">
         <svg id="btn-refresh-icon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
         </svg>
