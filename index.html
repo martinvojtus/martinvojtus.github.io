@@ -281,6 +281,7 @@ const customChartPlugin = {
           let bx = Math.max(left, Math.min(right - pw, xPos - pw / 2));
           let by = bottom + 4;
           let radius = 6;
+          let sRgb = val <= 20 ? theme.lowRgb : (val >= 80 ? theme.highRgb : theme.midRgb);
           
           ctx.beginPath();
           if (ctx.roundRect) {
@@ -288,13 +289,15 @@ const customChartPlugin = {
           } else {
               ctx.rect(bx, by, pw, ph);
           }
-          ctx.fillStyle = 'rgba(23, 23, 23, 0.95)';
+          ctx.fillStyle = '#0a0a0a';
           ctx.fill();
-          ctx.strokeStyle = `${sHex}70`;
+          ctx.fillStyle = `rgba(${sRgb}, 0.20)`;
+          ctx.fill();
+          ctx.strokeStyle = `rgba(${sRgb}, 0.50)`;
           ctx.lineWidth = 1;
           ctx.stroke();
 
-          ctx.fillStyle = '#d4d4d4';
+          ctx.fillStyle = sHex;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(xLabel, bx + pw / 2, by + ph / 2);
