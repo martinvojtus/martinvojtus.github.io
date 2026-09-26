@@ -238,8 +238,10 @@ def calculate_zec_macro_score(prices):
     peak_52w = prices.rolling(52, min_periods=10).max()
     dd_52w = ((prices - peak_52w) / peak_52w) * 100
 
-    log_ratio = np.log(prices / ma200).clip(lower=0)
-    log_norm = (log_ratio / 2.0 * 100).clip(0, 100) 
+    # Dual trend baseline: blend of 200W MA (65%) and 50W MA (35%)
+    trend_baseline = (0.65 * ma200) + (0.35 * ma50)
+    log_ratio = np.log(prices / trend_baseline).clip(lower=0)
+    log_norm = (log_ratio / 1.8 * 100).clip(0, 100) 
     dd_norm = ((dd_156w - (-90)) / (0 - (-90)) * 100).clip(0, 100)
     rsi_norm = ((rsi - 25) / (85 - 25) * 100).clip(0, 100)
     stoch_norm = stoch_k.fillna(50).clip(0, 100)
@@ -266,9 +268,11 @@ def calculate_zec_macro_score(prices):
         else: 
             weeks_since_bottom += 1
 
-        # Deep mid-cycle dip discount: if price dumped >= 40% from 52W high and RSI is resetting (< 55)
-        if dd52_curr <= -40 and r_curr < 55:
-            discount = 0.45 if dd52_curr <= -50 else 0.52
+        # Smooth, continuous mid-cycle dip discount (no harsh step thresholds)
+        if dd52_curr < -25:
+            dd_progress = min(1.0, max(0.0, (-dd52_curr - 25.0) / 25.0)) # 0.0 at -25%, 1.0 at -50%
+            rsi_factor = min(1.0, max(0.55, (65.0 - r_curr) / 25.0))
+            discount = 1.0 - (0.68 * dd_progress * rsi_factor)
             score *= discount
 
         # Deep macro bear discount (under 200W MA with high drawdown)
