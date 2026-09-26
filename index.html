@@ -73,7 +73,7 @@
         <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000">
             
             <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
-                <div id="badge-name" class="border border-neutral-800/60 bg-neutral-900/40 px-3 h-8 flex items-center rounded-md text-neutral-400">
+                <div id="badge-name" class="border border-[#262626] bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-400">
                     Načítavam...
                 </div>
                 <div id="badge-phase" class="border border-neutral-800/60 bg-neutral-800/40 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse">
@@ -215,7 +215,7 @@ function triggerAnalysis() {
     dScore.innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">88.8%</span>';
     
     let badgeName = document.getElementById("badge-name");
-    badgeName.className = "border border-neutral-800/60 bg-neutral-900/40 px-3 h-8 flex items-center rounded-md text-neutral-400";
+    badgeName.className = "border border-[#262626] bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-400";
     badgeName.innerText = (window.currentCoin === 'ZEC') ? "Zcash (ZEC)" : "Bitcoin (BTC)";
 
     let pBadge = document.getElementById("badge-phase");
