@@ -291,9 +291,9 @@ const customChartPlugin = {
           }
           ctx.fillStyle = '#0a0a0a';
           ctx.fill();
-          ctx.fillStyle = `rgba(${sRgb}, 0.20)`;
+          ctx.fillStyle = `rgba(${sRgb}, 0.10)`;
           ctx.fill();
-          ctx.strokeStyle = `rgba(${sRgb}, 0.50)`;
+          ctx.strokeStyle = `rgba(${sRgb}, 0.40)`;
           ctx.lineWidth = 1;
           ctx.stroke();
 
@@ -424,9 +424,9 @@ async function analyze() {
     }
     
     let badgeBgColor, badgeBorderColor, badgeTextColor, mcBg, mcBorder;
-    if (s <= 20) { badgeBgColor="bg-[#A88468]/20"; badgeBorderColor="border-[#A88468]/50"; badgeTextColor="text-[#A88468]"; mcBg="bg-[#A88468]/12"; mcBorder="border-[#A88468]/35"; }
-    else if (s >= 80) { badgeBgColor="bg-[#FF4500]/20"; badgeBorderColor="border-[#FF4500]/50"; badgeTextColor="text-[#FF4500]"; mcBg="bg-[#FF4500]/12"; mcBorder="border-[#FF4500]/35"; }
-    else { badgeBgColor="bg-[#F7931A]/20"; badgeBorderColor="border-[#F7931A]/50"; badgeTextColor="text-[#F7931A]"; mcBg="bg-[#F7931A]/12"; mcBorder="border-[#F7931A]/35"; }
+    if (s <= 20) { badgeBgColor="bg-[#A88468]/10"; badgeBorderColor="border-[#A88468]/40"; badgeTextColor="text-[#A88468]"; mcBg="bg-[#A88468]/10"; mcBorder="border-[#A88468]/30"; }
+    else if (s >= 80) { badgeBgColor="bg-[#FF4500]/10"; badgeBorderColor="border-[#FF4500]/40"; badgeTextColor="text-[#FF4500]"; mcBg="bg-[#FF4500]/10"; mcBorder="border-[#FF4500]/30"; }
+    else { badgeBgColor="bg-[#F7931A]/10"; badgeBorderColor="border-[#F7931A]/40"; badgeTextColor="text-[#F7931A]"; mcBg="bg-[#F7931A]/10"; mcBorder="border-[#F7931A]/30"; }
 
     let pBadge = document.getElementById("badge-phase");
     pBadge.className = `border w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 ${badgeBgColor} ${badgeBorderColor} ${badgeTextColor}`;
