@@ -196,7 +196,6 @@ function updateCoinButtonsUI(coin) {
 }
 
 function switchCoin(coin) {
-    if (window.isAnalyzing || window.currentCoin === coin) return;
     window.currentCoin = coin;
     localStorage.setItem('trading_coin', coin);
     updateCoinButtonsUI(coin);
@@ -370,7 +369,7 @@ const customChartPlugin = {
 Chart.register(customChartPlugin);
 
 function updateChart(period) {
-    if (!window.fullData) return;
+    if (!window.fullData || !window.fullData.chart_dates) return;
     if (period) {
         if (['1Y', '2Y', '4Y'].includes(period)) {
             window.currentMacroView = period;
@@ -383,13 +382,16 @@ function updateChart(period) {
     else if (window.currentMacroView === '2Y') pts = 104;
     else pts = 208;
     
+    const available = window.fullData.chart_dates.length;
+    const actualPts = Math.min(pts, available);
+
     // Format raw timestamps to local date strings
-    const dts = window.fullData.chart_dates.slice(-pts).map(ts => {
+    const dts = window.fullData.chart_dates.slice(-actualPts).map(ts => {
         const d = new Date(ts);
         return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     });
     
-    const scr = window.fullData.chart_score.slice(-pts);
+    const scr = window.fullData.chart_score.slice(-actualPts);
     if (scoreChartInstance) scoreChartInstance.destroy();
     Chart.defaults.color = '#737373'; Chart.defaults.font.family = "'Inter', sans-serif"; Chart.defaults.font.size = 9.6;
     const theme = getTheme();
@@ -439,12 +441,15 @@ function updateChart(period) {
 
 async function analyze() {
   try {
+    const coinToSend = window.currentCoin || "BTC";
     const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
         ? "http://127.0.0.1:10000/analyze"
         : "https://mv-backend-ak8l.onrender.com/analyze";
     const res = await fetch(apiUrl, { 
-        method: "POST", headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ mode: "MACRO", interval: "1w", coin: window.currentCoin || "BTC" })
+        method: "POST", 
+        headers: {"Content-Type": "application/json"},
+        cache: "no-store",
+        body: JSON.stringify({ mode: "MACRO", interval: "1w", coin: coinToSend })
     });
     const data = await res.json(); 
     console.log("Data from backend:", data);
@@ -462,7 +467,7 @@ async function analyze() {
     if (data.name && data.ticker) {
         document.getElementById("badge-name").innerText = `${data.name} (${data.ticker})`;
     } else {
-        document.getElementById("badge-name").innerText = "Bitcoin (BTC)";
+        document.getElementById("badge-name").innerText = coinToSend === 'ZEC' ? "Zcash (ZEC)" : "Bitcoin (BTC)";
     }
     
     let pBadge = document.getElementById("badge-phase");
