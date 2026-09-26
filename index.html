@@ -132,7 +132,7 @@
         </button>
     </div>
 
-    <div id="error-box" class="hidden mt-4 bg-pink-900/20 border border-pink-900 p-4 rounded-xl text-pink-500 text-[0.6rem] tracking-widest uppercase text-center">❌ CONNECTION FAILED. PLEASE TRY AGAIN.</div>
+    <div id="error-box" class="hidden mt-4 bg-[#FF2A6D]/10 border border-[#FF2A6D]/30 p-4 rounded-2xl text-[#FF2A6D] text-[0.6rem] tracking-widest uppercase text-center">❌ CONNECTION FAILED. PLEASE TRY AGAIN.</div>
 
 </div>
 
@@ -431,7 +431,7 @@ async function analyze() {
     document.getElementById("val-price").innerText = `$${Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
 
     let vCh = document.getElementById("val-change");
-    vCh.className = `text-[0.6rem] uppercase tracking-widest mt-2 flex items-center h-4 gap-1.5 ${data.change >= 0 ? 'text-[#22c55e]' : 'text-pink-500'}`;
+    vCh.className = `text-[0.6rem] uppercase tracking-widest mt-2 flex items-center h-4 gap-1.5 ${data.change >= 0 ? 'text-[#00FF88]' : 'text-[#FF2A6D]'}`;
     vCh.innerHTML = `${data.change >= 0 ? '+':''}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded font-normal">24H</span>`;
 
     document.getElementById("val-score-large").innerText = `${s.toFixed(1)}%`;
