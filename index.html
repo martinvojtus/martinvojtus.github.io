@@ -251,12 +251,28 @@ const customChartPlugin = {
 
     const activeElements = chart.getActiveElements();
     if (activeElements.length > 0) {
-      let activePoint = activeElements[0]; let xPos = activePoint.element.x;
-      ctx.save(); ctx.beginPath(); ctx.moveTo(xPos, top); ctx.lineTo(xPos, bottom);
-      ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.45)'; ctx.stroke();
+      let activePoint = activeElements[0]; 
+      let xPos = activePoint.element.x;
+      let yPos = activePoint.element.y;
+      let val = Math.max(0, Math.min(100, activePoint.element.$context.parsed.y));
+      let sHex = val <= 20 ? theme.low : (val >= 80 ? theme.high : theme.mid);
+
+      ctx.save();
+      ctx.beginPath(); 
+      ctx.moveTo(xPos, top); 
+      ctx.lineTo(xPos, bottom);
+      ctx.lineWidth = 1; 
+      ctx.strokeStyle = `${sHex}cc`; 
+      ctx.stroke();
+
+      // Mini point on hover line
+      ctx.beginPath();
+      ctx.arc(xPos, yPos, 3, 0, 2 * Math.PI);
+      ctx.fillStyle = sHex;
+      ctx.fill();
+
       let xLabel = chart.data.labels[activePoint.index];
       if (xLabel) {
-          ctx.save();
           ctx.font = "500 9.5px 'Inter', sans-serif";
           let tw = ctx.measureText(xLabel).width;
           let pw = tw + 18;
@@ -273,24 +289,35 @@ const customChartPlugin = {
           }
           ctx.fillStyle = 'rgba(23, 23, 23, 0.95)';
           ctx.fill();
-          ctx.strokeStyle = 'rgba(64, 64, 64, 0.7)';
+          ctx.strokeStyle = `${sHex}70`;
           ctx.lineWidth = 1;
           ctx.stroke();
 
-          ctx.fillStyle = '#a3a3a3';
+          ctx.fillStyle = '#d4d4d4';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(xLabel, bx + pw / 2, by + ph / 2);
-          ctx.restore();
       }
-      let val = Math.max(0, Math.min(100, activePoint.element.$context.parsed.y));
-      let sHex = val <= 20 ? theme.low : (val >= 80 ? theme.high : theme.mid);
       document.getElementById('dynamic-score').innerText = val.toFixed(1) + '%';
       document.getElementById('dynamic-score').style.color = sHex;
       document.getElementById('dynamic-score').style.textShadow = `0 0 10px ${sHex}80`;
       document.getElementById('dynamic-title').style.color = sHex;
       document.getElementById('dynamic-title').style.textShadow = `0 0 10px ${sHex}80`;
       ctx.restore();
+    }
+
+    // Mini dot on end of line (NOW)
+    const meta = chart.getDatasetMeta(0);
+    if (meta.data && meta.data.length > 0) {
+        const lastP = meta.data[meta.data.length - 1];
+        const lastV = chart.data.datasets[0].data[meta.data.length - 1];
+        let dotC = lastV <= 20 ? theme.low : (lastV >= 80 ? theme.high : theme.mid);
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(lastP.x, lastP.y, 3, 0, 2 * Math.PI);
+        ctx.fillStyle = dotC;
+        ctx.fill();
+        ctx.restore();
     }
   }
 };
