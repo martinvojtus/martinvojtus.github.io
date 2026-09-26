@@ -231,15 +231,20 @@ def calculate_zec_macro_score(prices):
     stoch_k, _ = calculate_stoch_rsi(rsi, 14, 3, 3)
     ma200 = prices.rolling(200, min_periods=10).mean().bfill()
     ma50 = prices.rolling(50, min_periods=10).mean().bfill() 
-    rolling_peak = prices.rolling(156, min_periods=20).max()
-    drawdown = ((prices - rolling_peak) / rolling_peak) * 100
+    
+    peak_156w = prices.rolling(156, min_periods=20).max()
+    dd_156w = ((prices - peak_156w) / peak_156w) * 100
+
+    peak_52w = prices.rolling(52, min_periods=10).max()
+    dd_52w = ((prices - peak_52w) / peak_52w) * 100
 
     log_ratio = np.log(prices / ma200).clip(lower=0)
-    log_norm = (log_ratio / 1.5 * 100).clip(0, 100) 
-    dd_norm = ((drawdown - (-90)) / (0 - (-90)) * 100).clip(0, 100)
+    log_norm = (log_ratio / 2.0 * 100).clip(0, 100) 
+    dd_norm = ((dd_156w - (-90)) / (0 - (-90)) * 100).clip(0, 100)
     rsi_norm = ((rsi - 25) / (85 - 25) * 100).clip(0, 100)
     stoch_norm = stoch_k.fillna(50).clip(0, 100)
-    base_score = (0.35 * log_norm) + (0.35 * rsi_norm) + (0.15 * dd_norm) + (0.15 * stoch_norm)
+
+    base_score = (0.15 * log_norm) + (0.35 * rsi_norm) + (0.30 * dd_norm) + (0.20 * stoch_norm)
     
     final_scores = []
     weeks_since_bottom = 0 
@@ -249,11 +254,11 @@ def calculate_zec_macro_score(prices):
             final_scores.append(base_score.iloc[i])
             continue
             
-        p_curr = prices.iloc[i]; r_curr = rsi.iloc[i]; r_prev = rsi.iloc[i-1]; r_prev2 = rsi.iloc[i-2]; k_curr = stoch_k.iloc[i]
+        p_curr = prices.iloc[i]; r_curr = rsi.iloc[i]; k_curr = stoch_k.iloc[i]
         score = base_score.iloc[i]
 
         p_52w = prices.iloc[max(0, i-52):i+1]
-        p_26w = prices.iloc[max(0, i-26):i+1]
+        dd52_curr = dd_52w.iloc[i]
 
         if p_curr <= p_52w.min() * 1.05: 
             weeks_since_bottom = 0
@@ -261,13 +266,16 @@ def calculate_zec_macro_score(prices):
         else: 
             weeks_since_bottom += 1
 
-        if p_curr > ma200.iloc[i] and drawdown.iloc[i] <= -30 and k_curr < 20: 
-            score *= 0.65 
+        # Deep mid-cycle dip discount: if price dumped >= 40% from 52W high and RSI is resetting (< 55)
+        if dd52_curr <= -40 and r_curr < 55:
+            discount = 0.45 if dd52_curr <= -50 else 0.52
+            score *= discount
 
-        recent_low = p_26w.min()
-        if p_curr < ma200.iloc[i] and ((p_curr - recent_low) / recent_low) * 100 >= 25 and k_curr > 80: 
-            score += (100 - score) * 0.35
+        # Deep macro bear discount (under 200W MA with high drawdown)
+        if p_curr < ma200.iloc[i] and dd_156w.iloc[i] <= -70:
+            score = min(score, 18.0)
 
+        # Bull run parabolic blow-off booster (price > 1.8x 50W MA and RSI > 75)
         if p_curr > ma50.iloc[i] * 1.8 and r_curr > 75: 
             score += (100 - score) * 0.45
 
