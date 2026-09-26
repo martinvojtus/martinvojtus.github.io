@@ -29,6 +29,7 @@ app.add_middleware(
 class AnalyzeRequest(BaseModel):
     mode: str = "MACRO"
     interval: str = "1w"
+    coin: str = "BTC"
 
 @app.get("/")
 def keep_alive():
@@ -88,34 +89,44 @@ def _fetch_from_kraken(pair="XBTUSDT", interval=10080):
     return df.set_index('Time').sort_index()
 
 def get_crypto_data(symbol="BTCUSDT", interval="1w"):
+    is_zec = "ZEC" in symbol.upper()
+    gate_pair = "ZEC_USDT" if is_zec else "BTC_USDT"
+    kraken_pair = "ZECUSD" if is_zec else "XBTUSDT"
+    bybit_sym = "ZECUSDT" if is_zec else "BTCUSDT"
+
     sources = [
         ("Binance Vision", lambda: _fetch_from_binance_url(f"https://data-api.binance.vision/api/v3/klines?symbol={symbol}&interval={interval}&limit=1000")),
         ("Binance Official", lambda: _fetch_from_binance_url(f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit=1000")),
-        ("Gate.io", lambda: _fetch_from_gateio()),
-        ("Bybit", lambda: _fetch_from_bybit()),
+        ("Gate.io", lambda: _fetch_from_gateio(pair=gate_pair, interval="7d")),
+        ("Bybit", lambda: _fetch_from_bybit(symbol=bybit_sym, interval="W")),
         ("Binance US", lambda: _fetch_from_binance_url(f"https://api.binance.us/api/v3/klines?symbol={symbol}&interval={interval}&limit=1000")),
-        ("Kraken", lambda: _fetch_from_kraken()),
+        ("Kraken", lambda: _fetch_from_kraken(pair=kraken_pair, interval=10080)),
     ]
     for name, fetch_func in sources:
         try:
             df = fetch_func()
             if not df.empty:
-                logger.info(f"Successfully fetched {len(df)} candles from {name}")
+                logger.info(f"Successfully fetched {len(df)} candles from {name} for {symbol}")
                 return df
         except Exception as e:
-            logger.warning(f"Data Fetch from {name} failed: {e}")
+            logger.warning(f"Data Fetch from {name} for {symbol} failed: {e}")
 
-    logger.error("All crypto data sources failed.")
+    logger.error(f"All crypto data sources failed for {symbol}.")
     return pd.DataFrame()
 
 def get_24h_change(symbol="BTCUSDT"):
+    is_zec = "ZEC" in symbol.upper()
+    gate_pair = "ZEC_USDT" if is_zec else "BTC_USDT"
+    kraken_pair = "ZECUSD" if is_zec else "XBTUSDT"
+    bybit_sym = "ZECUSDT" if is_zec else "BTCUSDT"
+
     sources = [
         ("Binance Vision", f"https://data-api.binance.vision/api/v3/ticker/24hr?symbol={symbol}", lambda r: float(r.json()['priceChangePercent'])),
         ("Binance Official", f"https://api.binance.com/api/v3/ticker/24hr?symbol={symbol}", lambda r: float(r.json()['priceChangePercent'])),
-        ("Gate.io", "https://api.gateio.ws/api/v4/spot/tickers?currency_pair=BTC_USDT", lambda r: float(r.json()[0]['change_percentage'])),
-        ("Bybit", f"https://api.bybit.com/v5/market/tickers?category=spot&symbol={symbol}", lambda r: float(r.json()['result']['list'][0]['price24hPcnt']) * 100.0),
+        ("Gate.io", f"https://api.gateio.ws/api/v4/spot/tickers?currency_pair={gate_pair}", lambda r: float(r.json()[0]['change_percentage'])),
+        ("Bybit", f"https://api.bybit.com/v5/market/tickers?category=spot&symbol={bybit_sym}", lambda r: float(r.json()['result']['list'][0]['price24hPcnt']) * 100.0),
         ("Binance US", f"https://api.binance.us/api/v3/ticker/24hr?symbol={symbol}", lambda r: float(r.json()['priceChangePercent'])),
-        ("Kraken", "https://api.kraken.com/0/public/Ticker?pair=XBTUSDT", lambda r: ((float(r.json()['result'][next(iter(r.json()['result']))]['c'][0]) - float(r.json()['result'][next(iter(r.json()['result']))]['o'])) / float(r.json()['result'][next(iter(r.json()['result']))]['o'])) * 100.0),
+        ("Kraken", f"https://api.kraken.com/0/public/Ticker?pair={kraken_pair}", lambda r: ((float(r.json()['result'][next(iter(r.json()['result']))]['c'][0]) - float(r.json()['result'][next(iter(r.json()['result']))]['o'])) / float(r.json()['result'][next(iter(r.json()['result']))]['o'])) * 100.0),
     ]
     for name, url, parser in sources:
         try:
@@ -214,18 +225,79 @@ def calculate_macro_score(prices):
 
     return pd.Series(final_scores, index=prices.index).bfill().fillna(50)
 
+def calculate_zec_macro_score(prices):
+    if len(prices) < 150: return pd.Series([50]*len(prices), index=prices.index)
+    rsi = calculate_rsi(prices, 14)
+    stoch_k, _ = calculate_stoch_rsi(rsi, 14, 3, 3)
+    ma200 = prices.rolling(200, min_periods=10).mean().bfill()
+    ma50 = prices.rolling(50, min_periods=10).mean().bfill() 
+    rolling_peak = prices.rolling(156, min_periods=20).max()
+    drawdown = ((prices - rolling_peak) / rolling_peak) * 100
+
+    log_ratio = np.log(prices / ma200).clip(lower=0)
+    log_norm = (log_ratio / 1.5 * 100).clip(0, 100) 
+    dd_norm = ((drawdown - (-90)) / (0 - (-90)) * 100).clip(0, 100)
+    rsi_norm = ((rsi - 25) / (85 - 25) * 100).clip(0, 100)
+    stoch_norm = stoch_k.fillna(50).clip(0, 100)
+    base_score = (0.35 * log_norm) + (0.35 * rsi_norm) + (0.15 * dd_norm) + (0.15 * stoch_norm)
+    
+    final_scores = []
+    weeks_since_bottom = 0 
+    
+    for i in range(len(prices)):
+        if i < 100:
+            final_scores.append(base_score.iloc[i])
+            continue
+            
+        p_curr = prices.iloc[i]; r_curr = rsi.iloc[i]; r_prev = rsi.iloc[i-1]; r_prev2 = rsi.iloc[i-2]; k_curr = stoch_k.iloc[i]
+        score = base_score.iloc[i]
+
+        p_52w = prices.iloc[max(0, i-52):i+1]
+        p_26w = prices.iloc[max(0, i-26):i+1]
+
+        if p_curr <= p_52w.min() * 1.05: 
+            weeks_since_bottom = 0
+            score *= 0.6  
+        else: 
+            weeks_since_bottom += 1
+
+        if p_curr > ma200.iloc[i] and drawdown.iloc[i] <= -30 and k_curr < 20: 
+            score *= 0.65 
+
+        recent_low = p_26w.min()
+        if p_curr < ma200.iloc[i] and ((p_curr - recent_low) / recent_low) * 100 >= 25 and k_curr > 80: 
+            score += (100 - score) * 0.35
+
+        if p_curr > ma50.iloc[i] * 1.8 and r_curr > 75: 
+            score += (100 - score) * 0.45
+
+        final_scores.append(max(0.0, min(100.0, score)))
+
+    return pd.Series(final_scores, index=prices.index).bfill().fillna(50)
+
 @app.post("/analyze")
 def analyze(req: AnalyzeRequest = None):
-    symbol = "BTCUSDT"
-    interval = "1w"
-    name = "Bitcoin"
-    ticker = "BTC"
+    requested_coin = "BTC"
+    if req and hasattr(req, 'coin') and req.coin:
+        requested_coin = req.coin.upper()
 
+    if requested_coin == "ZEC":
+        symbol = "ZECUSDT"
+        name = "Zcash"
+        ticker = "ZEC"
+        calc_fn = calculate_zec_macro_score
+    else:
+        symbol = "BTCUSDT"
+        name = "Bitcoin"
+        ticker = "BTC"
+        calc_fn = calculate_macro_score
+
+    interval = "1w"
     df = get_crypto_data(symbol, interval)
     if df.empty:
-        return {"error": "API Error: All market data sources unreachable."}
+        return {"error": f"API Error: All market data sources unreachable for {ticker}."}
 
-    score_series = calculate_macro_score(df['Close'])
+    score_series = calc_fn(df['Close'])
     curr_score = round(float(score_series.iloc[-1]), 1)
 
     return {
