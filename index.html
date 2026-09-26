@@ -145,6 +145,12 @@ window.fullData = null;
 const savedView = localStorage.getItem('trading_macro_view');
 window.currentMacroView = (savedView === '1Y' || savedView === '2Y' || savedView === '4Y') ? savedView : '4Y';
 
+const PALETTE = {
+    low:  { full: '#A88468', bgCard: '#080705', bgBadge: '#110D0A', border: '#32281F', line: '#544234' },
+    mid:  { full: '#F7931A', bgCard: '#0C0701', bgBadge: '#190F03', border: '#4A2C08', line: '#7C4A0D' },
+    high: { full: '#FF4500', bgCard: '#0D0300', bgBadge: '#1A0700', border: '#4C1500', line: '#802300' }
+};
+
 function getTheme() {
     return {
         low: '#A88468', lowRgb: '168, 132, 104',
@@ -183,6 +189,9 @@ function triggerAnalysis() {
 
     let pBadge = document.getElementById("badge-phase");
     pBadge.className = 'border border-neutral-800/60 bg-neutral-800/40 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse';
+    pBadge.style.backgroundColor = "";
+    pBadge.style.borderColor = "";
+    pBadge.style.color = "";
     pBadge.innerHTML = 'HODL';
 
     document.getElementById("val-price").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded">88,888.88</span>';
@@ -195,7 +204,10 @@ function triggerAnalysis() {
     vScoreLarge.style.textShadow = "none";
     
     // Reset main card to neutral
-    document.getElementById("main-card").className = "p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000";
+    const mainCard = document.getElementById("main-card");
+    mainCard.className = "p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000";
+    mainCard.style.backgroundColor = "";
+    mainCard.style.borderColor = "";
     
     // Reset score bar
     const bar = document.getElementById("animated-score-bar");
@@ -256,14 +268,15 @@ const customChartPlugin = {
       let xPos = activePoint.element.x;
       let yPos = activePoint.element.y;
       let val = Math.max(0, Math.min(100, activePoint.element.$context.parsed.y));
-      let sHex = val <= 20 ? theme.low : (val >= 80 ? theme.high : theme.mid);
+      let currentTier = val <= 20 ? PALETTE.low : (val >= 80 ? PALETTE.high : PALETTE.mid);
+      let sHex = currentTier.full;
 
       ctx.save();
       ctx.beginPath(); 
       ctx.moveTo(xPos, top); 
       ctx.lineTo(xPos, bottom);
       ctx.lineWidth = 1; 
-      ctx.strokeStyle = `${sHex}cc`; 
+      ctx.strokeStyle = currentTier.line; 
       ctx.stroke();
 
       // Mini point on hover line
@@ -281,7 +294,6 @@ const customChartPlugin = {
           let bx = Math.max(left, Math.min(right - pw, xPos - pw / 2));
           let by = bottom + 4;
           let radius = 6;
-          let sRgb = val <= 20 ? theme.lowRgb : (val >= 80 ? theme.highRgb : theme.midRgb);
           
           ctx.beginPath();
           if (ctx.roundRect) {
@@ -289,11 +301,9 @@ const customChartPlugin = {
           } else {
               ctx.rect(bx, by, pw, ph);
           }
-          ctx.fillStyle = '#0a0a0a';
+          ctx.fillStyle = currentTier.bgBadge;
           ctx.fill();
-          ctx.fillStyle = `rgba(${sRgb}, 0.10)`;
-          ctx.fill();
-          ctx.strokeStyle = `rgba(${sRgb}, 0.30)`;
+          ctx.strokeStyle = currentTier.border;
           ctx.lineWidth = 1;
           ctx.stroke();
 
@@ -315,11 +325,11 @@ const customChartPlugin = {
     if (meta.data && meta.data.length > 0) {
         const lastP = meta.data[meta.data.length - 1];
         const lastV = chart.data.datasets[0].data[meta.data.length - 1];
-        let dotC = lastV <= 20 ? theme.low : (lastV >= 80 ? theme.high : theme.mid);
+        let currentTier = lastV <= 20 ? PALETTE.low : (lastV >= 80 ? PALETTE.high : PALETTE.mid);
         ctx.save();
         ctx.beginPath();
         ctx.arc(lastP.x, lastP.y, 3, 0, 2 * Math.PI);
-        ctx.fillStyle = dotC;
+        ctx.fillStyle = currentTier.full;
         ctx.fill();
         ctx.restore();
     }
@@ -414,8 +424,8 @@ async function analyze() {
         return;
     }
     const s = data.cycle_score || 0;
-    const theme = getTheme();
-    let sHex = s <= 20 ? theme.low : (s >= 80 ? theme.high : theme.mid);
+    const activeTier = s <= 20 ? PALETTE.low : (s >= 80 ? PALETTE.high : PALETTE.mid);
+    const sHex = activeTier.full;
     
     if (data.name && data.ticker) {
         document.getElementById("badge-name").innerText = `${data.name} (${data.ticker})`;
@@ -423,13 +433,11 @@ async function analyze() {
         document.getElementById("badge-name").innerText = "Bitcoin (BTC)";
     }
     
-    let badgeBgColor, badgeBorderColor, badgeTextColor, mcBg, mcBorder;
-    if (s <= 20) { badgeBgColor="bg-[#A88468]/10"; badgeBorderColor="border-[#A88468]/30"; badgeTextColor="text-[#A88468]"; mcBg="bg-[#A88468]/5"; mcBorder="border-[#A88468]/30"; }
-    else if (s >= 80) { badgeBgColor="bg-[#FF4500]/10"; badgeBorderColor="border-[#FF4500]/30"; badgeTextColor="text-[#FF4500]"; mcBg="bg-[#FF4500]/5"; mcBorder="border-[#FF4500]/30"; }
-    else { badgeBgColor="bg-[#F7931A]/10"; badgeBorderColor="border-[#F7931A]/30"; badgeTextColor="text-[#F7931A]"; mcBg="bg-[#F7931A]/5"; mcBorder="border-[#F7931A]/30"; }
-
     let pBadge = document.getElementById("badge-phase");
-    pBadge.className = `border w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 ${badgeBgColor} ${badgeBorderColor} ${badgeTextColor}`;
+    pBadge.className = "border w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000";
+    pBadge.style.backgroundColor = activeTier.bgBadge;
+    pBadge.style.borderColor = activeTier.border;
+    pBadge.style.color = activeTier.full;
     pBadge.innerText = data.phase || "HODL";
 
     document.getElementById("val-price").innerText = `$${Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
@@ -449,7 +457,10 @@ async function analyze() {
     document.getElementById("dynamic-title").style.color = sHex;
     document.getElementById("dynamic-title").style.textShadow = `0 0 10px ${sHex}80`;
 
-    document.getElementById("main-card").className = `p-6 rounded-3xl border shadow-2xl transition-colors duration-1000 ${mcBg} ${mcBorder}`;
+    const mainCard = document.getElementById("main-card");
+    mainCard.className = "p-6 rounded-3xl border shadow-2xl transition-colors duration-1000";
+    mainCard.style.backgroundColor = activeTier.bgCard;
+    mainCard.style.borderColor = activeTier.border;
 
     updateChart(window.currentMacroView);
     setTimeout(() => {
