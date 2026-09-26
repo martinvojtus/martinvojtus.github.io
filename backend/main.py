@@ -1,4 +1,6 @@
 import os
+import time
+import json
 import logging
 import requests
 import numpy as np
@@ -7,11 +9,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from google import genai
 
 load_dotenv()
 
 # --- CONFIG & LOGGING ---
 logging.basicConfig(level=logging.INFO)
+logging.getLogger("google_genai.models").setLevel(logging.ERROR)
 logger = logging.getLogger(__name__)
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
@@ -214,6 +218,105 @@ def calculate_macro_score(prices):
 
     return pd.Series(final_scores, index=prices.index).bfill().fillna(50)
 
+_ai_cache = {
+    "data": None,
+    "timestamp": 0,
+    "price": None,
+    "score": None,
+}
+
+def generate_ai_macro_insight(price: float, change_24h: float, cycle_score: float, phase: str, rsi_val: float, ma200_val: float, drawdown: float) -> dict | None:
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        logger.warning("GEMINI_API_KEY not configured. Skipping AI insight generation.")
+        return None
+
+    now = time.time()
+    if _ai_cache["data"] and (now - _ai_cache["timestamp"] < 600):
+        if _ai_cache["score"] is not None and abs(_ai_cache["score"] - cycle_score) < 1.0:
+            logger.info("Serving AI macro insight from cache.")
+            return _ai_cache["data"]
+
+    ma200_rel = round(((price - ma200_val) / ma200_val) * 100, 1) if ma200_val else 0
+
+    prompt = f"""You are a quantitative macro analyst specializing in Bitcoin cycle analysis.
+Analyze the following live Bitcoin macro metrics:
+- Current Price: ${price:,.2f}
+- 24h Change: {change_24h:+.2f}%
+- Macro Cycle Score: {cycle_score:.1f}% (Scale: 0-100%. 0-20% DCA IN, 21-79% HODL, 80-100% DCA OUT)
+- Current Cycle Phase: {phase}
+- 14-week RSI: {rsi_val:.1f}
+- Price vs 200-Week Moving Average: {ma200_rel:+.1f}%
+- Drawdown from Rolling ATH: {drawdown:.1f}%
+
+Provide a high-signal institutional macro brief.
+Respond strictly in JSON format with exactly these keys:
+{{
+  "regime": "A 2-4 word macro regime label (e.g. 'Mid-Cycle Consolidation', 'Accumulation Zone', 'Distribution Warning', etc.)",
+  "summary": "2 concise sentences synthesizing the market regime, momentum, and cycle position.",
+  "strategy": "1 sentence actionable perspective aligned with the macro score and phase."
+}}"""
+
+    models_to_try = ["gemini-flash-latest", "gemini-2.5-flash-lite"]
+    try:
+        client = genai.Client(api_key=api_key)
+    except Exception as e:
+        logger.warning(f"Failed to initialize Gemini client: {e}")
+        return _ai_cache.get("data")
+
+    for model_name in models_to_try:
+        try:
+            logger.info(f"Generating AI macro insight with model: {model_name}")
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config={"response_mime_type": "application/json"}
+            )
+            raw_text = response.text.strip()
+            if raw_text.startswith("```json"):
+                raw_text = raw_text[7:]
+            if raw_text.startswith("```"):
+                raw_text = raw_text[3:]
+            if raw_text.endswith("```"):
+                raw_text = raw_text[:-3]
+
+            insight_data = json.loads(raw_text.strip())
+            insight_data["model"] = "Gemini AI"
+            insight_data["generated_at"] = int(now * 1000)
+
+            _ai_cache["data"] = insight_data
+            _ai_cache["timestamp"] = now
+            _ai_cache["price"] = price
+            _ai_cache["score"] = cycle_score
+            return insight_data
+        except Exception as e:
+            logger.warning(f"Gemini generation with {model_name} failed: {e}")
+
+    return _ai_cache.get("data")
+
+@app.get("/ai-insight")
+def get_ai_insight_endpoint():
+    symbol = "BTCUSDT"
+    interval = "1w"
+    df = get_crypto_data(symbol, interval)
+    if df.empty:
+        return {"error": "API Error: All market data sources unreachable."}
+
+    score_series = calculate_macro_score(df['Close'])
+    curr_score = round(float(score_series.iloc[-1]), 1)
+    price = float(df['Close'].iloc[-1])
+    change_24h = round(get_24h_change(symbol), 2)
+    rsi_series = calculate_rsi(df['Close'], 14)
+    rsi_val = round(float(rsi_series.iloc[-1]), 1) if not rsi_series.empty else 50.0
+    ma200_series = df['Close'].rolling(200, min_periods=10).mean().bfill()
+    ma200_val = float(ma200_series.iloc[-1]) if not ma200_series.empty else price
+    rolling_ath = float(df['Close'].cummax().iloc[-1])
+    drawdown = round(((price - rolling_ath) / rolling_ath) * 100, 1) if rolling_ath else 0.0
+    phase = "DCA IN" if curr_score <= 20 else ("HODL" if curr_score <= 79 else "DCA OUT")
+
+    insight = generate_ai_macro_insight(price, change_24h, curr_score, phase, rsi_val, ma200_val, drawdown)
+    return {"ai_insight": insight}
+
 @app.post("/analyze")
 def analyze(req: AnalyzeRequest = None):
     symbol = "BTCUSDT"
@@ -227,17 +330,29 @@ def analyze(req: AnalyzeRequest = None):
 
     score_series = calculate_macro_score(df['Close'])
     curr_score = round(float(score_series.iloc[-1]), 1)
+    price = float(df['Close'].iloc[-1])
+    change_24h = round(get_24h_change(symbol), 2)
+    rsi_series = calculate_rsi(df['Close'], 14)
+    rsi_val = round(float(rsi_series.iloc[-1]), 1) if not rsi_series.empty else 50.0
+    ma200_series = df['Close'].rolling(200, min_periods=10).mean().bfill()
+    ma200_val = float(ma200_series.iloc[-1]) if not ma200_series.empty else price
+    rolling_ath = float(df['Close'].cummax().iloc[-1])
+    drawdown = round(((price - rolling_ath) / rolling_ath) * 100, 1) if rolling_ath else 0.0
+    phase = "DCA IN" if curr_score <= 20 else ("HODL" if curr_score <= 79 else "DCA OUT")
+
+    ai_insight = generate_ai_macro_insight(price, change_24h, curr_score, phase, rsi_val, ma200_val, drawdown)
 
     return {
-        "price": float(df['Close'].iloc[-1]),
-        "change": round(get_24h_change(symbol), 2),
+        "price": price,
+        "change": change_24h,
         "analysis": "MACRO (1W)",
         "name": name,
         "ticker": ticker,
         "chart_dates": [int(d.timestamp() * 1000) for d in df.index],
         "chart_score": score_series.values.tolist(),
         "cycle_score": curr_score,
-        "phase": "DCA IN" if curr_score <= 20 else ("HODL" if curr_score <= 79 else "DCA OUT")
+        "phase": phase,
+        "ai_insight": ai_insight
     }
 
 if __name__ == "__main__":
