@@ -14,6 +14,8 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+
 app = FastAPI()
 
 app.add_middleware(
@@ -32,25 +34,97 @@ class AnalyzeRequest(BaseModel):
 def keep_alive():
     return {"status": "Trading Engine - Bot Active!"}
 
+def _fetch_from_binance_url(url):
+    r = requests.get(url, headers=HEADERS, timeout=8)
+    r.raise_for_status()
+    df = pd.DataFrame(r.json(), columns=['Time', 'Open', 'High', 'Low', 'Close', 'Vol', 'CloseTime', 'QuoteVol', 'Trades', 'TakerBuyVol', 'TakerBuyQuoteVol', 'Ignore'])
+    for col in ['Open', 'High', 'Low', 'Close', 'Vol']:
+        df[col] = df[col].astype(float)
+    df['Time'] = pd.to_datetime(df['Time'], unit='ms')
+    df = df.set_index('Time')
+    if len(df) >= 200:
+        return df
+    raise ValueError(f"Insufficient candles: {len(df)}")
+
+def _fetch_from_gateio(pair="BTC_USDT", interval="7d"):
+    url = f"https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair={pair}&interval={interval}&limit=1000"
+    r = requests.get(url, headers=HEADERS, timeout=8)
+    r.raise_for_status()
+    raw = r.json()
+    if not isinstance(raw, list) or len(raw) < 200:
+        raise ValueError("Invalid or insufficient Gate.io candles")
+    df = pd.DataFrame(raw, columns=['Time', 'QuoteVol', 'Close', 'High', 'Low', 'Open', 'Vol', 'WindowEnd'])
+    for col in ['Open', 'High', 'Low', 'Close', 'Vol']:
+        df[col] = df[col].astype(float)
+    df['Time'] = pd.to_datetime(df['Time'].astype(int), unit='s')
+    return df.set_index('Time').sort_index()
+
+def _fetch_from_bybit(symbol="BTCUSDT", interval="W"):
+    url = f"https://api.bybit.com/v5/market/kline?category=spot&symbol={symbol}&interval={interval}&limit=1000"
+    r = requests.get(url, headers=HEADERS, timeout=8)
+    r.raise_for_status()
+    raw = r.json().get('result', {}).get('list', [])
+    if not isinstance(raw, list) or len(raw) < 200:
+        raise ValueError("Invalid or insufficient Bybit candles")
+    df = pd.DataFrame(raw, columns=['Time', 'Open', 'High', 'Low', 'Close', 'Vol', 'Turnover'])
+    for col in ['Open', 'High', 'Low', 'Close', 'Vol']:
+        df[col] = df[col].astype(float)
+    df['Time'] = pd.to_datetime(df['Time'].astype(int), unit='ms')
+    return df.set_index('Time').sort_index()
+
+def _fetch_from_kraken(pair="XBTUSDT", interval=10080):
+    url = f"https://api.kraken.com/0/public/OHLC?pair={pair}&interval={interval}"
+    r = requests.get(url, headers=HEADERS, timeout=8)
+    r.raise_for_status()
+    res = r.json().get('result', {})
+    key = [k for k in res.keys() if k != 'last'][0]
+    raw = res[key]
+    if not isinstance(raw, list) or len(raw) < 200:
+        raise ValueError("Invalid or insufficient Kraken candles")
+    df = pd.DataFrame(raw, columns=['Time', 'Open', 'High', 'Low', 'Close', 'Vwap', 'Vol', 'Count'])
+    for col in ['Open', 'High', 'Low', 'Close', 'Vol']:
+        df[col] = df[col].astype(float)
+    df['Time'] = pd.to_datetime(df['Time'].astype(int), unit='s')
+    return df.set_index('Time').sort_index()
+
 def get_crypto_data(symbol="BTCUSDT", interval="1w"):
-    try:
-        url = f"https://data-api.binance.vision/api/v3/klines?symbol={symbol}&interval={interval}&limit=1000"
-        r = requests.get(url, timeout=10)
-        df = pd.DataFrame(r.json(), columns=['Time', 'Open', 'High', 'Low', 'Close', 'Vol', 'CloseTime', 'QuoteVol', 'Trades', 'TakerBuyVol', 'TakerBuyQuoteVol', 'Ignore'])
-        for col in ['Open', 'High', 'Low', 'Close', 'Vol']:
-            df[col] = df[col].astype(float)
-        df['Time'] = pd.to_datetime(df['Time'], unit='ms')
-        return df.set_index('Time')
-    except Exception as e:
-        logger.error(f"Data Fetch Error: {e}")
-        return pd.DataFrame()
+    sources = [
+        ("Binance Vision", lambda: _fetch_from_binance_url(f"https://data-api.binance.vision/api/v3/klines?symbol={symbol}&interval={interval}&limit=1000")),
+        ("Binance Official", lambda: _fetch_from_binance_url(f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit=1000")),
+        ("Gate.io", lambda: _fetch_from_gateio()),
+        ("Bybit", lambda: _fetch_from_bybit()),
+        ("Binance US", lambda: _fetch_from_binance_url(f"https://api.binance.us/api/v3/klines?symbol={symbol}&interval={interval}&limit=1000")),
+        ("Kraken", lambda: _fetch_from_kraken()),
+    ]
+    for name, fetch_func in sources:
+        try:
+            df = fetch_func()
+            if not df.empty:
+                logger.info(f"Successfully fetched {len(df)} candles from {name}")
+                return df
+        except Exception as e:
+            logger.warning(f"Data Fetch from {name} failed: {e}")
+
+    logger.error("All crypto data sources failed.")
+    return pd.DataFrame()
 
 def get_24h_change(symbol="BTCUSDT"):
-    try:
-        r = requests.get(f"https://data-api.binance.vision/api/v3/ticker/24hr?symbol={symbol}", timeout=5)
-        return float(r.json()['priceChangePercent'])
-    except:
-        return 0.0
+    sources = [
+        ("Binance Vision", f"https://data-api.binance.vision/api/v3/ticker/24hr?symbol={symbol}", lambda r: float(r.json()['priceChangePercent'])),
+        ("Binance Official", f"https://api.binance.com/api/v3/ticker/24hr?symbol={symbol}", lambda r: float(r.json()['priceChangePercent'])),
+        ("Gate.io", "https://api.gateio.ws/api/v4/spot/tickers?currency_pair=BTC_USDT", lambda r: float(r.json()[0]['change_percentage'])),
+        ("Bybit", f"https://api.bybit.com/v5/market/tickers?category=spot&symbol={symbol}", lambda r: float(r.json()['result']['list'][0]['price24hPcnt']) * 100.0),
+        ("Binance US", f"https://api.binance.us/api/v3/ticker/24hr?symbol={symbol}", lambda r: float(r.json()['priceChangePercent'])),
+        ("Kraken", "https://api.kraken.com/0/public/Ticker?pair=XBTUSDT", lambda r: ((float(r.json()['result'][next(iter(r.json()['result']))]['c'][0]) - float(r.json()['result'][next(iter(r.json()['result']))]['o'])) / float(r.json()['result'][next(iter(r.json()['result']))]['o'])) * 100.0),
+    ]
+    for name, url, parser in sources:
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=5)
+            if r.status_code == 200:
+                return float(parser(r))
+        except Exception as e:
+            logger.warning(f"Ticker Fetch from {name} failed: {e}")
+    return 0.0
 
 def calculate_rsi(series, window=14):
     delta = series.diff()
@@ -149,7 +223,7 @@ def analyze(req: AnalyzeRequest = None):
 
     df = get_crypto_data(symbol, interval)
     if df.empty:
-        return {"error": "API Error: Binance unreachable."}
+        return {"error": "API Error: All market data sources unreachable."}
 
     score_series = calculate_macro_score(df['Close'])
     curr_score = round(float(score_series.iloc[-1]), 1)
