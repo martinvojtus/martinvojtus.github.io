@@ -275,9 +275,10 @@ def calculate_zec_macro_score(prices):
             discount = 1.0 - (0.68 * dd_progress * rsi_factor)
             score *= discount
 
-        # Deep macro bear discount (under 200W MA with high drawdown)
+        # Deep macro bear discount (smooth proportional reduction based on drawdown depth)
         if p_curr < ma200.iloc[i] and dd_156w.iloc[i] <= -70:
-            score = min(score, 18.0)
+            bear_depth = min(1.0, max(0.0, (-dd_156w.iloc[i] - 70.0) / 20.0))
+            score *= (0.65 - 0.20 * bear_depth)
 
         # Bull run parabolic blow-off booster (price > 1.8x 50W MA and RSI > 75)
         if p_curr > ma50.iloc[i] * 1.8 and r_curr > 75: 
