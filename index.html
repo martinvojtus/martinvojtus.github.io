@@ -106,42 +106,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- GEMINI AI MACRO INTELLIGENCE CARD -->
-        <div id="ai-insight-card" class="mt-4 p-5 sm:p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-all duration-700">
-            <div class="flex justify-between items-center mb-3 text-[0.6rem] uppercase tracking-widest">
-                <div class="flex items-center gap-2">
-                    <span class="relative flex h-2 w-2">
-                      <span id="ai-pulse-dot" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                      <span id="ai-solid-dot" class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-                    </span>
-                    <span class="font-medium text-neutral-300 flex items-center gap-1.5 select-none">
-                        <svg class="w-3.5 h-3.5 text-cyan-400 shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2L14.4 8.6L21 11L14.4 13.4L12 20L9.6 13.4L3 11L9.6 8.6L12 2Z" />
-                        </svg>
-                        GEMINI MACRO AI
-                    </span>
-                </div>
-                <div id="ai-regime-badge" class="border border-neutral-800/60 bg-neutral-800/40 px-2.5 py-1 rounded-md text-neutral-400 text-[0.55rem] tracking-wider transition-all duration-500 uppercase select-none">
-                    ANALYZING...
-                </div>
-            </div>
-
-            <div id="ai-summary-container" class="text-[0.72rem] sm:text-[0.76rem] leading-relaxed text-neutral-300">
-                <div id="ai-skeleton" class="space-y-2">
-                    <div class="h-3 bg-neutral-800/60 rounded animate-pulse w-full"></div>
-                    <div class="h-3 bg-neutral-800/60 rounded animate-pulse w-11/12"></div>
-                    <div class="h-3 bg-neutral-800/60 rounded animate-pulse w-4/5"></div>
-                </div>
-                <p id="ai-summary-text" class="hidden text-neutral-300 leading-relaxed"></p>
-            </div>
-
-            <div id="ai-strategy-container" class="mt-3.5 pt-3 border-t border-neutral-800/50 flex items-start gap-2 text-[0.68rem] text-neutral-400">
-                <span class="text-neutral-500 font-semibold uppercase text-[0.55rem] tracking-wider shrink-0 mt-0.5 select-none">STRATEGY:</span>
-                <div id="ai-strategy-skeleton" class="h-3 bg-neutral-800/60 rounded animate-pulse flex-1"></div>
-                <span id="ai-strategy-text" class="hidden text-neutral-300 leading-normal"></span>
-            </div>
-        </div>
     </div>
 
     <!-- BOTTOM CONTROLS: LEGEND & REFRESH -->
@@ -252,23 +216,6 @@ function triggerAnalysis() {
     
     // Hide error box when refreshing
     document.getElementById("error-box").classList.add("hidden");
-
-    // Reset AI card skeleton
-    const aiSkeleton = document.getElementById("ai-skeleton");
-    const aiSummaryText = document.getElementById("ai-summary-text");
-    const aiStratSkeleton = document.getElementById("ai-strategy-skeleton");
-    const aiStratText = document.getElementById("ai-strategy-text");
-    const aiRegimeBadge = document.getElementById("ai-regime-badge");
-    const aiPulseDot = document.getElementById("ai-pulse-dot");
-    if (aiSkeleton) aiSkeleton.classList.remove("hidden");
-    if (aiSummaryText) { aiSummaryText.classList.add("hidden"); aiSummaryText.innerText = ""; }
-    if (aiStratSkeleton) aiStratSkeleton.classList.remove("hidden");
-    if (aiStratText) { aiStratText.classList.add("hidden"); aiStratText.innerText = ""; }
-    if (aiPulseDot) aiPulseDot.classList.add("animate-ping");
-    if (aiRegimeBadge) {
-        aiRegimeBadge.innerText = "ANALYZING...";
-        aiRegimeBadge.className = "border border-neutral-800/60 bg-neutral-800/40 px-2.5 py-1 rounded-md text-neutral-400 text-[0.55rem] tracking-wider transition-all duration-500 uppercase select-none";
-    }
 
     analyze();
 }
@@ -456,44 +403,6 @@ async function analyze() {
     document.getElementById("dynamic-title").style.textShadow = `0 0 10px ${sHex}80`;
 
     document.getElementById("main-card").className = `p-6 rounded-3xl border shadow-2xl transition-colors duration-1000 ${mcBg} ${mcBorder}`;
-
-    // Render Gemini AI Macro Insight
-    const aiSkeleton = document.getElementById("ai-skeleton");
-    const aiSummaryText = document.getElementById("ai-summary-text");
-    const aiStratSkeleton = document.getElementById("ai-strategy-skeleton");
-    const aiStratText = document.getElementById("ai-strategy-text");
-    const aiRegimeBadge = document.getElementById("ai-regime-badge");
-    const aiPulseDot = document.getElementById("ai-pulse-dot");
-
-    if (data.ai_insight) {
-        if (aiSkeleton) aiSkeleton.classList.add("hidden");
-        if (aiStratSkeleton) aiStratSkeleton.classList.add("hidden");
-        if (aiSummaryText) {
-            aiSummaryText.innerText = data.ai_insight.summary || "";
-            aiSummaryText.classList.remove("hidden");
-        }
-        if (aiStratText) {
-            aiStratText.innerText = data.ai_insight.strategy || "";
-            aiStratText.classList.remove("hidden");
-        }
-        if (aiRegimeBadge) {
-            aiRegimeBadge.innerText = (data.ai_insight.regime || "CYCLE INSIGHT").toUpperCase();
-            aiRegimeBadge.className = `border px-2.5 py-1 rounded-md text-[0.55rem] tracking-wider transition-all duration-500 uppercase select-none ${badgeBgColor} ${badgeBorderColor} ${badgeTextColor}`;
-        }
-        if (aiPulseDot) aiPulseDot.classList.remove("animate-ping");
-    } else {
-        if (aiSkeleton) aiSkeleton.classList.add("hidden");
-        if (aiStratSkeleton) aiStratSkeleton.classList.add("hidden");
-        if (aiSummaryText) {
-            aiSummaryText.innerText = "Macro intelligence currently calibrating. Refresh to update.";
-            aiSummaryText.classList.remove("hidden");
-        }
-        if (aiRegimeBadge) {
-            aiRegimeBadge.innerText = data.phase || "HODL";
-            aiRegimeBadge.className = `border px-2.5 py-1 rounded-md text-[0.55rem] tracking-wider transition-all duration-500 uppercase select-none ${badgeBgColor} ${badgeBorderColor} ${badgeTextColor}`;
-        }
-        if (aiPulseDot) aiPulseDot.classList.remove("animate-ping");
-    }
 
     updateChart(window.currentMacroView);
     setTimeout(() => {
