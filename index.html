@@ -36,7 +36,7 @@
           </g>
         </svg>
         <div class="w-10 flex justify-between text-[0.6rem] uppercase text-white font-medium mt-3 tracking-normal leading-none select-none">
-            <span>S</span><span>P</span><span>A</span><span>C</span><span>E</span>
+            <span>L</span><span>I</span><span>N</span><span>E</span>
         </div>
     </div>
 
@@ -131,16 +131,6 @@
             </button>
         </div>
 
-        <!-- COIN TOGGLE SELECTOR (FULL WIDTH) -->
-        <div class="w-full mt-2.5 sm:mt-3 p-1 bg-neutral-900/40 border border-neutral-800/50 rounded-2xl flex gap-1 shadow-2xl shadow-black/50 select-none">
-            <button id="coin-btn-BTC" onclick="switchCoin('BTC')" class="flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-white bg-neutral-800/80">
-                <span>BITCOIN (BTC)</span>
-            </button>
-            <button id="coin-btn-ZEC" onclick="switchCoin('ZEC')" class="flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-400 hover:text-white">
-                <span>ZCASH (ZEC)</span>
-            </button>
-        </div>
-
         <div id="error-box" class="hidden mt-4 bg-[#FF2A6D]/10 border border-[#FF2A6D]/30 p-4 rounded-2xl text-[#FF2A6D] text-[0.6rem] tracking-widest uppercase text-center">❌ CONNECTION FAILED. PLEASE TRY AGAIN.</div>
 
     </div>
@@ -154,8 +144,6 @@ window.currentScoreData = { score: 0, colorClass: "" };
 window.fullData = null; 
 const savedView = localStorage.getItem('trading_macro_view');
 window.currentMacroView = (savedView === '1Y' || savedView === '2Y' || savedView === '4Y') ? savedView : '4Y';
-const savedCoin = localStorage.getItem('trading_coin');
-window.currentCoin = (savedCoin === 'BTC' || savedCoin === 'ZEC') ? savedCoin : 'BTC';
 
 const PALETTE = {
     low:  { full: '#A88468', bgCard: '#080705', bgBadge: '#110D0A', border: '#32281F', line: '#544234' },
@@ -174,7 +162,6 @@ function getTheme() {
 // --- DASHBOARD LOGIC ---
 function initUI() {
     updateMacroButtonsUI(window.currentMacroView);
-    updateCoinButtonsUI(window.currentCoin);
 }
 
 function updateMacroButtonsUI(period) {
@@ -182,24 +169,6 @@ function updateMacroButtonsUI(period) {
         const btn = document.getElementById(`btn-${p}`);
         if(btn) btn.className = p === period ? "px-3 py-1 rounded-md text-white bg-neutral-800/80 transition-all" : "px-3 py-1 rounded-md text-neutral-400 hover:text-white transition-all";
     });
-}
-
-function updateCoinButtonsUI(coin) {
-    ['BTC', 'ZEC'].forEach(c => {
-        const btn = document.getElementById(`coin-btn-${c}`);
-        if (btn) {
-            btn.className = c === coin 
-                ? "flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-white bg-neutral-800/80" 
-                : "flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-400 hover:text-white";
-        }
-    });
-}
-
-function switchCoin(coin) {
-    window.currentCoin = coin;
-    localStorage.setItem('trading_coin', coin);
-    updateCoinButtonsUI(coin);
-    triggerAnalysis();
 }
 
 function triggerAnalysis() {
@@ -216,7 +185,7 @@ function triggerAnalysis() {
     
     let badgeName = document.getElementById("badge-name");
     badgeName.className = "border border-[#262626] bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-400";
-    badgeName.innerText = (window.currentCoin === 'ZEC') ? "Zcash (ZEC)" : "Bitcoin (BTC)";
+    badgeName.innerText = "Bitcoin (BTC)";
 
     let pBadge = document.getElementById("badge-phase");
     pBadge.className = 'border border-neutral-800/60 bg-neutral-800/40 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse';
@@ -441,7 +410,6 @@ function updateChart(period) {
 
 async function analyze() {
   try {
-    const coinToSend = window.currentCoin || "BTC";
     const apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
         ? "http://127.0.0.1:10000/analyze"
         : "https://mv-backend-ak8l.onrender.com/analyze";
@@ -449,7 +417,7 @@ async function analyze() {
         method: "POST", 
         headers: {"Content-Type": "application/json"},
         cache: "no-store",
-        body: JSON.stringify({ mode: "MACRO", interval: "1w", coin: coinToSend })
+        body: JSON.stringify({ mode: "MACRO", interval: "1w", coin: "BTC" })
     });
     const data = await res.json(); 
     console.log("Data from backend:", data);
@@ -467,7 +435,7 @@ async function analyze() {
     if (data.name && data.ticker) {
         document.getElementById("badge-name").innerText = `${data.name} (${data.ticker})`;
     } else {
-        document.getElementById("badge-name").innerText = coinToSend === 'ZEC' ? "Zcash (ZEC)" : "Bitcoin (BTC)";
+        document.getElementById("badge-name").innerText = "Bitcoin (BTC)";
     }
     
     let pBadge = document.getElementById("badge-phase");
