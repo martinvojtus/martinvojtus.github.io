@@ -9,20 +9,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;500;600;700;800&display=block">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        if ('fonts' in document) {
-            document.documentElement.classList.add('fonts-loading');
-            Promise.race([
-                document.fonts.ready,
-                new Promise(r => setTimeout(r, 600))
-            ]).then(() => {
-                document.documentElement.classList.remove('fonts-loading');
-            });
-        }
-    </script>
     <style>
-        .fonts-loading #header-brand { opacity: 0; }
-        #header-brand { transition: opacity 0.15s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -34,26 +21,6 @@
 <body class="font-['Inter'] bg-black text-white flex justify-center min-h-screen items-start pt-6 pb-10 overflow-x-hidden">
 
 <div class="w-full max-w-xl p-5 relative">
-
-    <!-- DASHBOARD HEADER -->
-    <div id="dashboard-controls" class="flex items-center justify-between mb-8 px-1">
-        <svg class="h-[1.8rem] w-auto shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="72.35 270 935.31 810">
-          <g transform="translate(540, 540)">
-            <path d="
-              M 0,0 
-              L 467.654, -270 
-              L 467.654, 270 
-              L 0, 540 
-              L -467.654, 270 
-              L -467.654, -270 
-              Z" 
-              fill="white" />
-          </g>
-        </svg>
-        <div id="header-brand" class="text-[1.8rem] uppercase select-none leading-none flex items-center justify-end">
-            <span class="font-extrabold text-white" style="font-weight: 800;">V</span> <span class="font-normal text-neutral-400 mx-2" style="font-weight: 400;">•</span> <span class="font-thin text-white" style="font-weight: 100;">SPACE</span>
-        </div>
-    </div>
 
     <!-- VIEW: DASHBOARD -->
     <div id="view-dashboard-container" class="animate-fade-in">
