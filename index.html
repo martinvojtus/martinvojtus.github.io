@@ -102,21 +102,23 @@
             </div>
         </div>
 
-        <!-- REFRESH BUTTON (FULL WIDTH) -->
-        <button id="btn-refresh" onclick="refreshWindow(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="w-full mt-4 h-[46px] bg-neutral-900/40 [@media(hover:hover)]:hover:bg-neutral-800/40 border border-neutral-800/50 [@media(hover:hover)]:hover:border-neutral-700/50 rounded-2xl flex items-center justify-center gap-2 text-neutral-400 [@media(hover:hover)]:hover:text-white text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 active:scale-[0.99] focus:outline-none focus:ring-0 shadow-2xl shadow-black/50 select-none">
-            <svg id="btn-refresh-icon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
-            <span>REFRESH</span>
-        </button>
+        <!-- CONTROLS ROW: COIN TOGGLE & REFRESH -->
+        <div class="w-full mt-4 flex gap-2 select-none">
+            <!-- COIN TOGGLE SELECTOR -->
+            <div class="flex-1 p-1 bg-neutral-900/40 border border-neutral-800/50 rounded-2xl flex gap-1 shadow-2xl shadow-black/50">
+                <button id="coin-btn-BTC" onclick="switchCoin('BTC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-white bg-neutral-800/80">
+                    <span>BITCOIN (BTC)</span>
+                </button>
+                <button id="coin-btn-ZEC" onclick="switchCoin('ZEC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-400 [@media(hover:hover)]:hover:text-white">
+                    <span>ZCASH (ZEC)</span>
+                </button>
+            </div>
 
-        <!-- COIN TOGGLE SELECTOR (FULL WIDTH) -->
-        <div class="w-full mt-2.5 sm:mt-3 p-1 bg-neutral-900/40 border border-neutral-800/50 rounded-2xl flex gap-1 shadow-2xl shadow-black/50 select-none">
-            <button id="coin-btn-BTC" onclick="switchCoin('BTC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-white bg-neutral-800/80">
-                <span>BITCOIN (BTC)</span>
-            </button>
-            <button id="coin-btn-ZEC" onclick="switchCoin('ZEC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-400 [@media(hover:hover)]:hover:text-white">
-                <span>ZCASH (ZEC)</span>
+            <!-- REFRESH BUTTON (SQUARE) -->
+            <button id="btn-refresh" onclick="refreshWindow(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="w-[46px] h-[46px] shrink-0 bg-neutral-900/40 [@media(hover:hover)]:hover:bg-neutral-800/40 border border-neutral-800/50 [@media(hover:hover)]:hover:border-neutral-700/50 rounded-2xl flex items-center justify-center text-neutral-400 [@media(hover:hover)]:hover:text-white transition-all duration-300 active:scale-[0.99] focus:outline-none focus:ring-0 shadow-2xl shadow-black/50">
+                <svg id="btn-refresh-icon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
             </button>
         </div>
 
