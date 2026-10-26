@@ -39,35 +39,8 @@
 
     <!-- VIEW: DASHBOARD -->
     <div id="view-dashboard-container" class="animate-fade-in">
-        <div class="flex justify-between items-center px-1 mb-4 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
-            <div class="w-16 text-left">
-                <div id="dynamic-title" class="text-neutral-500 transition-colors duration-500">SCORE</div>
-            </div>
-            
-            <div id="macro-buttons" class="flex gap-1 absolute left-1/2 -translate-x-1/2">
-                <button onclick="updateChart('1Y')" id="btn-1Y" class="px-3 py-1 rounded-md transition-all duration-300">1Y</button>
-                <button onclick="updateChart('2Y')" id="btn-2Y" class="px-3 py-1 rounded-md transition-all duration-300">2Y</button>
-                <button onclick="updateChart('4Y')" id="btn-4Y" class="px-3 py-1 rounded-md transition-all duration-300">4Y</button>
-            </div>
-
-            <div class="w-16 flex justify-end">
-                <div id="dynamic-score" class="transition-colors duration-500 flex items-center justify-end h-full w-16">
-                    <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded px-0.5">00.0%</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="h-48 w-full relative mb-4">
-            <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
-                <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
-            </div>
-            
-            <div class="absolute top-0 bottom-0 -left-[8px] w-[calc(100%+16px)] pointer-events-none">
-                <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000 pointer-events-auto"></canvas>
-            </div>
-        </div>
-
-        <div id="main-card" class="p-6 rounded-3xl bg-white dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800/50 shadow-xl shadow-neutral-200/50 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-1000">
+        <!-- MAIN CARD (NOW AT THE VERY TOP) -->
+        <div id="main-card" class="p-6 rounded-3xl bg-white dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800/50 shadow-xl shadow-neutral-200/50 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-1000 mb-6">
             
             <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
                 <div id="badge-name" class="border border-neutral-200 dark:border-[#262626] bg-neutral-100 dark:bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-600 dark:text-neutral-400">
@@ -114,6 +87,36 @@
                         <span>DCA OUT</span>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- SCORE CHART HEADER -->
+        <div class="flex justify-between items-center px-1 mb-4 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
+            <div class="w-16 text-left">
+                <div id="dynamic-title" class="text-neutral-500 transition-colors duration-500">SCORE</div>
+            </div>
+            
+            <div id="macro-buttons" class="flex gap-1 absolute left-1/2 -translate-x-1/2">
+                <button onclick="updateChart('1Y')" id="btn-1Y" class="px-3 py-1 rounded-md transition-all duration-300">1Y</button>
+                <button onclick="updateChart('2Y')" id="btn-2Y" class="px-3 py-1 rounded-md transition-all duration-300">2Y</button>
+                <button onclick="updateChart('4Y')" id="btn-4Y" class="px-3 py-1 rounded-md transition-all duration-300">4Y</button>
+            </div>
+
+            <div class="w-16 flex justify-end">
+                <div id="dynamic-score" class="transition-colors duration-500 flex items-center justify-end h-full w-16">
+                    <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded px-0.5">00.0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCORE CHART CANVAS -->
+        <div class="h-48 w-full relative mb-4">
+            <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
+                <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
+            </div>
+            
+            <div class="absolute top-0 bottom-0 -left-[8px] w-[calc(100%+16px)] pointer-events-none">
+                <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000 pointer-events-auto"></canvas>
             </div>
         </div>
 
@@ -396,12 +399,6 @@ const customChartPlugin = {
           ? chart.chartPrices[activePoint.index]
           : null;
 
-      if (pointPrice !== null) {
-          const formattedPrice = '$' + Number(pointPrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-          const valEl = document.getElementById('val-price');
-          if (valEl) valEl.innerText = formattedPrice;
-      }
-
       if (xLabel) {
           ctx.fillStyle = currentTier.bgBadge;
           ctx.strokeStyle = currentTier.border;
@@ -479,11 +476,6 @@ function resetDynamicHover() {
     document.getElementById('dynamic-score').style.textShadow = isDark ? `0 0 10px ${sHex}80` : `0 0 5px ${sHex}40`;
     document.getElementById('dynamic-title').style.color = sHex;
     document.getElementById('dynamic-title').style.textShadow = isDark ? `0 0 10px ${sHex}80` : `0 0 5px ${sHex}40`;
-    
-    if (window.fullData.price) {
-        const valEl = document.getElementById('val-price');
-        if (valEl) valEl.innerText = `$${Number(window.fullData.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-    }
 }
 
 function updateChart(period) {
