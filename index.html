@@ -43,7 +43,7 @@
     <!-- VIEW: DASHBOARD -->
     <div id="view-dashboard-container" class="animate-fade-in">
         <!-- MAIN CARD (NOW AT THE VERY TOP) -->
-        <div id="main-card" class="p-6 rounded-3xl bg-white dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800/50 shadow-xl shadow-neutral-200/50 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-1000 mb-12">
+        <div id="main-card" class="p-6 rounded-3xl bg-white dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800/50 shadow-xl shadow-neutral-200/50 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-1000 mb-8">
             
             <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
                 <div id="badge-name" class="border border-neutral-200 dark:border-[#262626] bg-neutral-100 dark:bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-600 dark:text-neutral-400">
@@ -113,7 +113,7 @@
         </div>
 
         <!-- SCORE CHART CANVAS -->
-        <div class="h-48 w-full relative mb-4">
+        <div class="h-48 w-full relative mb-6">
             <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[20px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
                 <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
             </div>
@@ -319,8 +319,8 @@ function resetCardUI() {
     
     const mainCard = document.getElementById("main-card");
     mainCard.className = isDark 
-        ? "p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000 mb-12"
-        : "p-6 rounded-3xl bg-white border border-neutral-200 shadow-xl shadow-neutral-200/50 transition-colors duration-1000 mb-12";
+        ? "p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000 mb-8"
+        : "p-6 rounded-3xl bg-white border border-neutral-200 shadow-xl shadow-neutral-200/50 transition-colors duration-1000 mb-8";
     mainCard.style.backgroundColor = "";
     mainCard.style.borderColor = "";
     
@@ -605,7 +605,7 @@ function applyCardData(data) {
 
     const mainCard = document.getElementById("main-card");
     const shadowClass = isDark ? "shadow-2xl shadow-black/50" : "shadow-xl shadow-neutral-200/50";
-    mainCard.className = `p-6 rounded-3xl border ${shadowClass} transition-colors duration-1000 mb-12`;
+    mainCard.className = `p-6 rounded-3xl border ${shadowClass} transition-colors duration-1000 mb-8`;
     mainCard.style.backgroundColor = activeTier.bgCard;
     mainCard.style.borderColor = activeTier.border;
 
