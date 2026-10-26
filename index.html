@@ -43,7 +43,7 @@
     <!-- VIEW: DASHBOARD -->
     <div id="view-dashboard-container" class="animate-fade-in">
         <!-- MAIN CARD (NOW AT THE VERY TOP) -->
-        <div id="main-card" class="p-6 rounded-3xl bg-white dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800/50 shadow-xl shadow-neutral-200/50 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-1000 mb-10">
+        <div id="main-card" class="p-6 rounded-3xl bg-white dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800/50 shadow-xl shadow-neutral-200/50 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-1000 mb-12">
             
             <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
                 <div id="badge-name" class="border border-neutral-200 dark:border-[#262626] bg-neutral-100 dark:bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-600 dark:text-neutral-400">
@@ -94,7 +94,7 @@
         </div>
 
         <!-- SCORE CHART HEADER -->
-        <div class="flex justify-between items-center px-1 mb-5 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
+        <div class="flex justify-between items-center px-1 mb-6 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
             <div class="w-16 text-left">
                 <div id="dynamic-title" class="text-neutral-500 transition-colors duration-500">SCORE</div>
             </div>
@@ -113,8 +113,8 @@
         </div>
 
         <!-- SCORE CHART CANVAS -->
-        <div class="h-48 w-full relative mb-1">
-            <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[22px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
+        <div class="h-48 w-full relative mb-0">
+            <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[20px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
                 <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
             </div>
             
@@ -537,7 +537,7 @@ function updateChart(period) {
             responsive: true, maintainAspectRatio: false,
             animation: { duration: 1000, easing: 'easeOutQuart' },
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            layout: { padding: { left: 8, right: 8, top: 5, bottom: 22 } },
+            layout: { padding: { left: 8, right: 8, top: 5, bottom: 20 } },
             interaction: { mode: 'index', intersect: false },
             scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } },
             onHover: (event, activeElements) => {
