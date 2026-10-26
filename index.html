@@ -113,8 +113,8 @@
         </div>
 
         <!-- SCORE CHART CANVAS -->
-        <div class="h-48 w-full relative mb-10">
-            <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[20px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
+        <div class="h-48 w-full relative mb-2">
+            <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[30px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
                 <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
             </div>
             
@@ -417,13 +417,13 @@ const customChartPlugin = {
           }
 
           let textWidth = ctx.measureText(labelText).width;
-          let boxWidth = textWidth + 16; 
-          let boxHeight = 20;
+          let boxWidth = textWidth + 18; 
+          let boxHeight = 22;
           let boxX = Math.max(left, Math.min(right - boxWidth, xPos - boxWidth / 2));
-          let boxY = bottom + 2;
+          let boxY = bottom + 4;
 
           ctx.beginPath();
-          if (ctx.roundRect) ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 4);
+          if (ctx.roundRect) ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 5);
           else ctx.rect(boxX, boxY, boxWidth, boxHeight);
           ctx.fill(); ctx.stroke();
 
@@ -537,7 +537,7 @@ function updateChart(period) {
             responsive: true, maintainAspectRatio: false,
             animation: { duration: 1000, easing: 'easeOutQuart' },
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            layout: { padding: { left: 8, right: 8, top: 5, bottom: 20 } },
+            layout: { padding: { left: 8, right: 8, top: 5, bottom: 30 } },
             interaction: { mode: 'index', intersect: false },
             scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } },
             onHover: (event, activeElements) => {
