@@ -549,7 +549,7 @@ function updateChart(period) {
             labels: chartDates,
             datasets: [{
                 data: chartScoreRaw,
-                fill: false, borderWidth: 1.5, tension: 0.35, pointRadius: 0, clip: false,
+                fill: false, borderWidth: 1, tension: 0, pointRadius: 0, pointHoverRadius: 0, pointHitRadius: 10, borderCapStyle: 'round', borderJoinStyle: 'round', clip: false,
                 borderColor: function(c) {
                     const {ctx, chartArea} = c.chart; if (!chartArea) return;
                     const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
