@@ -24,9 +24,9 @@
 <div class="w-full max-w-xl p-5 relative">
 
     <!-- HEADER PANEL -->
-    <header id="header-panel" class="flex justify-between items-center px-1 mb-8 relative text-[0.6rem] tracking-widest h-[24px]">
-        <div class="w-20 flex items-center justify-start">
-            <svg id="header-logo" xmlns="http://www.w3.org/2000/svg" width="935.31" height="810" viewBox="72.35 270 935.31 810" class="shrink-0 text-white fill-white [&_path]:fill-white" style="height: 0.6rem; width: auto;">
+    <header id="header-panel" class="flex justify-between items-center px-1 mb-8 relative h-9">
+        <div class="flex items-center justify-start shrink-0">
+            <svg id="header-logo" xmlns="http://www.w3.org/2000/svg" width="935.31" height="810" viewBox="72.35 270 935.31 810" class="shrink-0 text-white fill-white [&_path]:fill-white h-[1.8rem] w-auto" style="height: 1.8rem; width: auto;">
               <g transform="translate(540, 540)">
                 <path d="
                   M 0,0 
@@ -41,17 +41,17 @@
             </svg>
         </div>
         
-        <div class="flex items-center justify-center absolute left-1/2 -translate-x-1/2 uppercase select-none leading-none">
+        <div class="flex items-center justify-center absolute left-1/2 -translate-x-1/2 uppercase select-none leading-none tracking-tight text-[1.8rem] whitespace-nowrap">
             <span class="font-extrabold text-white" style="font-weight: 800;">MARTINVOJTUS</span><span class="font-normal text-white" style="font-weight: 400;">.</span><span class="font-thin text-white" style="font-weight: 100;">SPACE</span>
         </div>
         
-        <div class="w-20 flex items-center justify-end relative">
-            <button id="btn-menu" onclick="toggleMenu(event)" class="text-neutral-400 hover:text-white transition-colors focus:outline-none flex items-center justify-center h-6 w-6 rounded-md hover:bg-neutral-800/40" aria-label="Menu">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <div class="flex items-center justify-end relative shrink-0">
+            <button id="btn-menu" onclick="toggleMenu(event)" class="text-neutral-400 hover:text-white transition-colors focus:outline-none flex items-center justify-center h-9 w-9 rounded-xl hover:bg-neutral-800/40" aria-label="Menu">
+                <svg class="w-[1.8rem] h-[1.8rem]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
             </button>
-            <div id="dropdown-menu" class="hidden absolute right-0 top-full mt-2 w-44 bg-neutral-900/95 backdrop-blur-md border border-neutral-800/80 rounded-2xl p-2 shadow-2xl shadow-black/80 flex flex-col gap-1 z-50 text-[0.6rem] uppercase tracking-widest select-none">
+            <div id="dropdown-menu" class="hidden absolute right-0 top-full mt-2 w-48 bg-neutral-900/95 backdrop-blur-md border border-neutral-800/80 rounded-2xl p-2 shadow-2xl shadow-black/80 flex flex-col gap-1 z-50 text-[0.6rem] uppercase tracking-widest select-none">
                 <a href="/" class="px-3 py-2 rounded-xl text-white bg-neutral-800/80 flex items-center justify-between transition-colors">
                     <span>DCA INDICATOR</span>
                     <span class="w-1.5 h-1.5 rounded-full bg-[#00FF88]"></span>
