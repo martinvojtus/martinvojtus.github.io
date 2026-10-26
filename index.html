@@ -94,7 +94,7 @@
         </div>
 
         <!-- SCORE CHART HEADER -->
-        <div class="flex justify-between items-center px-1 mb-6 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
+        <div class="flex justify-between items-center px-1 mb-1 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
             <div class="w-16 text-left">
                 <div id="dynamic-title" class="text-neutral-500 transition-colors duration-500">SCORE</div>
             </div>
@@ -113,7 +113,7 @@
         </div>
 
         <!-- SCORE CHART CANVAS -->
-        <div class="h-48 w-full relative mb-0">
+        <div class="h-48 w-full relative mb-4">
             <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[20px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
                 <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
             </div>
@@ -319,8 +319,8 @@ function resetCardUI() {
     
     const mainCard = document.getElementById("main-card");
     mainCard.className = isDark 
-        ? "p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000"
-        : "p-6 rounded-3xl bg-white border border-neutral-200 shadow-xl shadow-neutral-200/50 transition-colors duration-1000";
+        ? "p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000 mb-12"
+        : "p-6 rounded-3xl bg-white border border-neutral-200 shadow-xl shadow-neutral-200/50 transition-colors duration-1000 mb-12";
     mainCard.style.backgroundColor = "";
     mainCard.style.borderColor = "";
     
@@ -605,7 +605,7 @@ function applyCardData(data) {
 
     const mainCard = document.getElementById("main-card");
     const shadowClass = isDark ? "shadow-2xl shadow-black/50" : "shadow-xl shadow-neutral-200/50";
-    mainCard.className = `p-6 rounded-3xl border ${shadowClass} transition-colors duration-1000`;
+    mainCard.className = `p-6 rounded-3xl border ${shadowClass} transition-colors duration-1000 mb-12`;
     mainCard.style.backgroundColor = activeTier.bgCard;
     mainCard.style.borderColor = activeTier.border;
 
