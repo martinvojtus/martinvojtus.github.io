@@ -320,7 +320,6 @@ def analyze(req: AnalyzeRequest = None):
         "name": name,
         "ticker": ticker,
         "chart_dates": [int(d.timestamp() * 1000) for d in df.index],
-        "chart_prices": [round(float(p), 2) for p in df['Close']],
         "chart_score": score_series.values.tolist(),
         "cycle_score": curr_score,
         "phase": "DCA IN" if curr_score <= 20 else ("HODL" if curr_score <= 79 else "DCA OUT")
