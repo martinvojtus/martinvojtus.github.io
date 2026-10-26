@@ -313,10 +313,10 @@ function resetCardUI() {
     dScore.innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded px-0.5">88.8%</span>`;
     
     let badgeName = document.getElementById("badge-name");
-    badgeName.className = isDark 
-        ? "border border-[#262626] bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-400"
-        : "border border-neutral-200 bg-neutral-100 px-3 h-8 flex items-center rounded-md text-neutral-600";
-    badgeName.innerText = (window.currentCoin === 'ZEC') ? "Zcash (ZEC)" : "Bitcoin (BTC)";
+    if (badgeName) {
+        badgeName.className = "border border-neutral-200 dark:border-[#262626] bg-neutral-100 dark:bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-600 dark:text-neutral-400";
+        badgeName.innerText = (window.currentCoin === 'ZEC') ? "Zcash (ZEC)" : "Bitcoin (BTC)";
+    }
 
     let pBadge = document.getElementById("badge-phase");
     pBadge.className = isDark 
@@ -592,10 +592,14 @@ function applyCardData(data) {
     const isDark = isDarkMode();
     
     const coinToSend = window.currentCoin || "BTC";
-    if (data.name && data.ticker) {
-        document.getElementById("badge-name").innerText = `${data.name} (${data.ticker})`;
-    } else {
-        document.getElementById("badge-name").innerText = coinToSend === 'ZEC' ? "Zcash (ZEC)" : "Bitcoin (BTC)";
+    const badgeName = document.getElementById("badge-name");
+    if (badgeName) {
+        badgeName.className = "border border-neutral-200 dark:border-[#262626] bg-neutral-100 dark:bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-600 dark:text-neutral-400";
+        if (data.name && data.ticker) {
+            badgeName.innerText = `${data.name} (${data.ticker})`;
+        } else {
+            badgeName.innerText = coinToSend === 'ZEC' ? "Zcash (ZEC)" : "Bitcoin (BTC)";
+        }
     }
     
     let pBadge = document.getElementById("badge-phase");
