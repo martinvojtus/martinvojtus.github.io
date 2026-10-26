@@ -40,7 +40,7 @@
     <!-- VIEW: DASHBOARD -->
     <div id="view-dashboard-container" class="animate-fade-in">
         <!-- MAIN CARD (NOW AT THE VERY TOP) -->
-        <div id="main-card" class="p-6 rounded-3xl bg-white dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800/50 shadow-xl shadow-neutral-200/50 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-1000 mb-6">
+        <div id="main-card" class="p-6 rounded-3xl bg-white dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800/50 shadow-xl shadow-neutral-200/50 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-1000 mb-8">
             
             <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
                 <div id="badge-name" class="border border-neutral-200 dark:border-[#262626] bg-neutral-100 dark:bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-600 dark:text-neutral-400">
@@ -110,8 +110,8 @@
         </div>
 
         <!-- SCORE CHART CANVAS -->
-        <div class="h-48 w-full relative mb-4">
-            <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
+        <div class="h-48 w-full relative mb-1">
+            <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[22px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
                 <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
             </div>
             
@@ -121,7 +121,7 @@
         </div>
 
         <!-- CONTROLS ROW: COIN TOGGLE, THEME TOGGLE & REFRESH -->
-        <div class="w-full mt-4 flex gap-2 select-none">
+        <div class="w-full flex gap-2 select-none">
             <!-- COIN TOGGLE SELECTOR -->
             <div id="coin-toggle-box" class="flex-1 p-1 bg-neutral-100 dark:bg-neutral-900/40 border border-neutral-200/80 dark:border-neutral-800/50 rounded-2xl flex gap-1 shadow-xl shadow-neutral-200/40 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-300">
                 <button id="coin-btn-BTC" onclick="switchCoin('BTC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5">
@@ -415,7 +415,7 @@ const customChartPlugin = {
           let boxWidth = textWidth + 16; 
           let boxHeight = 20;
           let boxX = Math.max(left, Math.min(right - boxWidth, xPos - boxWidth / 2));
-          let boxY = bottom + 5;
+          let boxY = bottom + 2;
 
           ctx.beginPath();
           if (ctx.roundRect) ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 4);
@@ -532,7 +532,7 @@ function updateChart(period) {
             responsive: true, maintainAspectRatio: false,
             animation: { duration: 1000, easing: 'easeOutQuart' },
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            layout: { padding: { left: 8, right: 8, top: 5, bottom: 28 } },
+            layout: { padding: { left: 8, right: 8, top: 5, bottom: 22 } },
             interaction: { mode: 'index', intersect: false },
             scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } },
             onHover: (event, activeElements) => {
