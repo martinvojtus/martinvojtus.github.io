@@ -6,7 +6,7 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;500;600;700;800&display=block">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700;800&display=block">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -40,7 +40,7 @@
 <div class="w-full max-w-xl p-5 relative">
 
     <!-- HEADER PANEL -->
-    <header id="header-panel" class="flex justify-between items-center px-1 mb-8 relative h-9">
+    <header id="header-panel" class="flex justify-between items-center px-1 mb-8 relative h-[24px] text-[0.6rem] uppercase tracking-widest select-none">
         <!-- LOGO (Always on left, exactly matched to font height) -->
         <div class="flex items-center justify-start shrink-0">
             <svg id="header-logo" xmlns="http://www.w3.org/2000/svg" width="935.31" height="810" viewBox="72.35 270 935.31 810" class="shrink-0 w-auto" style="height: 0.7275em; height: 1cap; width: auto;">
@@ -58,9 +58,9 @@
             </svg>
         </div>
         
-        <!-- BRAND TEXT (Always on right) -->
-        <div id="header-brand-text" class="flex items-center justify-end uppercase select-none leading-none tracking-tighter sm:tracking-tight text-[1.8rem] whitespace-nowrap">
-            <span class="font-extrabold text-neutral-900 dark:text-white" style="font-weight: 800;">MARTINVOJTUS</span><span class="font-normal text-neutral-400 dark:text-neutral-400 mx-1.5 sm:mx-2" style="font-weight: 400;">•</span><span class="font-thin text-neutral-900 dark:text-white" style="font-weight: 100;">SPACE</span>
+        <!-- BRAND TEXT (Always on right, small font with bold & light/thin) -->
+        <div id="header-brand-text" class="flex items-center justify-end uppercase select-none leading-none tracking-widest whitespace-nowrap">
+            <span class="font-bold text-neutral-900 dark:text-white" style="font-weight: 700;">MARTINVOJTUS</span><span class="font-normal text-neutral-400 dark:text-neutral-400 mx-1.5" style="font-weight: 400;">•</span><span class="font-light text-neutral-900 dark:text-white" style="font-weight: 300;">SPACE</span>
         </div>
     </header>
 
