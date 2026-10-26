@@ -1,13 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;500;600;700;800&display=block">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700;800&display=block">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -16,76 +24,59 @@
         .animate-pulse-soft { animation: pulse-soft 2s infinite ease-in-out; }
         @keyframes spin-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
         .animate-spin-reverse { animation: spin-reverse 1s linear infinite; }
-    </style>    
+    </style>
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('trading_theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
 </head>
-<body class="font-['Inter'] bg-black text-white flex justify-center min-h-screen items-start pt-6 pb-10 overflow-x-hidden">
+<body class="font-['Inter'] bg-[#FAFAFA] text-neutral-900 dark:bg-black dark:text-white flex justify-center min-h-screen items-start pt-6 pb-10 overflow-x-hidden transition-colors duration-300">
 
 <div class="w-full max-w-xl p-5 relative">
 
     <!-- VIEW: DASHBOARD -->
     <div id="view-dashboard-container" class="animate-fade-in">
-        <div class="flex justify-between items-center px-1 mb-4 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
-            <div class="w-16 text-left">
-                <div id="dynamic-title" class="text-neutral-500 transition-colors duration-500">SCORE</div>
-            </div>
-            
-            <div id="macro-buttons" class="flex gap-1 absolute left-1/2 -translate-x-1/2">
-                <button onclick="updateChart('1Y')" id="btn-1Y" class="px-3 py-1 rounded-md text-neutral-400 hover:text-white transition-all duration-300">1Y</button>
-                <button onclick="updateChart('2Y')" id="btn-2Y" class="px-3 py-1 rounded-md text-neutral-400 hover:text-white transition-all duration-300">2Y</button>
-                <button onclick="updateChart('4Y')" id="btn-4Y" class="px-3 py-1 rounded-md text-neutral-400 hover:text-white transition-all duration-300">4Y</button>
-            </div>
-
-            <div class="w-16 flex justify-end">
-                <div id="dynamic-score" class="transition-colors duration-500 flex items-center justify-end h-full w-16">
-                    <span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">00.0%</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="h-48 w-full relative mb-4">
-            <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[28px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
-                <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
-            </div>
-            
-            <div class="absolute top-0 bottom-0 -left-[8px] w-[calc(100%+16px)] pointer-events-none">
-                <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000 pointer-events-auto"></canvas>
-            </div>
-        </div>
-
-        <div id="main-card" class="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000">
+        <!-- MAIN CARD (NOW AT THE VERY TOP) -->
+        <div id="main-card" class="p-6 rounded-3xl bg-white dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800/50 shadow-xl shadow-neutral-200/50 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-1000 mb-12">
             
             <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
-                <div id="badge-name" class="border border-[#262626] bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-400">
+                <div id="badge-name" class="border border-neutral-200 dark:border-[#262626] bg-neutral-100 dark:bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-600 dark:text-neutral-400">
                     Načítavam...
                 </div>
-                <div id="badge-phase" class="border border-neutral-800/60 bg-neutral-800/40 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse">
+                <div id="badge-phase" class="border border-neutral-200 dark:border-neutral-800/60 bg-neutral-100 dark:bg-neutral-800/40 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse">
                     HODL
                 </div>
             </div>
             
             <div class="flex justify-between items-start mb-4 gap-4 px-1">
                 <div>
-                    <div id="val-price" class="text-[1.8rem] font-bold h-9 flex items-center leading-none tracking-tight text-white transition-all duration-1000">
-                        <span class="bg-neutral-800 text-transparent animate-pulse rounded">$00,000.00</span>
+                    <div id="val-price" class="text-[1.8rem] font-bold h-9 flex items-center leading-none tracking-tight text-neutral-900 dark:text-white transition-all duration-1000">
+                        <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded">$00,000.00</span>
                     </div>
                     <div id="val-change" class="text-[0.6rem] uppercase tracking-widest mt-2 flex items-center gap-1.5 h-4">
-                        <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1 inline-block h-3">+0.00%</span> 
-                        <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1.5 h-4 flex items-center">24H</span>
+                        <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded px-1 inline-block h-3">+0.00%</span> 
+                        <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded px-1.5 h-4 flex items-center">24H</span>
                     </div>
                 </div>
                 <div class="text-right flex flex-col items-end">
                     <div id="val-score-large" class="text-[1.8rem] font-bold h-9 flex items-center justify-end leading-none w-24 transition-all duration-1000">
-                        <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">00.0%</span>
+                        <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded px-1">00.0%</span>
                     </div>
                     <div class="text-[0.6rem] text-neutral-500 uppercase tracking-widest mt-2">SCORE</div>
                 </div>
             </div>
             
             <div>
-                <div class="w-full bg-neutral-800/60 h-1.5 rounded-full overflow-hidden relative">
+                <div class="w-full bg-neutral-200 dark:bg-neutral-800/60 h-1.5 rounded-full overflow-hidden relative">
                     <div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: transparent;"></div>
                 </div>
-                <div class="flex items-center justify-between mt-3 px-0.5 text-[0.6rem] uppercase tracking-widest text-neutral-400 select-none">
+                <div class="flex items-center justify-between mt-3 px-0.5 text-[0.6rem] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 select-none">
                     <div class="flex items-center gap-1.5">
                         <span class="w-1.5 h-1.5 rounded-full bg-[#A88468] inline-block shrink-0"></span>
                         <span>DCA IN</span>
@@ -102,20 +93,60 @@
             </div>
         </div>
 
-        <!-- CONTROLS ROW: COIN TOGGLE & REFRESH -->
-        <div class="w-full mt-4 flex gap-2 select-none">
+        <!-- SCORE CHART HEADER -->
+        <div class="flex justify-between items-center px-1 mb-6 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
+            <div class="w-16 text-left">
+                <div id="dynamic-title" class="text-neutral-500 transition-colors duration-500">SCORE</div>
+            </div>
+            
+            <div id="macro-buttons" class="flex gap-1 absolute left-1/2 -translate-x-1/2">
+                <button onclick="updateChart('1Y')" id="btn-1Y" class="px-3 py-1 rounded-md transition-all duration-300">1Y</button>
+                <button onclick="updateChart('2Y')" id="btn-2Y" class="px-3 py-1 rounded-md transition-all duration-300">2Y</button>
+                <button onclick="updateChart('4Y')" id="btn-4Y" class="px-3 py-1 rounded-md transition-all duration-300">4Y</button>
+            </div>
+
+            <div class="w-16 flex justify-end">
+                <div id="dynamic-score" class="transition-colors duration-500 flex items-center justify-end h-full w-16">
+                    <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded px-0.5">00.0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCORE CHART CANVAS -->
+        <div class="h-48 w-full relative mb-0">
+            <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[20px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
+                <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
+            </div>
+            
+            <div class="absolute top-0 bottom-0 -left-[8px] w-[calc(100%+16px)] pointer-events-none">
+                <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000 pointer-events-auto"></canvas>
+            </div>
+        </div>
+
+        <!-- CONTROLS ROW: COIN TOGGLE, THEME TOGGLE & REFRESH -->
+        <div class="w-full flex gap-2 select-none">
             <!-- COIN TOGGLE SELECTOR -->
-            <div class="flex-1 p-1 bg-neutral-900/40 border border-neutral-800/50 rounded-2xl flex gap-1 shadow-2xl shadow-black/50">
-                <button id="coin-btn-BTC" onclick="switchCoin('BTC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-white bg-neutral-800/80">
+            <div id="coin-toggle-box" class="flex-1 p-1 bg-neutral-100 dark:bg-neutral-900/40 border border-neutral-200/80 dark:border-neutral-800/50 rounded-2xl flex gap-1 shadow-xl shadow-neutral-200/40 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-300">
+                <button id="coin-btn-BTC" onclick="switchCoin('BTC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5">
                     <span>BITCOIN (BTC)</span>
                 </button>
-                <button id="coin-btn-ZEC" onclick="switchCoin('ZEC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-400 [@media(hover:hover)]:hover:text-white">
+                <button id="coin-btn-ZEC" onclick="switchCoin('ZEC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5">
                     <span>ZCASH (ZEC)</span>
                 </button>
             </div>
 
+            <!-- THEME TOGGLE BUTTON -->
+            <button id="btn-theme" onclick="toggleTheme(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" title="Prepnúť režim (Svetlý / Tmavý)" aria-label="Toggle theme" class="w-[46px] h-[46px] shrink-0 bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-900/40 dark:hover:bg-neutral-800/40 border border-neutral-200/80 dark:border-neutral-800/50 hover:border-neutral-300 dark:hover:border-neutral-700/50 rounded-2xl flex items-center justify-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-all duration-300 active:scale-[0.99] focus:outline-none focus:ring-0 shadow-xl shadow-neutral-200/40 dark:shadow-2xl dark:shadow-black/50">
+                <svg id="theme-icon-sun" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <svg id="theme-icon-moon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+            </button>
+
             <!-- REFRESH BUTTON (SQUARE) -->
-            <button id="btn-refresh" onclick="refreshWindow(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="w-[46px] h-[46px] shrink-0 bg-neutral-900/40 [@media(hover:hover)]:hover:bg-neutral-800/40 border border-neutral-800/50 [@media(hover:hover)]:hover:border-neutral-700/50 rounded-2xl flex items-center justify-center text-neutral-400 [@media(hover:hover)]:hover:text-white transition-all duration-300 active:scale-[0.99] focus:outline-none focus:ring-0 shadow-2xl shadow-black/50">
+            <button id="btn-refresh" onclick="refreshWindow(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" title="Refresh" aria-label="Refresh" class="w-[46px] h-[46px] shrink-0 bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-900/40 dark:hover:bg-neutral-800/40 border border-neutral-200/80 dark:border-neutral-800/50 hover:border-neutral-300 dark:hover:border-neutral-700/50 rounded-2xl flex items-center justify-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-all duration-300 active:scale-[0.99] focus:outline-none focus:ring-0 shadow-xl shadow-neutral-200/40 dark:shadow-2xl dark:shadow-black/50">
                 <svg id="btn-refresh-icon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                 </svg>
@@ -125,8 +156,13 @@
         <div id="error-box" class="hidden mt-4 bg-[#FF2A6D]/10 border border-[#FF2A6D]/30 p-4 rounded-2xl text-[#FF2A6D] text-[0.6rem] tracking-widest uppercase text-center">❌ CONNECTION FAILED. PLEASE TRY AGAIN.</div>
 
         <!-- FOOTER DISCLAIMER -->
-        <footer class="mt-8 px-1 text-[0.6rem] text-neutral-500 leading-relaxed text-justify hyphens-auto select-none" style="text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;">
+        <div class="mt-8 px-1 text-[0.6rem] text-neutral-500 leading-relaxed text-justify hyphens-auto select-none" style="text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;">
             Disclaimer: This quantitative model is for informational purposes only and does not constitute financial or investment advice. Digital asset markets involve extreme volatility and risk of capital loss. Model outputs do not guarantee future performance. Independent due diligence is advised.
+        </div>
+
+        <!-- COPYRIGHT -->
+        <footer class="mt-6 text-center text-[0.6rem] uppercase tracking-widest text-neutral-500 dark:text-neutral-600 select-none">
+            © 2026 MARTIN VOJTUŠ
         </footer>
 
     </div>
@@ -143,18 +179,52 @@ window.currentMacroView = (savedView === '1Y' || savedView === '2Y' || savedView
 const savedCoin = localStorage.getItem('trading_coin');
 window.currentCoin = (savedCoin === 'BTC' || savedCoin === 'ZEC') ? savedCoin : 'BTC';
 
-const PALETTE = {
+const PALETTE_DARK = {
     low:  { full: '#A88468', bgCard: '#080705', bgBadge: '#110D0A', border: '#32281F', line: '#544234' },
     mid:  { full: '#F7931A', bgCard: '#0C0701', bgBadge: '#190F03', border: '#4A2C08', line: '#7C4A0D' },
     high: { full: '#FF4500', bgCard: '#0D0300', bgBadge: '#1A0700', border: '#4C1500', line: '#802300' }
 };
 
+const PALETTE_LIGHT = {
+    low:  { full: '#8C684E', bgCard: '#FAF6F2', bgBadge: '#F0E8E1', border: '#DCCFC4', line: '#B59E8D' },
+    mid:  { full: '#D97706', bgCard: '#FCF9F2', bgBadge: '#F9EED9', border: '#E8D5B5', line: '#CDA76D' },
+    high: { full: '#DC2626', bgCard: '#FCF5F3', bgBadge: '#F9E3DD', border: '#EAC3BA', line: '#D0887A' }
+};
+
+function isDarkMode() {
+    return document.documentElement.classList.contains('dark');
+}
+
+function getPalette() {
+    return isDarkMode() ? PALETTE_DARK : PALETTE_LIGHT;
+}
+
 function getTheme() {
-    return {
-        low: '#A88468', lowRgb: '168, 132, 104',
-        mid: '#F7931A', midRgb: '247, 147, 26',
-        high: '#FF4500', highRgb: '255, 69, 0'
+    const pal = getPalette();
+    return isDarkMode() ? {
+        low: pal.low.full, lowRgb: '168, 132, 104',
+        mid: pal.mid.full, midRgb: '247, 147, 26',
+        high: pal.high.full, highRgb: '255, 69, 0'
+    } : {
+        low: pal.low.full, lowRgb: '140, 104, 78',
+        mid: pal.mid.full, midRgb: '217, 119, 6',
+        high: pal.high.full, highRgb: '220, 38, 38'
     };
+}
+
+// --- THEME SWITCHING ---
+function toggleTheme() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('trading_theme', isDark ? 'dark' : 'light');
+    updateMacroButtonsUI(window.currentMacroView);
+    updateCoinButtonsUI(window.currentCoin);
+    updateSkeletonGrid();
+    if (window.fullData) {
+        updateChart(window.currentMacroView);
+        applyCardData(window.fullData);
+    } else {
+        resetCardUI();
+    }
 }
 
 // --- DASHBOARD LOGIC ---
@@ -164,19 +234,37 @@ function initUI() {
 }
 
 function updateMacroButtonsUI(period) {
+    const isDark = isDarkMode();
     ['1Y', '2Y', '4Y'].forEach(p => {
         const btn = document.getElementById(`btn-${p}`);
-        if(btn) btn.className = p === period ? "px-3 py-1 rounded-md text-white bg-neutral-800/80 transition-all" : "px-3 py-1 rounded-md text-neutral-400 hover:text-white transition-all";
+        if(btn) {
+            if (p === period) {
+                btn.className = isDark 
+                    ? "px-3 py-1 rounded-md text-white bg-neutral-800/80 transition-all font-medium" 
+                    : "px-3 py-1 rounded-md text-neutral-900 bg-white border border-neutral-200/90 shadow-sm transition-all font-semibold";
+            } else {
+                btn.className = isDark 
+                    ? "px-3 py-1 rounded-md text-neutral-400 hover:text-white transition-all" 
+                    : "px-3 py-1 rounded-md text-neutral-500 hover:text-neutral-900 transition-all";
+            }
+        }
     });
 }
 
 function updateCoinButtonsUI(coin) {
+    const isDark = isDarkMode();
     ['BTC', 'ZEC'].forEach(c => {
         const btn = document.getElementById(`coin-btn-${c}`);
         if (btn) {
-            btn.className = c === coin 
-                ? "flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-white bg-neutral-800/80" 
-                : "flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-400 [@media(hover:hover)]:hover:text-white";
+            if (c === coin) {
+                btn.className = isDark
+                    ? "flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-white bg-neutral-800/80"
+                    : "flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-900 bg-white shadow-sm border border-neutral-200/60";
+            } else {
+                btn.className = isDark
+                    ? "flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-400 [@media(hover:hover)]:hover:text-white"
+                    : "flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-500 [@media(hover:hover)]:hover:text-neutral-900";
+            }
         }
     });
 }
@@ -192,7 +280,66 @@ function switchCoin(coin) {
 function refreshWindow() {
     const refBtn = document.getElementById('btn-refresh-icon');
     if (refBtn) refBtn.classList.add('animate-spin-reverse');
-    window.location.reload();
+    const url = new URL(window.location.href);
+    url.searchParams.set('t', Date.now());
+    window.location.replace(url.toString());
+}
+
+function resetCardUI() {
+    const isDark = isDarkMode();
+    const spanBg = isDark ? "bg-neutral-800" : "bg-neutral-200";
+
+    const dScore = document.getElementById("dynamic-score");
+    dScore.style.transition = "none";
+    dScore.innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded px-0.5">88.8%</span>`;
+    
+    let badgeName = document.getElementById("badge-name");
+    if (badgeName) {
+        badgeName.className = "border border-neutral-200 dark:border-[#262626] bg-neutral-100 dark:bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-600 dark:text-neutral-400";
+        badgeName.innerText = (window.currentCoin === 'ZEC') ? "Zcash (ZEC)" : "Bitcoin (BTC)";
+    }
+
+    let pBadge = document.getElementById("badge-phase");
+    pBadge.className = isDark 
+        ? "border border-neutral-800/60 bg-neutral-800/40 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse"
+        : "border border-neutral-200 bg-neutral-100 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse";
+    pBadge.style.backgroundColor = "";
+    pBadge.style.borderColor = "";
+    pBadge.style.color = "";
+    pBadge.innerHTML = 'HODL';
+
+    document.getElementById("val-price").innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded">88,888.88</span>`;
+    document.getElementById("val-change").innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded px-1 inline-block h-3">+0.00%</span> <span class="${spanBg} text-transparent animate-pulse rounded px-1.5 h-4 flex items-center">24H</span>`;
+    
+    const vScoreLarge = document.getElementById("val-score-large");
+    vScoreLarge.style.transition = "none";
+    vScoreLarge.innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded px-1">88.8%</span>`;
+    vScoreLarge.style.color = "inherit";
+    vScoreLarge.style.textShadow = "none";
+    
+    const mainCard = document.getElementById("main-card");
+    mainCard.className = isDark 
+        ? "p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000"
+        : "p-6 rounded-3xl bg-white border border-neutral-200 shadow-xl shadow-neutral-200/50 transition-colors duration-1000";
+    mainCard.style.backgroundColor = "";
+    mainCard.style.borderColor = "";
+    
+    const bar = document.getElementById("animated-score-bar");
+    if(bar) { bar.style.width = "0%"; bar.style.backgroundColor = "transparent"; bar.style.boxShadow = "none"; }
+
+    const dTitle = document.getElementById("dynamic-title");
+    dTitle.style.transition = "none";
+    dTitle.style.color = "#737373";
+    dTitle.style.textShadow = "none";
+    dScore.style.color = "#737373";
+    dScore.style.textShadow = "none";
+    
+    void dScore.offsetWidth;
+    dScore.style.transition = "";
+    vScoreLarge.style.transition = "";
+    dTitle.style.transition = "";
+    
+    document.getElementById("error-box").classList.add("hidden");
 }
 
 function triggerAnalysis() {
@@ -202,58 +349,7 @@ function triggerAnalysis() {
     document.getElementById("scoreChart").classList.add("opacity-0");
     document.getElementById("chart-skeleton").classList.remove("opacity-0");
     
-    // Set Skeletons
-    const dScore = document.getElementById("dynamic-score");
-    dScore.style.transition = "none";
-    dScore.innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-0.5">88.8%</span>';
-    
-    let badgeName = document.getElementById("badge-name");
-    badgeName.className = "border border-[#262626] bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-400";
-    badgeName.innerText = (window.currentCoin === 'ZEC') ? "Zcash (ZEC)" : "Bitcoin (BTC)";
-
-    let pBadge = document.getElementById("badge-phase");
-    pBadge.className = 'border border-neutral-800/60 bg-neutral-800/40 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse';
-    pBadge.style.backgroundColor = "";
-    pBadge.style.borderColor = "";
-    pBadge.style.color = "";
-    pBadge.innerHTML = 'HODL';
-
-    document.getElementById("val-price").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded">88,888.88</span>';
-    document.getElementById("val-change").innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-1 inline-block h-3">+0.00%</span> <span class="bg-neutral-800 text-transparent animate-pulse rounded px-1.5 h-4 flex items-center">24H</span>';
-    
-    const vScoreLarge = document.getElementById("val-score-large");
-    vScoreLarge.style.transition = "none";
-    vScoreLarge.innerHTML = '<span class="bg-neutral-800 text-transparent animate-pulse rounded px-1">88.8%</span>';
-    vScoreLarge.style.color = "inherit";
-    vScoreLarge.style.textShadow = "none";
-    
-    // Reset main card to neutral
-    const mainCard = document.getElementById("main-card");
-    mainCard.className = "p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000";
-    mainCard.style.backgroundColor = "";
-    mainCard.style.borderColor = "";
-    
-    // Reset score bar
-    const bar = document.getElementById("animated-score-bar");
-    if(bar) { bar.style.width = "0%"; bar.style.backgroundColor = "transparent"; bar.style.boxShadow = "none"; }
-
-    // Reset dynamic colors
-    const dTitle = document.getElementById("dynamic-title");
-    dTitle.style.transition = "none";
-    dTitle.style.color = "#737373";
-    dTitle.style.textShadow = "none";
-    dScore.style.color = "#737373";
-    dScore.style.textShadow = "none";
-    
-    // Force reflow and restore transitions
-    void dScore.offsetWidth;
-    dScore.style.transition = "";
-    vScoreLarge.style.transition = "";
-    dTitle.style.transition = "";
-    
-    // Hide error box
-    document.getElementById("error-box").classList.add("hidden");
-
+    resetCardUI();
     analyze();
 }
 
@@ -261,7 +357,8 @@ function updateSkeletonGrid() {
     const skeleton = document.getElementById('chart-skeleton'); if (!skeleton) return;
     const width = skeleton.clientWidth; if (width === 0) return;
     const targetDash = 4; const numDashes = Math.round((width / targetDash + 1) / 2); const exactDash = width / (2 * numDashes - 1);
-    const grad = `repeating-linear-gradient(to right, #525252 0, #525252 ${exactDash}px, transparent ${exactDash}px, transparent ${exactDash * 2}px)`;
+    const dashColor = isDarkMode() ? '#525252' : '#D4D4D4';
+    const grad = `repeating-linear-gradient(to right, ${dashColor} 0, ${dashColor} ${exactDash}px, transparent ${exactDash}px, transparent ${exactDash * 2}px)`;
     const lines = skeleton.children;
     for (let i = 0; i < lines.length; i++) lines[i].style.backgroundImage = grad;
 }
@@ -274,6 +371,9 @@ const customChartPlugin = {
     const ctx = chart.ctx; if (!chart.chartArea) return; 
     const { chartArea: {top, bottom, left, right}, scales: {y} } = chart;
     const theme = getTheme();
+    const activePalette = getPalette();
+    const isDark = isDarkMode();
+
     ctx.save(); ctx.lineWidth = 1;
     const gridWidth = right - left;
     const exactDash = gridWidth / (2 * Math.round(((gridWidth / 4) + 1) / 2) - 1);
@@ -292,144 +392,229 @@ const customChartPlugin = {
       let xPos = activePoint.element.x;
       let yPos = activePoint.element.y;
       let val = Math.max(0, Math.min(100, activePoint.element.$context.parsed.y));
-      let currentTier = val <= 20 ? PALETTE.low : (val >= 80 ? PALETTE.high : PALETTE.mid);
+      let currentTier = val <= 20 ? activePalette.low : (val >= 80 ? activePalette.high : activePalette.mid);
       let sHex = currentTier.full;
 
       ctx.save();
-      ctx.beginPath(); 
-      ctx.moveTo(xPos, top); 
-      ctx.lineTo(xPos, bottom);
-      ctx.lineWidth = 1; 
-      ctx.strokeStyle = currentTier.line; 
-      ctx.stroke();
-
-      // Mini point on hover line
-      ctx.beginPath();
-      ctx.arc(xPos, yPos, 3, 0, 2 * Math.PI);
-      ctx.fillStyle = sHex;
-      ctx.fill();
+      ctx.beginPath(); ctx.moveTo(xPos, top); ctx.lineTo(xPos, bottom);
+      ctx.lineWidth = 1; ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.15)'; ctx.stroke();
 
       let xLabel = chart.data.labels[activePoint.index];
+      let pointPrice = (chart.chartPrices && chart.chartPrices[activePoint.index] !== undefined)
+          ? chart.chartPrices[activePoint.index]
+          : null;
+
       if (xLabel) {
-          ctx.font = "500 9.5px 'Inter', sans-serif";
-          let tw = ctx.measureText(xLabel).width;
-          let pw = tw + 18;
-          let ph = 22;
-          let bx = Math.max(left, Math.min(right - pw, xPos - pw / 2));
-          let by = bottom + 4;
-          let radius = 6;
-          
-          ctx.beginPath();
-          if (ctx.roundRect) {
-              ctx.roundRect(bx, by, pw, ph, radius);
-          } else {
-              ctx.rect(bx, by, pw, ph);
-          }
           ctx.fillStyle = currentTier.bgBadge;
-          ctx.fill();
           ctx.strokeStyle = currentTier.border;
           ctx.lineWidth = 1;
-          ctx.stroke();
+
+          ctx.font = '500 9.6px "Inter", sans-serif'; 
+          let labelText = xLabel;
+          if (pointPrice !== null) {
+              const formattedPrice = '$' + Number(pointPrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+              labelText = `${xLabel} • ${formattedPrice}`;
+          }
+
+          let textWidth = ctx.measureText(labelText).width;
+          let boxWidth = textWidth + 16; 
+          let boxHeight = 20;
+          let boxX = Math.max(left, Math.min(right - boxWidth, xPos - boxWidth / 2));
+          let boxY = bottom + 2;
+
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 4);
+          else ctx.rect(boxX, boxY, boxWidth, boxHeight);
+          ctx.fill(); ctx.stroke();
 
           ctx.fillStyle = sHex;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(xLabel, bx + pw / 2, by + ph / 2);
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText(labelText, boxX + boxWidth / 2, boxY + boxHeight / 2);
       }
+
+      ctx.beginPath(); ctx.arc(xPos, yPos, 4, 0, 2 * Math.PI);
+      ctx.fillStyle = sHex; ctx.fill();
+      ctx.lineWidth = 2; ctx.strokeStyle = currentTier.border; ctx.stroke();
+
       document.getElementById('dynamic-score').innerText = val.toFixed(1) + '%';
       document.getElementById('dynamic-score').style.color = sHex;
-      document.getElementById('dynamic-score').style.textShadow = `0 0 10px ${sHex}80`;
+      document.getElementById('dynamic-score').style.textShadow = isDark ? `0 0 10px ${sHex}80` : `0 0 5px ${sHex}40`;
       document.getElementById('dynamic-title').style.color = sHex;
-      document.getElementById('dynamic-title').style.textShadow = `0 0 10px ${sHex}80`;
-      ctx.restore();
-    }
+      document.getElementById('dynamic-title').style.textShadow = isDark ? `0 0 10px ${sHex}80` : `0 0 5px ${sHex}40`;
 
-    // Mini dot on end of line (NOW)
-    const meta = chart.getDatasetMeta(0);
-    if (meta.data && meta.data.length > 0) {
-        const lastP = meta.data[meta.data.length - 1];
-        const lastV = chart.data.datasets[0].data[meta.data.length - 1];
-        let currentTier = lastV <= 20 ? PALETTE.low : (lastV >= 80 ? PALETTE.high : PALETTE.mid);
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(lastP.x, lastP.y, 3, 0, 2 * Math.PI);
-        ctx.fillStyle = currentTier.full;
-        ctx.fill();
-        ctx.restore();
+      ctx.restore();
+    } else {
+      const datasetMeta = chart.getDatasetMeta(0);
+      if (datasetMeta.data && datasetMeta.data.length > 0) {
+          let lastIdx = chart.data.labels ? chart.data.labels.length - 1 : -1;
+          if (lastIdx >= 0) {
+              const pt = datasetMeta.data[lastIdx];
+              const val = chart.data.datasets[0].data[lastIdx];
+              if (val !== null && val !== undefined) {
+                  let currentTier = val <= 20 ? activePalette.low : (val >= 80 ? activePalette.high : activePalette.mid);
+                  let dotColor = currentTier.full;
+                  ctx.save();
+                  ctx.beginPath(); ctx.arc(pt.x, pt.y, 4, 0, 2 * Math.PI);
+                  ctx.fillStyle = dotColor; ctx.fill();
+                  ctx.lineWidth = 2; ctx.strokeStyle = currentTier.border; ctx.stroke();
+                  ctx.restore();
+              }
+          }
+      }
     }
   }
 };
 Chart.register(customChartPlugin);
 
+function resetDynamicHover() {
+    if (window.isAnalyzing || !window.fullData) return;
+    if (scoreChartInstance) {
+        scoreChartInstance.setActiveElements([]);
+        scoreChartInstance.update();
+    }
+    const s = window.fullData.cycle_score || 0;
+    const theme = getTheme();
+    const isDark = isDarkMode();
+    let sHex = s <= 20 ? theme.low : (s >= 80 ? theme.high : theme.mid);
+    document.getElementById('dynamic-score').innerText = s.toFixed(1) + '%';
+    document.getElementById('dynamic-score').style.color = sHex;
+    document.getElementById('dynamic-score').style.textShadow = isDark ? `0 0 10px ${sHex}80` : `0 0 5px ${sHex}40`;
+    document.getElementById('dynamic-title').style.color = sHex;
+    document.getElementById('dynamic-title').style.textShadow = isDark ? `0 0 10px ${sHex}80` : `0 0 5px ${sHex}40`;
+}
+
 function updateChart(period) {
     if (!window.fullData || !window.fullData.chart_dates) return;
-    if (period) {
-        if (['1Y', '2Y', '4Y'].includes(period)) {
-            window.currentMacroView = period;
-            localStorage.setItem('trading_macro_view', period);
-            updateMacroButtonsUI(period);
-        }
-    }
-    let pts = 208;
-    if (window.currentMacroView === '1Y') pts = 52;
-    else if (window.currentMacroView === '2Y') pts = 104;
-    else pts = 208;
-    
-    const available = window.fullData.chart_dates.length;
-    const actualPts = Math.min(pts, available);
+    window.currentMacroView = period;
+    localStorage.setItem('trading_macro_view', period);
+    updateMacroButtonsUI(period);
 
-    // Format raw timestamps to local date strings
-    const dts = window.fullData.chart_dates.slice(-actualPts).map(ts => {
+    let points = 208;
+    if (period === '1Y') points = 52;
+    if (period === '2Y') points = 104;
+    if (period === '4Y') points = 208;
+
+    const actualPts = Math.min(points, window.fullData.chart_dates.length);
+    const chartDates = window.fullData.chart_dates.slice(-actualPts).map(ts => {
         const d = new Date(ts);
         return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     });
-    
-    const scr = window.fullData.chart_score.slice(-actualPts);
-    if (scoreChartInstance) scoreChartInstance.destroy();
-    Chart.defaults.color = '#737373'; Chart.defaults.font.family = "'Inter', sans-serif"; Chart.defaults.font.size = 9.6;
-    const theme = getTheme();
+    const chartScoreRaw = window.fullData.chart_score.slice(-actualPts);
+    const chartPricesRaw = (window.fullData.chart_prices && window.fullData.chart_prices.length)
+        ? window.fullData.chart_prices.slice(-actualPts)
+        : null;
 
-    scoreChartInstance = new Chart(document.getElementById('scoreChart').getContext('2d'), {
+    if (scoreChartInstance) scoreChartInstance.destroy();
+    
+    const theme = getTheme();
+    const isDark = isDarkMode();
+    Chart.defaults.color = isDark ? '#737373' : '#a3a3a3';
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.font.size = 9.6;
+
+    let ctxScore = document.getElementById('scoreChart').getContext('2d');
+    scoreChartInstance = new Chart(ctxScore, {
         type: 'line',
-        data: { labels: dts, datasets: [{ 
-            data: scr, 
-            fill: false, 
-            borderWidth: 1, 
-            tension: 0, 
-            pointRadius: 0,
-            pointHoverRadius: 0,
-            pointHitRadius: 10,
-            borderCapStyle: 'round',
-            borderJoinStyle: 'round',
-            borderColor: function(c) {
-                const {ctx, chartArea} = c.chart; if (!chartArea) return;
-                const g = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                g.addColorStop(0, theme.low); g.addColorStop(0.2, theme.low);
-                g.addColorStop(0.3, theme.mid); g.addColorStop(0.7, theme.mid);
-                g.addColorStop(0.8, theme.high); g.addColorStop(1, theme.high);    
-                return g;
-            }
-        }]},
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            layout: { padding: { left: 8, right: 8, top: 5, bottom: 28 } }, interaction: { mode: 'index', intersect: false },
+        data: {
+            labels: chartDates,
+            datasets: [{
+                data: chartScoreRaw,
+                fill: false, borderWidth: 1, tension: 0, pointRadius: 0, pointHoverRadius: 0, pointHitRadius: 10, borderCapStyle: 'round', borderJoinStyle: 'round', clip: false,
+                borderColor: function(c) {
+                    const {ctx, chartArea} = c.chart; if (!chartArea) return;
+                    const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                    gradient.addColorStop(0, theme.low);
+                    gradient.addColorStop(0.2, theme.low);
+                    gradient.addColorStop(0.35, theme.mid);
+                    gradient.addColorStop(0.65, theme.mid);
+                    gradient.addColorStop(0.8, theme.high);
+                    gradient.addColorStop(1, theme.high);
+                    return gradient;
+                }
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            animation: { duration: 1000, easing: 'easeOutQuart' },
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            layout: { padding: { left: 8, right: 8, top: 5, bottom: 20 } },
+            interaction: { mode: 'index', intersect: false },
             scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } },
-            events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'],
             onHover: (event, activeElements) => {
                 if (window.isAnalyzing) return;
                 if (!activeElements.length) {
-                    if (scoreChartInstance) scoreChartInstance.update();
-                    const s = window.fullData ? window.fullData.cycle_score : 0;
-                    document.getElementById('dynamic-score').innerText = s.toFixed(1) + '%';
-                    document.getElementById('dynamic-score').style.color = "#737373";
-                    document.getElementById('dynamic-score').style.textShadow = "none";
-                    document.getElementById('dynamic-title').style.color = "#737373";
-                    document.getElementById('dynamic-title').style.textShadow = "none";
+                    resetDynamicHover();
                 }
             }
         }
     });
+    scoreChartInstance.chartPrices = chartPricesRaw;
     document.getElementById("chart-skeleton").classList.add("opacity-0");
     document.getElementById("scoreChart").classList.remove("opacity-0");
+}
+
+function applyCardData(data) {
+    if (!data) return;
+    const s = data.cycle_score || 0;
+    const activePalette = getPalette();
+    const activeTier = s <= 20 ? activePalette.low : (s >= 80 ? activePalette.high : activePalette.mid);
+    const sHex = activeTier.full;
+    const isDark = isDarkMode();
+    
+    const coinToSend = window.currentCoin || "BTC";
+    const badgeName = document.getElementById("badge-name");
+    if (badgeName) {
+        badgeName.className = "border border-neutral-200 dark:border-[#262626] bg-neutral-100 dark:bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-600 dark:text-neutral-400";
+        if (data.name && data.ticker) {
+            badgeName.innerText = `${data.name} (${data.ticker})`;
+        } else {
+            badgeName.innerText = coinToSend === 'ZEC' ? "Zcash (ZEC)" : "Bitcoin (BTC)";
+        }
+    }
+    
+    let pBadge = document.getElementById("badge-phase");
+    pBadge.className = "border w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 font-medium";
+    pBadge.style.backgroundColor = activeTier.bgBadge;
+    pBadge.style.borderColor = activeTier.border;
+    pBadge.style.color = activeTier.full;
+    pBadge.innerText = data.phase || "HODL";
+
+    document.getElementById("val-price").innerText = `$${Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+
+    let vCh = document.getElementById("val-change");
+    const changeColor = data.change >= 0 
+        ? (isDark ? 'text-[#00FF88]' : 'text-[#059669]') 
+        : (isDark ? 'text-[#FF2A6D]' : 'text-[#DC2626]');
+    vCh.className = `text-[0.6rem] uppercase tracking-widest mt-2 flex items-center h-4 gap-1.5 ${changeColor}`;
+    const badge24Class = isDark ? "text-white bg-neutral-800" : "text-neutral-700 bg-neutral-200";
+    vCh.innerHTML = `${data.change >= 0 ? '+':''}${data.change.toFixed(2)}% <span class="${badge24Class} px-1.5 py-0.5 rounded font-normal">24H</span>`;
+
+    const vScoreLarge = document.getElementById("val-score-large");
+    vScoreLarge.innerText = `${s.toFixed(1)}%`;
+    vScoreLarge.style.color = sHex;
+    vScoreLarge.style.textShadow = isDark ? `0 0 15px ${sHex}80` : `0 0 8px ${sHex}40`;
+
+    const dScore = document.getElementById("dynamic-score");
+    dScore.innerText = `${s.toFixed(1)}%`;
+    dScore.style.color = sHex;
+    dScore.style.textShadow = isDark ? `0 0 10px ${sHex}80` : `0 0 5px ${sHex}40`;
+    
+    const dTitle = document.getElementById("dynamic-title");
+    dTitle.style.color = sHex;
+    dTitle.style.textShadow = isDark ? `0 0 10px ${sHex}80` : `0 0 5px ${sHex}40`;
+
+    const mainCard = document.getElementById("main-card");
+    const shadowClass = isDark ? "shadow-2xl shadow-black/50" : "shadow-xl shadow-neutral-200/50";
+    mainCard.className = `p-6 rounded-3xl border ${shadowClass} transition-colors duration-1000`;
+    mainCard.style.backgroundColor = activeTier.bgCard;
+    mainCard.style.borderColor = activeTier.border;
+
+    const bar = document.getElementById("animated-score-bar");
+    if(bar) { 
+        bar.style.width = `${s}%`; 
+        bar.style.backgroundColor = sHex; 
+        bar.style.boxShadow = isDark ? `0 0 10px ${sHex}` : `0 0 6px ${sHex}80`; 
+    }
 }
 
 async function analyze() {
@@ -454,50 +639,22 @@ async function analyze() {
         document.getElementById("error-box").classList.remove("hidden");
         return;
     }
-    const s = data.cycle_score || 0;
-    const activeTier = s <= 20 ? PALETTE.low : (s >= 80 ? PALETTE.high : PALETTE.mid);
-    const sHex = activeTier.full;
     
-    if (data.name && data.ticker) {
-        document.getElementById("badge-name").innerText = `${data.name} (${data.ticker})`;
-    } else {
-        document.getElementById("badge-name").innerText = coinToSend === 'ZEC' ? "Zcash (ZEC)" : "Bitcoin (BTC)";
+    if (!data.chart_prices || !data.chart_prices.length) {
+        try {
+            const sym = coinToSend === 'ZEC' ? 'ZECUSDT' : 'BTCUSDT';
+            const kRes = await fetch(`https://api.binance.com/api/v3/klines?symbol=${sym}&interval=1w&limit=${data.chart_dates.length}`);
+            if (kRes.ok) {
+                const kData = await kRes.json();
+                data.chart_prices = kData.map(k => parseFloat(k[4]));
+            }
+        } catch(err) {
+            console.warn('Fallback price fetch failed:', err);
+        }
     }
     
-    let pBadge = document.getElementById("badge-phase");
-    pBadge.className = "border w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000";
-    pBadge.style.backgroundColor = activeTier.bgBadge;
-    pBadge.style.borderColor = activeTier.border;
-    pBadge.style.color = activeTier.full;
-    pBadge.innerText = data.phase || "HODL";
-
-    document.getElementById("val-price").innerText = `$${Number(data.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-
-    let vCh = document.getElementById("val-change");
-    vCh.className = `text-[0.6rem] uppercase tracking-widest mt-2 flex items-center h-4 gap-1.5 ${data.change >= 0 ? 'text-[#00FF88]' : 'text-[#FF2A6D]'}`;
-    vCh.innerHTML = `${data.change >= 0 ? '+':''}${data.change.toFixed(2)}% <span class="text-white bg-neutral-800 px-1.5 py-0.5 rounded font-normal">24H</span>`;
-
-    document.getElementById("val-score-large").innerText = `${s.toFixed(1)}%`;
-    document.getElementById("val-score-large").style.color = sHex;
-    document.getElementById("val-score-large").style.textShadow = `0 0 15px ${sHex}80`;
-
-    const dScore = document.getElementById("dynamic-score");
-    dScore.innerText = `${s.toFixed(1)}%`;
-    dScore.style.color = sHex;
-    dScore.style.textShadow = `0 0 10px ${sHex}80`;
-    document.getElementById("dynamic-title").style.color = sHex;
-    document.getElementById("dynamic-title").style.textShadow = `0 0 10px ${sHex}80`;
-
-    const mainCard = document.getElementById("main-card");
-    mainCard.className = "p-6 rounded-3xl border shadow-2xl transition-colors duration-1000";
-    mainCard.style.backgroundColor = activeTier.bgCard;
-    mainCard.style.borderColor = activeTier.border;
-
+    applyCardData(data);
     updateChart(window.currentMacroView);
-    setTimeout(() => {
-        const bar = document.getElementById("animated-score-bar");
-        if(bar) { bar.style.width = `${s}%`; bar.style.backgroundColor = sHex; bar.style.boxShadow = `0 0 10px ${sHex}`; }
-    }, 50);
   } catch (e) { document.getElementById("error-box").classList.remove("hidden"); }
   finally { 
     window.isAnalyzing = false;
@@ -512,16 +669,7 @@ async function analyze() {
     window.addEventListener(evt, (e) => {
         if (window.isAnalyzing) return;
         if (scoreChartInstance && !e.target.closest('#scoreChart')) {
-            scoreChartInstance.setActiveElements([]);
-            scoreChartInstance.update();
-            const s = window.fullData ? window.fullData.cycle_score : 0;
-            const theme = getTheme();
-            let sHex = s <= 20 ? theme.low : (s >= 80 ? theme.high : theme.mid);
-            document.getElementById('dynamic-score').innerText = s.toFixed(1) + '%';
-            document.getElementById('dynamic-score').style.color = sHex;
-            document.getElementById('dynamic-score').style.textShadow = `0 0 10px ${sHex}80`;
-            document.getElementById('dynamic-title').style.color = sHex;
-            document.getElementById('dynamic-title').style.textShadow = `0 0 10px ${sHex}80`;
+            resetDynamicHover();
         }
     }, { passive: true });
 });
