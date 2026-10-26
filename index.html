@@ -21,8 +21,6 @@
         .animate-pulse-soft { animation: pulse-soft 2s infinite ease-in-out; }
         @keyframes spin-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
         .animate-spin-reverse { animation: spin-reverse 1s linear infinite; }
-        #header-logo path { fill: #000000; transition: fill 0.3s ease; }
-        .dark #header-logo path { fill: #ffffff; }
     </style>
     <script>
         (function() {
@@ -38,31 +36,6 @@
 <body class="font-['Inter'] bg-[#FAFAFA] text-neutral-900 dark:bg-black dark:text-white flex justify-center min-h-screen items-start pt-6 pb-10 overflow-x-hidden transition-colors duration-300">
 
 <div class="w-full max-w-xl p-5 relative">
-
-    <!-- HEADER PANEL -->
-    <header id="header-panel" class="flex justify-between items-center px-1 mb-8 relative h-[24px] text-[0.6rem] uppercase tracking-widest select-none">
-        <!-- LOGO (Always on left, exactly matched to font height) -->
-        <div class="flex items-center justify-start shrink-0">
-            <svg id="header-logo" xmlns="http://www.w3.org/2000/svg" width="935.31" height="810" viewBox="72.35 270 935.31 810" class="shrink-0 w-auto" style="height: 0.7275em; height: 1cap; width: auto;">
-              <g transform="translate(540, 540)">
-                <path d="
-                  M 0,0 
-                  L 467.654, -270 
-                  L 467.654, 270 
-                  L 0, 540 
-                  L -467.654, 270 
-                  L -467.654, -270 
-                  Z" 
-                  fill="#000000" />
-              </g>
-            </svg>
-        </div>
-        
-        <!-- BRAND TEXT (Always on right, small font with bold & light/thin) -->
-        <div id="header-brand-text" class="flex items-center justify-end uppercase select-none leading-none tracking-widest whitespace-nowrap">
-            <span class="font-bold text-neutral-900 dark:text-white" style="font-weight: 700;">MARTINVOJTUS</span><span class="font-normal text-neutral-400 dark:text-neutral-400 mx-1.5" style="font-weight: 400;">•</span><span class="font-light text-neutral-900 dark:text-white" style="font-weight: 300;">SPACE</span>
-        </div>
-    </header>
 
     <!-- VIEW: DASHBOARD -->
     <div id="view-dashboard-container" class="animate-fade-in">
@@ -249,19 +222,7 @@ function toggleTheme() {
 }
 
 // --- DASHBOARD LOGIC ---
-function syncLogoHeight() {
-    const brand = document.getElementById('header-brand-text');
-    const logo = document.getElementById('header-logo');
-    if (!brand || !logo) return;
-    const computedFontSize = parseFloat(window.getComputedStyle(brand).fontSize) || 28.8;
-    const capHeight = computedFontSize * 0.7275;
-    logo.style.height = `${capHeight.toFixed(2)}px`;
-    logo.style.width = 'auto';
-}
-window.addEventListener('resize', syncLogoHeight);
-
 function initUI() {
-    syncLogoHeight();
     updateMacroButtonsUI(window.currentMacroView);
     updateCoinButtonsUI(window.currentCoin);
 }
