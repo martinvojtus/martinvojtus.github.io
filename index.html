@@ -16,11 +16,55 @@
         .animate-pulse-soft { animation: pulse-soft 2s infinite ease-in-out; }
         @keyframes spin-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
         .animate-spin-reverse { animation: spin-reverse 1s linear infinite; }
+        #header-logo path { fill: #ffffff; }
     </style>    
 </head>
 <body class="font-['Inter'] bg-black text-white flex justify-center min-h-screen items-start pt-6 pb-10 overflow-x-hidden">
 
 <div class="w-full max-w-xl p-5 relative">
+
+    <!-- HEADER PANEL -->
+    <header id="header-panel" class="flex justify-between items-center px-1 mb-8 relative text-[0.6rem] tracking-widest h-[24px]">
+        <div class="w-20 flex items-center justify-start">
+            <svg id="header-logo" xmlns="http://www.w3.org/2000/svg" width="935.31" height="810" viewBox="72.35 270 935.31 810" class="shrink-0 text-white fill-white [&_path]:fill-white" style="height: 0.6rem; width: auto;">
+              <g transform="translate(540, 540)">
+                <path d="
+                  M 0,0 
+                  L 467.654, -270 
+                  L 467.654, 270 
+                  L 0, 540 
+                  L -467.654, 270 
+                  L -467.654, -270 
+                  Z" 
+                  fill="#000000" />
+              </g>
+            </svg>
+        </div>
+        
+        <div class="flex items-center justify-center absolute left-1/2 -translate-x-1/2 lowercase select-none leading-none">
+            <span class="font-extrabold text-white" style="font-weight: 800;">martinvojtus</span><span class="font-normal text-white" style="font-weight: 400;">.</span><span class="font-thin text-white" style="font-weight: 100;">space</span>
+        </div>
+        
+        <div class="w-20 flex items-center justify-end relative">
+            <button id="btn-menu" onclick="toggleMenu(event)" class="text-neutral-400 hover:text-white transition-colors focus:outline-none flex items-center justify-center h-6 w-6 rounded-md hover:bg-neutral-800/40" aria-label="Menu">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <div id="dropdown-menu" class="hidden absolute right-0 top-full mt-2 w-44 bg-neutral-900/95 backdrop-blur-md border border-neutral-800/80 rounded-2xl p-2 shadow-2xl shadow-black/80 flex flex-col gap-1 z-50 text-[0.6rem] uppercase tracking-widest select-none">
+                <a href="/" class="px-3 py-2 rounded-xl text-white bg-neutral-800/80 flex items-center justify-between transition-colors">
+                    <span>DCA INDICATOR</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#00FF88]"></span>
+                </a>
+                <a href="#methodology" onclick="toggleMenu(event);" class="px-3 py-2 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-800/40 flex items-center transition-colors">
+                    <span>Methodology</span>
+                </a>
+                <a href="mailto:martinvojtus@gmail.com" onclick="toggleMenu(event);" class="px-3 py-2 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-800/40 flex items-center transition-colors">
+                    <span>Contact</span>
+                </a>
+            </div>
+        </div>
+    </header>
 
     <!-- VIEW: DASHBOARD -->
     <div id="view-dashboard-container" class="animate-fade-in">
@@ -508,8 +552,19 @@ async function analyze() {
   }
 }
 
+function toggleMenu(e) {
+    if (e) e.stopPropagation();
+    const menu = document.getElementById('dropdown-menu');
+    if (menu) menu.classList.toggle('hidden');
+}
+
 ['click', 'touchstart'].forEach(evt => {
     window.addEventListener(evt, (e) => {
+        const menu = document.getElementById('dropdown-menu');
+        const btn = document.getElementById('btn-menu');
+        if (menu && !menu.classList.contains('hidden') && !menu.contains(e.target) && (!btn || !btn.contains(e.target))) {
+            menu.classList.add('hidden');
+        }
         if (window.isAnalyzing) return;
         if (scoreChartInstance && !e.target.closest('#scoreChart')) {
             scoreChartInstance.setActiveElements([]);
