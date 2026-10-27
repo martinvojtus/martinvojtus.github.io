@@ -24,9 +24,34 @@
         .animate-pulse-soft { animation: pulse-soft 2s infinite ease-in-out; }
         @keyframes spin-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
         .animate-spin-reverse { animation: spin-reverse 1s linear infinite; }
+        @keyframes modalPop { 0% { opacity: 0; transform: scale(0.94); } 100% { opacity: 1; transform: scale(1); } }
+        .animate-modal-pop { animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     </style>
     <script>
         (function() {
+            try {
+                const choice = localStorage.getItem('smart_theme_choice');
+                const coordsRaw = localStorage.getItem('smart_theme_coords');
+                if (choice === 'allowed' && coordsRaw) {
+                    const coords = JSON.parse(coordsRaw);
+                    const now = new Date();
+                    const rad = Math.PI / 180;
+                    const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+                    const b = (360 / 365) * (dayOfYear - 81) * rad;
+                    const decl = Math.asin(Math.sin(23.45 * rad) * Math.sin(b));
+                    const eot = 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b);
+                    const curHours = now.getUTCHours() + now.getUTCMinutes() / 60 + now.getUTCSeconds() / 3600;
+                    const noonUTC = 12 - (coords.lng / 15) - (eot / 60);
+                    const hAngle = (curHours - noonUTC) * 15 * rad;
+                    const sinAlt = Math.sin(coords.lat * rad) * Math.sin(decl) + Math.cos(coords.lat * rad) * Math.cos(decl) * Math.cos(hAngle);
+                    if (sinAlt > -0.0145) {
+                        document.documentElement.classList.remove('dark');
+                    } else {
+                        document.documentElement.classList.add('dark');
+                    }
+                    return;
+                }
+            } catch(e) {}
             const savedTheme = localStorage.getItem('trading_theme');
             if (savedTheme === 'light') {
                 document.documentElement.classList.remove('dark');
@@ -136,7 +161,7 @@
             </div>
 
             <!-- THEME TOGGLE BUTTON -->
-            <button id="btn-theme" onclick="toggleTheme(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" title="Prepnúť režim (Svetlý / Tmavý)" aria-label="Toggle theme" class="w-[46px] h-[46px] shrink-0 bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-900/40 dark:hover:bg-neutral-800/40 border border-neutral-200/80 dark:border-neutral-800/50 hover:border-neutral-300 dark:hover:border-neutral-700/50 rounded-2xl flex items-center justify-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-all duration-300 active:scale-[0.99] focus:outline-none focus:ring-0 shadow-xl shadow-neutral-200/40 dark:shadow-2xl dark:shadow-black/50">
+            <button id="btn-theme" onclick="toggleTheme(); this.blur();" ondblclick="openSmartThemeModal(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" title="Prepnúť režim (Svetlý / Tmavý) • Dvojklik pre smart tému" aria-label="Toggle theme" class="w-[46px] h-[46px] shrink-0 bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-900/40 dark:hover:bg-neutral-800/40 border border-neutral-200/80 dark:border-neutral-800/50 hover:border-neutral-300 dark:hover:border-neutral-700/50 rounded-2xl flex items-center justify-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-all duration-300 active:scale-[0.99] focus:outline-none focus:ring-0 shadow-xl shadow-neutral-200/40 dark:shadow-2xl dark:shadow-black/50">
                 <svg id="theme-icon-sun" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                 </svg>
@@ -165,8 +190,65 @@
             © 2026 MARTIN VOJTUŠ
         </footer>
 
+        <!-- SMART THEME STATUS / TRIGGER -->
+        <div class="mt-3 text-center">
+            <button id="smart-theme-status-btn" onclick="openSmartThemeModal(); this.blur();" class="text-[0.55rem] uppercase tracking-widest text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300 transition-colors duration-200 select-none focus:outline-none">
+                ☀️ Smart téma podľa polohy
+            </button>
+        </div>
+
     </div>
 
+</div>
+
+<!-- SMART THEME DIALOG MODAL -->
+<div id="smart-theme-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden select-none transition-opacity duration-300" role="dialog" aria-modal="true" aria-labelledby="smart-theme-title">
+    <div id="smart-theme-modal-card" class="w-full max-w-sm bg-white dark:bg-[#141414] border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 shadow-2xl transition-all duration-300">
+        <!-- ICON HEADER -->
+        <div class="w-12 h-12 rounded-2xl bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700/60 flex items-center justify-center text-xl mb-4 mx-auto shadow-sm select-none">
+            <span class="dark:hidden">☀️</span>
+            <span class="hidden dark:inline">🌙</span>
+        </div>
+        
+        <!-- TITLE & DESCRIPTION -->
+        <h3 id="smart-theme-title" class="text-center font-bold text-sm tracking-wide text-neutral-900 dark:text-white uppercase mb-2">
+            Automatická téma podľa polohy
+        </h3>
+        <p id="smart-theme-desc" class="text-center text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed mb-4">
+            Povoľujete webu prístup k vašej polohe na zistenie času východu a západu slnka a inteligentné nastavenie svetlého alebo tmavého režimu?
+        </p>
+        
+        <!-- STATUS / FEEDBACK BOX -->
+        <div id="smart-theme-feedback" class="hidden mb-4 p-3 rounded-2xl text-center text-xs transition-all duration-300"></div>
+        
+        <!-- ACTION BUTTONS -->
+        <div id="smart-theme-actions" class="flex gap-2">
+            <button id="smart-theme-btn-deny" onclick="handleSmartThemeDeny(); this.blur();" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-medium uppercase tracking-wider text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-800 active:scale-[0.98] transition-all duration-200 focus:outline-none">
+                Zrušiť
+            </button>
+            <button id="smart-theme-btn-allow" onclick="handleSmartThemeAllow(); this.blur();" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold uppercase tracking-wider bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:opacity-90 active:scale-[0.98] transition-all duration-200 shadow-md flex items-center justify-center gap-1.5 focus:outline-none">
+                <svg id="smart-theme-btn-spinner" class="w-3.5 h-3.5 animate-spin-reverse hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                <span id="smart-theme-btn-text">Povoliť polohu</span>
+            </button>
+        </div>
+
+        <!-- DISABLE / RESET BUTTON (WHEN ACTIVE) -->
+        <div id="smart-theme-disable-box" class="hidden mt-3 text-center">
+            <button id="smart-theme-btn-disable" onclick="disableSmartTheme(); this.blur();" class="text-[0.6rem] text-neutral-400 hover:text-red-500 uppercase tracking-widest transition-colors duration-200 focus:outline-none">
+                Vypnúť automatický režim
+            </button>
+        </div>
+
+        <!-- REMEMBER CHECKBOX -->
+        <div id="smart-theme-remember-container">
+            <label class="flex items-center justify-center gap-2 mt-4 cursor-pointer text-[0.65rem] text-neutral-500 select-none">
+                <input type="checkbox" id="smart-theme-remember" checked class="rounded border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-white focus:ring-0">
+                <span>Zapamätať si voľbu</span>
+            </label>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -213,8 +295,13 @@ function getTheme() {
 }
 
 // --- THEME SWITCHING ---
-function toggleTheme() {
-    const isDark = document.documentElement.classList.toggle('dark');
+function setTheme(mode) {
+    const isDark = (mode === 'dark');
+    if (isDark) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
     localStorage.setItem('trading_theme', isDark ? 'dark' : 'light');
     updateMacroButtonsUI(window.currentMacroView);
     updateCoinButtonsUI(window.currentCoin);
@@ -225,6 +312,11 @@ function toggleTheme() {
     } else {
         resetCardUI();
     }
+}
+
+function toggleTheme() {
+    setTheme(isDarkMode() ? 'light' : 'dark');
+    updateSmartThemeFooterStatus();
 }
 
 // --- DASHBOARD LOGIC ---
@@ -674,7 +766,320 @@ async function analyze() {
     }, { passive: true });
 });
 
-window.addEventListener('DOMContentLoaded', () => { updateSkeletonGrid(); initUI(); triggerAnalysis(); });
+// --- SOLAR TIME CALCULATIONS & SMART LOGIC ---
+function calculateSunriseSunset(lat, lng, date = new Date()) {
+    const rad = Math.PI / 180;
+    const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
+    const b = (360 / 365) * (dayOfYear - 81) * rad;
+    const declination = Math.asin(Math.sin(23.45 * rad) * Math.sin(b));
+    const eot = 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b);
+    const solarNoonUTC = 12 - (lng / 15) - (eot / 60);
+    const cosHourAngle = (Math.cos(90.833 * rad) - Math.sin(lat * rad) * Math.sin(declination)) / (Math.cos(lat * rad) * Math.cos(declination));
+    
+    if (cosHourAngle > 1) return { polarNight: true, sunrise: null, sunset: null };
+    if (cosHourAngle < -1) return { midnightSun: true, sunrise: null, sunset: null };
+    
+    const hourAngleHours = Math.acos(cosHourAngle) / (15 * rad);
+    const sunriseUTC = solarNoonUTC - hourAngleHours;
+    const sunsetUTC = solarNoonUTC + hourAngleHours;
+    
+    const srHours = Math.floor(sunriseUTC);
+    const srMinutes = Math.round((sunriseUTC - srHours) * 60);
+    const ssHours = Math.floor(sunsetUTC);
+    const ssMinutes = Math.round((sunsetUTC - ssHours) * 60);
+    
+    const sunrise = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), srHours, srMinutes));
+    const sunset = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), ssHours, ssMinutes));
+    
+    return { sunrise, sunset };
+}
+
+function isDaytime(lat, lng, now = new Date()) {
+    const rad = Math.PI / 180;
+    const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+    const b = (360 / 365) * (dayOfYear - 81) * rad;
+    const declination = Math.asin(Math.sin(23.45 * rad) * Math.sin(b));
+    const eot = 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b);
+    const currentUTCHours = now.getUTCHours() + now.getUTCMinutes() / 60 + now.getUTCSeconds() / 3600;
+    const solarNoonUTC = 12 - (lng / 15) - (eot / 60);
+    const hourAngle = (currentUTCHours - solarNoonUTC) * 15 * rad;
+    const sinAlt = Math.sin(lat * rad) * Math.sin(declination) + Math.cos(lat * rad) * Math.cos(declination) * Math.cos(hourAngle);
+    return sinAlt > -0.0145;
+}
+
+async function applySmartThemeFromCoords(lat, lng, feedbackEl = null) {
+    const now = new Date();
+    let isDay = isDaytime(lat, lng, now);
+    let solarTimes = calculateSunriseSunset(lat, lng, now);
+    setTheme(isDay ? 'light' : 'dark');
+
+    try {
+        const controller = new AbortController();
+        const tId = setTimeout(() => controller.abort(), 3500);
+        const res = await fetch(`https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&formatted=0`, { signal: controller.signal });
+        clearTimeout(tId);
+        if (res.ok) {
+            const json = await res.json();
+            if (json && json.status === 'OK' && json.results) {
+                const apiSunrise = new Date(json.results.sunrise);
+                const apiSunset = new Date(json.results.sunset);
+                if (!isNaN(apiSunrise.getTime()) && !isNaN(apiSunset.getTime())) {
+                    solarTimes.sunrise = apiSunrise;
+                    solarTimes.sunset = apiSunset;
+                    isDay = (now >= apiSunrise && now < apiSunset);
+                    setTheme(isDay ? 'light' : 'dark');
+                }
+            }
+        }
+    } catch(e) {}
+
+    const srStr = solarTimes.sunrise ? solarTimes.sunrise.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
+    const ssStr = solarTimes.sunset ? solarTimes.sunset.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
+
+    localStorage.setItem('smart_theme_solar', JSON.stringify({
+        sunrise: srStr,
+        sunset: ssStr,
+        isDay: isDay,
+        date: now.toDateString()
+    }));
+
+    updateSmartThemeFooterStatus();
+
+    if (feedbackEl) {
+        feedbackEl.classList.remove('hidden');
+        feedbackEl.className = "mb-4 p-3 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/70 border border-neutral-200 dark:border-neutral-700/60 text-center";
+        feedbackEl.innerHTML = `
+            <div class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mb-1">✓ Poloha zistená</div>
+            <div class="text-[0.68rem] text-neutral-600 dark:text-neutral-300">
+                ☀️ Východ: <span class="font-bold text-neutral-900 dark:text-white">${srStr}</span> &nbsp;•&nbsp; 
+                🌙 Západ: <span class="font-bold text-neutral-900 dark:text-white">${ssStr}</span>
+            </div>
+            <div class="text-[0.65rem] text-neutral-500 dark:text-neutral-400 mt-1 uppercase tracking-wider">
+                Nastavený <span class="font-bold text-neutral-900 dark:text-white">${isDay ? 'svetlý režim (deň)' : 'tmavý režim (noc)'}</span>
+            </div>
+        `;
+    }
+}
+
+function updateSmartThemeFooterStatus() {
+    const statusBtn = document.getElementById('smart-theme-status-btn');
+    if (!statusBtn) return;
+    
+    const choice = localStorage.getItem('smart_theme_choice');
+    const solarRaw = localStorage.getItem('smart_theme_solar');
+    
+    if (choice === 'allowed' && solarRaw) {
+        try {
+            const solar = JSON.parse(solarRaw);
+            const modeName = solar.isDay ? 'Svetlý režim' : 'Tmavý režim';
+            statusBtn.innerHTML = `📍 SMART TÉMA: ☀️ ${solar.sunrise} • 🌙 ${solar.sunset} (${modeName})`;
+            return;
+        } catch(e) {}
+    }
+    
+    statusBtn.innerHTML = `☀️ Nastaviť smart tému podľa polohy`;
+}
+
+function openSmartThemeModal() {
+    const modal = document.getElementById('smart-theme-modal');
+    const card = document.getElementById('smart-theme-modal-card');
+    const feedback = document.getElementById('smart-theme-feedback');
+    const actions = document.getElementById('smart-theme-actions');
+    const allowBtn = document.getElementById('smart-theme-btn-allow');
+    const denyBtn = document.getElementById('smart-theme-btn-deny');
+    const spinner = document.getElementById('smart-theme-btn-spinner');
+    const btnText = document.getElementById('smart-theme-btn-text');
+    const desc = document.getElementById('smart-theme-desc');
+    const disableBox = document.getElementById('smart-theme-disable-box');
+    const rememberBox = document.getElementById('smart-theme-remember-container');
+
+    const choice = localStorage.getItem('smart_theme_choice');
+    const solarRaw = localStorage.getItem('smart_theme_solar');
+
+    if (spinner) spinner.classList.add('hidden');
+    if (allowBtn) { 
+        allowBtn.disabled = false; 
+        if (btnText) btnText.innerText = (choice === 'allowed') ? "Aktualizovať" : "Povoliť polohu"; 
+    }
+    if (denyBtn) {
+        denyBtn.innerText = (choice === 'allowed') ? "Zavrieť" : "Zrušiť";
+    }
+
+    if (choice === 'allowed' && solarRaw) {
+        try {
+            const solar = JSON.parse(solarRaw);
+            if (feedback) {
+                feedback.classList.remove('hidden');
+                feedback.className = "mb-4 p-3 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/70 border border-neutral-200 dark:border-neutral-700/60 text-center";
+                feedback.innerHTML = `
+                    <div class="text-[0.62rem] uppercase tracking-wider font-semibold text-neutral-500 dark:text-neutral-400 mb-1">Aktuálne časy vo vašej lokalite</div>
+                    <div class="text-xs text-neutral-800 dark:text-neutral-200 font-medium">
+                        ☀️ Východ: <b>${solar.sunrise}</b> &nbsp;•&nbsp; 🌙 Západ: <b>${solar.sunset}</b>
+                    </div>
+                    <div class="text-[0.65rem] text-neutral-500 dark:text-neutral-400 mt-1">
+                        Režim: <b>${solar.isDay ? 'Svetlý (deň)' : 'Tmavý (noc)'}</b>
+                    </div>
+                `;
+            }
+            if (desc) desc.innerText = "Smart téma automaticky prepína svetlý a tmavý režim podľa polohy a času východu/západu slnka.";
+            if (disableBox) disableBox.classList.remove('hidden');
+            if (rememberBox) rememberBox.classList.add('hidden');
+        } catch(e) {}
+    } else {
+        if (feedback) { feedback.className = "hidden"; feedback.innerHTML = ""; }
+        if (desc) desc.innerText = "Povoľujete webu prístup k vašej polohe na zistenie času východu a západu slnka a inteligentné nastavenie svetlého alebo tmavého režimu?";
+        if (disableBox) disableBox.classList.add('hidden');
+        if (rememberBox) rememberBox.classList.remove('hidden');
+    }
+
+    if (actions) actions.classList.remove('hidden');
+
+    modal.classList.remove('hidden');
+    card.classList.remove('animate-modal-pop');
+    void card.offsetWidth;
+    card.classList.add('animate-modal-pop');
+}
+
+function closeSmartThemeModal() {
+    const modal = document.getElementById('smart-theme-modal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+}
+
+function handleSmartThemeDeny() {
+    const remember = document.getElementById('smart-theme-remember')?.checked;
+    if (remember) {
+        localStorage.setItem('smart_theme_choice', 'denied');
+    }
+    closeSmartThemeModal();
+    updateSmartThemeFooterStatus();
+}
+
+function disableSmartTheme() {
+    localStorage.removeItem('smart_theme_choice');
+    localStorage.removeItem('smart_theme_solar');
+    closeSmartThemeModal();
+    updateSmartThemeFooterStatus();
+}
+
+function showSmartThemeModalError(msg) {
+    const feedback = document.getElementById('smart-theme-feedback');
+    const allowBtn = document.getElementById('smart-theme-btn-allow');
+    const spinner = document.getElementById('smart-theme-btn-spinner');
+    const btnText = document.getElementById('smart-theme-btn-text');
+    if (spinner) spinner.classList.add('hidden');
+    if (allowBtn) {
+        allowBtn.disabled = false;
+        if (btnText) btnText.innerText = "Skúsiť znova";
+    }
+    if (feedback) {
+        feedback.classList.remove('hidden');
+        feedback.className = "mb-4 p-3 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-500 text-center text-xs";
+        feedback.innerText = msg;
+    }
+}
+
+async function handleSmartThemeAllow() {
+    const allowBtn = document.getElementById('smart-theme-btn-allow');
+    const spinner = document.getElementById('smart-theme-btn-spinner');
+    const btnText = document.getElementById('smart-theme-btn-text');
+    const feedback = document.getElementById('smart-theme-feedback');
+    const actions = document.getElementById('smart-theme-actions');
+    const remember = document.getElementById('smart-theme-remember')?.checked;
+
+    if (allowBtn) allowBtn.disabled = true;
+    if (spinner) spinner.classList.remove('hidden');
+    if (btnText) btnText.innerText = "Zisťujem...";
+
+    const onCoordsFound = async (lat, lng) => {
+        if (remember !== false) {
+            localStorage.setItem('smart_theme_choice', 'allowed');
+        }
+        localStorage.setItem('smart_theme_coords', JSON.stringify({ lat, lng, time: Date.now() }));
+
+        if (feedback) {
+            feedback.classList.remove('hidden');
+            feedback.className = "mb-4 p-3 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/70 border border-neutral-200 dark:border-neutral-700/60 text-center";
+            feedback.innerHTML = `<span class="text-xs text-neutral-500 dark:text-neutral-400 animate-pulse">Počítam východ a západ slnka...</span>`;
+        }
+
+        await applySmartThemeFromCoords(lat, lng, feedback);
+
+        if (actions) actions.classList.add('hidden');
+        setTimeout(() => {
+            closeSmartThemeModal();
+        }, 1600);
+    };
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                await onCoordsFound(pos.coords.latitude, pos.coords.longitude);
+            },
+            async (err) => {
+                console.warn("Geolocation permission error or unavailable, trying IP fallback:", err);
+                try {
+                    const ipRes = await fetch("https://ipwho.is/");
+                    if (ipRes.ok) {
+                        const ipData = await ipRes.json();
+                        if (ipData && ipData.latitude && ipData.longitude) {
+                            await onCoordsFound(ipData.latitude, ipData.longitude);
+                            return;
+                        }
+                    }
+                } catch(e) {}
+                showSmartThemeModalError("Prístup k polohe nebol udelený. Téma zostáva zachovaná.");
+            },
+            { timeout: 8000, enableHighAccuracy: false }
+        );
+    } else {
+        try {
+            const ipRes = await fetch("https://ipwho.is/");
+            if (ipRes.ok) {
+                const ipData = await ipRes.json();
+                if (ipData && ipData.latitude && ipData.longitude) {
+                    await onCoordsFound(ipData.latitude, ipData.longitude);
+                    return;
+                }
+            }
+        } catch(e) {}
+        showSmartThemeModalError("Geolokácia nie je podporovaná vo vašom prehliadači.");
+    }
+}
+
+function checkSmartThemeOnLoad() {
+    const choice = localStorage.getItem('smart_theme_choice');
+    const coordsRaw = localStorage.getItem('smart_theme_coords');
+
+    if (choice === 'allowed' && coordsRaw) {
+        try {
+            const coords = JSON.parse(coordsRaw);
+            applySmartThemeFromCoords(coords.lat, coords.lng);
+        } catch(e) {}
+    } else if (!choice) {
+        setTimeout(() => {
+            openSmartThemeModal();
+        }, 450);
+    }
+    updateSmartThemeFooterStatus();
+}
+
+const smartModal = document.getElementById('smart-theme-modal');
+if (smartModal) {
+    smartModal.addEventListener('click', (e) => {
+        if (e.target === smartModal) closeSmartThemeModal();
+    });
+}
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSmartThemeModal();
+});
+
+window.addEventListener('DOMContentLoaded', () => { 
+    updateSkeletonGrid(); 
+    initUI(); 
+    triggerAnalysis(); 
+    checkSmartThemeOnLoad();
+});
 </script>
 </body>
 </html>
