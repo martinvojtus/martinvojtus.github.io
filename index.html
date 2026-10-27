@@ -26,6 +26,33 @@
         .animate-spin-reverse { animation: spin-reverse 1s linear infinite; }
         @keyframes modalPop { 0% { opacity: 0; transform: scale(0.94); } 100% { opacity: 1; transform: scale(1); } }
         .animate-modal-pop { animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        /* DISCLAIMER COLLAPSE & FADE */
+        #disclaimer-box {
+            max-height: 1.65rem;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 45%, rgba(0, 0, 0, 0) 100%);
+            mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 45%, rgba(0, 0, 0, 0) 100%);
+            cursor: pointer;
+        }
+        #disclaimer-box:not(.is-expanded):hover {
+            color: #404040;
+        }
+        .dark #disclaimer-box:not(.is-expanded):hover {
+            color: #a3a3a3;
+        }
+        #disclaimer-box.is-expanded {
+            -webkit-mask-image: none;
+            mask-image: none;
+            cursor: default;
+        }
+        #disclaimer-collapse-btn {
+            display: none;
+        }
+        #disclaimer-box.is-expanded #disclaimer-collapse-btn {
+            display: inline-block;
+        }
     </style>
     <script>
         (function() {
@@ -181,8 +208,29 @@
         <div id="error-box" class="hidden mt-3 bg-[#FF2A6D]/10 border border-[#FF2A6D]/30 p-4 rounded-2xl text-[#FF2A6D] text-[0.6rem] tracking-widest uppercase text-center">❌ CONNECTION FAILED. PLEASE TRY AGAIN.</div>
 
         <!-- FOOTER DISCLAIMER -->
-        <div class="mt-3 px-1 text-[0.6rem] text-neutral-500 leading-relaxed text-justify hyphens-auto select-none" style="text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;">
-            Disclaimer: This quantitative model is for informational purposes only and does not constitute financial or investment advice. Digital asset markets involve extreme volatility and risk of capital loss. Model outputs do not guarantee future performance. Independent due diligence is advised.
+        <div class="mt-3 px-1 select-none">
+            <div id="disclaimer-box" 
+                 onclick="if (!this.classList.contains('is-expanded')) toggleDisclaimer(event);" 
+                 class="text-[0.6rem] text-neutral-500 leading-relaxed text-justify hyphens-auto transition-colors duration-200" 
+                 style="text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;">
+                <button type="button" 
+                        id="disclaimer-toggle-btn" 
+                        onclick="toggleDisclaimer(event); this.blur();" 
+                        aria-expanded="false" 
+                        aria-controls="disclaimer-box"
+                        class="inline font-semibold text-neutral-700 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white underline decoration-neutral-400/60 dark:decoration-neutral-500/60 hover:decoration-neutral-900 dark:hover:decoration-white underline-offset-2 transition-colors cursor-pointer focus:outline-none">
+                    <span>Disclaimer</span>
+                    <svg id="disclaimer-chevron" class="inline-block w-2.5 h-2.5 ml-0.5 -mt-0.5 transform transition-transform duration-300 align-middle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>: This quantitative model is for informational purposes only and does not constitute financial or investment advice. Digital asset markets involve extreme volatility and risk of capital loss. Model outputs do not guarantee future performance. Independent due diligence is advised.
+                <button type="button" 
+                        id="disclaimer-collapse-btn" 
+                        onclick="toggleDisclaimer(event); this.blur();" 
+                        class="ml-1.5 font-medium text-[0.55rem] text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300 underline decoration-dotted underline-offset-2 cursor-pointer transition-colors focus:outline-none">
+                    Show less
+                </button>
+            </div>
         </div>
 
         <!-- COPYRIGHT -->
@@ -1075,11 +1123,54 @@ window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeSmartThemeModal();
 });
 
+function toggleDisclaimer(e) {
+    if (e) e.stopPropagation();
+    const box = document.getElementById('disclaimer-box');
+    const chevron = document.getElementById('disclaimer-chevron');
+    const toggleBtn = document.getElementById('disclaimer-toggle-btn');
+    if (!box) return;
+
+    const isExpanded = box.classList.contains('is-expanded');
+
+    if (isExpanded) {
+        box.style.maxHeight = box.offsetHeight + 'px';
+        void box.offsetHeight;
+        box.classList.remove('is-expanded');
+        box.style.maxHeight = '1.65rem';
+        if (chevron) chevron.classList.remove('rotate-180');
+        if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+    } else {
+        box.style.maxHeight = box.offsetHeight + 'px';
+        box.classList.add('is-expanded');
+        box.style.maxHeight = box.scrollHeight + 'px';
+        if (chevron) chevron.classList.add('rotate-180');
+        if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
+    }
+}
+
+function initDisclaimer() {
+    const box = document.getElementById('disclaimer-box');
+    if (!box) return;
+    box.addEventListener('transitionend', (e) => {
+        if (e.propertyName === 'max-height' && box.classList.contains('is-expanded')) {
+            box.style.maxHeight = 'none';
+        }
+    });
+}
+
+window.addEventListener('resize', () => {
+    const box = document.getElementById('disclaimer-box');
+    if (box && box.classList.contains('is-expanded') && box.style.maxHeight !== 'none') {
+        box.style.maxHeight = box.scrollHeight + 'px';
+    }
+});
+
 window.addEventListener('DOMContentLoaded', () => { 
     updateSkeletonGrid(); 
     initUI(); 
     triggerAnalysis(); 
     checkSmartThemeOnLoad();
+    initDisclaimer();
 });
 </script>
 </body>
