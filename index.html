@@ -20,12 +20,10 @@
     <style>
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        .animate-pulse-soft { animation: pulse-soft 2s infinite ease-in-out; }
+        @keyframes pulse-soft { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.65; transform: scale(1.03); } }
+        .animate-pulse-soft { animation: pulse-soft 3s infinite ease-in-out; }
         @keyframes spin-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
         .animate-spin-reverse { animation: spin-reverse 1s linear infinite; }
-        @keyframes modalPop { 0% { opacity: 0; transform: scale(0.94); } 100% { opacity: 1; transform: scale(1); } }
-        .animate-modal-pop { animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
         /* DISCLAIMER COLLAPSE & FADE */
         #disclaimer-box {
@@ -57,9 +55,20 @@
     <script>
         (function() {
             try {
+                const weatherMode = localStorage.getItem('weather_theme_mode');
                 const choice = localStorage.getItem('smart_theme_choice');
-                const coordsRaw = localStorage.getItem('smart_theme_coords');
-                if (choice === 'allowed' && coordsRaw) {
+                const coordsRaw = localStorage.getItem('weather_coords') || localStorage.getItem('smart_theme_coords');
+
+                if (weatherMode === 'light') {
+                    document.documentElement.classList.remove('dark');
+                    return;
+                }
+                if (weatherMode === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    return;
+                }
+
+                if ((weatherMode === 'solar' || choice === 'allowed' || !weatherMode) && coordsRaw) {
                     const coords = JSON.parse(coordsRaw);
                     const now = new Date();
                     const rad = Math.PI / 180;
@@ -94,7 +103,128 @@
 
     <!-- VIEW: DASHBOARD -->
     <div id="view-dashboard-container" class="animate-fade-in">
-        <!-- MAIN CARD (NOW AT THE VERY TOP) -->
+
+        <!-- APPLE WEATHER WIDGET (AT THE VERY TOP) -->
+        <div id="weather-widget" class="relative overflow-hidden p-5 md:p-6 rounded-3xl border border-neutral-200/80 dark:border-neutral-800/60 bg-white/70 dark:bg-neutral-900/40 backdrop-blur-xl shadow-xl shadow-neutral-200/40 dark:shadow-2xl dark:shadow-black/50 transition-all duration-700 mb-3 select-none">
+            
+            <!-- DYNAMIC AMBIENT WEATHER GLOW -->
+            <div id="weather-ambient-glow" class="absolute -top-16 -right-16 w-52 h-52 rounded-full blur-3xl pointer-events-none opacity-40 transition-all duration-1000 bg-sky-400"></div>
+
+            <!-- TOP ROW: LOCATION / STATUS & THEME / REFRESH CONTROLS -->
+            <div class="flex justify-between items-center relative z-10 gap-2 mb-3">
+                <!-- LOCATION INFO -->
+                <div class="flex items-center gap-1.5 min-w-0">
+                    <button onclick="refreshWeatherLocation(true); this.blur();" title="Aktualizovať polohu" class="group flex items-center gap-2 text-left focus:outline-none">
+                        <span id="weather-loc-icon" class="w-6 h-6 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center shrink-0 text-neutral-600 dark:text-neutral-300 group-hover:scale-105 transition-transform">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                        </span>
+                        <div class="min-w-0">
+                            <div id="weather-city" class="text-xs md:text-sm font-semibold tracking-tight text-neutral-900 dark:text-white truncate">
+                                Zisťujem polohu...
+                            </div>
+                            <div id="weather-subtitle" class="text-[0.6rem] uppercase tracking-wider text-neutral-500 dark:text-neutral-400 leading-tight">
+                                Moja poloha
+                            </div>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- CONTROLS: THEME SEGMENTED SELECTOR & LOCATE BUTTON -->
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <!-- THEME SEGMENTED CONTROL -->
+                    <div id="weather-theme-controls" class="p-0.5 bg-black/5 dark:bg-white/10 rounded-xl border border-black/5 dark:border-white/10 flex items-center gap-0.5 backdrop-blur-sm text-[0.6rem]">
+                        <button id="theme-btn-light" onclick="setWeatherTheme('light'); this.blur();" title="Svetlý režim" class="px-2 py-1 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all flex items-center gap-1">
+                            <span>☀️</span>
+                            <span class="hidden sm:inline uppercase tracking-widest text-[0.55rem]">Svetlý</span>
+                        </button>
+                        <button id="theme-btn-dark" onclick="setWeatherTheme('dark'); this.blur();" title="Tmavý režim" class="px-2 py-1 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all flex items-center gap-1">
+                            <span>🌙</span>
+                            <span class="hidden sm:inline uppercase tracking-widest text-[0.55rem]">Tmavý</span>
+                        </button>
+                        <button id="theme-btn-solar" onclick="setWeatherTheme('solar'); this.blur();" title="Solárny automatický režim podľa polohy a slnka" class="px-2 py-1 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all flex items-center gap-1 font-medium">
+                            <span>⛅</span>
+                            <span class="hidden sm:inline uppercase tracking-widest text-[0.55rem]">Auto</span>
+                        </button>
+                    </div>
+
+                    <!-- REFRESH LOCATION BUTTON -->
+                    <button onclick="refreshWeatherLocation(true); this.blur();" id="weather-locate-btn" title="Aktualizovať polohu a počasie" aria-label="Aktualizovať polohu" class="w-7 h-7 flex items-center justify-center rounded-xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/5 dark:border-white/10 text-neutral-600 dark:text-neutral-300 transition-all active:scale-95">
+                        <svg id="weather-locate-spinner" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- MAIN WEATHER HERO: LARGE TEMP, CONDITION & ICON -->
+            <div class="flex justify-between items-center relative z-10 my-1">
+                <div>
+                    <div class="flex items-baseline gap-1.5">
+                        <div id="weather-temp" class="text-4xl md:text-5xl font-light tracking-tight leading-none text-neutral-900 dark:text-white">
+                            <span class="inline-block animate-pulse bg-neutral-200 dark:bg-neutral-800 text-transparent rounded px-2">--°</span>
+                        </div>
+                    </div>
+                    <div id="weather-desc" class="text-xs uppercase tracking-wider font-semibold text-neutral-700 dark:text-neutral-300 mt-2">
+                        Načítavam počasie...
+                    </div>
+                    <div id="weather-temp-range" class="text-[0.65rem] uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mt-1 flex items-center gap-2">
+                        <span>V: <strong id="weather-temp-max" class="font-semibold text-neutral-700 dark:text-neutral-300">--°</strong></span>
+                        <span>•</span>
+                        <span>N: <strong id="weather-temp-min" class="font-semibold text-neutral-700 dark:text-neutral-300">--°</strong></span>
+                    </div>
+                </div>
+
+                <!-- WEATHER ANIMATED VECTOR ICON -->
+                <div id="weather-icon-wrapper" class="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center shrink-0">
+                    <div class="w-12 h-12 rounded-full bg-neutral-200 dark:bg-neutral-800 animate-pulse"></div>
+                </div>
+            </div>
+
+            <!-- WARNINGS / ALERTS SECTION (VAROVANIA: VIETOR, MRÁZ, ATĎ.) -->
+            <div id="weather-warnings-container" class="mt-3 relative z-10 transition-all duration-300">
+                <!-- Dynamically rendered alerts or calm status -->
+            </div>
+
+            <!-- APPLE WEATHER METRICS TILES -->
+            <div class="grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-black/5 dark:border-white/10 relative z-10 text-center">
+                <div class="p-2 rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.04] dark:border-white/[0.05]">
+                    <div class="text-[0.52rem] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-medium">Pocitovo</div>
+                    <div id="weather-apparent" class="text-xs md:text-sm font-semibold tracking-tight text-neutral-800 dark:text-neutral-200 mt-0.5">--°</div>
+                </div>
+                <div class="p-2 rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.04] dark:border-white/[0.05]">
+                    <div class="text-[0.52rem] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-medium">Vietor</div>
+                    <div id="weather-wind-speed" class="text-xs md:text-sm font-semibold tracking-tight text-neutral-800 dark:text-neutral-200 mt-0.5">-- <span class="text-[0.55rem] font-normal">km/h</span></div>
+                </div>
+                <div class="p-2 rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.04] dark:border-white/[0.05]">
+                    <div class="text-[0.52rem] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-medium">Vlhkosť</div>
+                    <div id="weather-humidity" class="text-xs md:text-sm font-semibold tracking-tight text-neutral-800 dark:text-neutral-200 mt-0.5">--%</div>
+                </div>
+                <div class="p-2 rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.04] dark:border-white/[0.05]">
+                    <div class="text-[0.52rem] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-medium">Zrážky</div>
+                    <div id="weather-precip" class="text-xs md:text-sm font-semibold tracking-tight text-neutral-800 dark:text-neutral-200 mt-0.5">-- <span class="text-[0.55rem] font-normal">mm</span></div>
+                </div>
+            </div>
+
+            <!-- SOLAR SUNRISE & SUNSET BAR -->
+            <div class="flex items-center justify-between text-[0.6rem] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mt-2.5 pt-2 border-t border-black/5 dark:border-white/5 select-none relative z-10">
+                <div class="flex items-center gap-1.5">
+                    <span>☀️ Východ:</span>
+                    <strong id="weather-sunrise" class="font-semibold text-neutral-800 dark:text-neutral-200">--:--</strong>
+                </div>
+                <div id="weather-solar-status-tag" class="text-[0.55rem] tracking-wider px-2 py-0.5 rounded-md bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 font-medium">
+                    Solárny režim
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span>🌙 Západ:</span>
+                    <strong id="weather-sunset" class="font-semibold text-neutral-800 dark:text-neutral-200">--:--</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CARD (BITCOIN / ZCASH QUANTITATIVE MODEL) -->
         <div id="main-card" class="p-6 rounded-3xl bg-white dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800/50 shadow-xl shadow-neutral-200/50 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-1000 mb-3">
             
             <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
@@ -187,8 +317,8 @@
                 </button>
             </div>
 
-            <!-- THEME TOGGLE BUTTON -->
-            <button id="btn-theme" onclick="toggleTheme(); this.blur();" ondblclick="openSmartThemeModal(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" title="Toggle theme (Light / Dark) • Double-click for smart solar theme" aria-label="Toggle theme" class="w-[46px] h-[46px] shrink-0 bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-900/40 dark:hover:bg-neutral-800/40 border border-neutral-200/80 dark:border-neutral-800/50 hover:border-neutral-300 dark:hover:border-neutral-700/50 rounded-2xl flex items-center justify-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-all duration-300 active:scale-[0.99] focus:outline-none focus:ring-0 shadow-xl shadow-neutral-200/40 dark:shadow-2xl dark:shadow-black/50">
+            <!-- THEME QUICK TOGGLE BUTTON (IN SYNC WITH WIDGET) -->
+            <button id="btn-theme" onclick="toggleTheme(); this.blur();" ondblclick="setWeatherTheme('solar'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" title="Prepúť režim (Svetlý / Tmavý) • Dvojklik pre solárny režim" aria-label="Toggle theme" class="w-[46px] h-[46px] shrink-0 bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-900/40 dark:hover:bg-neutral-800/40 border border-neutral-200/80 dark:border-neutral-800/50 hover:border-neutral-300 dark:hover:border-neutral-700/50 rounded-2xl flex items-center justify-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-all duration-300 active:scale-[0.99] focus:outline-none focus:ring-0 shadow-xl shadow-neutral-200/40 dark:shadow-2xl dark:shadow-black/50">
                 <svg id="theme-icon-sun" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                 </svg>
@@ -198,7 +328,7 @@
             </button>
 
             <!-- REFRESH BUTTON (SQUARE) -->
-            <button id="btn-refresh" onclick="refreshWindow(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" title="Refresh" aria-label="Refresh" class="w-[46px] h-[46px] shrink-0 bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-900/40 dark:hover:bg-neutral-800/40 border border-neutral-200/80 dark:border-neutral-800/50 hover:border-neutral-300 dark:hover:border-neutral-700/50 rounded-2xl flex items-center justify-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-all duration-300 active:scale-[0.99] focus:outline-none focus:ring-0 shadow-xl shadow-neutral-200/40 dark:shadow-2xl dark:shadow-black/50">
+            <button id="btn-refresh" onclick="refreshWindow(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" title="Obnoviť dáta" aria-label="Refresh" class="w-[46px] h-[46px] shrink-0 bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-900/40 dark:hover:bg-neutral-800/40 border border-neutral-200/80 dark:border-neutral-800/50 hover:border-neutral-300 dark:hover:border-neutral-700/50 rounded-2xl flex items-center justify-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-all duration-300 active:scale-[0.99] focus:outline-none focus:ring-0 shadow-xl shadow-neutral-200/40 dark:shadow-2xl dark:shadow-black/50">
                 <svg id="btn-refresh-icon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                 </svg>
@@ -238,65 +368,8 @@
             © 2026 MARTIN VOJTUŠ
         </footer>
 
-        <!-- SMART THEME STATUS / TRIGGER -->
-        <div class="mt-3 flex justify-center items-center">
-            <button id="smart-theme-status-btn" onclick="openSmartThemeModal(); this.blur();" class="text-[0.55rem] leading-none uppercase tracking-widest text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300 transition-colors duration-200 select-none focus:outline-none">
-                ☀️ Smart Solar Theme
-            </button>
-        </div>
-
     </div>
 
-</div>
-
-<!-- SMART THEME DIALOG MODAL -->
-<div id="smart-theme-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden select-none transition-opacity duration-300" role="dialog" aria-modal="true" aria-labelledby="smart-theme-title">
-    <div id="smart-theme-modal-card" class="w-full max-w-sm bg-white dark:bg-[#141414] border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 shadow-2xl transition-all duration-300">
-        <!-- ICON HEADER -->
-        <div class="w-12 h-12 rounded-2xl bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700/60 flex items-center justify-center text-xl mb-4 mx-auto shadow-sm select-none">
-            <span class="dark:hidden">☀️</span>
-            <span class="hidden dark:inline">🌙</span>
-        </div>
-        
-        <!-- TITLE & DESCRIPTION -->
-        <h3 id="smart-theme-title" class="text-center font-bold text-sm tracking-wide text-neutral-900 dark:text-white uppercase mb-2">
-            Smart Solar Theme
-        </h3>
-        <p id="smart-theme-desc" class="text-center text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed mb-4">
-            Allow access to your location to automatically adapt light and dark mode based on sunrise and sunset times in your area?
-        </p>
-        
-        <!-- STATUS / FEEDBACK BOX -->
-        <div id="smart-theme-feedback" class="hidden mb-4 p-3 rounded-2xl text-center text-xs transition-all duration-300"></div>
-        
-        <!-- ACTION BUTTONS -->
-        <div id="smart-theme-actions" class="flex gap-2">
-            <button id="smart-theme-btn-deny" onclick="handleSmartThemeDeny(); this.blur();" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-medium uppercase tracking-wider text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-800 active:scale-[0.98] transition-all duration-200 focus:outline-none">
-                Cancel
-            </button>
-            <button id="smart-theme-btn-allow" onclick="handleSmartThemeAllow(); this.blur();" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold uppercase tracking-wider bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:opacity-90 active:scale-[0.98] transition-all duration-200 shadow-md flex items-center justify-center gap-1.5 focus:outline-none">
-                <svg id="smart-theme-btn-spinner" class="w-3.5 h-3.5 animate-spin-reverse hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                </svg>
-                <span id="smart-theme-btn-text">Allow Location</span>
-            </button>
-        </div>
-
-        <!-- DISABLE / RESET BUTTON (WHEN ACTIVE) -->
-        <div id="smart-theme-disable-box" class="hidden mt-3 text-center">
-            <button id="smart-theme-btn-disable" onclick="disableSmartTheme(); this.blur();" class="text-[0.6rem] text-neutral-400 hover:text-red-500 uppercase tracking-widest transition-colors duration-200 focus:outline-none">
-                Disable automatic theme
-            </button>
-        </div>
-
-        <!-- REMEMBER CHECKBOX -->
-        <div id="smart-theme-remember-container">
-            <label class="flex items-center justify-center gap-2 mt-4 cursor-pointer text-[0.65rem] text-neutral-500 select-none">
-                <input type="checkbox" id="smart-theme-remember" checked class="rounded border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-white focus:ring-0">
-                <span>Remember my choice</span>
-            </label>
-        </div>
-    </div>
 </div>
 
 <script>
@@ -304,11 +377,14 @@
 let scoreChartInstance = null;
 window.currentScoreData = { score: 0, colorClass: "" };
 window.fullData = null; 
+window.weatherData = null;
 const savedView = localStorage.getItem('trading_macro_view');
 window.currentMacroView = (savedView === '1Y' || savedView === '2Y' || savedView === '4Y') ? savedView : '4Y';
 const savedCoin = localStorage.getItem('trading_coin');
 window.currentCoin = (savedCoin === 'BTC' || savedCoin === 'ZEC') ? savedCoin : 'BTC';
+window.currentThemeMode = localStorage.getItem('weather_theme_mode') || 'solar';
 
+// --- PALETTES ---
 const PALETTE_DARK = {
     low:  { full: '#A88468', bgCard: '#080705', bgBadge: '#110D0A', border: '#32281F', line: '#544234' },
     mid:  { full: '#F7931A', bgCard: '#0C0701', bgBadge: '#190F03', border: '#4A2C08', line: '#7C4A0D' },
@@ -342,15 +418,376 @@ function getTheme() {
     };
 }
 
-// --- THEME SWITCHING ---
-function setTheme(mode) {
-    const isDark = (mode === 'dark');
+// --- WMO WEATHER CODES MAPPING ---
+const WEATHER_CONDITIONS = {
+    0:  { label: 'Jasno', category: 'clear' },
+    1:  { label: 'Prevažne jasno', category: 'clear' },
+    2:  { label: 'Polooblačno', category: 'partly-cloudy' },
+    3:  { label: 'Zamračené', category: 'overcast' },
+    45: { label: 'Hmla', category: 'fog' },
+    48: { label: 'Námraza a hmla', category: 'fog' },
+    51: { label: 'Slabé mrholenie', category: 'rain' },
+    53: { label: 'Mrholenie', category: 'rain' },
+    55: { label: 'Husté mrholenie', category: 'rain' },
+    56: { label: 'Mrznúce mrholenie', category: 'snow' },
+    57: { label: 'Husté mrznúce mrholenie', category: 'snow' },
+    61: { label: 'Slabý dážď', category: 'rain' },
+    63: { label: 'Mierny dážď', category: 'rain' },
+    65: { label: 'Výdatný dážď', category: 'rain' },
+    66: { label: 'Slabý mrznúci dážď', category: 'snow' },
+    67: { label: 'Silný mrznúci dážď', category: 'snow' },
+    71: { label: 'Slabé sneženie', category: 'snow' },
+    73: { label: 'Mierne sneženie', category: 'snow' },
+    75: { label: 'Husté sneženie', category: 'snow' },
+    77: { label: 'Snehové zrná', category: 'snow' },
+    80: { label: 'Slabé prehánky', category: 'rain' },
+    81: { label: 'Mierne prehánky', category: 'rain' },
+    82: { label: 'Prudké prehánky', category: 'rain' },
+    85: { label: 'Snehové prehánky', category: 'snow' },
+    86: { label: 'Husté snehové prehánky', category: 'snow' },
+    95: { label: 'Búrka', category: 'thunderstorm' },
+    96: { label: 'Búrka s krupobitím', category: 'thunderstorm' },
+    99: { label: 'Silná búrka s krupobitím', category: 'thunderstorm' }
+};
+
+// --- APPLE WEATHER VECTOR ICONS ---
+function getWeatherIconSvg(iconType) {
+    switch (iconType) {
+        case 'clear-day':
+            return `
+            <svg class="w-12 h-12 md:w-14 md:h-14 animate-pulse-soft" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="5" fill="#FBBF24" stroke="#F59E0B" stroke-width="1.5" style="filter: drop-shadow(0 0 8px rgba(251,191,36,0.7));"></circle>
+                <path stroke-linecap="round" stroke-width="2" stroke="#FBBF24" d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.364-7.364l-1.414 1.414M7.05 16.95l-1.414 1.414m12.728 0l-1.414-1.414M7.05 7.05L5.636 5.636"></path>
+            </svg>`;
+        case 'clear-night':
+            return `
+            <svg class="w-12 h-12 md:w-14 md:h-14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path fill="#C7D2FE" stroke="#818CF8" stroke-width="1.5" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" style="filter: drop-shadow(0 0 8px rgba(129,140,248,0.5));"></path>
+                <circle cx="18" cy="5" r="1" fill="#FDE047" stroke="none"></circle>
+                <circle cx="15" cy="8" r="0.75" fill="#FDE047" stroke="none"></circle>
+            </svg>`;
+        case 'partly-cloudy-day':
+            return `
+            <svg class="w-12 h-12 md:w-14 md:h-14" viewBox="0 0 24 24" fill="none">
+                <circle cx="9" cy="9" r="4" fill="#FBBF24" stroke="#F59E0B" stroke-width="1.5" style="filter: drop-shadow(0 0 6px rgba(251,191,36,0.6));"></circle>
+                <path stroke-linecap="round" stroke-width="1.5" stroke="#FBBF24" d="M9 2v1.5m0 11v1.5M16 9h-1.5M3.5 9H2m10.2-5.2l-1.06 1.06M4.86 13.14l-1.06 1.06m0-8.48l1.06 1.06"></path>
+                <path d="M7 17.5a4.5 4.5 0 014.2-3 4.49 4.49 0 014.1 2.7 3.5 3.5 0 11.2 6.8H7a4 4 0 010-6.5z" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1.2" class="dark:fill-slate-600 dark:stroke-slate-400"></path>
+            </svg>`;
+        case 'partly-cloudy-night':
+            return `
+            <svg class="w-12 h-12 md:w-14 md:h-14" viewBox="0 0 24 24" fill="none">
+                <path fill="#C7D2FE" stroke="#818CF8" stroke-width="1.2" d="M16 4.5a5 5 0 01-4 4.8 5 5 0 01-5-4.8 6 6 0 109 0z"></path>
+                <path d="M6 18a4.5 4.5 0 014.2-3 4.49 4.49 0 014.1 2.7 3.5 3.5 0 11.2 6.3H6a4 4 0 010-6z" fill="#94A3B8" stroke="#64748B" stroke-width="1.2" class="dark:fill-slate-700 dark:stroke-slate-500"></path>
+            </svg>`;
+        case 'cloudy':
+            return `
+            <svg class="w-12 h-12 md:w-14 md:h-14" viewBox="0 0 24 24" fill="none">
+                <path d="M6 14a4 4 0 013.8-2.7 4 4 0 013.7 2.4A3 3 0 1114 19H6a3.5 3.5 0 010-5z" fill="#CBD5E1" stroke="#94A3B8" stroke-width="1.2" class="dark:fill-slate-600 dark:stroke-slate-500"></path>
+                <path d="M9 11a4.5 4.5 0 014.3-3 4.5 4.5 0 014.2 2.8 3.5 3.5 0 11-.5 7.2H9" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1.2" class="dark:fill-slate-500 dark:stroke-slate-400"></path>
+            </svg>`;
+        case 'rain':
+            return `
+            <svg class="w-12 h-12 md:w-14 md:h-14" viewBox="0 0 24 24" fill="none">
+                <path d="M6 12a4 4 0 013.8-2.7 4 4 0 013.7 2.4A3.5 3.5 0 1114 17H6a3 3 0 010-5z" fill="#94A3B8" stroke="#64748B" stroke-width="1.2" class="dark:fill-slate-600 dark:stroke-slate-500"></path>
+                <line x1="8" y1="18" x2="6.5" y2="22" stroke="#38BDF8" stroke-width="2" stroke-linecap="round"></line>
+                <line x1="12" y1="18" x2="10.5" y2="22" stroke="#38BDF8" stroke-width="2" stroke-linecap="round"></line>
+                <line x1="16" y1="18" x2="14.5" y2="22" stroke="#38BDF8" stroke-width="2" stroke-linecap="round"></line>
+            </svg>`;
+        case 'thunderstorm':
+            return `
+            <svg class="w-12 h-12 md:w-14 md:h-14" viewBox="0 0 24 24" fill="none">
+                <path d="M5 11a4 4 0 013.8-2.7 4 4 0 013.7 2.4A3.5 3.5 0 1113 16H5a3 3 0 010-5z" fill="#475569" stroke="#334155" stroke-width="1.2" class="dark:fill-slate-700 dark:stroke-slate-600"></path>
+                <polygon points="12,14 8.5,19 11.5,19 10,23 15.5,17 12.5,17" fill="#FBBF24" stroke="#F59E0B" stroke-width="1" style="filter: drop-shadow(0 0 8px rgba(251,191,36,0.8));"></polygon>
+            </svg>`;
+        case 'snow':
+            return `
+            <svg class="w-12 h-12 md:w-14 md:h-14" viewBox="0 0 24 24" fill="none">
+                <path d="M6 12a4 4 0 013.8-2.7 4 4 0 013.7 2.4A3.5 3.5 0 1114 17H6a3 3 0 010-5z" fill="#CBD5E1" stroke="#94A3B8" stroke-width="1.2" class="dark:fill-slate-600 dark:stroke-slate-500"></path>
+                <g stroke="#38BDF8" stroke-width="1.5" stroke-linecap="round">
+                    <path d="M8 18.5v3m-1.5-1.5h3"></path>
+                    <path d="M12 18.5v3m-1.5-1.5h3"></path>
+                    <path d="M16 18.5v3m-1.5-1.5h3"></path>
+                </g>
+            </svg>`;
+        case 'fog':
+            return `
+            <svg class="w-12 h-12 md:w-14 md:h-14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round">
+                <line x1="5" y1="8" x2="19" y2="8" class="opacity-75"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="6" y1="16" x2="18" y2="16" class="opacity-80"></line>
+                <line x1="8" y1="20" x2="16" y2="20" class="opacity-60"></line>
+            </svg>`;
+        default:
+            return `
+            <svg class="w-12 h-12 md:w-14 md:h-14" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2">
+                <circle cx="12" cy="12" r="5" fill="#FBBF24"></circle>
+            </svg>`;
+    }
+}
+
+// --- DYNAMIC WEATHER THEME COLORS (APPLE WEATHER STYLES) ---
+function getWeatherStyle(weatherCode, isDay, temp) {
+    const isFreezing = (temp <= 0);
+    let category = 'clear';
+    
+    if (weatherCode === 0 || weatherCode === 1) category = 'clear';
+    else if (weatherCode === 2) category = 'partly-cloudy';
+    else if (weatherCode === 3) category = 'overcast';
+    else if (weatherCode === 45 || weatherCode === 48) category = 'fog';
+    else if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(weatherCode)) category = 'rain';
+    else if ([56, 57, 66, 67, 71, 73, 75, 77, 85, 86].includes(weatherCode) || isFreezing) category = 'snow';
+    else if ([95, 96, 99].includes(weatherCode)) category = 'thunderstorm';
+
+    if (category === 'clear' && isDay) {
+        return {
+            classes: "bg-gradient-to-br from-sky-400/25 via-blue-200/30 to-amber-100/40 border-sky-300/60 shadow-sky-500/10 dark:from-[#0c2340]/90 dark:via-[#0a1b32]/85 dark:to-[#040e1b]/90 dark:border-sky-700/50 dark:shadow-sky-950/40",
+            glowColor: "bg-amber-400",
+            icon: "clear-day"
+        };
+    }
+    if (category === 'clear' && !isDay) {
+        return {
+            classes: "bg-gradient-to-br from-indigo-100/80 via-slate-100/80 to-purple-100/60 border-indigo-200/60 shadow-indigo-500/10 dark:from-[#0a0e20]/90 dark:via-[#101432]/85 dark:to-[#060814]/90 dark:border-indigo-900/50 dark:shadow-indigo-950/50",
+            glowColor: "bg-indigo-500",
+            icon: "clear-night"
+        };
+    }
+    if (category === 'partly-cloudy' && isDay) {
+        return {
+            classes: "bg-gradient-to-br from-sky-100/90 via-slate-100/80 to-amber-50/70 border-sky-200/70 shadow-blue-500/10 dark:from-[#0f172a]/85 dark:via-[#182338]/80 dark:to-[#0c121e]/90 dark:border-slate-700/50 dark:shadow-black/40",
+            glowColor: "bg-sky-400",
+            icon: "partly-cloudy-day"
+        };
+    }
+    if (category === 'partly-cloudy' && !isDay) {
+        return {
+            classes: "bg-gradient-to-br from-slate-200/80 via-indigo-50/80 to-slate-100/80 border-slate-300/60 shadow-slate-500/10 dark:from-[#0d1322]/90 dark:via-[#131b2e]/85 dark:to-[#080c14]/90 dark:border-slate-800/60 dark:shadow-black/50",
+            glowColor: "bg-indigo-600",
+            icon: "partly-cloudy-night"
+        };
+    }
+    if (category === 'overcast') {
+        return {
+            classes: "bg-gradient-to-br from-slate-200/90 via-gray-100/80 to-slate-200/70 border-slate-300/70 shadow-slate-400/10 dark:from-[#181d26]/90 dark:via-[#202632]/85 dark:to-[#12161d]/90 dark:border-slate-700/50 dark:shadow-black/50",
+            glowColor: "bg-slate-500",
+            icon: "cloudy"
+        };
+    }
+    if (category === 'rain') {
+        return {
+            classes: "bg-gradient-to-br from-blue-200/80 via-cyan-100/80 to-slate-200/70 border-blue-300/60 shadow-blue-500/10 dark:from-[#082034]/90 dark:via-[#0c2a44]/85 dark:to-[#051320]/90 dark:border-cyan-800/50 dark:shadow-cyan-950/40",
+            glowColor: "bg-cyan-500",
+            icon: "rain"
+        };
+    }
+    if (category === 'snow') {
+        return {
+            classes: "bg-gradient-to-br from-cyan-100/85 via-blue-50/90 to-slate-100/80 border-cyan-300/60 shadow-cyan-500/10 dark:from-[#07202d]/90 dark:via-[#0e2e3f]/85 dark:to-[#06141d]/90 dark:border-cyan-700/50 dark:shadow-cyan-950/50",
+            glowColor: "bg-cyan-400",
+            icon: "snow"
+        };
+    }
+    if (category === 'thunderstorm') {
+        return {
+            classes: "bg-gradient-to-br from-purple-200/80 via-slate-200/80 to-amber-100/60 border-purple-300/60 shadow-purple-500/10 dark:from-[#18102b]/90 dark:via-[#23153c]/85 dark:to-[#0f0a1b]/90 dark:border-purple-800/50 dark:shadow-purple-950/50",
+            glowColor: "bg-purple-600",
+            icon: "thunderstorm"
+        };
+    }
+    if (category === 'fog') {
+        return {
+            classes: "bg-gradient-to-br from-stone-200/80 via-neutral-100/80 to-stone-200/60 border-stone-300/60 shadow-stone-500/10 dark:from-[#1b1c20]/90 dark:via-[#23262a]/85 dark:to-[#131416]/90 dark:border-neutral-700/40 dark:shadow-black/50",
+            glowColor: "bg-neutral-500",
+            icon: "fog"
+        };
+    }
+
+    return {
+        classes: "bg-white/70 dark:bg-neutral-900/40 border-neutral-200/80 dark:border-neutral-800/60 shadow-xl shadow-neutral-200/40 dark:shadow-2xl dark:shadow-black/50",
+        glowColor: "bg-sky-400",
+        icon: "clear-day"
+    };
+}
+
+// --- WEATHER WARNINGS GENERATOR (VIETOR, MRÁZ, BÚRKY, POĽADOVICA...) ---
+function generateWeatherWarnings(current, daily) {
+    const warnings = [];
+    const temp = current.temperature_2m;
+    const apparent = current.apparent_temperature;
+    const windSpeed = current.wind_speed_10m;
+    const windGusts = current.wind_gusts_10m;
+    const maxWindGusts = (daily && daily.wind_gusts_10m_max && daily.wind_gusts_10m_max[0]) ? daily.wind_gusts_10m_max[0] : windGusts;
+    const minTemp = (daily && daily.temperature_2m_min && daily.temperature_2m_min[0] !== undefined) ? daily.temperature_2m_min[0] : temp;
+    const weatherCode = current.weather_code;
+
+    // 1. Mráz / Nízke teploty (Frost Warning)
+    if (temp <= -10 || apparent <= -12) {
+        warnings.push({
+            type: 'frost-severe',
+            icon: '❄️',
+            badge: 'EXTRÉMNY MRÁZ',
+            badgeBg: 'bg-blue-500/20 text-blue-600 dark:text-cyan-300 border-blue-500/30',
+            border: 'border-cyan-500/40 dark:border-cyan-500/40',
+            bg: 'bg-cyan-500/10 dark:bg-cyan-950/40',
+            text: `Teplota klesá na ${temp.toFixed(1)}°C (pocitovo ${apparent.toFixed(1)}°C). Riziko omrzlín a silného podchladenia.`
+        });
+    } else if (temp <= 0 || minTemp <= 0 || apparent <= 0) {
+        warnings.push({
+            type: 'frost',
+            icon: '❄️',
+            badge: 'VÝSTRAHA PRED MRAZOM',
+            badgeBg: 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-500/30',
+            border: 'border-cyan-500/30 dark:border-cyan-500/30',
+            bg: 'bg-cyan-500/10 dark:bg-cyan-950/30',
+            text: temp <= 0 
+                ? `Aktuálna teplota ${temp.toFixed(1)}°C pod bodom mrazu (min. ${minTemp.toFixed(1)}°C). Pozor na námrazu.`
+                : `Očakáva sa nočný mráz s poklesom na ${minTemp.toFixed(1)}°C. Riziko prízemného mrazu a poškodenia vegetácie.`
+        });
+    }
+
+    // 2. Poľadovica / Mrznúci dážď
+    if ([56, 57, 66, 67].includes(weatherCode) || (current.precipitation > 0 && temp <= 0.5)) {
+        warnings.push({
+            type: 'ice',
+            icon: '🧊',
+            badge: 'POĽADOVICA A NÁMRAZA',
+            badgeBg: 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-500/30',
+            border: 'border-indigo-500/40 dark:border-indigo-500/40',
+            bg: 'bg-indigo-500/10 dark:bg-indigo-950/40',
+            text: 'Nebezpečenstvo tvorby poľadovice na cestách a chodníkoch v dôsledku mrznúceho dažďa.'
+        });
+    }
+
+    // 3. Vietor / Víchrica (Wind Warning)
+    if (windGusts >= 75 || maxWindGusts >= 80 || windSpeed >= 50) {
+        warnings.push({
+            type: 'gale',
+            icon: '🌪️',
+            badge: 'VÍCHRICI / SILNÝ VIETOR',
+            badgeBg: 'bg-red-500/20 text-red-600 dark:text-red-300 border-red-500/30',
+            border: 'border-red-500/40 dark:border-red-500/40',
+            bg: 'bg-red-500/10 dark:bg-red-950/40',
+            text: `Mimoriadne silný vietor! Nárazy dosahujú ${Math.round(Math.max(windGusts, maxWindGusts))} km/h. Možné škody a nebezpečenstvo.`
+        });
+    } else if (windGusts >= 45 || maxWindGusts >= 50 || windSpeed >= 30) {
+        warnings.push({
+            type: 'wind',
+            icon: '💨',
+            badge: 'VÝSTRAHA PRED VETROM',
+            badgeBg: 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30',
+            border: 'border-amber-500/30 dark:border-amber-500/30',
+            bg: 'bg-amber-500/10 dark:bg-amber-950/30',
+            text: `Zvýšená rýchlosť vetra: nárazy až ${Math.round(Math.max(windGusts, maxWindGusts))} km/h (priemerná rýchlosť ${Math.round(windSpeed)} km/h).`
+        });
+    }
+
+    // 4. Búrky (Thunderstorm)
+    if ([95, 96, 99].includes(weatherCode)) {
+        warnings.push({
+            type: 'storm',
+            icon: '⚡',
+            badge: 'BÚRKOVÁ VÝSTRAHA',
+            badgeBg: 'bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30',
+            border: 'border-purple-500/40 dark:border-purple-500/40',
+            bg: 'bg-purple-500/10 dark:bg-purple-950/40',
+            text: 'Zvýšená blesková aktivita, možnosť prívalového dažďa, silného vetra alebo krupobitia.'
+        });
+    }
+
+    // 5. Výdatný dážď (Heavy Rain)
+    if ([65, 82].includes(weatherCode) || current.precipitation >= 5) {
+        warnings.push({
+            type: 'heavy-rain',
+            icon: '🌧️',
+            badge: 'VÝDATNÝ DÁŽĎ',
+            badgeBg: 'bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30',
+            border: 'border-blue-500/30 dark:border-blue-500/30',
+            bg: 'bg-blue-500/10 dark:bg-blue-950/30',
+            text: `Intenzívne zrážky (${current.precipitation.toFixed(1)} mm/h). Znížená viditeľnosť a riziko aquaplaningu.`
+        });
+    }
+
+    // 6. Horúčavy (Extreme Heat)
+    if (temp >= 32 || apparent >= 35) {
+        warnings.push({
+            type: 'heat',
+            icon: '🔥',
+            badge: 'VYSOKÉ TEPLOTY',
+            badgeBg: 'bg-orange-500/20 text-orange-700 dark:text-orange-300 border-orange-500/30',
+            border: 'border-orange-500/30 dark:border-orange-500/30',
+            bg: 'bg-orange-500/10 dark:bg-orange-950/30',
+            text: `Vysoká teplota vzduchu (${temp.toFixed(1)}°C, pocitovo ${apparent.toFixed(1)}°C). Dodržiavajte pitný režim a obmedzte pobyt na slnku.`
+        });
+    }
+
+    // 7. Husté sneženie
+    if ([73, 75, 85, 86].includes(weatherCode)) {
+        warnings.push({
+            type: 'snow-heavy',
+            icon: '🌨️',
+            badge: 'SNEHOVÁ VÝSTRAHA',
+            badgeBg: 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-500/30',
+            border: 'border-cyan-500/30 dark:border-cyan-500/30',
+            bg: 'bg-cyan-500/10 dark:bg-cyan-950/30',
+            text: 'Intenzívne sneženie. Riziko vzniku snehových jazykov a komplikácií na cestách.'
+        });
+    }
+
+    return warnings;
+}
+
+// --- SOLAR ZENITH CALCULATION ---
+function isDaytime(lat, lng, now = new Date()) {
+    const rad = Math.PI / 180;
+    const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+    const b = (360 / 365) * (dayOfYear - 81) * rad;
+    const declination = Math.asin(Math.sin(23.45 * rad) * Math.sin(b));
+    const eot = 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b);
+    const currentUTCHours = now.getUTCHours() + now.getUTCMinutes() / 60 + now.getUTCSeconds() / 3600;
+    const solarNoonUTC = 12 - (lng / 15) - (eot / 60);
+    const hourAngle = (currentUTCHours - solarNoonUTC) * 15 * rad;
+    const sinAlt = Math.sin(lat * rad) * Math.sin(declination) + Math.cos(lat * rad) * Math.cos(declination) * Math.cos(hourAngle);
+    return sinAlt > -0.0145;
+}
+
+// --- THEME SWITCHING (LIGHT / DARK / SOLAR) ---
+function setWeatherTheme(mode, skipSave = false) {
+    window.currentThemeMode = mode;
+    if (!skipSave) {
+        localStorage.setItem('weather_theme_mode', mode);
+    }
+    
+    let isDark = false;
+    if (mode === 'light') {
+        isDark = false;
+    } else if (mode === 'dark') {
+        isDark = true;
+    } else if (mode === 'solar') {
+        if (window.weatherData && window.weatherData.current && window.weatherData.current.is_day !== undefined) {
+            isDark = (window.weatherData.current.is_day === 0);
+        } else {
+            const coordsRaw = localStorage.getItem('weather_coords') || localStorage.getItem('smart_theme_coords');
+            if (coordsRaw) {
+                try {
+                    const coords = JSON.parse(coordsRaw);
+                    isDark = !isDaytime(coords.lat, coords.lng, new Date());
+                } catch(e) {
+                    isDark = true;
+                }
+            } else {
+                isDark = true;
+            }
+        }
+    }
+
     if (isDark) {
         document.documentElement.classList.add('dark');
     } else {
         document.documentElement.classList.remove('dark');
     }
     localStorage.setItem('trading_theme', isDark ? 'dark' : 'light');
+
+    updateThemeSegmentedUI();
     updateMacroButtonsUI(window.currentMacroView);
     updateCoinButtonsUI(window.currentCoin);
     updateSkeletonGrid();
@@ -360,17 +797,319 @@ function setTheme(mode) {
     } else {
         resetCardUI();
     }
+    if (window.weatherData) {
+        applyWeatherStyling(window.weatherData);
+    }
+}
+
+function updateThemeSegmentedUI() {
+    const mode = window.currentThemeMode || 'solar';
+    const isDark = isDarkMode();
+    const btnLight = document.getElementById('theme-btn-light');
+    const btnDark = document.getElementById('theme-btn-dark');
+    const btnSolar = document.getElementById('theme-btn-solar');
+    const solarTag = document.getElementById('weather-solar-status-tag');
+
+    const activeClass = isDark
+        ? "px-2 py-1 rounded-lg text-white bg-neutral-800 shadow-sm font-semibold transition-all flex items-center gap-1"
+        : "px-2 py-1 rounded-lg text-neutral-900 bg-white shadow-sm font-semibold transition-all flex items-center gap-1";
+    const inactiveClass = isDark
+        ? "px-2 py-1 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center gap-1 font-normal"
+        : "px-2 py-1 rounded-lg text-neutral-500 hover:text-neutral-900 transition-all flex items-center gap-1 font-normal";
+
+    if (btnLight) btnLight.className = (mode === 'light') ? activeClass : inactiveClass;
+    if (btnDark) btnDark.className = (mode === 'dark') ? activeClass : inactiveClass;
+    if (btnSolar) btnSolar.className = (mode === 'solar') ? activeClass : inactiveClass;
+
+    if (solarTag) {
+        if (mode === 'solar') {
+            const isDay = window.weatherData?.current ? (window.weatherData.current.is_day === 1) : !isDark;
+            solarTag.innerHTML = `Solárny režim • <span class="font-bold">${isDay ? 'Deň ☀️' : 'Noc 🌙'}</span>`;
+        } else {
+            solarTag.innerHTML = `Manuálny režim • <span class="font-bold">${mode === 'light' ? 'Svetlý ☀️' : 'Tmavý 🌙'}</span>`;
+        }
+    }
 }
 
 function toggleTheme() {
-    setTheme(isDarkMode() ? 'light' : 'dark');
-    updateSmartThemeFooterStatus();
+    const currentlyDark = isDarkMode();
+    setWeatherTheme(currentlyDark ? 'light' : 'dark');
+}
+
+// --- REVERSE GEOCODING (CITY NAME) ---
+async function getCityNameFromCoords(lat, lng) {
+    try {
+        const controller = new AbortController();
+        const tId = setTimeout(() => controller.abort(), 2500);
+        const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=sk`, { signal: controller.signal });
+        clearTimeout(tId);
+        if (res.ok) {
+            const data = await res.json();
+            const city = data.city || data.locality || data.principalSubdivision;
+            if (city) return city;
+        }
+    } catch(e) {}
+
+    try {
+        const controller = new AbortController();
+        const tId = setTimeout(() => controller.abort(), 2500);
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`, {
+            headers: { 'Accept-Language': 'sk,en' },
+            signal: controller.signal
+        });
+        clearTimeout(tId);
+        if (res.ok) {
+            const data = await res.json();
+            const addr = data.address || {};
+            const city = addr.city || addr.town || addr.village || addr.municipality || addr.county;
+            if (city) return city;
+        }
+    } catch(e) {}
+
+    return "Moja poloha";
+}
+
+// --- APPLY WEATHER DATA TO UI ---
+function applyWeatherStyling(data) {
+    const widget = document.getElementById('weather-widget');
+    const glow = document.getElementById('weather-ambient-glow');
+    if (!widget || !data || !data.current) return;
+
+    const weatherCode = data.current.weather_code;
+    const isDay = (data.current.is_day === 1);
+    const temp = data.current.temperature_2m;
+    const style = getWeatherStyle(weatherCode, isDay, temp);
+
+    widget.className = `relative overflow-hidden p-5 md:p-6 rounded-3xl border ${style.classes} backdrop-blur-xl transition-all duration-700 mb-3 select-none`;
+    if (glow) {
+        glow.className = `absolute -top-16 -right-16 w-52 h-52 rounded-full blur-3xl pointer-events-none opacity-40 transition-all duration-1000 ${style.glowColor}`;
+    }
+
+    const iconWrapper = document.getElementById('weather-icon-wrapper');
+    if (iconWrapper) {
+        iconWrapper.innerHTML = getWeatherIconSvg(style.icon);
+    }
+}
+
+async function renderWeatherData(data, cityName = null) {
+    window.weatherData = data;
+    const current = data.current;
+    const daily = data.daily;
+    if (!current) return;
+
+    const cond = WEATHER_CONDITIONS[current.weather_code] || { label: 'Oblačno', category: 'cloudy' };
+    const tempRounded = Math.round(current.temperature_2m);
+    const apparentRounded = Math.round(current.apparent_temperature);
+    const tempMax = (daily && daily.temperature_2m_max && daily.temperature_2m_max[0] !== undefined) ? Math.round(daily.temperature_2m_max[0]) : tempRounded;
+    const tempMin = (daily && daily.temperature_2m_min && daily.temperature_2m_min[0] !== undefined) ? Math.round(daily.temperature_2m_min[0]) : tempRounded;
+
+    if (cityName) {
+        const cityEl = document.getElementById('weather-city');
+        if (cityEl) cityEl.innerText = cityName;
+    }
+
+    const tempEl = document.getElementById('weather-temp');
+    if (tempEl) tempEl.innerHTML = `${tempRounded}°`;
+
+    const descEl = document.getElementById('weather-desc');
+    if (descEl) descEl.innerText = cond.label;
+
+    const maxEl = document.getElementById('weather-temp-max');
+    if (maxEl) maxEl.innerText = `${tempMax}°`;
+
+    const minEl = document.getElementById('weather-temp-min');
+    if (minEl) minEl.innerText = `${tempMin}°`;
+
+    const apparentEl = document.getElementById('weather-apparent');
+    if (apparentEl) apparentEl.innerText = `${apparentRounded}°`;
+
+    const windEl = document.getElementById('weather-wind-speed');
+    if (windEl) windEl.innerHTML = `${Math.round(current.wind_speed_10m)} <span class="text-[0.55rem] font-normal">km/h</span>`;
+
+    const humidityEl = document.getElementById('weather-humidity');
+    if (humidityEl) humidityEl.innerText = `${Math.round(current.relative_humidity_2m)}%`;
+
+    const precipEl = document.getElementById('weather-precip');
+    if (precipEl) precipEl.innerHTML = `${current.precipitation.toFixed(1)} <span class="text-[0.55rem] font-normal">mm</span>`;
+
+    if (daily && daily.sunrise && daily.sunrise[0]) {
+        const srDate = new Date(daily.sunrise[0]);
+        const srEl = document.getElementById('weather-sunrise');
+        if (srEl && !isNaN(srDate.getTime())) {
+            srEl.innerText = srDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+    }
+    if (daily && daily.sunset && daily.sunset[0]) {
+        const ssDate = new Date(daily.sunset[0]);
+        const ssEl = document.getElementById('weather-sunset');
+        if (ssEl && !isNaN(ssDate.getTime())) {
+            ssEl.innerText = ssDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+    }
+
+    // Render weather alerts/warnings
+    const warnings = generateWeatherWarnings(current, daily);
+    const warnContainer = document.getElementById('weather-warnings-container');
+    if (warnContainer) {
+        if (warnings.length > 0) {
+            warnContainer.innerHTML = warnings.map(w => `
+                <div class="p-3 rounded-2xl ${w.bg} border ${w.border} backdrop-blur-md mb-2 last:mb-0 transition-all flex items-start gap-2.5">
+                    <div class="text-base shrink-0 mt-0.5">${w.icon}</div>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="text-[0.6rem] font-bold tracking-wider uppercase px-2 py-0.5 rounded-md ${w.badgeBg} border">
+                                ${w.badge}
+                            </span>
+                        </div>
+                        <div class="text-[0.68rem] text-neutral-800 dark:text-neutral-200 mt-1 leading-snug">
+                            ${w.text}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            warnContainer.innerHTML = `
+                <div class="px-3 py-2 rounded-2xl bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-[0.62rem] text-neutral-600 dark:text-neutral-400">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block shrink-0 animate-pulse"></span>
+                        <span class="font-medium">Bez meteorologických výstrah</span>
+                    </div>
+                    <span class="text-[0.6rem] text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wider">Pokojné podmienky</span>
+                </div>
+            `;
+        }
+    }
+
+    // Apply Apple Weather styling
+    applyWeatherStyling(data);
+
+    // If in solar mode, synchronize dark/light mode
+    if (window.currentThemeMode === 'solar') {
+        const isDark = (current.is_day === 0);
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        localStorage.setItem('trading_theme', isDark ? 'dark' : 'light');
+        updateThemeSegmentedUI();
+        updateMacroButtonsUI(window.currentMacroView);
+        updateCoinButtonsUI(window.currentCoin);
+        updateSkeletonGrid();
+        if (window.fullData) {
+            updateChart(window.currentMacroView);
+            applyCardData(window.fullData);
+        }
+    }
+}
+
+// --- FETCH WEATHER FROM OPEN-METEO ---
+async function fetchWeatherData(lat, lng) {
+    try {
+        const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,wind_speed_10m_max,wind_gusts_10m_max,sunrise,sunset&timezone=auto&forecast_days=2`;
+        const res = await fetch(apiUrl);
+        if (!res.ok) throw new Error("Weather fetch failed");
+        const data = await res.json();
+        
+        const cachedCity = localStorage.getItem('weather_city');
+        let city = cachedCity;
+        if (!city || city === "Moja poloha") {
+            city = await getCityNameFromCoords(lat, lng);
+            if (city) localStorage.setItem('weather_city', city);
+        }
+        
+        await renderWeatherData(data, city);
+        return data;
+    } catch(err) {
+        console.warn("Error fetching weather:", err);
+    }
+}
+
+// --- LOCATION MANAGEMENT & REFRESH ---
+async function refreshWeatherLocation(forcePrompt = false) {
+    const spinner = document.getElementById('weather-locate-spinner');
+    if (spinner) spinner.classList.add('animate-spin-reverse');
+
+    const handleCoordsSuccess = async (lat, lng, sourceCity = null) => {
+        localStorage.setItem('weather_coords', JSON.stringify({ lat, lng, time: Date.now() }));
+        localStorage.setItem('smart_theme_coords', JSON.stringify({ lat, lng, time: Date.now() }));
+        
+        let city = sourceCity;
+        if (!city) {
+            city = await getCityNameFromCoords(lat, lng);
+        }
+        if (city) {
+            localStorage.setItem('weather_city', city);
+            const cityEl = document.getElementById('weather-city');
+            if (cityEl) cityEl.innerText = city;
+        }
+
+        await fetchWeatherData(lat, lng);
+        if (spinner) spinner.classList.remove('animate-spin-reverse');
+    };
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                await handleCoordsSuccess(pos.coords.latitude, pos.coords.longitude);
+            },
+            async (err) => {
+                console.warn("Geolocation prompt error or denied, falling back to IP:", err);
+                try {
+                    const ipRes = await fetch("https://ipwho.is/");
+                    if (ipRes.ok) {
+                        const ipData = await ipRes.json();
+                        if (ipData && ipData.latitude && ipData.longitude) {
+                            await handleCoordsSuccess(ipData.latitude, ipData.longitude, ipData.city);
+                            return;
+                        }
+                    }
+                } catch(e) {}
+                if (spinner) spinner.classList.remove('animate-spin-reverse');
+            },
+            { timeout: 7000, enableHighAccuracy: forcePrompt }
+        );
+    } else {
+        try {
+            const ipRes = await fetch("https://ipwho.is/");
+            if (ipRes.ok) {
+                const ipData = await ipRes.json();
+                if (ipData && ipData.latitude && ipData.longitude) {
+                    await handleCoordsSuccess(ipData.latitude, ipData.longitude, ipData.city);
+                    return;
+                }
+            }
+        } catch(e) {}
+        if (spinner) spinner.classList.remove('animate-spin-reverse');
+    }
+}
+
+async function initWeatherWidget() {
+    updateThemeSegmentedUI();
+    const coordsRaw = localStorage.getItem('weather_coords') || localStorage.getItem('smart_theme_coords');
+    const cachedCity = localStorage.getItem('weather_city');
+
+    if (coordsRaw) {
+        try {
+            const coords = JSON.parse(coordsRaw);
+            if (cachedCity) {
+                const cityEl = document.getElementById('weather-city');
+                if (cityEl) cityEl.innerText = cachedCity;
+            }
+            await fetchWeatherData(coords.lat, coords.lng);
+            return;
+        } catch(e) {}
+    }
+
+    // Auto-detect location seamlessly on first visit
+    await refreshWeatherLocation(false);
 }
 
 // --- DASHBOARD LOGIC ---
 function initUI() {
     updateMacroButtonsUI(window.currentMacroView);
     updateCoinButtonsUI(window.currentCoin);
+    updateThemeSegmentedUI();
 }
 
 function updateMacroButtonsUI(period) {
@@ -815,314 +1554,6 @@ async function analyze() {
     }, { passive: true });
 });
 
-// --- SOLAR TIME CALCULATIONS & SMART LOGIC ---
-function calculateSunriseSunset(lat, lng, date = new Date()) {
-    const rad = Math.PI / 180;
-    const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
-    const b = (360 / 365) * (dayOfYear - 81) * rad;
-    const declination = Math.asin(Math.sin(23.45 * rad) * Math.sin(b));
-    const eot = 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b);
-    const solarNoonUTC = 12 - (lng / 15) - (eot / 60);
-    const cosHourAngle = (Math.cos(90.833 * rad) - Math.sin(lat * rad) * Math.sin(declination)) / (Math.cos(lat * rad) * Math.cos(declination));
-    
-    if (cosHourAngle > 1) return { polarNight: true, sunrise: null, sunset: null };
-    if (cosHourAngle < -1) return { midnightSun: true, sunrise: null, sunset: null };
-    
-    const hourAngleHours = Math.acos(cosHourAngle) / (15 * rad);
-    const sunriseUTC = solarNoonUTC - hourAngleHours;
-    const sunsetUTC = solarNoonUTC + hourAngleHours;
-    
-    const srHours = Math.floor(sunriseUTC);
-    const srMinutes = Math.round((sunriseUTC - srHours) * 60);
-    const ssHours = Math.floor(sunsetUTC);
-    const ssMinutes = Math.round((sunsetUTC - ssHours) * 60);
-    
-    const sunrise = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), srHours, srMinutes));
-    const sunset = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), ssHours, ssMinutes));
-    
-    return { sunrise, sunset };
-}
-
-function isDaytime(lat, lng, now = new Date()) {
-    const rad = Math.PI / 180;
-    const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
-    const b = (360 / 365) * (dayOfYear - 81) * rad;
-    const declination = Math.asin(Math.sin(23.45 * rad) * Math.sin(b));
-    const eot = 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b);
-    const currentUTCHours = now.getUTCHours() + now.getUTCMinutes() / 60 + now.getUTCSeconds() / 3600;
-    const solarNoonUTC = 12 - (lng / 15) - (eot / 60);
-    const hourAngle = (currentUTCHours - solarNoonUTC) * 15 * rad;
-    const sinAlt = Math.sin(lat * rad) * Math.sin(declination) + Math.cos(lat * rad) * Math.cos(declination) * Math.cos(hourAngle);
-    return sinAlt > -0.0145;
-}
-
-async function applySmartThemeFromCoords(lat, lng, feedbackEl = null) {
-    const now = new Date();
-    let isDay = isDaytime(lat, lng, now);
-    let solarTimes = calculateSunriseSunset(lat, lng, now);
-    setTheme(isDay ? 'light' : 'dark');
-
-    try {
-        const controller = new AbortController();
-        const tId = setTimeout(() => controller.abort(), 3500);
-        const res = await fetch(`https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&formatted=0`, { signal: controller.signal });
-        clearTimeout(tId);
-        if (res.ok) {
-            const json = await res.json();
-            if (json && json.status === 'OK' && json.results) {
-                const apiSunrise = new Date(json.results.sunrise);
-                const apiSunset = new Date(json.results.sunset);
-                if (!isNaN(apiSunrise.getTime()) && !isNaN(apiSunset.getTime())) {
-                    solarTimes.sunrise = apiSunrise;
-                    solarTimes.sunset = apiSunset;
-                    isDay = (now >= apiSunrise && now < apiSunset);
-                    setTheme(isDay ? 'light' : 'dark');
-                }
-            }
-        }
-    } catch(e) {}
-
-    const srStr = solarTimes.sunrise ? solarTimes.sunrise.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
-    const ssStr = solarTimes.sunset ? solarTimes.sunset.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
-
-    localStorage.setItem('smart_theme_solar', JSON.stringify({
-        sunrise: srStr,
-        sunset: ssStr,
-        isDay: isDay,
-        date: now.toDateString()
-    }));
-
-    updateSmartThemeFooterStatus();
-
-    if (feedbackEl) {
-        feedbackEl.classList.remove('hidden');
-        feedbackEl.className = "mb-4 p-3 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/70 border border-neutral-200 dark:border-neutral-700/60 text-center";
-        feedbackEl.innerHTML = `
-            <div class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mb-1">✓ Location detected</div>
-            <div class="text-[0.68rem] text-neutral-600 dark:text-neutral-300">
-                ☀️ Sunrise: <span class="font-bold text-neutral-900 dark:text-white">${srStr}</span> &nbsp;•&nbsp; 
-                🌙 Sunset: <span class="font-bold text-neutral-900 dark:text-white">${ssStr}</span>
-            </div>
-            <div class="text-[0.65rem] text-neutral-500 dark:text-neutral-400 mt-1 uppercase tracking-wider">
-                Switched to <span class="font-bold text-neutral-900 dark:text-white">${isDay ? 'light mode (day)' : 'dark mode (night)'}</span>
-            </div>
-        `;
-    }
-}
-
-function updateSmartThemeFooterStatus() {
-    const statusBtn = document.getElementById('smart-theme-status-btn');
-    if (!statusBtn) return;
-    
-    const choice = localStorage.getItem('smart_theme_choice');
-    const solarRaw = localStorage.getItem('smart_theme_solar');
-    
-    if (choice === 'allowed' && solarRaw) {
-        try {
-            const solar = JSON.parse(solarRaw);
-            const modeName = solar.isDay ? 'Light Mode' : 'Dark Mode';
-            statusBtn.innerHTML = `📍 SMART THEME: ☀️ ${solar.sunrise} • 🌙 ${solar.sunset} (${modeName})`;
-            return;
-        } catch(e) {}
-    }
-    
-    statusBtn.innerHTML = `☀️ Smart Solar Theme`;
-}
-
-function openSmartThemeModal() {
-    const modal = document.getElementById('smart-theme-modal');
-    const card = document.getElementById('smart-theme-modal-card');
-    const feedback = document.getElementById('smart-theme-feedback');
-    const actions = document.getElementById('smart-theme-actions');
-    const allowBtn = document.getElementById('smart-theme-btn-allow');
-    const denyBtn = document.getElementById('smart-theme-btn-deny');
-    const spinner = document.getElementById('smart-theme-btn-spinner');
-    const btnText = document.getElementById('smart-theme-btn-text');
-    const desc = document.getElementById('smart-theme-desc');
-    const disableBox = document.getElementById('smart-theme-disable-box');
-    const rememberBox = document.getElementById('smart-theme-remember-container');
-
-    const choice = localStorage.getItem('smart_theme_choice');
-    const solarRaw = localStorage.getItem('smart_theme_solar');
-
-    if (spinner) spinner.classList.add('hidden');
-    if (allowBtn) { 
-        allowBtn.disabled = false; 
-        if (btnText) btnText.innerText = (choice === 'allowed') ? "Update Location" : "Allow Location"; 
-    }
-    if (denyBtn) {
-        denyBtn.innerText = (choice === 'allowed') ? "Close" : "Cancel";
-    }
-
-    if (choice === 'allowed' && solarRaw) {
-        try {
-            const solar = JSON.parse(solarRaw);
-            if (feedback) {
-                feedback.classList.remove('hidden');
-                feedback.className = "mb-4 p-3 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/70 border border-neutral-200 dark:border-neutral-700/60 text-center";
-                feedback.innerHTML = `
-                    <div class="text-[0.62rem] uppercase tracking-wider font-semibold text-neutral-500 dark:text-neutral-400 mb-1">Current solar times for your location</div>
-                    <div class="text-xs text-neutral-800 dark:text-neutral-200 font-medium">
-                        ☀️ Sunrise: <b>${solar.sunrise}</b> &nbsp;•&nbsp; 🌙 Sunset: <b>${solar.sunset}</b>
-                    </div>
-                    <div class="text-[0.65rem] text-neutral-500 dark:text-neutral-400 mt-1">
-                        Mode: <b>${solar.isDay ? 'Light (Day)' : 'Dark (Night)'}</b>
-                    </div>
-                `;
-            }
-            if (desc) desc.innerText = "Smart theme automatically adapts light and dark mode based on sunrise and sunset times in your area.";
-            if (disableBox) disableBox.classList.remove('hidden');
-            if (rememberBox) rememberBox.classList.add('hidden');
-        } catch(e) {}
-    } else {
-        if (feedback) { feedback.className = "hidden"; feedback.innerHTML = ""; }
-        if (desc) desc.innerText = "Allow access to your location to automatically adapt light and dark mode based on sunrise and sunset times in your area?";
-        if (disableBox) disableBox.classList.add('hidden');
-        if (rememberBox) rememberBox.classList.remove('hidden');
-    }
-
-    if (actions) actions.classList.remove('hidden');
-
-    modal.classList.remove('hidden');
-    card.classList.remove('animate-modal-pop');
-    void card.offsetWidth;
-    card.classList.add('animate-modal-pop');
-}
-
-function closeSmartThemeModal() {
-    const modal = document.getElementById('smart-theme-modal');
-    if (!modal) return;
-    modal.classList.add('hidden');
-}
-
-function handleSmartThemeDeny() {
-    const remember = document.getElementById('smart-theme-remember')?.checked;
-    if (remember) {
-        localStorage.setItem('smart_theme_choice', 'denied');
-    }
-    closeSmartThemeModal();
-    updateSmartThemeFooterStatus();
-}
-
-function disableSmartTheme() {
-    localStorage.removeItem('smart_theme_choice');
-    localStorage.removeItem('smart_theme_solar');
-    closeSmartThemeModal();
-    updateSmartThemeFooterStatus();
-}
-
-function showSmartThemeModalError(msg) {
-    const feedback = document.getElementById('smart-theme-feedback');
-    const allowBtn = document.getElementById('smart-theme-btn-allow');
-    const spinner = document.getElementById('smart-theme-btn-spinner');
-    const btnText = document.getElementById('smart-theme-btn-text');
-    if (spinner) spinner.classList.add('hidden');
-    if (allowBtn) {
-        allowBtn.disabled = false;
-        if (btnText) btnText.innerText = "Try again";
-    }
-    if (feedback) {
-        feedback.classList.remove('hidden');
-        feedback.className = "mb-4 p-3 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-500 text-center text-xs";
-        feedback.innerText = msg;
-    }
-}
-
-async function handleSmartThemeAllow() {
-    const allowBtn = document.getElementById('smart-theme-btn-allow');
-    const spinner = document.getElementById('smart-theme-btn-spinner');
-    const btnText = document.getElementById('smart-theme-btn-text');
-    const feedback = document.getElementById('smart-theme-feedback');
-    const actions = document.getElementById('smart-theme-actions');
-    const remember = document.getElementById('smart-theme-remember')?.checked;
-
-    if (allowBtn) allowBtn.disabled = true;
-    if (spinner) spinner.classList.remove('hidden');
-    if (btnText) btnText.innerText = "Detecting...";
-
-    const onCoordsFound = async (lat, lng) => {
-        if (remember !== false) {
-            localStorage.setItem('smart_theme_choice', 'allowed');
-        }
-        localStorage.setItem('smart_theme_coords', JSON.stringify({ lat, lng, time: Date.now() }));
-
-        if (feedback) {
-            feedback.classList.remove('hidden');
-            feedback.className = "mb-4 p-3 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/70 border border-neutral-200 dark:border-neutral-700/60 text-center";
-            feedback.innerHTML = `<span class="text-xs text-neutral-500 dark:text-neutral-400 animate-pulse">Calculating sunrise and sunset times...</span>`;
-        }
-
-        await applySmartThemeFromCoords(lat, lng, feedback);
-
-        if (actions) actions.classList.add('hidden');
-        setTimeout(() => {
-            closeSmartThemeModal();
-        }, 1600);
-    };
-
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            async (pos) => {
-                await onCoordsFound(pos.coords.latitude, pos.coords.longitude);
-            },
-            async (err) => {
-                console.warn("Geolocation permission error or unavailable, trying IP fallback:", err);
-                try {
-                    const ipRes = await fetch("https://ipwho.is/");
-                    if (ipRes.ok) {
-                        const ipData = await ipRes.json();
-                        if (ipData && ipData.latitude && ipData.longitude) {
-                            await onCoordsFound(ipData.latitude, ipData.longitude);
-                            return;
-                        }
-                    }
-                } catch(e) {}
-                showSmartThemeModalError("Location access was denied. Theme remains unchanged.");
-            },
-            { timeout: 8000, enableHighAccuracy: false }
-        );
-    } else {
-        try {
-            const ipRes = await fetch("https://ipwho.is/");
-            if (ipRes.ok) {
-                const ipData = await ipRes.json();
-                if (ipData && ipData.latitude && ipData.longitude) {
-                    await onCoordsFound(ipData.latitude, ipData.longitude);
-                    return;
-                }
-            }
-        } catch(e) {}
-        showSmartThemeModalError("Geolocation is not supported by your browser.");
-    }
-}
-
-function checkSmartThemeOnLoad() {
-    const choice = localStorage.getItem('smart_theme_choice');
-    const coordsRaw = localStorage.getItem('smart_theme_coords');
-
-    if (choice === 'allowed' && coordsRaw) {
-        try {
-            const coords = JSON.parse(coordsRaw);
-            applySmartThemeFromCoords(coords.lat, coords.lng);
-        } catch(e) {}
-    } else if (!choice) {
-        setTimeout(() => {
-            openSmartThemeModal();
-        }, 450);
-    }
-    updateSmartThemeFooterStatus();
-}
-
-const smartModal = document.getElementById('smart-theme-modal');
-if (smartModal) {
-    smartModal.addEventListener('click', (e) => {
-        if (e.target === smartModal) closeSmartThemeModal();
-    });
-}
-window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeSmartThemeModal();
-});
-
 function toggleDisclaimer(e) {
     if (e) e.stopPropagation();
     const box = document.getElementById('disclaimer-box');
@@ -1168,8 +1599,8 @@ window.addEventListener('resize', () => {
 window.addEventListener('DOMContentLoaded', () => { 
     updateSkeletonGrid(); 
     initUI(); 
+    initWeatherWidget();
     triggerAnalysis(); 
-    checkSmartThemeOnLoad();
     initDisclaimer();
 });
 </script>
