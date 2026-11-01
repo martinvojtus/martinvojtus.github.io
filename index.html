@@ -149,17 +149,17 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
                     </div>
-                    <span id="weather-city" class="text-xs md:text-sm font-semibold text-neutral-900 dark:text-white truncate max-w-[180px] sm:max-w-[280px]">
+                    <span id="weather-city" class="text-xs md:text-sm font-semibold text-neutral-900 dark:text-white truncate min-w-0 flex-1" title="Locating...">
                         Locating...
                     </span>
-                    <button onclick="refreshWeatherLocation(true); this.blur();" id="weather-locate-btn" title="Update location and weather" aria-label="Update location" class="w-6 h-6 flex items-center justify-center rounded-lg bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/5 dark:border-white/10 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all active:scale-95 shrink-0">
-                        <svg id="weather-locate-spinner" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button onclick="refreshWeatherLocation(true); this.blur();" id="weather-locate-btn" title="Update location and weather" aria-label="Update location" class="w-7 h-7 flex items-center justify-center rounded-xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/5 dark:border-white/10 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all active:scale-95 shrink-0">
+                        <svg id="weather-locate-spinner" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
                     </button>
                 </div>
-                <div class="shrink-0 flex items-center">
-                    <span class="text-[0.65rem] font-medium uppercase tracking-wider px-2 py-0.5 rounded-lg bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm">
+                <div class="shrink-0 flex items-center ml-2">
+                    <span class="text-[0.65rem] font-semibold uppercase tracking-wider px-2.5 h-7 flex items-center rounded-lg bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm">
                         Weather
                     </span>
                 </div>
@@ -168,7 +168,7 @@
             <!-- ROW 2: PRIMARY WEATHER INFO -->
             <div class="flex items-center justify-between gap-3 relative z-10 min-w-0">
                 <!-- LEFT: WEATHER ICON, TEMP, CONDITION & FEELS-LIKE -->
-                <div class="flex items-center gap-3.5 min-w-0">
+                <div class="flex items-center gap-3.5 min-w-0 flex-1">
                     <div id="weather-icon-wrapper" class="w-11 h-11 shrink-0 flex items-center justify-center">
                         <div class="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-800 animate-pulse"></div>
                     </div>
@@ -177,16 +177,16 @@
                             --°
                         </span>
                     </div>
-                    <div class="min-w-0 flex flex-col justify-center">
+                    <div class="min-w-0 flex-1 flex flex-col justify-center">
                         <div class="flex items-center gap-2 min-w-0">
-                            <span id="weather-desc" class="font-semibold text-sm md:text-base text-neutral-900 dark:text-white truncate leading-tight">
+                            <span id="weather-desc" class="font-semibold text-sm md:text-base text-neutral-900 dark:text-white leading-tight break-words">
                                 Loading...
                             </span>
                         </div>
-                        <div class="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400 font-medium whitespace-nowrap truncate leading-tight mt-1">
-                            <span id="weather-apparent-inline">Feels like --°</span>
-                            <span>•</span>
-                            <span id="weather-temp-range">H: --° L: --°</span>
+                        <div class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-neutral-500 dark:text-neutral-400 font-medium leading-tight mt-1">
+                            <span id="weather-apparent-inline" class="whitespace-nowrap">Feels like --°</span>
+                            <span class="opacity-60">•</span>
+                            <span id="weather-temp-range" class="whitespace-nowrap">H: --° L: --°</span>
                         </div>
                     </div>
                 </div>
@@ -194,24 +194,42 @@
 
             <!-- ROW 3: DETAILED METRICS / ALERTS STRIP -->
             <div id="weather-secondary-bar" class="mt-3.5 pt-3 border-t border-black/5 dark:border-white/10 relative z-10 min-w-0">
-                <div id="weather-alerts-and-stats" class="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 min-w-0 gap-2 whitespace-nowrap">
-                    <span class="animate-pulse text-xs">Loading weather data...</span>
+                <div id="weather-alerts-and-stats" class="w-full min-w-0">
+                    <span class="animate-pulse text-xs text-neutral-500 dark:text-neutral-400">Loading weather data...</span>
                 </div>
             </div>
 
         </div>
 
         <!-- WIDGET 3: QUANTITATIVE MODEL WITH INTEGRATED SCORE CHART -->
-        <div id="main-card" class="p-5 md:p-6 rounded-2xl md:rounded-3xl bg-white dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800/50 shadow-lg shadow-neutral-200/40 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-1000 mb-3 select-none">
+        <div id="main-card" class="p-5 md:p-6 rounded-2xl md:rounded-3xl bg-white/70 dark:bg-neutral-900/40 backdrop-blur-xl border border-neutral-200/80 dark:border-neutral-800/60 shadow-lg shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-1000 mb-3 select-none">
             
-            <!-- HEADER: ASSET NAME & CYCLE PHASE -->
-            <div class="flex justify-between items-center mb-4 text-[0.65rem] uppercase tracking-wider">
-                <div id="badge-name" class="border border-neutral-200 dark:border-neutral-800/80 bg-neutral-100 dark:bg-neutral-800/50 px-3 h-8 flex items-center rounded-xl text-neutral-700 dark:text-neutral-300 font-semibold whitespace-nowrap truncate max-w-[200px]">
-                    Loading...
+            <!-- HEADER: COIN SELECTOR, REFRESH & CYCLE PHASE -->
+            <div class="flex justify-between items-center mb-4 text-[0.65rem] uppercase tracking-wider gap-2">
+                <div class="flex items-center gap-2 min-w-0">
+                    <!-- COIN TOGGLE SELECTOR -->
+                    <div id="coin-toggle-box" class="p-0.5 bg-black/5 dark:bg-white/10 rounded-xl border border-black/5 dark:border-white/10 flex items-center gap-0.5 backdrop-blur-sm whitespace-nowrap">
+                        <button id="coin-btn-BTC" onclick="switchCoin('BTC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="h-7 px-2.5 rounded-lg text-[0.65rem] uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap">
+                            <span>Bitcoin (BTC)</span>
+                        </button>
+                        <button id="coin-btn-ZEC" onclick="switchCoin('ZEC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="h-7 px-2.5 rounded-lg text-[0.65rem] uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap">
+                            <span>Zcash (ZEC)</span>
+                        </button>
+                    </div>
+
+                    <!-- REFRESH BUTTON -->
+                    <button id="btn-refresh" onclick="refreshWindow(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" title="Refresh data" aria-label="Refresh" class="w-7 h-7 flex items-center justify-center rounded-xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/5 dark:border-white/10 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all active:scale-95 shrink-0">
+                        <svg id="btn-refresh-icon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                    </button>
                 </div>
-                <div id="badge-phase" class="border border-neutral-200 dark:border-neutral-800/80 bg-neutral-100 dark:bg-neutral-800/50 w-20 h-8 flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold">
+
+                <!-- CYCLE PHASE BADGE -->
+                <div id="badge-phase" class="border border-neutral-200 dark:border-neutral-800/80 bg-neutral-100 dark:bg-neutral-800/50 w-20 h-7 flex items-center justify-center rounded-lg transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-[0.65rem]">
                     HODL
                 </div>
+                <span id="badge-name" class="hidden">Bitcoin (BTC)</span>
             </div>
             
             <!-- PRICE, 24H CHANGE & SCORE LARGE -->
@@ -297,26 +315,6 @@
                 </div>
             </div>
 
-        </div>
-
-        <!-- CONTROLS ROW: COIN TOGGLE & REFRESH -->
-        <div class="w-full flex gap-2 select-none mb-3">
-            <!-- COIN TOGGLE SELECTOR -->
-            <div id="coin-toggle-box" class="flex-1 p-1 bg-white/70 dark:bg-neutral-900/40 backdrop-blur-xl border border-neutral-200/80 dark:border-neutral-800/60 rounded-2xl md:rounded-3xl flex gap-1 shadow-lg shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-300">
-                <button id="coin-btn-BTC" onclick="switchCoin('BTC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="flex-1 h-9 rounded-xl text-[0.65rem] uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <span>Bitcoin (BTC)</span>
-                </button>
-                <button id="coin-btn-ZEC" onclick="switchCoin('ZEC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="flex-1 h-9 rounded-xl text-[0.65rem] uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <span>Zcash (ZEC)</span>
-                </button>
-            </div>
-
-            <!-- REFRESH BUTTON -->
-            <button id="btn-refresh" onclick="refreshWindow(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" title="Refresh data" aria-label="Refresh" class="w-[46px] h-[46px] shrink-0 bg-white/70 hover:bg-white dark:bg-neutral-900/40 dark:hover:bg-neutral-800/60 backdrop-blur-xl border border-neutral-200/80 dark:border-neutral-800/60 hover:border-neutral-300 dark:hover:border-neutral-700/60 rounded-2xl md:rounded-3xl flex items-center justify-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-all duration-300 active:scale-[0.98] focus:outline-none focus:ring-0 shadow-lg shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/50">
-                <svg id="btn-refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                </svg>
-            </button>
         </div>
 
         <!-- ERROR BOX -->
@@ -886,7 +884,10 @@ async function renderWeatherData(data, cityName = null) {
 
     if (cityName) {
         const cityEl = document.getElementById('weather-city');
-        if (cityEl) cityEl.innerText = cityName;
+        if (cityEl) {
+            cityEl.innerText = cityName;
+            cityEl.title = cityName;
+        }
     }
 
     const tempEl = document.getElementById('weather-temp');
@@ -909,17 +910,19 @@ async function renderWeatherData(data, cityName = null) {
             const w = warnings[0];
             const extraCount = warnings.length > 1 ? ` (+${warnings.length - 1})` : '';
             secondaryBarEl.innerHTML = `
-                <div class="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
-                    <span class="px-2 py-0.5 rounded-lg text-[0.6rem] font-bold uppercase tracking-wider ${w.badgeBg} border shrink-0 flex items-center gap-1">
-                        <span>${w.icon}</span>
-                        <span>${w.badge}${extraCount}</span>
-                    </span>
-                    <span class="text-xs text-neutral-700 dark:text-neutral-300 truncate font-medium" title="${w.text}">
-                        ${w.text}
-                    </span>
-                </div>
-                <div class="text-xs text-neutral-500 dark:text-neutral-400 shrink-0 font-medium ml-2 whitespace-nowrap">
-                    💨 ${Math.round(current.wind_speed_10m)} km/h
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 w-full min-w-0">
+                    <div class="flex items-start sm:items-center gap-2 min-w-0 flex-1">
+                        <span class="px-2 py-0.5 rounded-lg text-[0.6rem] font-bold uppercase tracking-wider ${w.badgeBg} border shrink-0 flex items-center gap-1 mt-0.5 sm:mt-0">
+                            <span>${w.icon}</span>
+                            <span>${w.badge}${extraCount}</span>
+                        </span>
+                        <span class="text-xs text-neutral-700 dark:text-neutral-300 font-medium leading-snug break-words">
+                            ${w.text}
+                        </span>
+                    </div>
+                    <div class="text-xs text-neutral-500 dark:text-neutral-400 shrink-0 font-medium flex items-center gap-1 self-start sm:self-auto sm:ml-2">
+                        <span>💨</span> <span>${Math.round(current.wind_speed_10m)} km/h</span>
+                    </div>
                 </div>
             `;
         } else {
@@ -929,25 +932,23 @@ async function renderWeatherData(data, cityName = null) {
             const sunTime = isDay 
                 ? (ssDate && !isNaN(ssDate.getTime()) ? ssDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--')
                 : (srDate && !isNaN(srDate.getTime()) ? srDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--');
-            const sunLabel = isDay ? '🌙 Sunset' : '☀️ Sunrise';
+            const sunIcon = isDay ? '🌙' : '☀️';
+            const sunLabel = isDay ? 'Sunset' : 'Sunrise';
 
             secondaryBarEl.innerHTML = `
-                <div class="flex items-center justify-between w-full text-xs text-neutral-600 dark:text-neutral-400 gap-2 overflow-x-auto min-w-0 whitespace-nowrap">
-                    <span class="flex items-center gap-1.5 shrink-0">
-                        <span>💨</span> <strong class="font-medium text-neutral-800 dark:text-neutral-200">${Math.round(current.wind_speed_10m)} km/h</strong>
-                    </span>
-                    <span class="text-neutral-300 dark:text-neutral-700 shrink-0">•</span>
-                    <span class="flex items-center gap-1.5 shrink-0">
-                        <span>💧</span> <strong class="font-medium text-neutral-800 dark:text-neutral-200">${Math.round(current.relative_humidity_2m)}%</strong>
-                    </span>
-                    <span class="text-neutral-300 dark:text-neutral-700 shrink-0">•</span>
-                    <span class="flex items-center gap-1.5 shrink-0">
-                        <span>🌧️</span> <strong class="font-medium text-neutral-800 dark:text-neutral-200">${current.precipitation.toFixed(1)} mm</strong>
-                    </span>
-                    <span class="text-neutral-300 dark:text-neutral-700 shrink-0">•</span>
-                    <span class="flex items-center gap-1.5 shrink-0">
-                        <span>${sunLabel}:</span> <strong class="font-medium text-neutral-800 dark:text-neutral-200">${sunTime}</strong>
-                    </span>
+                <div class="grid grid-cols-2 min-[420px]:grid-cols-4 gap-2 w-full text-xs text-neutral-600 dark:text-neutral-400">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <span>💨</span> <span class="font-medium text-neutral-800 dark:text-neutral-200 truncate">${Math.round(current.wind_speed_10m)} km/h</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <span>💧</span> <span class="font-medium text-neutral-800 dark:text-neutral-200 truncate">${Math.round(current.relative_humidity_2m)}%</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <span>🌧️</span> <span class="font-medium text-neutral-800 dark:text-neutral-200 truncate">${current.precipitation.toFixed(1)} mm</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <span>${sunIcon}</span> <span class="font-medium text-neutral-800 dark:text-neutral-200 truncate">${sunLabel} ${sunTime}</span>
+                    </div>
                 </div>
             `;
         }
@@ -1014,7 +1015,10 @@ async function refreshWeatherLocation(forcePrompt = false) {
         if (city) {
             localStorage.setItem('weather_city', city);
             const cityEl = document.getElementById('weather-city');
-            if (cityEl) cityEl.innerText = city;
+            if (cityEl) {
+                cityEl.innerText = city;
+                cityEl.title = city;
+            }
         }
 
         await fetchWeatherData(lat, lng);
@@ -1067,7 +1071,10 @@ async function initWeatherWidget() {
             const coords = JSON.parse(coordsRaw);
             if (cachedCity) {
                 const cityEl = document.getElementById('weather-city');
-                if (cityEl) cityEl.innerText = cachedCity;
+                if (cityEl) {
+                    cityEl.innerText = cachedCity;
+                    cityEl.title = cachedCity;
+                }
             }
             await fetchWeatherData(coords.lat, coords.lng);
             return;
@@ -1110,12 +1117,12 @@ function updateCoinButtonsUI(coin) {
         if (btn) {
             if (c === coin) {
                 btn.className = isDark
-                    ? "flex-1 h-9 rounded-xl text-[0.65rem] uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 text-white bg-neutral-800/90 shadow-sm whitespace-nowrap"
-                    : "flex-1 h-9 rounded-xl text-[0.65rem] uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-900 bg-white shadow-sm border border-neutral-200/90 whitespace-nowrap";
+                    ? "h-7 px-2.5 rounded-lg text-[0.65rem] uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 text-white bg-neutral-800/90 shadow-sm border border-neutral-700/60 whitespace-nowrap"
+                    : "h-7 px-2.5 rounded-lg text-[0.65rem] uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-900 bg-white shadow-sm border border-neutral-200/90 whitespace-nowrap";
             } else {
                 btn.className = isDark
-                    ? "flex-1 h-9 rounded-xl text-[0.65rem] uppercase tracking-wider font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-400 hover:text-white whitespace-nowrap"
-                    : "flex-1 h-9 rounded-xl text-[0.65rem] uppercase tracking-wider font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-500 hover:text-neutral-900 whitespace-nowrap";
+                    ? "h-7 px-2.5 rounded-lg text-[0.65rem] uppercase tracking-wider font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-400 hover:text-white whitespace-nowrap"
+                    : "h-7 px-2.5 rounded-lg text-[0.65rem] uppercase tracking-wider font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-500 hover:text-neutral-900 whitespace-nowrap";
             }
         }
     });
@@ -1147,14 +1154,14 @@ function resetCardUI() {
     
     let badgeName = document.getElementById("badge-name");
     if (badgeName) {
-        badgeName.className = "border border-neutral-200 dark:border-neutral-800/80 bg-neutral-100 dark:bg-neutral-800/50 px-3 h-8 flex items-center rounded-xl text-neutral-600 dark:text-neutral-400 whitespace-nowrap truncate max-w-[200px] font-semibold text-[0.65rem] uppercase tracking-wider";
+        badgeName.className = "hidden";
         badgeName.innerText = (window.currentCoin === 'ZEC') ? "Zcash (ZEC)" : "Bitcoin (BTC)";
     }
 
     let pBadge = document.getElementById("badge-phase");
     pBadge.className = isDark 
-        ? "border border-neutral-800/80 bg-neutral-800/50 w-20 h-8 flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold"
-        : "border border-neutral-200 bg-neutral-100 w-20 h-8 flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold";
+        ? "border border-neutral-800/80 bg-neutral-800/50 w-20 h-7 flex items-center justify-center rounded-lg transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-[0.65rem]"
+        : "border border-neutral-200 bg-neutral-100 w-20 h-7 flex items-center justify-center rounded-lg transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-[0.65rem]";
     pBadge.style.backgroundColor = "";
     pBadge.style.borderColor = "";
     pBadge.style.color = "";
@@ -1417,7 +1424,7 @@ function applyCardData(data) {
     const coinToSend = window.currentCoin || "BTC";
     const badgeName = document.getElementById("badge-name");
     if (badgeName) {
-        badgeName.className = "border border-neutral-200 dark:border-neutral-800/80 bg-neutral-100 dark:bg-neutral-800/50 px-3 h-8 flex items-center rounded-xl text-neutral-700 dark:text-neutral-300 font-semibold whitespace-nowrap truncate max-w-[200px] text-[0.65rem] uppercase tracking-wider";
+        badgeName.className = "hidden";
         if (data.name && data.ticker) {
             badgeName.innerText = `${data.name} (${data.ticker})`;
         } else {
@@ -1426,7 +1433,7 @@ function applyCardData(data) {
     }
     
     let pBadge = document.getElementById("badge-phase");
-    pBadge.className = "border w-20 h-8 flex items-center justify-center rounded-xl transition-all duration-1000 font-semibold whitespace-nowrap shrink-0 text-[0.65rem] uppercase tracking-wider";
+    pBadge.className = "border w-20 h-7 flex items-center justify-center rounded-lg transition-all duration-1000 font-semibold whitespace-nowrap shrink-0 text-[0.65rem] uppercase tracking-wider";
     pBadge.style.backgroundColor = activeTier.bgBadge;
     pBadge.style.borderColor = activeTier.border;
     pBadge.style.color = activeTier.full;
