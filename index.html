@@ -103,27 +103,19 @@
     <!-- VIEW: DASHBOARD CONTAINER -->
     <div id="view-dashboard-container" class="animate-fade-in">
 
-        <!-- WIDGET 1: LOCATION & THEME CONTROLS (DEDICATED TOP WIDGET) -->
-        <div id="location-theme-widget" class="px-4 py-3 md:px-5 md:py-3.5 rounded-2xl md:rounded-3xl border border-neutral-200/80 dark:border-neutral-800/60 bg-white/70 dark:bg-neutral-900/40 backdrop-blur-xl shadow-lg shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/50 transition-all duration-500 mb-3 select-none flex items-center justify-between gap-2.5">
+        <!-- WIDGET 1: THEME CONTROLS (DEDICATED TOP WIDGET) -->
+        <div id="theme-widget" class="px-4 py-2.5 md:px-5 md:py-3 rounded-2xl md:rounded-3xl border border-neutral-200/80 dark:border-neutral-800/60 bg-white/70 dark:bg-neutral-900/40 backdrop-blur-xl shadow-lg shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/50 transition-all duration-500 mb-3 select-none flex items-center justify-between gap-2.5">
             
-            <!-- LEFT: LOCATION PIN & CURRENT CITY -->
-            <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                <div class="w-8 h-8 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center shrink-0 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <!-- LEFT: THEME LABEL & ICON -->
+            <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-7 h-7 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center shrink-0 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                     </svg>
                 </div>
-                <div class="min-w-0 flex items-center gap-2 flex-1">
-                    <span id="weather-city" class="text-xs md:text-sm font-semibold text-neutral-900 dark:text-white truncate max-w-[150px] sm:max-w-[220px]">
-                        Locating...
-                    </span>
-                    <button onclick="refreshWeatherLocation(true); this.blur();" id="weather-locate-btn" title="Update location and weather" aria-label="Update location" class="w-7 h-7 flex items-center justify-center rounded-lg bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/5 dark:border-white/10 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all active:scale-95 shrink-0">
-                        <svg id="weather-locate-spinner" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                        </svg>
-                    </button>
-                </div>
+                <span class="text-xs md:text-sm font-semibold text-neutral-900 dark:text-white tracking-tight">
+                    Theme Mode
+                </span>
             </div>
 
             <!-- RIGHT: THEME SEGMENTED SELECTOR (AUTO / LIGHT / DARK) -->
@@ -142,13 +134,38 @@
 
         </div>
 
-        <!-- WIDGET 2: WEATHER WIDGET (CLEAN, AIRY & IN ENGLISH) -->
+        <!-- WIDGET 2: WEATHER WIDGET (CLEAN, AIRY & IN ENGLISH WITH LOCATION) -->
         <div id="weather-widget" class="relative overflow-hidden p-4 md:p-5 rounded-2xl md:rounded-3xl border border-neutral-200/80 dark:border-neutral-800/60 bg-white/70 dark:bg-neutral-900/40 backdrop-blur-xl shadow-lg shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/50 transition-all duration-700 mb-3 select-none">
             
             <!-- DYNAMIC AMBIENT WEATHER GLOW -->
             <div id="weather-ambient-glow" class="absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none opacity-30 transition-all duration-1000 bg-sky-400"></div>
 
-            <!-- ROW 1: PRIMARY WEATHER INFO -->
+            <!-- ROW 1: LOCATION PIN, CURRENT CITY, REFRESH & BADGE -->
+            <div class="flex items-center justify-between mb-3 relative z-10 min-w-0">
+                <div class="flex items-center gap-2 min-w-0 flex-1">
+                    <div class="w-7 h-7 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center shrink-0 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </div>
+                    <span id="weather-city" class="text-xs md:text-sm font-semibold text-neutral-900 dark:text-white truncate max-w-[180px] sm:max-w-[280px]">
+                        Locating...
+                    </span>
+                    <button onclick="refreshWeatherLocation(true); this.blur();" id="weather-locate-btn" title="Update location and weather" aria-label="Update location" class="w-6 h-6 flex items-center justify-center rounded-lg bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/5 dark:border-white/10 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all active:scale-95 shrink-0">
+                        <svg id="weather-locate-spinner" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="shrink-0 flex items-center">
+                    <span class="text-[0.65rem] font-medium uppercase tracking-wider px-2 py-0.5 rounded-lg bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm">
+                        Weather
+                    </span>
+                </div>
+            </div>
+
+            <!-- ROW 2: PRIMARY WEATHER INFO -->
             <div class="flex items-center justify-between gap-3 relative z-10 min-w-0">
                 <!-- LEFT: WEATHER ICON, TEMP, CONDITION & FEELS-LIKE -->
                 <div class="flex items-center gap-3.5 min-w-0">
@@ -173,16 +190,9 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- RIGHT: WEATHER BADGE -->
-                <div class="shrink-0 hidden sm:flex items-center">
-                    <span class="text-[0.65rem] font-medium uppercase tracking-wider px-2.5 py-1 rounded-xl bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm">
-                        Weather
-                    </span>
-                </div>
             </div>
 
-            <!-- ROW 2: DETAILED METRICS / ALERTS STRIP -->
+            <!-- ROW 3: DETAILED METRICS / ALERTS STRIP -->
             <div id="weather-secondary-bar" class="mt-3.5 pt-3 border-t border-black/5 dark:border-white/10 relative z-10 min-w-0">
                 <div id="weather-alerts-and-stats" class="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 min-w-0 gap-2 whitespace-nowrap">
                     <span class="animate-pulse text-xs">Loading weather data...</span>
