@@ -18,16 +18,16 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes pulse-soft { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.04); } }
+        @keyframes pulse-soft { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.75; transform: scale(1.04); } }
         .animate-pulse-soft { animation: pulse-soft 3s infinite ease-in-out; }
         @keyframes spin-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
         .animate-spin-reverse { animation: spin-reverse 1s linear infinite; }
 
         /* DISCLAIMER COLLAPSE & FADE */
         #disclaimer-box {
-            max-height: 1.65rem;
+            max-height: 1.85rem;
             overflow: hidden;
             transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 45%, rgba(0, 0, 0, 0) 100%);
@@ -96,71 +96,29 @@
         })();
     </script>
 </head>
-<body class="font-['Inter'] bg-[#FAFAFA] text-neutral-900 dark:bg-black dark:text-white flex justify-center min-h-screen items-start pt-0 pb-4 overflow-x-hidden transition-colors duration-300">
+<body class="font-['Inter'] bg-[#FAFAFA] text-neutral-900 dark:bg-black dark:text-white flex justify-center min-h-screen items-start pt-2 pb-6 overflow-x-hidden transition-colors duration-300">
 
-<div class="w-full max-w-xl px-4 pt-0 pb-4 relative">
+<div class="w-full max-w-xl px-4 py-2 relative">
 
-    <!-- VIEW: DASHBOARD -->
+    <!-- VIEW: DASHBOARD CONTAINER -->
     <div id="view-dashboard-container" class="animate-fade-in">
 
-        <!-- APPLE WEATHER COMPACT WIDGET (STREAMLINED & CONCISE) -->
-        <div id="weather-widget" class="relative overflow-hidden px-4 py-3 md:px-5 md:py-3.5 rounded-2xl md:rounded-3xl border border-neutral-200/80 dark:border-neutral-800/60 bg-white/70 dark:bg-neutral-900/40 backdrop-blur-xl shadow-lg shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/50 transition-all duration-700 mb-3 select-none">
+        <!-- WIDGET 1: LOCATION & THEME CONTROLS (DEDICATED TOP WIDGET) -->
+        <div id="location-theme-widget" class="px-4 py-3 md:px-5 md:py-3.5 rounded-2xl md:rounded-3xl border border-neutral-200/80 dark:border-neutral-800/60 bg-white/70 dark:bg-neutral-900/40 backdrop-blur-xl shadow-lg shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/50 transition-all duration-500 mb-3 select-none flex items-center justify-between gap-2.5">
             
-            <!-- DYNAMIC AMBIENT WEATHER GLOW -->
-            <div id="weather-ambient-glow" class="absolute -top-12 -right-12 w-44 h-44 rounded-full blur-3xl pointer-events-none opacity-30 transition-all duration-1000 bg-sky-400"></div>
-
-            <!-- ROW 1: PRIMARY WEATHER INFO & SOLAR THEME CONTROLS -->
-            <div class="flex items-center justify-between gap-2.5 relative z-10 min-w-0">
-                <!-- LEFT: ICON, TEMP & LOCATION DETAILS -->
-                <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                    <!-- WEATHER ICON -->
-                    <div id="weather-icon-wrapper" class="w-9 h-9 shrink-0 flex items-center justify-center">
-                        <div class="w-7 h-7 rounded-full bg-neutral-200 dark:bg-neutral-800 animate-pulse"></div>
-                    </div>
-
-                    <!-- TEMPERATURE -->
-                    <div class="shrink-0 flex items-baseline">
-                        <span id="weather-temp" class="text-2xl md:text-3xl font-light tracking-tight leading-none text-neutral-900 dark:text-white whitespace-nowrap">
-                            --°
-                        </span>
-                    </div>
-
-                    <!-- CITY, HIGH/LOW & CONDITION -->
-                    <div class="min-w-0 flex-1 flex flex-col justify-center">
-                        <div class="flex items-center gap-1.5 min-w-0">
-                            <span id="weather-city" class="font-semibold text-xs md:text-sm text-neutral-900 dark:text-white truncate leading-tight">
-                                Zisťujem polohu...
-                            </span>
-                            <span id="weather-temp-range" class="text-[0.62rem] text-neutral-500 dark:text-neutral-400 shrink-0 whitespace-nowrap font-medium">
-                                --° / --°
-                            </span>
-                        </div>
-                        <div class="flex items-center gap-1.5 text-[0.62rem] text-neutral-500 dark:text-neutral-400 whitespace-nowrap truncate leading-tight mt-0.5">
-                            <span id="weather-desc" class="truncate font-medium">Načítavam...</span>
-                            <span>•</span>
-                            <span id="weather-apparent-inline" class="shrink-0">Pocitovo --°</span>
-                        </div>
-                    </div>
+            <!-- LEFT: LOCATION PIN & CURRENT CITY -->
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                <div class="w-8 h-8 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center shrink-0 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
                 </div>
-
-                <!-- RIGHT: SOLAR THEME CONTROLS & REFRESH -->
-                <div class="flex items-center gap-1.5 shrink-0">
-                    <!-- THEME SEGMENTED SELECTOR -->
-                    <div id="weather-theme-controls" class="p-0.5 bg-black/5 dark:bg-white/10 rounded-xl border border-black/5 dark:border-white/10 flex items-center gap-0.5 backdrop-blur-sm text-[0.6rem] whitespace-nowrap">
-                        <button id="theme-btn-solar" onclick="setWeatherTheme('solar'); this.blur();" title="Solárny automatický režim podľa polohy a slnka" class="px-2 py-1 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all flex items-center gap-1 font-medium">
-                            <span id="theme-solar-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0"></span>
-                            <span id="theme-solar-label" class="uppercase tracking-widest text-[0.55rem]">Auto</span>
-                        </button>
-                        <button id="theme-btn-light" onclick="setWeatherTheme('light'); this.blur();" title="Svetlý režim" class="w-6 h-6 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all flex items-center justify-center">
-                            <span>☀️</span>
-                        </button>
-                        <button id="theme-btn-dark" onclick="setWeatherTheme('dark'); this.blur();" title="Tmavý režim" class="w-6 h-6 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all flex items-center justify-center">
-                            <span>🌙</span>
-                        </button>
-                    </div>
-
-                    <!-- REFRESH LOCATION BUTTON -->
-                    <button onclick="refreshWeatherLocation(true); this.blur();" id="weather-locate-btn" title="Aktualizovať polohu a počasie" aria-label="Aktualizovať polohu" class="w-7 h-7 flex items-center justify-center rounded-xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/5 dark:border-white/10 text-neutral-600 dark:text-neutral-300 transition-all active:scale-95 shrink-0">
+                <div class="min-w-0 flex items-center gap-2 flex-1">
+                    <span id="weather-city" class="text-xs md:text-sm font-semibold text-neutral-900 dark:text-white truncate max-w-[150px] sm:max-w-[220px]">
+                        Locating...
+                    </span>
+                    <button onclick="refreshWeatherLocation(true); this.blur();" id="weather-locate-btn" title="Update location and weather" aria-label="Update location" class="w-7 h-7 flex items-center justify-center rounded-lg bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/5 dark:border-white/10 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all active:scale-95 shrink-0">
                         <svg id="weather-locate-spinner" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
@@ -168,50 +126,109 @@
                 </div>
             </div>
 
-            <!-- ROW 2: COMPACT WARNING PILL OR COMPACT STATS STRIP -->
-            <div id="weather-secondary-bar" class="mt-2.5 pt-2 border-t border-black/5 dark:border-white/10 relative z-10 min-w-0">
-                <div id="weather-alerts-and-stats" class="flex items-center justify-between text-[0.6rem] text-neutral-500 dark:text-neutral-400 min-w-0 gap-2 whitespace-nowrap">
-                    <span class="animate-pulse">Načítavam meteorologické údaje...</span>
+            <!-- RIGHT: THEME SEGMENTED SELECTOR (AUTO / LIGHT / DARK) -->
+            <div id="weather-theme-controls" class="p-0.5 bg-black/5 dark:bg-white/10 rounded-xl border border-black/5 dark:border-white/10 flex items-center gap-0.5 backdrop-blur-sm text-xs whitespace-nowrap shrink-0">
+                <button id="theme-btn-solar" onclick="setWeatherTheme('solar'); this.blur();" title="Solar automatic mode based on daylight" class="px-2.5 py-1 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all flex items-center gap-1.5 font-medium">
+                    <span id="theme-solar-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0"></span>
+                    <span id="theme-solar-label" class="uppercase tracking-wider text-[0.6rem] font-semibold">Auto</span>
+                </button>
+                <button id="theme-btn-light" onclick="setWeatherTheme('light'); this.blur();" title="Light mode" class="w-7 h-7 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all flex items-center justify-center text-xs">
+                    <span>☀️</span>
+                </button>
+                <button id="theme-btn-dark" onclick="setWeatherTheme('dark'); this.blur();" title="Dark mode" class="w-7 h-7 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all flex items-center justify-center text-xs">
+                    <span>🌙</span>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- WIDGET 2: WEATHER WIDGET (CLEAN, AIRY & IN ENGLISH) -->
+        <div id="weather-widget" class="relative overflow-hidden p-4 md:p-5 rounded-2xl md:rounded-3xl border border-neutral-200/80 dark:border-neutral-800/60 bg-white/70 dark:bg-neutral-900/40 backdrop-blur-xl shadow-lg shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/50 transition-all duration-700 mb-3 select-none">
+            
+            <!-- DYNAMIC AMBIENT WEATHER GLOW -->
+            <div id="weather-ambient-glow" class="absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none opacity-30 transition-all duration-1000 bg-sky-400"></div>
+
+            <!-- ROW 1: PRIMARY WEATHER INFO -->
+            <div class="flex items-center justify-between gap-3 relative z-10 min-w-0">
+                <!-- LEFT: WEATHER ICON, TEMP, CONDITION & FEELS-LIKE -->
+                <div class="flex items-center gap-3.5 min-w-0">
+                    <div id="weather-icon-wrapper" class="w-11 h-11 shrink-0 flex items-center justify-center">
+                        <div class="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-800 animate-pulse"></div>
+                    </div>
+                    <div class="shrink-0 flex items-baseline">
+                        <span id="weather-temp" class="text-3xl md:text-4xl font-light tracking-tight leading-none text-neutral-900 dark:text-white whitespace-nowrap">
+                            --°
+                        </span>
+                    </div>
+                    <div class="min-w-0 flex flex-col justify-center">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <span id="weather-desc" class="font-semibold text-sm md:text-base text-neutral-900 dark:text-white truncate leading-tight">
+                                Loading...
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400 font-medium whitespace-nowrap truncate leading-tight mt-1">
+                            <span id="weather-apparent-inline">Feels like --°</span>
+                            <span>•</span>
+                            <span id="weather-temp-range">H: --° L: --°</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: WEATHER BADGE -->
+                <div class="shrink-0 hidden sm:flex items-center">
+                    <span class="text-[0.65rem] font-medium uppercase tracking-wider px-2.5 py-1 rounded-xl bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm">
+                        Weather
+                    </span>
+                </div>
+            </div>
+
+            <!-- ROW 2: DETAILED METRICS / ALERTS STRIP -->
+            <div id="weather-secondary-bar" class="mt-3.5 pt-3 border-t border-black/5 dark:border-white/10 relative z-10 min-w-0">
+                <div id="weather-alerts-and-stats" class="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 min-w-0 gap-2 whitespace-nowrap">
+                    <span class="animate-pulse text-xs">Loading weather data...</span>
                 </div>
             </div>
 
         </div>
 
-        <!-- MAIN CARD (BITCOIN / ZCASH QUANTITATIVE MODEL) -->
-        <div id="main-card" class="p-6 rounded-3xl bg-white dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800/50 shadow-xl shadow-neutral-200/50 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-1000 mb-3">
+        <!-- WIDGET 3: QUANTITATIVE MODEL WITH INTEGRATED SCORE CHART -->
+        <div id="main-card" class="p-5 md:p-6 rounded-2xl md:rounded-3xl bg-white dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800/50 shadow-lg shadow-neutral-200/40 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-1000 mb-3 select-none">
             
-            <div class="flex justify-between items-center mb-4 text-[0.6rem] uppercase tracking-widest">
-                <div id="badge-name" class="border border-neutral-200 dark:border-[#262626] bg-neutral-100 dark:bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-600 dark:text-neutral-400 whitespace-nowrap truncate max-w-[200px]">
+            <!-- HEADER: ASSET NAME & CYCLE PHASE -->
+            <div class="flex justify-between items-center mb-4 text-[0.65rem] uppercase tracking-wider">
+                <div id="badge-name" class="border border-neutral-200 dark:border-neutral-800/80 bg-neutral-100 dark:bg-neutral-800/50 px-3 h-8 flex items-center rounded-xl text-neutral-700 dark:text-neutral-300 font-semibold whitespace-nowrap truncate max-w-[200px]">
                     Loading...
                 </div>
-                <div id="badge-phase" class="border border-neutral-200 dark:border-neutral-800/60 bg-neutral-100 dark:bg-neutral-800/40 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0">
+                <div id="badge-phase" class="border border-neutral-200 dark:border-neutral-800/80 bg-neutral-100 dark:bg-neutral-800/50 w-20 h-8 flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold">
                     HODL
                 </div>
             </div>
             
-            <div class="flex justify-between items-start mb-4 gap-4 px-1">
+            <!-- PRICE, 24H CHANGE & SCORE LARGE -->
+            <div class="flex justify-between items-start mb-4 gap-4 px-0.5">
                 <div class="min-w-0">
-                    <div id="val-price" class="text-[1.8rem] font-bold h-9 flex items-center leading-none tracking-tight text-neutral-900 dark:text-white transition-all duration-1000 whitespace-nowrap">
-                        <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded">$00,000.00</span>
+                    <div id="val-price" class="text-3xl md:text-[2rem] font-bold h-9 flex items-center leading-none tracking-tight text-neutral-900 dark:text-white transition-all duration-1000 whitespace-nowrap">
+                        <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-lg">$00,000.00</span>
                     </div>
-                    <div id="val-change" class="text-[0.6rem] uppercase tracking-widest mt-2 flex items-center gap-1.5 h-[22px] whitespace-nowrap">
-                        <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded px-1 inline-block h-3">+0.00%</span> 
-                        <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-md px-2 h-[22px] flex items-center justify-center text-[0.6rem] uppercase tracking-widest shrink-0">24H</span>
+                    <div id="val-change" class="text-[0.65rem] uppercase tracking-wider mt-2.5 flex items-center gap-1.5 h-[22px] whitespace-nowrap font-medium">
+                        <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-md px-1.5 inline-block h-3.5">+0.00%</span> 
+                        <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-lg px-2 h-[22px] flex items-center justify-center text-[0.65rem] uppercase tracking-wider shrink-0">24H</span>
                     </div>
                 </div>
                 <div class="text-right flex flex-col items-end shrink-0">
-                    <div id="val-score-large" class="text-[1.8rem] font-bold h-9 flex items-center justify-end leading-none w-24 transition-all duration-1000 whitespace-nowrap">
-                        <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded px-1">00.0%</span>
+                    <div id="val-score-large" class="text-3xl md:text-[2rem] font-bold h-9 flex items-center justify-end leading-none w-24 transition-all duration-1000 whitespace-nowrap">
+                        <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-lg px-1">00.0%</span>
                     </div>
-                    <div class="text-[0.6rem] text-neutral-500 uppercase tracking-widest mt-2 whitespace-nowrap">SCORE</div>
+                    <div class="text-[0.65rem] text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mt-2.5 whitespace-nowrap font-medium">SCORE</div>
                 </div>
             </div>
             
+            <!-- SCORE PROGRESS / LOADING BAR -->
             <div>
-                <div class="w-full bg-neutral-200 dark:bg-neutral-800/60 h-1.5 rounded-full overflow-hidden relative">
-                    <div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out" style="width: 0%; background-color: transparent;"></div>
+                <div class="w-full bg-neutral-200 dark:bg-neutral-800/60 h-2 rounded-full overflow-hidden relative">
+                    <div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out rounded-full" style="width: 0%; background-color: transparent;"></div>
                 </div>
-                <div class="flex items-center justify-between mt-3 px-0.5 text-[0.6rem] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 select-none whitespace-nowrap">
+                <div class="flex items-center justify-between mt-3 px-0.5 text-[0.65rem] uppercase tracking-wider text-neutral-500 dark:text-neutral-400 select-none whitespace-nowrap font-medium">
                     <div class="flex items-center gap-1.5 shrink-0">
                         <span class="w-1.5 h-1.5 rounded-full bg-[#A88468] inline-block shrink-0"></span>
                         <span>DCA IN</span>
@@ -226,65 +243,80 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- SCORE CHART HEADER -->
-        <div class="flex justify-between items-center px-1 mb-1 text-[0.6rem] uppercase tracking-widest relative h-[24px]">
-            <div class="w-16 text-left shrink-0">
-                <div id="dynamic-title" class="text-neutral-500 transition-colors duration-500 whitespace-nowrap">SCORE</div>
-            </div>
-            
-            <div id="macro-buttons" class="flex gap-1 absolute left-1/2 -translate-x-1/2 whitespace-nowrap">
-                <button onclick="updateChart('1Y')" id="btn-1Y" class="h-[22px] px-3 rounded-md transition-all duration-300 flex items-center justify-center text-[0.6rem] uppercase tracking-widest shrink-0">1Y</button>
-                <button onclick="updateChart('2Y')" id="btn-2Y" class="h-[22px] px-3 rounded-md transition-all duration-300 flex items-center justify-center text-[0.6rem] uppercase tracking-widest shrink-0">2Y</button>
-                <button onclick="updateChart('4Y')" id="btn-4Y" class="h-[22px] px-3 rounded-md transition-all duration-300 flex items-center justify-center text-[0.6rem] uppercase tracking-widest shrink-0">4Y</button>
-            </div>
+            <!-- INTEGRATED SCORE CHART SECTION -->
+            <div class="border-t border-black/5 dark:border-white/10 pt-4 mt-5">
+                <!-- CHART HEADER: DYNAMIC TITLE & TIMEFRAME BUTTONS -->
+                <div class="flex justify-between items-center px-0.5 mb-2 text-[0.65rem] uppercase tracking-wider relative h-[26px]">
+                    <div class="w-16 text-left shrink-0">
+                        <div id="dynamic-title" class="text-neutral-500 transition-colors duration-500 whitespace-nowrap font-semibold">SCORE</div>
+                    </div>
+                    
+                    <div id="macro-buttons" class="flex gap-1 absolute left-1/2 -translate-x-1/2 whitespace-nowrap p-0.5 bg-black/5 dark:bg-white/10 rounded-xl border border-black/5 dark:border-white/10 backdrop-blur-sm">
+                        <button onclick="updateChart('1Y')" id="btn-1Y" class="h-6 px-2.5 rounded-lg transition-all duration-300 flex items-center justify-center text-[0.6rem] uppercase tracking-wider font-semibold shrink-0">1Y</button>
+                        <button onclick="updateChart('2Y')" id="btn-2Y" class="h-6 px-2.5 rounded-lg transition-all duration-300 flex items-center justify-center text-[0.6rem] uppercase tracking-wider font-semibold shrink-0">2Y</button>
+                        <button onclick="updateChart('4Y')" id="btn-4Y" class="h-6 px-2.5 rounded-lg transition-all duration-300 flex items-center justify-center text-[0.6rem] uppercase tracking-wider font-semibold shrink-0">4Y</button>
+                    </div>
 
-            <div class="w-16 flex justify-end shrink-0">
-                <div id="dynamic-score" class="transition-colors duration-500 flex items-center justify-end h-full w-16 whitespace-nowrap">
-                    <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded px-0.5">00.0%</span>
+                    <div class="w-16 flex justify-end shrink-0">
+                        <div id="dynamic-score" class="transition-colors duration-500 flex items-center justify-end h-full w-16 whitespace-nowrap font-semibold">
+                            <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-md px-1">00.0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SCORE CHART CANVAS -->
+                <div class="h-44 w-full relative">
+                    <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[30px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
+                        <div class="w-full h-[1px] opacity-5"></div>
+                        <div class="w-full h-[1px] opacity-10"></div>
+                        <div class="w-full h-[1px] opacity-50"></div>
+                        <div class="w-full h-[1px] opacity-10"></div>
+                        <div class="w-full h-[1px] opacity-10"></div>
+                        <div class="w-full h-[1px] opacity-10"></div>
+                        <div class="w-full h-[1px] opacity-10"></div>
+                        <div class="w-full h-[1px] opacity-10"></div>
+                        <div class="w-full h-[1px] opacity-50"></div>
+                        <div class="w-full h-[1px] opacity-10"></div>
+                        <div class="w-full h-[1px] opacity-5"></div>
+                    </div>
+                    
+                    <div class="absolute inset-0 pointer-events-none">
+                        <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000 pointer-events-auto"></canvas>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- SCORE CHART CANVAS -->
-        <div class="h-48 w-full relative mb-3">
-            <div id="chart-skeleton" class="absolute inset-0 pt-[5px] pb-[30px] flex flex-col justify-between transition-opacity duration-1000 pointer-events-none">
-                <div class="w-full h-[1px] opacity-5"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-50"></div><div class="w-full h-[1px] opacity-10"></div><div class="w-full h-[1px] opacity-5"></div>
-            </div>
-            
-            <div class="absolute top-0 bottom-0 -left-[8px] w-[calc(100%+16px)] pointer-events-none">
-                <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000 pointer-events-auto"></canvas>
-            </div>
         </div>
 
         <!-- CONTROLS ROW: COIN TOGGLE & REFRESH -->
-        <div class="w-full flex gap-2 select-none">
+        <div class="w-full flex gap-2 select-none mb-3">
             <!-- COIN TOGGLE SELECTOR -->
-            <div id="coin-toggle-box" class="flex-1 p-1 bg-neutral-100 dark:bg-neutral-900/40 border border-neutral-200/80 dark:border-neutral-800/50 rounded-2xl flex gap-1 shadow-xl shadow-neutral-200/40 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-300">
-                <button id="coin-btn-BTC" onclick="switchCoin('BTC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <span>BITCOIN (BTC)</span>
+            <div id="coin-toggle-box" class="flex-1 p-1 bg-white/70 dark:bg-neutral-900/40 backdrop-blur-xl border border-neutral-200/80 dark:border-neutral-800/60 rounded-2xl md:rounded-3xl flex gap-1 shadow-lg shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-300">
+                <button id="coin-btn-BTC" onclick="switchCoin('BTC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="flex-1 h-9 rounded-xl text-[0.65rem] uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap">
+                    <span>Bitcoin (BTC)</span>
                 </button>
-                <button id="coin-btn-ZEC" onclick="switchCoin('ZEC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <span>ZCASH (ZEC)</span>
+                <button id="coin-btn-ZEC" onclick="switchCoin('ZEC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="flex-1 h-9 rounded-xl text-[0.65rem] uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap">
+                    <span>Zcash (ZEC)</span>
                 </button>
             </div>
 
-            <!-- REFRESH BUTTON (SQUARE) -->
-            <button id="btn-refresh" onclick="refreshWindow(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" title="Obnoviť dáta" aria-label="Refresh" class="w-[46px] h-[46px] shrink-0 bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-900/40 dark:hover:bg-neutral-800/40 border border-neutral-200/80 dark:border-neutral-800/50 hover:border-neutral-300 dark:hover:border-neutral-700/50 rounded-2xl flex items-center justify-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-all duration-300 active:scale-[0.99] focus:outline-none focus:ring-0 shadow-xl shadow-neutral-200/40 dark:shadow-2xl dark:shadow-black/50">
-                <svg id="btn-refresh-icon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <!-- REFRESH BUTTON -->
+            <button id="btn-refresh" onclick="refreshWindow(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" title="Refresh data" aria-label="Refresh" class="w-[46px] h-[46px] shrink-0 bg-white/70 hover:bg-white dark:bg-neutral-900/40 dark:hover:bg-neutral-800/60 backdrop-blur-xl border border-neutral-200/80 dark:border-neutral-800/60 hover:border-neutral-300 dark:hover:border-neutral-700/60 rounded-2xl md:rounded-3xl flex items-center justify-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-all duration-300 active:scale-[0.98] focus:outline-none focus:ring-0 shadow-lg shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/50">
+                <svg id="btn-refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                 </svg>
             </button>
         </div>
 
-        <div id="error-box" class="hidden mt-3 bg-[#FF2A6D]/10 border border-[#FF2A6D]/30 p-4 rounded-2xl text-[#FF2A6D] text-[0.6rem] tracking-widest uppercase text-center">❌ CONNECTION FAILED. PLEASE TRY AGAIN.</div>
+        <!-- ERROR BOX -->
+        <div id="error-box" class="hidden mb-3 bg-[#FF2A6D]/10 border border-[#FF2A6D]/30 p-4 rounded-2xl md:rounded-3xl text-[#FF2A6D] text-xs tracking-wider uppercase text-center font-medium">❌ CONNECTION FAILED. PLEASE TRY AGAIN.</div>
 
         <!-- FOOTER DISCLAIMER -->
-        <div class="mt-3 px-1 select-none">
+        <div class="mt-4 px-1 select-none">
             <div id="disclaimer-box" 
                  onclick="if (!this.classList.contains('is-expanded')) toggleDisclaimer(event);" 
-                 class="text-[0.6rem] text-neutral-500 leading-relaxed text-justify hyphens-auto transition-colors duration-200" 
+                 class="text-xs text-neutral-500 leading-relaxed text-justify hyphens-auto transition-colors duration-200" 
                  style="text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;">
                 <button type="button" 
                         id="disclaimer-toggle-btn" 
@@ -300,14 +332,14 @@
                 <button type="button" 
                         id="disclaimer-collapse-btn" 
                         onclick="toggleDisclaimer(event); this.blur();" 
-                        class="ml-1.5 font-medium text-[0.55rem] text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300 underline decoration-dotted underline-offset-2 cursor-pointer transition-colors focus:outline-none whitespace-nowrap">
+                        class="ml-1.5 font-medium text-[0.65rem] text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300 underline decoration-dotted underline-offset-2 cursor-pointer transition-colors focus:outline-none whitespace-nowrap">
                     Show less
                 </button>
             </div>
         </div>
 
         <!-- COPYRIGHT -->
-        <footer class="mt-3 text-center text-[0.6rem] leading-none uppercase tracking-widest text-neutral-500 dark:text-neutral-600 select-none whitespace-nowrap">
+        <footer class="mt-4 mb-2 text-center text-[0.65rem] leading-none uppercase tracking-wider text-neutral-500 dark:text-neutral-600 select-none whitespace-nowrap font-medium">
             © 2026 MARTIN VOJTUŠ
         </footer>
 
@@ -361,76 +393,76 @@ function getTheme() {
     };
 }
 
-// --- WMO WEATHER CODES MAPPING ---
+// --- WMO WEATHER CODES MAPPING (IN ENGLISH) ---
 const WEATHER_CONDITIONS = {
-    0:  { label: 'Jasno', category: 'clear' },
-    1:  { label: 'Prevažne jasno', category: 'clear' },
-    2:  { label: 'Polooblačno', category: 'partly-cloudy' },
-    3:  { label: 'Zamračené', category: 'overcast' },
-    45: { label: 'Hmla', category: 'fog' },
-    48: { label: 'Námraza a hmla', category: 'fog' },
-    51: { label: 'Slabé mrholenie', category: 'rain' },
-    53: { label: 'Mrholenie', category: 'rain' },
-    55: { label: 'Husté mrholenie', category: 'rain' },
-    56: { label: 'Mrznúce mrholenie', category: 'snow' },
-    57: { label: 'Husté mrznúce mrholenie', category: 'snow' },
-    61: { label: 'Slabý dážď', category: 'rain' },
-    63: { label: 'Mierny dážď', category: 'rain' },
-    65: { label: 'Výdatný dážď', category: 'rain' },
-    66: { label: 'Slabý mrznúci dážď', category: 'snow' },
-    67: { label: 'Silný mrznúci dážď', category: 'snow' },
-    71: { label: 'Slabé sneženie', category: 'snow' },
-    73: { label: 'Mierne sneženie', category: 'snow' },
-    75: { label: 'Husté sneženie', category: 'snow' },
-    77: { label: 'Snehové zrná', category: 'snow' },
-    80: { label: 'Slabé prehánky', category: 'rain' },
-    81: { label: 'Mierne prehánky', category: 'rain' },
-    82: { label: 'Prudké prehánky', category: 'rain' },
-    85: { label: 'Snehové prehánky', category: 'snow' },
-    86: { label: 'Husté snehové prehánky', category: 'snow' },
-    95: { label: 'Búrka', category: 'thunderstorm' },
-    96: { label: 'Búrka s krupobitím', category: 'thunderstorm' },
-    99: { label: 'Silná búrka s krupobitím', category: 'thunderstorm' }
+    0:  { label: 'Clear sky', category: 'clear' },
+    1:  { label: 'Mainly clear', category: 'clear' },
+    2:  { label: 'Partly cloudy', category: 'partly-cloudy' },
+    3:  { label: 'Overcast', category: 'overcast' },
+    45: { label: 'Fog', category: 'fog' },
+    48: { label: 'Depositing rime fog', category: 'fog' },
+    51: { label: 'Light drizzle', category: 'rain' },
+    53: { label: 'Moderate drizzle', category: 'rain' },
+    55: { label: 'Dense drizzle', category: 'rain' },
+    56: { label: 'Light freezing drizzle', category: 'snow' },
+    57: { label: 'Dense freezing drizzle', category: 'snow' },
+    61: { label: 'Slight rain', category: 'rain' },
+    63: { label: 'Moderate rain', category: 'rain' },
+    65: { label: 'Heavy rain', category: 'rain' },
+    66: { label: 'Light freezing rain', category: 'snow' },
+    67: { label: 'Heavy freezing rain', category: 'snow' },
+    71: { label: 'Slight snowfall', category: 'snow' },
+    73: { label: 'Moderate snowfall', category: 'snow' },
+    75: { label: 'Heavy snowfall', category: 'snow' },
+    77: { label: 'Snow grains', category: 'snow' },
+    80: { label: 'Slight rain showers', category: 'rain' },
+    81: { label: 'Moderate rain showers', category: 'rain' },
+    82: { label: 'Violent rain showers', category: 'rain' },
+    85: { label: 'Slight snow showers', category: 'snow' },
+    86: { label: 'Heavy snow showers', category: 'snow' },
+    95: { label: 'Thunderstorm', category: 'thunderstorm' },
+    96: { label: 'Thunderstorm with hail', category: 'thunderstorm' },
+    99: { label: 'Thunderstorm with heavy hail', category: 'thunderstorm' }
 };
 
-// --- COMPACT APPLE WEATHER VECTOR ICONS ---
+// --- APPLE WEATHER VECTOR ICONS ---
 function getWeatherIconSvg(iconType) {
     switch (iconType) {
         case 'clear-day':
             return `
-            <svg class="w-8 h-8 animate-pulse-soft shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <svg class="w-9 h-9 animate-pulse-soft shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <circle cx="12" cy="12" r="5" fill="#FBBF24" stroke="#F59E0B" stroke-width="1.5" style="filter: drop-shadow(0 0 6px rgba(251,191,36,0.8));"></circle>
                 <path stroke-linecap="round" stroke-width="2" stroke="#FBBF24" d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.364-7.364l-1.414 1.414M7.05 16.95l-1.414 1.414m12.728 0l-1.414-1.414M7.05 7.05L5.636 5.636"></path>
             </svg>`;
         case 'clear-night':
             return `
-            <svg class="w-8 h-8 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <svg class="w-9 h-9 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path fill="#C7D2FE" stroke="#818CF8" stroke-width="1.5" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" style="filter: drop-shadow(0 0 6px rgba(129,140,248,0.6));"></path>
                 <circle cx="17.5" cy="5.5" r="1" fill="#FDE047" stroke="none"></circle>
                 <circle cx="14.5" cy="8.5" r="0.75" fill="#FDE047" stroke="none"></circle>
             </svg>`;
         case 'partly-cloudy-day':
             return `
-            <svg class="w-8 h-8 shrink-0" viewBox="0 0 24 24" fill="none">
+            <svg class="w-9 h-9 shrink-0" viewBox="0 0 24 24" fill="none">
                 <circle cx="9" cy="9" r="4" fill="#FBBF24" stroke="#F59E0B" stroke-width="1.5" style="filter: drop-shadow(0 0 5px rgba(251,191,36,0.6));"></circle>
                 <path stroke-linecap="round" stroke-width="1.5" stroke="#FBBF24" d="M9 2v1.5m0 11v1.5M16 9h-1.5M3.5 9H2m10.2-5.2l-1.06 1.06M4.86 13.14l-1.06 1.06m0-8.48l1.06 1.06"></path>
                 <path d="M7 17.5a4.5 4.5 0 014.2-3 4.49 4.49 0 014.1 2.7 3.5 3.5 0 11.2 6.8H7a4 4 0 010-6.5z" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1.2" class="dark:fill-slate-600 dark:stroke-slate-400"></path>
             </svg>`;
         case 'partly-cloudy-night':
             return `
-            <svg class="w-8 h-8 shrink-0" viewBox="0 0 24 24" fill="none">
+            <svg class="w-9 h-9 shrink-0" viewBox="0 0 24 24" fill="none">
                 <path fill="#C7D2FE" stroke="#818CF8" stroke-width="1.2" d="M16 4.5a5 5 0 01-4 4.8 5 5 0 01-5-4.8 6 6 0 109 0z"></path>
                 <path d="M6 18a4.5 4.5 0 014.2-3 4.49 4.49 0 014.1 2.7 3.5 3.5 0 11.2 6.3H6a4 4 0 010-6z" fill="#94A3B8" stroke="#64748B" stroke-width="1.2" class="dark:fill-slate-700 dark:stroke-slate-500"></path>
             </svg>`;
         case 'cloudy':
             return `
-            <svg class="w-8 h-8 shrink-0" viewBox="0 0 24 24" fill="none">
+            <svg class="w-9 h-9 shrink-0" viewBox="0 0 24 24" fill="none">
                 <path d="M6 14a4 4 0 013.8-2.7 4 4 0 013.7 2.4A3 3 0 1114 19H6a3.5 3.5 0 010-5z" fill="#CBD5E1" stroke="#94A3B8" stroke-width="1.2" class="dark:fill-slate-600 dark:stroke-slate-500"></path>
                 <path d="M9 11a4.5 4.5 0 014.3-3 4.5 4.5 0 014.2 2.8 3.5 3.5 0 11-.5 7.2H9" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1.2" class="dark:fill-slate-500 dark:stroke-slate-400"></path>
             </svg>`;
         case 'rain':
             return `
-            <svg class="w-8 h-8 shrink-0" viewBox="0 0 24 24" fill="none">
+            <svg class="w-9 h-9 shrink-0" viewBox="0 0 24 24" fill="none">
                 <path d="M6 12a4 4 0 013.8-2.7 4 4 0 013.7 2.4A3.5 3.5 0 1114 17H6a3 3 0 010-5z" fill="#94A3B8" stroke="#64748B" stroke-width="1.2" class="dark:fill-slate-600 dark:stroke-slate-500"></path>
                 <line x1="8" y1="18" x2="6.5" y2="22" stroke="#38BDF8" stroke-width="2" stroke-linecap="round"></line>
                 <line x1="12" y1="18" x2="10.5" y2="22" stroke="#38BDF8" stroke-width="2" stroke-linecap="round"></line>
@@ -438,13 +470,13 @@ function getWeatherIconSvg(iconType) {
             </svg>`;
         case 'thunderstorm':
             return `
-            <svg class="w-8 h-8 shrink-0" viewBox="0 0 24 24" fill="none">
+            <svg class="w-9 h-9 shrink-0" viewBox="0 0 24 24" fill="none">
                 <path d="M5 11a4 4 0 013.8-2.7 4 4 0 013.7 2.4A3.5 3.5 0 1113 16H5a3 3 0 010-5z" fill="#475569" stroke="#334155" stroke-width="1.2" class="dark:fill-slate-700 dark:stroke-slate-600"></path>
                 <polygon points="12,14 8.5,19 11.5,19 10,23 15.5,17 12.5,17" fill="#FBBF24" stroke="#F59E0B" stroke-width="1" style="filter: drop-shadow(0 0 6px rgba(251,191,36,0.8));"></polygon>
             </svg>`;
         case 'snow':
             return `
-            <svg class="w-8 h-8 shrink-0" viewBox="0 0 24 24" fill="none">
+            <svg class="w-9 h-9 shrink-0" viewBox="0 0 24 24" fill="none">
                 <path d="M6 12a4 4 0 013.8-2.7 4 4 0 013.7 2.4A3.5 3.5 0 1114 17H6a3 3 0 010-5z" fill="#CBD5E1" stroke="#94A3B8" stroke-width="1.2" class="dark:fill-slate-600 dark:stroke-slate-500"></path>
                 <g stroke="#38BDF8" stroke-width="1.5" stroke-linecap="round">
                     <path d="M8 18.5v3m-1.5-1.5h3"></path>
@@ -454,7 +486,7 @@ function getWeatherIconSvg(iconType) {
             </svg>`;
         case 'fog':
             return `
-            <svg class="w-8 h-8 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round">
+            <svg class="w-9 h-9 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round">
                 <line x1="5" y1="8" x2="19" y2="8" class="opacity-75"></line>
                 <line x1="3" y1="12" x2="21" y2="12"></line>
                 <line x1="6" y1="16" x2="18" y2="16" class="opacity-80"></line>
@@ -462,7 +494,7 @@ function getWeatherIconSvg(iconType) {
             </svg>`;
         default:
             return `
-            <svg class="w-8 h-8 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2">
+            <svg class="w-9 h-9 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2">
                 <circle cx="12" cy="12" r="5" fill="#FBBF24"></circle>
             </svg>`;
     }
@@ -552,7 +584,7 @@ function getWeatherStyle(weatherCode, isDay, temp) {
     };
 }
 
-// --- WEATHER WARNINGS GENERATOR ---
+// --- WEATHER WARNINGS GENERATOR (IN ENGLISH) ---
 function generateWeatherWarnings(current, daily) {
     const warnings = [];
     const temp = current.temperature_2m;
@@ -563,98 +595,98 @@ function generateWeatherWarnings(current, daily) {
     const minTemp = (daily && daily.temperature_2m_min && daily.temperature_2m_min[0] !== undefined) ? daily.temperature_2m_min[0] : temp;
     const weatherCode = current.weather_code;
 
-    // 1. Mráz (Frost Warning)
+    // 1. Frost Warning
     if (temp <= -10 || apparent <= -12) {
         warnings.push({
             type: 'frost-severe',
             icon: '❄️',
-            badge: 'EXTRÉMNY MRÁZ',
+            badge: 'EXTREME FROST',
             badgeBg: 'bg-blue-500/20 text-blue-600 dark:text-cyan-300 border-blue-500/30',
-            text: `Teplota ${temp.toFixed(1)}°C (pocitovo ${apparent.toFixed(1)}°C). Riziko omrzlín a silného podchladenia.`
+            text: `Temperature ${temp.toFixed(1)}°C (feels like ${apparent.toFixed(1)}°C). Severe frostbite danger.`
         });
     } else if (temp <= 0 || minTemp <= 0 || apparent <= 0) {
         warnings.push({
             type: 'frost',
             icon: '❄️',
-            badge: 'VÝSTRAHA PRED MRAZOM',
+            badge: 'FROST WARNING',
             badgeBg: 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-500/30',
             text: temp <= 0 
-                ? `Teplota ${temp.toFixed(1)}°C pod bodom mrazu (min. ${minTemp.toFixed(1)}°C). Pozor na námrazu.`
-                : `Očakáva sa nočný mráz s poklesom na ${minTemp.toFixed(1)}°C. Riziko prízemného mrazu.`
+                ? `Freezing temp ${temp.toFixed(1)}°C (min ${minTemp.toFixed(1)}°C). Watch for frost on roads.`
+                : `Overnight frost expected with temperatures dropping to ${minTemp.toFixed(1)}°C.`
         });
     }
 
-    // 2. Poľadovica / Mrznúci dážď
+    // 2. Black Ice / Freezing Rain
     if ([56, 57, 66, 67].includes(weatherCode) || (current.precipitation > 0 && temp <= 0.5)) {
         warnings.push({
             type: 'ice',
             icon: '🧊',
-            badge: 'POĽADOVICA',
+            badge: 'BLACK ICE',
             badgeBg: 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-500/30',
-            text: 'Nebezpečenstvo poľadovice na cestách v dôsledku mrznúceho dažďa.'
+            text: 'Danger of black ice and slippery road conditions due to freezing precipitation.'
         });
     }
 
-    // 3. Vietor / Víchrica (Wind Warning)
+    // 3. High Wind / Gale Warning
     if (windGusts >= 75 || maxWindGusts >= 80 || windSpeed >= 50) {
         warnings.push({
             type: 'gale',
             icon: '🌪️',
-            badge: 'VÍCHRICI',
+            badge: 'GALE WARNING',
             badgeBg: 'bg-red-500/20 text-red-600 dark:text-red-300 border-red-500/30',
-            text: `Mimoriadne silný vietor! Nárazy až ${Math.round(Math.max(windGusts, maxWindGusts))} km/h.`
+            text: `Violent winds! Gusts up to ${Math.round(Math.max(windGusts, maxWindGusts))} km/h.`
         });
     } else if (windGusts >= 45 || maxWindGusts >= 50 || windSpeed >= 30) {
         warnings.push({
             type: 'wind',
             icon: '💨',
-            badge: 'SILNÝ VIETOR',
+            badge: 'STRONG WIND',
             badgeBg: 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30',
-            text: `Zvýšený vietor: nárazy až ${Math.round(Math.max(windGusts, maxWindGusts))} km/h (priemer ${Math.round(windSpeed)} km/h).`
+            text: `High winds: gusts up to ${Math.round(Math.max(windGusts, maxWindGusts))} km/h (avg ${Math.round(windSpeed)} km/h).`
         });
     }
 
-    // 4. Búrky (Thunderstorm)
+    // 4. Thunderstorm
     if ([95, 96, 99].includes(weatherCode)) {
         warnings.push({
             type: 'storm',
             icon: '⚡',
-            badge: 'BÚRKA',
+            badge: 'THUNDERSTORM',
             badgeBg: 'bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30',
-            text: 'Zvýšená blesková aktivita, možnosť prívalového dažďa alebo krupobitia.'
+            text: 'Lightning activity with potential for heavy downpours or hail.'
         });
     }
 
-    // 5. Výdatný dážď (Heavy Rain)
+    // 5. Heavy Rain
     if ([65, 82].includes(weatherCode) || current.precipitation >= 5) {
         warnings.push({
             type: 'heavy-rain',
             icon: '🌧️',
-            badge: 'VÝDATNÝ DÁŽĎ',
+            badge: 'HEAVY RAIN',
             badgeBg: 'bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30',
-            text: `Intenzívne zrážky (${current.precipitation.toFixed(1)} mm/h). Znížená viditeľnosť na cestách.`
+            text: `Heavy rain (${current.precipitation.toFixed(1)} mm/h). Reduced visibility.`
         });
     }
 
-    // 6. Horúčavy (Extreme Heat)
+    // 6. Excessive Heat
     if (temp >= 32 || apparent >= 35) {
         warnings.push({
             type: 'heat',
             icon: '🔥',
-            badge: 'HORÚČAVY',
+            badge: 'HEAT WARNING',
             badgeBg: 'bg-orange-500/20 text-orange-700 dark:text-orange-300 border-orange-500/30',
-            text: `Vysoká teplota vzduchu (${temp.toFixed(1)}°C, pocitovo ${apparent.toFixed(1)}°C).`
+            text: `High ambient temperature (${temp.toFixed(1)}°C, feels like ${apparent.toFixed(1)}°C).`
         });
     }
 
-    // 7. Sneh
+    // 7. Heavy Snow
     if ([73, 75, 85, 86].includes(weatherCode)) {
         warnings.push({
             type: 'snow-heavy',
             icon: '🌨️',
-            badge: 'SNEHOVÁ VÝSTRAHA',
+            badge: 'HEAVY SNOW',
             badgeBg: 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-500/30',
-            text: 'Intenzívne sneženie. Riziko tvorby snehových jazykov.'
+            text: 'Heavy snowfall with danger of snowdrift accumulation.'
         });
     }
 
@@ -737,18 +769,18 @@ function updateThemeSegmentedUI() {
     const solarDot = document.getElementById('theme-solar-dot');
 
     const activeClass = isDark
-        ? "px-2 py-1 rounded-lg text-white bg-neutral-800 shadow-sm font-semibold transition-all flex items-center gap-1"
-        : "px-2 py-1 rounded-lg text-neutral-900 bg-white shadow-sm font-semibold transition-all flex items-center gap-1";
+        ? "px-2.5 py-1 rounded-lg text-white bg-neutral-800 shadow-sm font-semibold transition-all flex items-center gap-1.5"
+        : "px-2.5 py-1 rounded-lg text-neutral-900 bg-white border border-neutral-200/90 shadow-sm font-semibold transition-all flex items-center gap-1.5";
     const inactiveClass = isDark
-        ? "px-2 py-1 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center gap-1 font-normal"
-        : "px-2 py-1 rounded-lg text-neutral-500 hover:text-neutral-900 transition-all flex items-center gap-1 font-normal";
+        ? "px-2.5 py-1 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center gap-1.5 font-medium"
+        : "px-2.5 py-1 rounded-lg text-neutral-500 hover:text-neutral-900 transition-all flex items-center gap-1.5 font-medium";
 
     const iconActiveClass = isDark
-        ? "w-6 h-6 rounded-lg text-white bg-neutral-800 shadow-sm font-semibold transition-all flex items-center justify-center"
-        : "w-6 h-6 rounded-lg text-neutral-900 bg-white shadow-sm font-semibold transition-all flex items-center justify-center";
+        ? "w-7 h-7 rounded-lg text-white bg-neutral-800 shadow-sm font-semibold transition-all flex items-center justify-center text-xs"
+        : "w-7 h-7 rounded-lg text-neutral-900 bg-white border border-neutral-200/90 shadow-sm font-semibold transition-all flex items-center justify-center text-xs";
     const iconInactiveClass = isDark
-        ? "w-6 h-6 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center justify-center font-normal"
-        : "w-6 h-6 rounded-lg text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center font-normal";
+        ? "w-7 h-7 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center justify-center text-xs font-normal"
+        : "w-7 h-7 rounded-lg text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center text-xs font-normal";
 
     if (btnLight) btnLight.className = (mode === 'light') ? iconActiveClass : iconInactiveClass;
     if (btnDark) btnDark.className = (mode === 'dark') ? iconActiveClass : iconInactiveClass;
@@ -757,7 +789,7 @@ function updateThemeSegmentedUI() {
     if (solarLabel) {
         if (mode === 'solar') {
             const isDay = window.weatherData?.current ? (window.weatherData.current.is_day === 1) : !isDark;
-            solarLabel.innerText = isDay ? "Auto Deň" : "Auto Noc";
+            solarLabel.innerText = isDay ? "Auto Day" : "Auto Night";
             if (solarDot) {
                 solarDot.className = isDay 
                     ? "w-1.5 h-1.5 rounded-full bg-amber-400 inline-block shrink-0 shadow-[0_0_4px_#fbbf24]" 
@@ -775,12 +807,12 @@ function toggleTheme() {
     setWeatherTheme(currentlyDark ? 'light' : 'dark');
 }
 
-// --- REVERSE GEOCODING ---
+// --- REVERSE GEOCODING (IN ENGLISH) ---
 async function getCityNameFromCoords(lat, lng) {
     try {
         const controller = new AbortController();
         const tId = setTimeout(() => controller.abort(), 2500);
-        const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=sk`, { signal: controller.signal });
+        const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`, { signal: controller.signal });
         clearTimeout(tId);
         if (res.ok) {
             const data = await res.json();
@@ -793,7 +825,7 @@ async function getCityNameFromCoords(lat, lng) {
         const controller = new AbortController();
         const tId = setTimeout(() => controller.abort(), 2500);
         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`, {
-            headers: { 'Accept-Language': 'sk,en' },
+            headers: { 'Accept-Language': 'en' },
             signal: controller.signal
         });
         clearTimeout(tId);
@@ -805,7 +837,7 @@ async function getCityNameFromCoords(lat, lng) {
         }
     } catch(e) {}
 
-    return "Moja poloha";
+    return "Current Location";
 }
 
 // --- APPLY WEATHER DATA TO UI ---
@@ -819,9 +851,9 @@ function applyWeatherStyling(data) {
     const temp = data.current.temperature_2m;
     const style = getWeatherStyle(weatherCode, isDay, temp);
 
-    widget.className = `relative overflow-hidden px-4 py-3 md:px-5 md:py-3.5 rounded-2xl md:rounded-3xl border ${style.classes} backdrop-blur-xl transition-all duration-700 mb-3 select-none`;
+    widget.className = `relative overflow-hidden p-4 md:p-5 rounded-2xl md:rounded-3xl border ${style.classes} backdrop-blur-xl transition-all duration-700 mb-3 select-none`;
     if (glow) {
-        glow.className = `absolute -top-12 -right-12 w-44 h-44 rounded-full blur-3xl pointer-events-none opacity-30 transition-all duration-1000 ${style.glowColor}`;
+        glow.className = `absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none opacity-30 transition-all duration-1000 ${style.glowColor}`;
     }
 
     const iconWrapper = document.getElementById('weather-icon-wrapper');
@@ -836,7 +868,7 @@ async function renderWeatherData(data, cityName = null) {
     const daily = data.daily;
     if (!current) return;
 
-    const cond = WEATHER_CONDITIONS[current.weather_code] || { label: 'Oblačno', category: 'cloudy' };
+    const cond = WEATHER_CONDITIONS[current.weather_code] || { label: 'Cloudy', category: 'cloudy' };
     const tempRounded = Math.round(current.temperature_2m);
     const apparentRounded = Math.round(current.apparent_temperature);
     const tempMax = (daily && daily.temperature_2m_max && daily.temperature_2m_max[0] !== undefined) ? Math.round(daily.temperature_2m_max[0]) : tempRounded;
@@ -854,12 +886,12 @@ async function renderWeatherData(data, cityName = null) {
     if (descEl) descEl.innerText = cond.label;
 
     const rangeEl = document.getElementById('weather-temp-range');
-    if (rangeEl) rangeEl.innerText = `${tempMax}° / ${tempMin}°`;
+    if (rangeEl) rangeEl.innerText = `H: ${tempMax}° L: ${tempMin}°`;
 
     const apparentInlineEl = document.getElementById('weather-apparent-inline');
-    if (apparentInlineEl) apparentInlineEl.innerText = `Pocitovo ${apparentRounded}°`;
+    if (apparentInlineEl) apparentInlineEl.innerText = `Feels like ${apparentRounded}°`;
 
-    // Render secondary compact bar (Warnings or stats)
+    // Render secondary metrics bar (Warnings or stats)
     const warnings = generateWeatherWarnings(current, daily);
     const secondaryBarEl = document.getElementById('weather-alerts-and-stats');
     if (secondaryBarEl) {
@@ -868,15 +900,15 @@ async function renderWeatherData(data, cityName = null) {
             const extraCount = warnings.length > 1 ? ` (+${warnings.length - 1})` : '';
             secondaryBarEl.innerHTML = `
                 <div class="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
-                    <span class="px-1.5 py-0.5 rounded-md text-[0.55rem] font-bold uppercase tracking-wider ${w.badgeBg} border shrink-0 flex items-center gap-1">
+                    <span class="px-2 py-0.5 rounded-lg text-[0.6rem] font-bold uppercase tracking-wider ${w.badgeBg} border shrink-0 flex items-center gap-1">
                         <span>${w.icon}</span>
                         <span>${w.badge}${extraCount}</span>
                     </span>
-                    <span class="text-[0.62rem] text-neutral-700 dark:text-neutral-300 truncate" title="${w.text}">
+                    <span class="text-xs text-neutral-700 dark:text-neutral-300 truncate font-medium" title="${w.text}">
                         ${w.text}
                     </span>
                 </div>
-                <div class="text-[0.58rem] text-neutral-500 dark:text-neutral-400 shrink-0 font-medium ml-1 whitespace-nowrap">
+                <div class="text-xs text-neutral-500 dark:text-neutral-400 shrink-0 font-medium ml-2 whitespace-nowrap">
                     💨 ${Math.round(current.wind_speed_10m)} km/h
                 </div>
             `;
@@ -887,24 +919,24 @@ async function renderWeatherData(data, cityName = null) {
             const sunTime = isDay 
                 ? (ssDate && !isNaN(ssDate.getTime()) ? ssDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--')
                 : (srDate && !isNaN(srDate.getTime()) ? srDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--');
-            const sunLabel = isDay ? '🌙 Západ' : '☀️ Východ';
+            const sunLabel = isDay ? '🌙 Sunset' : '☀️ Sunrise';
 
             secondaryBarEl.innerHTML = `
-                <div class="flex items-center justify-between w-full text-[0.6rem] text-neutral-500 dark:text-neutral-400 gap-1.5 overflow-x-auto min-w-0 whitespace-nowrap">
-                    <span class="flex items-center gap-1 shrink-0">
-                        <span>💨</span> <strong class="font-semibold text-neutral-700 dark:text-neutral-300">${Math.round(current.wind_speed_10m)} km/h</strong>
+                <div class="flex items-center justify-between w-full text-xs text-neutral-600 dark:text-neutral-400 gap-2 overflow-x-auto min-w-0 whitespace-nowrap">
+                    <span class="flex items-center gap-1.5 shrink-0">
+                        <span>💨</span> <strong class="font-medium text-neutral-800 dark:text-neutral-200">${Math.round(current.wind_speed_10m)} km/h</strong>
                     </span>
                     <span class="text-neutral-300 dark:text-neutral-700 shrink-0">•</span>
-                    <span class="flex items-center gap-1 shrink-0">
-                        <span>💧</span> <strong class="font-semibold text-neutral-700 dark:text-neutral-300">${Math.round(current.relative_humidity_2m)}%</strong>
+                    <span class="flex items-center gap-1.5 shrink-0">
+                        <span>💧</span> <strong class="font-medium text-neutral-800 dark:text-neutral-200">${Math.round(current.relative_humidity_2m)}%</strong>
                     </span>
                     <span class="text-neutral-300 dark:text-neutral-700 shrink-0">•</span>
-                    <span class="flex items-center gap-1 shrink-0">
-                        <span>🌧️</span> <strong class="font-semibold text-neutral-700 dark:text-neutral-300">${current.precipitation.toFixed(1)} mm</strong>
+                    <span class="flex items-center gap-1.5 shrink-0">
+                        <span>🌧️</span> <strong class="font-medium text-neutral-800 dark:text-neutral-200">${current.precipitation.toFixed(1)} mm</strong>
                     </span>
                     <span class="text-neutral-300 dark:text-neutral-700 shrink-0">•</span>
-                    <span class="flex items-center gap-1 shrink-0">
-                        <span>${sunLabel}:</span> <strong class="font-semibold text-neutral-700 dark:text-neutral-300">${sunTime}</strong>
+                    <span class="flex items-center gap-1.5 shrink-0">
+                        <span>${sunLabel}:</span> <strong class="font-medium text-neutral-800 dark:text-neutral-200">${sunTime}</strong>
                     </span>
                 </div>
             `;
@@ -944,7 +976,7 @@ async function fetchWeatherData(lat, lng) {
         
         const cachedCity = localStorage.getItem('weather_city');
         let city = cachedCity;
-        if (!city || city === "Moja poloha") {
+        if (!city || city === "Current Location" || city === "Moja poloha") {
             city = await getCityNameFromCoords(lat, lng);
             if (city) localStorage.setItem('weather_city', city);
         }
@@ -1050,12 +1082,12 @@ function updateMacroButtonsUI(period) {
         if(btn) {
             if (p === period) {
                 btn.className = isDark 
-                    ? "h-[22px] px-3 rounded-md text-white bg-neutral-800/80 transition-all font-medium flex items-center justify-center text-[0.6rem] uppercase tracking-widest whitespace-nowrap shrink-0" 
-                    : "h-[22px] px-3 rounded-md text-neutral-900 bg-white border border-neutral-200/90 shadow-sm transition-all font-semibold flex items-center justify-center text-[0.6rem] uppercase tracking-widest whitespace-nowrap shrink-0";
+                    ? "h-6 px-2.5 rounded-lg text-white bg-neutral-800 shadow-sm transition-all font-semibold flex items-center justify-center text-[0.6rem] uppercase tracking-wider whitespace-nowrap shrink-0" 
+                    : "h-6 px-2.5 rounded-lg text-neutral-900 bg-white border border-neutral-200/90 shadow-sm transition-all font-semibold flex items-center justify-center text-[0.6rem] uppercase tracking-wider whitespace-nowrap shrink-0";
             } else {
                 btn.className = isDark 
-                    ? "h-[22px] px-3 rounded-md text-neutral-400 hover:text-white transition-all flex items-center justify-center text-[0.6rem] uppercase tracking-widest font-normal whitespace-nowrap shrink-0" 
-                    : "h-[22px] px-3 rounded-md text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center text-[0.6rem] uppercase tracking-widest font-normal whitespace-nowrap shrink-0";
+                    ? "h-6 px-2.5 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center justify-center text-[0.6rem] uppercase tracking-wider font-medium whitespace-nowrap shrink-0" 
+                    : "h-6 px-2.5 rounded-lg text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center text-[0.6rem] uppercase tracking-wider font-medium whitespace-nowrap shrink-0";
             }
         }
     });
@@ -1068,12 +1100,12 @@ function updateCoinButtonsUI(coin) {
         if (btn) {
             if (c === coin) {
                 btn.className = isDark
-                    ? "flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-white bg-neutral-800/80 whitespace-nowrap"
-                    : "flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-900 bg-white shadow-sm border border-neutral-200/60 whitespace-nowrap";
+                    ? "flex-1 h-9 rounded-xl text-[0.65rem] uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 text-white bg-neutral-800/90 shadow-sm whitespace-nowrap"
+                    : "flex-1 h-9 rounded-xl text-[0.65rem] uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-900 bg-white shadow-sm border border-neutral-200/90 whitespace-nowrap";
             } else {
                 btn.className = isDark
-                    ? "flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-400 [@media(hover:hover)]:hover:text-white whitespace-nowrap"
-                    : "flex-1 h-9 rounded-xl text-[0.6rem] uppercase tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-500 [@media(hover:hover)]:hover:text-neutral-900 whitespace-nowrap";
+                    ? "flex-1 h-9 rounded-xl text-[0.65rem] uppercase tracking-wider font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-400 hover:text-white whitespace-nowrap"
+                    : "flex-1 h-9 rounded-xl text-[0.65rem] uppercase tracking-wider font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-500 hover:text-neutral-900 whitespace-nowrap";
             }
         }
     });
@@ -1101,37 +1133,37 @@ function resetCardUI() {
 
     const dScore = document.getElementById("dynamic-score");
     dScore.style.transition = "none";
-    dScore.innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded px-0.5">88.8%</span>`;
+    dScore.innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded-md px-1">88.8%</span>`;
     
     let badgeName = document.getElementById("badge-name");
     if (badgeName) {
-        badgeName.className = "border border-neutral-200 dark:border-[#262626] bg-neutral-100 dark:bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-600 dark:text-neutral-400 whitespace-nowrap truncate max-w-[200px]";
+        badgeName.className = "border border-neutral-200 dark:border-neutral-800/80 bg-neutral-100 dark:bg-neutral-800/50 px-3 h-8 flex items-center rounded-xl text-neutral-600 dark:text-neutral-400 whitespace-nowrap truncate max-w-[200px] font-semibold text-[0.65rem] uppercase tracking-wider";
         badgeName.innerText = (window.currentCoin === 'ZEC') ? "Zcash (ZEC)" : "Bitcoin (BTC)";
     }
 
     let pBadge = document.getElementById("badge-phase");
     pBadge.className = isDark 
-        ? "border border-neutral-800/60 bg-neutral-800/40 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0"
-        : "border border-neutral-200 bg-neutral-100 w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0";
+        ? "border border-neutral-800/80 bg-neutral-800/50 w-20 h-8 flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold"
+        : "border border-neutral-200 bg-neutral-100 w-20 h-8 flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold";
     pBadge.style.backgroundColor = "";
     pBadge.style.borderColor = "";
     pBadge.style.color = "";
     pBadge.innerHTML = 'HODL';
 
-    document.getElementById("val-price").innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded">88,888.88</span>`;
-    document.getElementById("val-change").className = "text-[0.6rem] uppercase tracking-widest mt-2 flex items-center gap-1.5 h-[22px] whitespace-nowrap";
-    document.getElementById("val-change").innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded px-1 inline-block h-3">+0.00%</span> <span class="${spanBg} text-transparent animate-pulse rounded-md px-2 h-[22px] flex items-center justify-center text-[0.6rem] uppercase tracking-widest shrink-0">24H</span>`;
+    document.getElementById("val-price").innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded-lg">$00,000.00</span>`;
+    document.getElementById("val-change").className = "text-[0.65rem] uppercase tracking-wider mt-2.5 flex items-center gap-1.5 h-[22px] whitespace-nowrap font-medium";
+    document.getElementById("val-change").innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded-md px-1.5 inline-block h-3.5">+0.00%</span> <span class="${spanBg} text-transparent animate-pulse rounded-lg px-2 h-[22px] flex items-center justify-center text-[0.65rem] uppercase tracking-wider shrink-0">24H</span>`;
     
     const vScoreLarge = document.getElementById("val-score-large");
     vScoreLarge.style.transition = "none";
-    vScoreLarge.innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded px-1">88.8%</span>`;
+    vScoreLarge.innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded-lg px-1">88.8%</span>`;
     vScoreLarge.style.color = "inherit";
     vScoreLarge.style.textShadow = "none";
     
     const mainCard = document.getElementById("main-card");
     mainCard.className = isDark 
-        ? "p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000 mb-3"
-        : "p-6 rounded-3xl bg-white border border-neutral-200 shadow-xl shadow-neutral-200/50 transition-colors duration-1000 mb-3";
+        ? "p-5 md:p-6 rounded-2xl md:rounded-3xl bg-neutral-900/40 border border-neutral-800/50 shadow-2xl shadow-black/50 transition-colors duration-1000 mb-3 select-none"
+        : "p-5 md:p-6 rounded-2xl md:rounded-3xl bg-white border border-neutral-200 shadow-xl shadow-neutral-200/50 transition-colors duration-1000 mb-3 select-none";
     mainCard.style.backgroundColor = "";
     mainCard.style.borderColor = "";
     
@@ -1231,10 +1263,10 @@ const customChartPlugin = {
           let boxWidth = textWidth + 18; 
           let boxHeight = 22;
           let boxX = Math.max(left, Math.min(right - boxWidth, xPos - boxWidth / 2));
-          let boxY = bottom + 4;
+          let boxY = bottom + 2;
 
           ctx.beginPath();
-          if (ctx.roundRect) ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 5);
+          if (ctx.roundRect) ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 6);
           else ctx.rect(boxX, boxY, boxWidth, boxHeight);
           ctx.fill(); ctx.stroke();
 
@@ -1348,7 +1380,7 @@ function updateChart(period) {
             responsive: true, maintainAspectRatio: false,
             animation: { duration: 1000, easing: 'easeOutQuart' },
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            layout: { padding: { left: 8, right: 8, top: 5, bottom: 30 } },
+            layout: { padding: { left: 4, right: 4, top: 5, bottom: 26 } },
             interaction: { mode: 'index', intersect: false },
             scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } },
             onHover: (event, activeElements) => {
@@ -1375,7 +1407,7 @@ function applyCardData(data) {
     const coinToSend = window.currentCoin || "BTC";
     const badgeName = document.getElementById("badge-name");
     if (badgeName) {
-        badgeName.className = "border border-neutral-200 dark:border-[#262626] bg-neutral-100 dark:bg-[#121212] px-3 h-8 flex items-center rounded-md text-neutral-600 dark:text-neutral-400 whitespace-nowrap truncate max-w-[200px]";
+        badgeName.className = "border border-neutral-200 dark:border-neutral-800/80 bg-neutral-100 dark:bg-neutral-800/50 px-3 h-8 flex items-center rounded-xl text-neutral-700 dark:text-neutral-300 font-semibold whitespace-nowrap truncate max-w-[200px] text-[0.65rem] uppercase tracking-wider";
         if (data.name && data.ticker) {
             badgeName.innerText = `${data.name} (${data.ticker})`;
         } else {
@@ -1384,7 +1416,7 @@ function applyCardData(data) {
     }
     
     let pBadge = document.getElementById("badge-phase");
-    pBadge.className = "border w-20 h-8 flex items-center justify-center rounded-md transition-all duration-1000 font-medium whitespace-nowrap shrink-0";
+    pBadge.className = "border w-20 h-8 flex items-center justify-center rounded-xl transition-all duration-1000 font-semibold whitespace-nowrap shrink-0 text-[0.65rem] uppercase tracking-wider";
     pBadge.style.backgroundColor = activeTier.bgBadge;
     pBadge.style.borderColor = activeTier.border;
     pBadge.style.color = activeTier.full;
@@ -1396,9 +1428,9 @@ function applyCardData(data) {
     const changeColor = data.change >= 0 
         ? (isDark ? 'text-[#00FF88]' : 'text-[#059669]') 
         : (isDark ? 'text-[#FF2A6D]' : 'text-[#DC2626]');
-    vCh.className = `text-[0.6rem] uppercase tracking-widest mt-2 flex items-center h-[22px] gap-1.5 whitespace-nowrap ${changeColor}`;
+    vCh.className = `text-[0.65rem] uppercase tracking-wider mt-2.5 flex items-center h-[22px] gap-1.5 whitespace-nowrap font-medium ${changeColor}`;
     const badge24Class = isDark ? "text-white bg-neutral-800" : "text-neutral-700 bg-neutral-200";
-    vCh.innerHTML = `${data.change >= 0 ? '+':''}${data.change.toFixed(2)}% <span class="${badge24Class} px-2 h-[22px] rounded-md font-medium flex items-center justify-center text-[0.6rem] uppercase tracking-widest shrink-0">24H</span>`;
+    vCh.innerHTML = `${data.change >= 0 ? '+':''}${data.change.toFixed(2)}% <span class="${badge24Class} px-2 h-[22px] rounded-lg font-semibold flex items-center justify-center text-[0.65rem] uppercase tracking-wider shrink-0">24H</span>`;
 
     const vScoreLarge = document.getElementById("val-score-large");
     vScoreLarge.innerText = `${s.toFixed(1)}%`;
@@ -1416,7 +1448,7 @@ function applyCardData(data) {
 
     const mainCard = document.getElementById("main-card");
     const shadowClass = isDark ? "shadow-2xl shadow-black/50" : "shadow-xl shadow-neutral-200/50";
-    mainCard.className = `p-6 rounded-3xl border ${shadowClass} transition-colors duration-1000 mb-3`;
+    mainCard.className = `p-5 md:p-6 rounded-2xl md:rounded-3xl border ${shadowClass} transition-colors duration-1000 mb-3 select-none`;
     mainCard.style.backgroundColor = activeTier.bgCard;
     mainCard.style.borderColor = activeTier.border;
 
@@ -1498,7 +1530,7 @@ function toggleDisclaimer(e) {
         box.style.maxHeight = box.offsetHeight + 'px';
         void box.offsetHeight;
         box.classList.remove('is-expanded');
-        box.style.maxHeight = '1.65rem';
+        box.style.maxHeight = '1.85rem';
         if (chevron) chevron.classList.remove('rotate-180');
         if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
     } else {
