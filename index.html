@@ -104,12 +104,15 @@
     <div id="view-dashboard-container" class="animate-fade-in">
 
         <!-- WIDGET 1: THEME CONTROLS (DEDICATED TOP WIDGET) -->
-        <div id="theme-widget" class="px-4 py-3 md:px-5 md:py-3.5 rounded-2xl md:rounded-3xl border border-neutral-200/80 dark:border-neutral-800/60 bg-white/70 dark:bg-neutral-900/40 backdrop-blur-xl shadow-lg shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/50 transition-all duration-500 mb-3 select-none flex items-center justify-between gap-2.5">
+        <div id="theme-widget" class="relative overflow-hidden px-4 py-3 md:px-5 md:py-3.5 rounded-2xl md:rounded-3xl border border-neutral-200/80 dark:border-neutral-800/60 bg-white/70 dark:bg-neutral-900/40 backdrop-blur-xl shadow-lg shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/50 transition-all duration-700 mb-3 select-none flex items-center justify-between gap-2.5">
             
+            <!-- DYNAMIC AMBIENT THEME GLOW -->
+            <div id="theme-ambient-glow" class="absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none transition-all duration-1000 opacity-25 bg-amber-400 dark:bg-indigo-500"></div>
+
             <!-- LEFT: THEME LABEL & ICON -->
-            <div class="flex items-center gap-2.5 min-w-0">
-                <div class="w-7 h-7 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center shrink-0 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex items-center gap-2.5 min-w-0 relative z-10">
+                <div id="theme-icon-box" class="w-7 h-7 rounded-xl bg-gradient-to-br from-amber-400/20 to-orange-500/10 dark:from-indigo-500/25 dark:to-purple-500/15 flex items-center justify-center shrink-0 text-amber-600 dark:text-indigo-400 border border-amber-400/30 dark:border-indigo-500/30 transition-all duration-500">
+                    <svg id="theme-mode-svg" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                     </svg>
                 </div>
@@ -119,7 +122,7 @@
             </div>
 
             <!-- RIGHT: THEME SEGMENTED SELECTOR (AUTO / LIGHT / DARK) -->
-            <div id="weather-theme-controls" class="p-0.5 bg-black/5 dark:bg-white/10 rounded-xl border border-black/5 dark:border-white/10 flex items-center gap-0.5 backdrop-blur-sm text-xs whitespace-nowrap shrink-0">
+            <div id="weather-theme-controls" class="relative z-10 p-0.5 bg-black/5 dark:bg-white/10 rounded-xl border border-black/5 dark:border-white/10 flex items-center gap-0.5 backdrop-blur-sm text-xs whitespace-nowrap shrink-0">
                 <button id="theme-btn-solar" onclick="setWeatherTheme('solar'); this.blur();" title="Solar automatic mode based on daylight" class="h-7 px-2.5 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all flex items-center gap-1.5 font-medium">
                     <span id="theme-solar-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0"></span>
                     <span id="theme-solar-label" class="uppercase tracking-wider text-xs font-semibold">Auto</span>
@@ -207,31 +210,30 @@
             <!-- DYNAMIC AMBIENT MODEL GLOW -->
             <div id="model-ambient-glow" class="absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none opacity-20 transition-all duration-1000"></div>
 
-            <!-- ROW 1: COIN SELECTOR, REFRESH & MODEL BADGE -->
+            <!-- ROW 1: COIN SELECTOR (LEFT) & REFRESH + INDICATOR BADGE (RIGHT) -->
             <div class="flex justify-between items-center mb-4 text-xs uppercase tracking-wider gap-2 relative z-10">
-                <div class="flex items-center gap-2 min-w-0">
-                    <!-- COIN TOGGLE SELECTOR -->
-                    <div id="coin-toggle-box" class="p-0.5 bg-black/5 dark:bg-white/10 rounded-xl border border-black/5 dark:border-white/10 flex items-center gap-0.5 backdrop-blur-sm whitespace-nowrap">
-                        <button id="coin-btn-BTC" onclick="switchCoin('BTC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="h-7 px-3 rounded-lg text-xs uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap">
-                            <span>BTC</span>
-                        </button>
-                        <button id="coin-btn-ZEC" onclick="switchCoin('ZEC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="h-7 px-3 rounded-lg text-xs uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap">
-                            <span>ZEC</span>
-                        </button>
-                    </div>
+                <!-- COIN TOGGLE SELECTOR -->
+                <div id="coin-toggle-box" class="p-0.5 bg-black/5 dark:bg-white/10 rounded-xl border border-black/5 dark:border-white/10 flex items-center gap-0.5 backdrop-blur-sm whitespace-nowrap">
+                    <button id="coin-btn-BTC" onclick="switchCoin('BTC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="h-7 px-3 rounded-lg text-xs uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap">
+                        <span>BTC</span>
+                    </button>
+                    <button id="coin-btn-ZEC" onclick="switchCoin('ZEC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="h-7 px-3 rounded-lg text-xs uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap">
+                        <span>ZEC</span>
+                    </button>
+                </div>
 
+                <!-- RIGHT: REFRESH BUTTON & INDICATOR BADGE -->
+                <div class="flex items-center gap-2 shrink-0">
                     <!-- REFRESH BUTTON -->
                     <button id="btn-refresh" onclick="refreshWindow(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" title="Refresh data" aria-label="Refresh" class="w-7 h-7 flex items-center justify-center rounded-xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/5 dark:border-white/10 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all active:scale-95 shrink-0">
                         <svg id="btn-refresh-icon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
                     </button>
-                </div>
 
-                <!-- MODEL BADGE -->
-                <div class="shrink-0 flex items-center ml-2">
+                    <!-- INDICATOR BADGE -->
                     <span class="text-xs font-semibold uppercase tracking-wider px-2.5 h-7 flex items-center rounded-lg bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm">
-                        Model
+                        Indicator
                     </span>
                 </div>
                 <span id="badge-name" class="hidden">Bitcoin (BTC)</span>
@@ -295,21 +297,22 @@
 
             <!-- SECTION 3: INTEGRATED SCORE CHART SECTION -->
             <div class="border-t border-black/5 dark:border-white/10 pt-3.5 relative z-10">
-                <!-- CHART HEADER: DYNAMIC TITLE & TIMEFRAME BUTTONS -->
-                <div class="flex justify-between items-center mb-2.5 text-xs uppercase tracking-wider h-7">
-                    <div class="flex items-center gap-1.5 text-left shrink-0">
+                <!-- CHART HEADER: DYNAMIC TITLE & TIMEFRAME BUTTONS (ABSOLUTE CENTERED TO PREVENT JUMPING) -->
+                <div class="relative flex justify-between items-center mb-2.5 text-xs uppercase tracking-wider h-7">
+                    <div class="flex items-center gap-1.5 text-left shrink-0 z-10">
                         <span class="text-xs font-semibold text-neutral-700 dark:text-neutral-300">History</span>
                         <span id="dynamic-title" class="text-neutral-400 transition-colors duration-500 whitespace-nowrap font-medium text-xs">4Y</span>
                     </div>
                     
-                    <div id="macro-buttons" class="flex gap-0.5 whitespace-nowrap p-0.5 bg-black/5 dark:bg-white/10 rounded-xl border border-black/5 dark:border-white/10 backdrop-blur-sm">
+                    <!-- ABSOLUTE CENTERED TO PREVENT ANY JUMPING ON NUMBER CHANGES -->
+                    <div id="macro-buttons" class="absolute left-1/2 -translate-x-1/2 flex gap-0.5 whitespace-nowrap p-0.5 bg-black/5 dark:bg-white/10 rounded-xl border border-black/5 dark:border-white/10 backdrop-blur-sm z-10">
                         <button onclick="updateChart('1Y')" id="btn-1Y" class="h-7 px-2.5 rounded-lg transition-all duration-300 flex items-center justify-center text-xs uppercase tracking-wider font-semibold shrink-0">1Y</button>
                         <button onclick="updateChart('2Y')" id="btn-2Y" class="h-7 px-2.5 rounded-lg transition-all duration-300 flex items-center justify-center text-xs uppercase tracking-wider font-semibold shrink-0">2Y</button>
                         <button onclick="updateChart('4Y')" id="btn-4Y" class="h-7 px-2.5 rounded-lg transition-all duration-300 flex items-center justify-center text-xs uppercase tracking-wider font-semibold shrink-0">4Y</button>
                     </div>
 
-                    <div class="flex items-center justify-end shrink-0">
-                        <div id="dynamic-score" class="transition-colors duration-500 flex items-center justify-end h-7 px-2 rounded-lg bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10 font-semibold text-xs whitespace-nowrap text-neutral-700 dark:text-neutral-300">
+                    <div class="flex items-center justify-end shrink-0 z-10">
+                        <div id="dynamic-score" class="transition-colors duration-500 flex items-center justify-center w-16 h-7 px-1 rounded-lg bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10 font-semibold text-xs tabular-nums whitespace-nowrap text-neutral-700 dark:text-neutral-300">
                             <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-md px-1">00.0%</span>
                         </div>
                     </div>
@@ -337,39 +340,39 @@
                 </div>
             </div>
 
+            <!-- SECTION 4: DISCLAIMER (INSIDE CRYPTO WIDGET AT THE VERY BOTTOM) -->
+            <div class="border-t border-black/5 dark:border-white/10 pt-3 mt-3 relative z-10 select-none">
+                <div id="disclaimer-box" 
+                     onclick="if (!this.classList.contains('is-expanded')) toggleDisclaimer(event);" 
+                     class="text-xs text-neutral-500 leading-relaxed text-justify hyphens-auto transition-colors duration-200" 
+                     style="text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;">
+                    <button type="button" 
+                            id="disclaimer-toggle-btn" 
+                            onclick="toggleDisclaimer(event); this.blur();" 
+                            aria-expanded="false" 
+                            aria-controls="disclaimer-box"
+                            class="inline font-semibold text-neutral-700 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white underline decoration-neutral-400/60 dark:decoration-neutral-500/60 hover:decoration-neutral-900 dark:hover:decoration-white underline-offset-2 transition-colors cursor-pointer focus:outline-none whitespace-nowrap">
+                        <span>Disclaimer</span>
+                        <svg id="disclaimer-chevron" class="inline-block w-2.5 h-2.5 ml-0.5 -mt-0.5 transform transition-transform duration-300 align-middle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>: This quantitative model is for informational purposes only and does not constitute financial or investment advice. Digital asset markets involve extreme volatility and risk of capital loss. Model outputs do not guarantee future performance. Independent due diligence is advised.
+                    <button type="button" 
+                            id="disclaimer-collapse-btn" 
+                            onclick="toggleDisclaimer(event); this.blur();" 
+                            class="ml-1.5 font-medium text-xs text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300 underline decoration-dotted underline-offset-2 cursor-pointer transition-colors focus:outline-none whitespace-nowrap">
+                        Show less
+                    </button>
+                </div>
+            </div>
+
         </div>
 
         <!-- ERROR BOX -->
         <div id="error-box" class="hidden mb-3 bg-[#FF2A6D]/10 border border-[#FF2A6D]/30 p-4 rounded-2xl md:rounded-3xl text-[#FF2A6D] text-xs tracking-wider uppercase text-center font-medium">❌ CONNECTION FAILED. PLEASE TRY AGAIN.</div>
 
-        <!-- FOOTER DISCLAIMER -->
-        <div class="mt-4 px-1 select-none">
-            <div id="disclaimer-box" 
-                 onclick="if (!this.classList.contains('is-expanded')) toggleDisclaimer(event);" 
-                 class="text-xs text-neutral-500 leading-relaxed text-justify hyphens-auto transition-colors duration-200" 
-                 style="text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;">
-                <button type="button" 
-                        id="disclaimer-toggle-btn" 
-                        onclick="toggleDisclaimer(event); this.blur();" 
-                        aria-expanded="false" 
-                        aria-controls="disclaimer-box"
-                        class="inline font-semibold text-neutral-700 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white underline decoration-neutral-400/60 dark:decoration-neutral-500/60 hover:decoration-neutral-900 dark:hover:decoration-white underline-offset-2 transition-colors cursor-pointer focus:outline-none whitespace-nowrap">
-                    <span>Disclaimer</span>
-                    <svg id="disclaimer-chevron" class="inline-block w-2.5 h-2.5 ml-0.5 -mt-0.5 transform transition-transform duration-300 align-middle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </button>: This quantitative model is for informational purposes only and does not constitute financial or investment advice. Digital asset markets involve extreme volatility and risk of capital loss. Model outputs do not guarantee future performance. Independent due diligence is advised.
-                <button type="button" 
-                        id="disclaimer-collapse-btn" 
-                        onclick="toggleDisclaimer(event); this.blur();" 
-                        class="ml-1.5 font-medium text-[0.65rem] text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300 underline decoration-dotted underline-offset-2 cursor-pointer transition-colors focus:outline-none whitespace-nowrap">
-                    Show less
-                </button>
-            </div>
-        </div>
-
         <!-- COPYRIGHT -->
-        <footer class="mt-4 mb-2 text-center text-[0.65rem] leading-none uppercase tracking-wider text-neutral-500 dark:text-neutral-600 select-none whitespace-nowrap font-medium">
+        <footer class="mt-4 mb-2 text-center text-xs leading-none uppercase tracking-wider text-neutral-500 dark:text-neutral-600 select-none whitespace-nowrap font-medium">
             © 2026 MARTIN VOJTUŠ
         </footer>
 
@@ -829,6 +832,25 @@ function updateThemeSegmentedUI() {
             solarLabel.innerText = "Auto";
             if (solarDot) solarDot.className = "w-1.5 h-1.5 rounded-full bg-neutral-400 inline-block shrink-0";
         }
+    }
+
+    const themeGlow = document.getElementById('theme-ambient-glow');
+    const themeIconBox = document.getElementById('theme-icon-box');
+    const themeSvg = document.getElementById('theme-mode-svg');
+    if (themeGlow) {
+        themeGlow.className = isDark
+            ? "absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none transition-all duration-1000 opacity-25 bg-indigo-500"
+            : "absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none transition-all duration-1000 opacity-25 bg-amber-400";
+    }
+    if (themeIconBox) {
+        themeIconBox.className = isDark
+            ? "w-7 h-7 rounded-xl bg-gradient-to-br from-indigo-500/25 to-purple-500/15 flex items-center justify-center shrink-0 text-indigo-400 border border-indigo-500/30 transition-all duration-500"
+            : "w-7 h-7 rounded-xl bg-gradient-to-br from-amber-400/20 to-orange-500/10 flex items-center justify-center shrink-0 text-amber-600 border border-amber-400/30 transition-all duration-500";
+    }
+    if (themeSvg) {
+        themeSvg.innerHTML = isDark
+            ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>`
+            : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>`;
     }
 }
 
