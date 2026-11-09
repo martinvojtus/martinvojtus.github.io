@@ -108,34 +108,50 @@
     <div id="view-dashboard-container" class="animate-fade-in">
 
         <!-- WIDGET 1: THEME CONTROLS (DEDICATED TOP WIDGET) -->
-        <div id="theme-widget" class="relative overflow-hidden px-4 py-3 md:px-5 md:py-3.5 rounded-2xl md:rounded-3xl border border-neutral-200/80 dark:border-neutral-800/60 bg-white/70 dark:bg-neutral-900/40 backdrop-blur-xl shadow-lg shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/50 transition-all duration-700 mb-3 select-none flex items-center justify-between gap-2.5">
+        <div id="theme-widget" class="relative overflow-hidden px-4 py-2.5 md:px-5 md:py-3 rounded-2xl md:rounded-3xl border border-neutral-200/80 dark:border-neutral-800/60 bg-white/70 dark:bg-neutral-900/40 backdrop-blur-xl shadow-lg shadow-neutral-200/20 dark:shadow-2xl dark:shadow-black/50 transition-all duration-700 mb-3 select-none flex items-center justify-between gap-2.5">
             
             <!-- DYNAMIC AMBIENT THEME GLOW -->
-            <div id="theme-ambient-glow" class="absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none transition-all duration-1000 opacity-25 bg-amber-400 dark:bg-indigo-500"></div>
+            <div id="theme-ambient-glow" class="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl pointer-events-none transition-all duration-1000 opacity-20 bg-amber-400 dark:bg-indigo-500"></div>
 
-            <!-- LEFT: THEME LABEL & ICON -->
-            <div class="flex items-center gap-2.5 min-w-0 relative z-10">
-                <div id="theme-icon-box" class="w-7 h-7 rounded-xl bg-gradient-to-br from-amber-400/20 to-orange-500/10 dark:from-indigo-500/25 dark:to-purple-500/15 flex items-center justify-center shrink-0 text-amber-600 dark:text-indigo-400 border border-amber-400/30 dark:border-indigo-500/30 transition-all duration-500">
-                    <svg id="theme-mode-svg" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- LEFT: THEME BRAND & ACTIVE STATUS -->
+            <div class="flex items-center gap-2.5 md:gap-3 min-w-0 relative z-10">
+                <div id="theme-icon-box" class="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400/20 to-orange-500/10 dark:from-indigo-500/25 dark:to-purple-500/15 flex items-center justify-center shrink-0 text-amber-600 dark:text-indigo-400 border border-amber-400/30 dark:border-indigo-500/30 transition-all duration-500 shadow-sm">
+                    <svg id="theme-mode-svg" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                     </svg>
                 </div>
-                <span class="text-xs font-semibold text-neutral-900 dark:text-white uppercase tracking-wider">
-                    Theme Mode
-                </span>
+                <div class="min-w-0 flex flex-col justify-center">
+                    <div class="flex items-center gap-1.5 leading-none">
+                        <span class="text-[0.6rem] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">Appearance</span>
+                        <span id="theme-live-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0 shadow-[0_0_5px_#10b981]"></span>
+                    </div>
+                    <div class="mt-0.5 flex items-center gap-1.5 min-w-0">
+                        <span id="theme-status-text" class="text-xs font-semibold text-neutral-900 dark:text-white truncate tracking-tight">Solar Dynamic</span>
+                        <span id="theme-substatus" class="text-[0.65rem] text-neutral-500 dark:text-neutral-400 font-medium truncate hidden min-[420px]:inline">• Daylight Active</span>
+                    </div>
+                </div>
             </div>
 
             <!-- RIGHT: THEME SEGMENTED SELECTOR (AUTO / LIGHT / DARK) -->
-            <div id="weather-theme-controls" class="relative z-10 p-0.5 bg-black/5 dark:bg-white/10 rounded-xl border border-black/5 dark:border-white/10 flex items-center gap-0.5 backdrop-blur-sm text-xs whitespace-nowrap shrink-0">
-                <button id="theme-btn-solar" onclick="setWeatherTheme('solar'); this.blur();" title="Solar automatic mode based on daylight" class="h-7 px-2.5 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all flex items-center gap-1.5 font-medium">
-                    <span id="theme-solar-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0"></span>
-                    <span id="theme-solar-label" class="uppercase tracking-wider text-xs font-semibold">Auto</span>
+            <div id="theme-segmented-box" class="relative z-10 p-0.5 bg-black/5 dark:bg-white/10 rounded-xl border border-black/5 dark:border-white/10 flex items-center gap-0.5 backdrop-blur-sm text-xs whitespace-nowrap shrink-0">
+                <button type="button" id="theme-btn-solar" onclick="setWeatherTheme('solar'); this.blur();" title="Solar automatic mode based on daylight" class="h-7 px-2.5 rounded-lg transition-all duration-300 flex items-center gap-1.5 text-xs font-medium">
+                    <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2l2.4 6.8 6.8 2.4-6.8 2.4L12 20.4l-2.4-6.8-6.8-2.4 6.8-2.4z"></path>
+                    </svg>
+                    <span class="font-semibold uppercase tracking-wider text-[0.65rem]">Auto</span>
                 </button>
-                <button id="theme-btn-light" onclick="setWeatherTheme('light'); this.blur();" title="Light mode" class="w-7 h-7 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all flex items-center justify-center text-xs">
-                    <span>☀️</span>
+                <button type="button" id="theme-btn-light" onclick="setWeatherTheme('light'); this.blur();" title="Light mode" class="h-7 px-2.5 rounded-lg transition-all duration-300 flex items-center gap-1.5 text-xs font-medium">
+                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="4.5"></circle>
+                        <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+                    </svg>
+                    <span class="font-semibold uppercase tracking-wider text-[0.65rem] hidden min-[480px]:inline">Light</span>
                 </button>
-                <button id="theme-btn-dark" onclick="setWeatherTheme('dark'); this.blur();" title="Dark mode" class="w-7 h-7 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all flex items-center justify-center text-xs">
-                    <span>🌙</span>
+                <button type="button" id="theme-btn-dark" onclick="setWeatherTheme('dark'); this.blur();" title="Dark mode" class="h-7 px-2.5 rounded-lg transition-all duration-300 flex items-center gap-1.5 text-xs font-medium">
+                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <span class="font-semibold uppercase tracking-wider text-[0.65rem] hidden min-[480px]:inline">Dark</span>
                 </button>
             </div>
 
@@ -432,40 +448,39 @@ function updateThemeSegmentedUI() {
     const btnLight = document.getElementById('theme-btn-light');
     const btnDark = document.getElementById('theme-btn-dark');
     const btnSolar = document.getElementById('theme-btn-solar');
-    const solarLabel = document.getElementById('theme-solar-label');
-    const solarDot = document.getElementById('theme-solar-dot');
 
     const activeClass = isDark
-        ? "h-7 px-2.5 rounded-lg text-white bg-neutral-800/90 border border-neutral-700/60 shadow-sm font-semibold transition-all flex items-center gap-1.5 text-xs"
+        ? "h-7 px-2.5 rounded-lg text-white bg-neutral-800/95 border border-neutral-700/80 shadow-sm font-semibold transition-all flex items-center gap-1.5 text-xs"
         : "h-7 px-2.5 rounded-lg text-neutral-900 bg-white border border-neutral-200/90 shadow-sm font-semibold transition-all flex items-center gap-1.5 text-xs";
     const inactiveClass = isDark
         ? "h-7 px-2.5 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center gap-1.5 font-medium text-xs"
         : "h-7 px-2.5 rounded-lg text-neutral-500 hover:text-neutral-900 transition-all flex items-center gap-1.5 font-medium text-xs";
 
-    const iconActiveClass = isDark
-        ? "w-7 h-7 rounded-lg text-white bg-neutral-800/90 border border-neutral-700/60 shadow-sm font-semibold transition-all flex items-center justify-center text-xs"
-        : "w-7 h-7 rounded-lg text-neutral-900 bg-white border border-neutral-200/90 shadow-sm font-semibold transition-all flex items-center justify-center text-xs";
-    const iconInactiveClass = isDark
-        ? "w-7 h-7 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center justify-center text-xs font-normal"
-        : "w-7 h-7 rounded-lg text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center text-xs font-normal";
-
-    if (btnLight) btnLight.className = (mode === 'light') ? iconActiveClass : iconInactiveClass;
-    if (btnDark) btnDark.className = (mode === 'dark') ? iconActiveClass : iconInactiveClass;
     if (btnSolar) btnSolar.className = (mode === 'solar') ? activeClass : inactiveClass;
+    if (btnLight) btnLight.className = (mode === 'light') ? activeClass : inactiveClass;
+    if (btnDark) btnDark.className = (mode === 'dark') ? activeClass : inactiveClass;
 
-    if (solarLabel) {
-        if (mode === 'solar') {
-            const isDay = !isDark;
-            solarLabel.innerText = isDay ? "Auto Day" : "Auto Night";
-            if (solarDot) {
-                solarDot.className = isDay 
-                    ? "w-1.5 h-1.5 rounded-full bg-amber-400 inline-block shrink-0 shadow-[0_0_4px_#fbbf24]" 
-                    : "w-1.5 h-1.5 rounded-full bg-indigo-400 inline-block shrink-0 shadow-[0_0_4px_#818cf8]";
-            }
-        } else {
-            solarLabel.innerText = "Auto";
-            if (solarDot) solarDot.className = "w-1.5 h-1.5 rounded-full bg-neutral-400 inline-block shrink-0";
+    const statusText = document.getElementById('theme-status-text');
+    const substatusText = document.getElementById('theme-substatus');
+    const liveDot = document.getElementById('theme-live-dot');
+
+    if (mode === 'solar') {
+        const isDay = !isDark;
+        if (statusText) statusText.innerText = "Solar Dynamic";
+        if (substatusText) substatusText.innerText = isDay ? "• Daylight Active" : "• Night Active";
+        if (liveDot) {
+            liveDot.className = isDay 
+                ? "w-1.5 h-1.5 rounded-full bg-amber-400 inline-block shrink-0 shadow-[0_0_5px_#fbbf24]" 
+                : "w-1.5 h-1.5 rounded-full bg-indigo-400 inline-block shrink-0 shadow-[0_0_5px_#818cf8]";
         }
+    } else if (mode === 'light') {
+        if (statusText) statusText.innerText = "Light Theme";
+        if (substatusText) substatusText.innerText = "• Always On";
+        if (liveDot) liveDot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 inline-block shrink-0 shadow-[0_0_5px_#fbbf24]";
+    } else if (mode === 'dark') {
+        if (statusText) statusText.innerText = "Dark Theme";
+        if (substatusText) substatusText.innerText = "• Always On";
+        if (liveDot) liveDot.className = "w-1.5 h-1.5 rounded-full bg-indigo-400 inline-block shrink-0 shadow-[0_0_5px_#818cf8]";
     }
 
     const themeGlow = document.getElementById('theme-ambient-glow');
@@ -473,18 +488,24 @@ function updateThemeSegmentedUI() {
     const themeSvg = document.getElementById('theme-mode-svg');
     if (themeGlow) {
         themeGlow.className = isDark
-            ? "absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none transition-all duration-1000 opacity-25 bg-indigo-500"
-            : "absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none transition-all duration-1000 opacity-25 bg-amber-400";
+            ? "absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl pointer-events-none transition-all duration-1000 opacity-20 bg-indigo-500"
+            : "absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl pointer-events-none transition-all duration-1000 opacity-20 bg-amber-400";
     }
     if (themeIconBox) {
         themeIconBox.className = isDark
-            ? "w-7 h-7 rounded-xl bg-gradient-to-br from-indigo-500/25 to-purple-500/15 flex items-center justify-center shrink-0 text-indigo-400 border border-indigo-500/30 transition-all duration-500"
-            : "w-7 h-7 rounded-xl bg-gradient-to-br from-amber-400/20 to-orange-500/10 flex items-center justify-center shrink-0 text-amber-600 border border-amber-400/30 transition-all duration-500";
+            ? "w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500/25 to-purple-500/15 flex items-center justify-center shrink-0 text-indigo-400 border border-indigo-500/30 transition-all duration-500 shadow-sm"
+            : "w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400/20 to-orange-500/15 flex items-center justify-center shrink-0 text-amber-600 border border-amber-400/30 transition-all duration-500 shadow-sm";
     }
     if (themeSvg) {
-        themeSvg.innerHTML = isDark
-            ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>`
-            : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>`;
+        if (mode === 'solar') {
+            themeSvg.innerHTML = isDark
+                ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>`
+                : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>`;
+        } else if (mode === 'light') {
+            themeSvg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>`;
+        } else {
+            themeSvg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>`;
+        }
     }
 }
 
