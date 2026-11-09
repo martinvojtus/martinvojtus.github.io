@@ -27,11 +27,17 @@
 
         /* DISCLAIMER COLLAPSE & FADE */
         #disclaimer-box {
-            max-height: 1.85rem;
+            max-height: 2.5rem;
             overflow: hidden;
             transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 45%, rgba(0, 0, 0, 0) 100%);
-            mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 45%, rgba(0, 0, 0, 0) 100%);
+            -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+            mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 1.25rem, transparent 1.25rem),
+                                linear-gradient(to right, #000 0%, #000 35%, transparent 80%);
+            mask-image: linear-gradient(to bottom, #000 0, #000 1.25rem, transparent 1.25rem),
+                        linear-gradient(to right, #000 0%, #000 35%, transparent 80%);
+            -webkit-mask-composite: source-over;
+            mask-composite: add;
             cursor: pointer;
         }
         #disclaimer-box:not(.is-expanded):hover {
@@ -137,74 +143,7 @@
 
         </div>
 
-        <!-- WIDGET 2: WEATHER WIDGET (CLEAN, AIRY & IN ENGLISH WITH LOCATION) -->
-        <div id="weather-widget" class="relative overflow-hidden p-4 md:p-5 rounded-2xl md:rounded-3xl border border-neutral-200/80 dark:border-neutral-800/60 bg-white/70 dark:bg-neutral-900/40 backdrop-blur-xl shadow-lg shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/50 transition-all duration-700 mb-3 select-none">
-            
-            <!-- DYNAMIC AMBIENT WEATHER GLOW -->
-            <div id="weather-ambient-glow" class="absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none opacity-30 transition-all duration-1000 bg-sky-400"></div>
-
-            <!-- ROW 1: LOCATION PIN, CURRENT CITY, REFRESH & BADGE -->
-            <div class="flex items-center justify-between mb-3 relative z-10 min-w-0">
-                <div class="flex items-center gap-2 min-w-0 flex-1">
-                    <div class="w-7 h-7 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center shrink-0 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                    </div>
-                    <span id="weather-city" class="text-xs font-semibold text-neutral-900 dark:text-white truncate min-w-0 flex-1" title="Locating...">
-                        Locating...
-                    </span>
-                    <button onclick="refreshWeatherLocation(true); this.blur();" id="weather-locate-btn" title="Update location and weather" aria-label="Update location" class="w-7 h-7 flex items-center justify-center rounded-xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/5 dark:border-white/10 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all active:scale-95 shrink-0">
-                        <svg id="weather-locate-spinner" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                        </svg>
-                    </button>
-                </div>
-                <div class="shrink-0 flex items-center ml-2">
-                    <span class="text-xs font-semibold uppercase tracking-wider px-2.5 h-7 flex items-center rounded-lg bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm">
-                        Weather
-                    </span>
-                </div>
-            </div>
-
-            <!-- ROW 2: PRIMARY WEATHER INFO -->
-            <div class="flex items-center justify-between gap-3 relative z-10 min-w-0">
-                <!-- LEFT: WEATHER ICON, TEMP, CONDITION & FEELS-LIKE -->
-                <div class="flex items-center gap-3.5 min-w-0 flex-1">
-                    <div id="weather-icon-wrapper" class="w-10 h-10 shrink-0 flex items-center justify-center">
-                        <div class="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-800 animate-pulse"></div>
-                    </div>
-                    <div class="shrink-0 flex items-baseline">
-                        <span id="weather-temp" class="text-3xl font-light tracking-tight leading-none text-neutral-900 dark:text-white whitespace-nowrap">
-                            --°
-                        </span>
-                    </div>
-                    <div class="min-w-0 flex-1 flex flex-col justify-center">
-                        <div class="flex items-center gap-2 min-w-0">
-                            <span id="weather-desc" class="font-semibold text-xs text-neutral-900 dark:text-white leading-tight break-words uppercase tracking-wider">
-                                Loading...
-                            </span>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-neutral-500 dark:text-neutral-400 font-medium leading-tight mt-1">
-                            <span id="weather-apparent-inline" class="whitespace-nowrap">Feels like --°</span>
-                            <span class="opacity-60">•</span>
-                            <span id="weather-temp-range" class="whitespace-nowrap">H: --° L: --°</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ROW 3: DETAILED METRICS / ALERTS STRIP -->
-            <div id="weather-secondary-bar" class="mt-3.5 pt-3 border-t border-black/5 dark:border-white/10 relative z-10 min-w-0">
-                <div id="weather-alerts-and-stats" class="w-full min-w-0">
-                    <span class="animate-pulse text-xs text-neutral-500 dark:text-neutral-400">Loading weather data...</span>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- WIDGET 3: QUANTITATIVE MODEL WITH INTEGRATED SCORE CHART -->
+        <!-- WIDGET 2: QUANTITATIVE MODEL WITH INTEGRATED SCORE CHART -->
         <div id="main-card" class="relative overflow-hidden p-4 md:p-5 rounded-2xl md:rounded-3xl bg-white/70 dark:bg-neutral-900/40 backdrop-blur-xl border border-neutral-200/80 dark:border-neutral-800/60 shadow-lg shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/50 transition-colors duration-1000 mb-3 select-none">
             
             <!-- DYNAMIC AMBIENT MODEL GLOW -->
@@ -344,8 +283,8 @@
             <div class="border-t border-black/5 dark:border-white/10 pt-3 mt-3 relative z-10 select-none">
                 <div id="disclaimer-box" 
                      onclick="if (!this.classList.contains('is-expanded')) toggleDisclaimer(event);" 
-                     class="text-xs text-neutral-500 leading-relaxed text-justify hyphens-auto transition-colors duration-200" 
-                     style="text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;">
+                     class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed text-left transition-colors duration-200" 
+                     title="Click to expand disclaimer">
                     <button type="button" 
                             id="disclaimer-toggle-btn" 
                             onclick="toggleDisclaimer(event); this.blur();" 
@@ -384,8 +323,7 @@
 // --- GLOBALS & STATE ---
 let scoreChartInstance = null;
 window.currentScoreData = { score: 0, colorClass: "" };
-window.fullData = null; 
-window.weatherData = null;
+window.fullData = null;
 const savedView = localStorage.getItem('trading_macro_view');
 window.currentMacroView = (savedView === '1Y' || savedView === '2Y' || savedView === '4Y') ? savedView : '4Y';
 const savedCoin = localStorage.getItem('trading_coin');
@@ -426,421 +364,6 @@ function getTheme() {
     };
 }
 
-// --- WMO WEATHER CODES MAPPING (IN ENGLISH) ---
-const WEATHER_CONDITIONS = {
-    0:  { label: 'Clear sky', category: 'clear' },
-    1:  { label: 'Mainly clear', category: 'clear' },
-    2:  { label: 'Partly cloudy', category: 'partly-cloudy' },
-    3:  { label: 'Overcast', category: 'overcast' },
-    45: { label: 'Fog', category: 'fog' },
-    48: { label: 'Depositing rime fog', category: 'fog' },
-    51: { label: 'Light drizzle', category: 'rain' },
-    53: { label: 'Moderate drizzle', category: 'rain' },
-    55: { label: 'Dense drizzle', category: 'rain' },
-    56: { label: 'Light freezing drizzle', category: 'snow' },
-    57: { label: 'Dense freezing drizzle', category: 'snow' },
-    61: { label: 'Slight rain', category: 'rain' },
-    63: { label: 'Moderate rain', category: 'rain' },
-    65: { label: 'Heavy rain', category: 'rain' },
-    66: { label: 'Light freezing rain', category: 'snow' },
-    67: { label: 'Heavy freezing rain', category: 'snow' },
-    71: { label: 'Slight snowfall', category: 'snow' },
-    73: { label: 'Moderate snowfall', category: 'snow' },
-    75: { label: 'Heavy snowfall', category: 'snow' },
-    77: { label: 'Snow grains', category: 'snow' },
-    80: { label: 'Slight rain showers', category: 'rain' },
-    81: { label: 'Moderate rain showers', category: 'rain' },
-    82: { label: 'Violent rain showers', category: 'rain' },
-    85: { label: 'Slight snow showers', category: 'snow' },
-    86: { label: 'Heavy snow showers', category: 'snow' },
-    95: { label: 'Thunderstorm', category: 'thunderstorm' },
-    96: { label: 'Thunderstorm with hail', category: 'thunderstorm' },
-    99: { label: 'Thunderstorm with heavy hail', category: 'thunderstorm' }
-};
-
-// --- APPLE WEATHER VECTOR ICONS ---
-function getWeatherIconSvg(iconType) {
-    switch (iconType) {
-        case 'clear-day':
-            return `
-            <svg class="w-10 h-10 animate-pulse-soft shrink-0" viewBox="0 0 36 36" fill="none">
-                <defs>
-                    <radialGradient id="sun-grad-cd" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stop-color="#FFFBEB"/>
-                        <stop offset="35%" stop-color="#FBBF24"/>
-                        <stop offset="100%" stop-color="#F59E0B"/>
-                    </radialGradient>
-                    <filter id="sun-glow-cd" x="-20%" y="-20%" width="140%" height="140%">
-                        <feGaussianBlur stdDeviation="1.5" result="blur"/>
-                        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-                    </filter>
-                </defs>
-                <circle cx="18" cy="18" r="7" fill="url(#sun-grad-cd)" stroke="#F59E0B" stroke-width="1" filter="url(#sun-glow-cd)"/>
-                <g stroke="#F59E0B" stroke-width="2" stroke-linecap="round">
-                    <line x1="18" y1="4" x2="18" y2="7.5"/>
-                    <line x1="18" y1="28.5" x2="18" y2="32"/>
-                    <line x1="4" y1="18" x2="7.5" y2="18"/>
-                    <line x1="28.5" y1="18" x2="32" y2="18"/>
-                    <line x1="8.1" y1="8.1" x2="10.6" y2="10.6"/>
-                    <line x1="25.4" y1="25.4" x2="27.9" y2="27.9"/>
-                    <line x1="8.1" y1="27.9" x2="10.6" y2="25.4"/>
-                    <line x1="25.4" y1="10.6" x2="27.9" y2="8.1"/>
-                </g>
-            </svg>`;
-
-        case 'clear-night':
-            return `
-            <svg class="w-10 h-10 shrink-0" viewBox="0 0 36 36" fill="none">
-                <defs>
-                    <linearGradient id="moon-grad-cn" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#EEF2FF"/>
-                        <stop offset="50%" stop-color="#C7D2FE"/>
-                        <stop offset="100%" stop-color="#818CF8"/>
-                    </linearGradient>
-                    <filter id="moon-glow-cn" x="-20%" y="-20%" width="140%" height="140%">
-                        <feGaussianBlur stdDeviation="1.5" result="blur"/>
-                        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-                    </filter>
-                </defs>
-                <path d="M 23 7 A 11 11 0 1 0 28 26 A 10 10 0 0 1 23 7 Z" fill="url(#moon-grad-cn)" stroke="#6366F1" stroke-width="1" filter="url(#moon-glow-cn)"/>
-                <circle cx="26" cy="11" r="1.2" fill="#FDE047"/>
-                <circle cx="29" cy="18" r="1" fill="#FDE047"/>
-            </svg>`;
-
-        case 'partly-cloudy-day':
-            return `
-            <svg class="w-10 h-10 shrink-0" viewBox="0 0 36 36" fill="none">
-                <defs>
-                    <radialGradient id="sun-grad-pcd" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stop-color="#FFFBEB"/>
-                        <stop offset="50%" stop-color="#FBBF24"/>
-                        <stop offset="100%" stop-color="#F59E0B"/>
-                    </radialGradient>
-                    <linearGradient id="cloud-grad-pcd" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#FFFFFF"/>
-                        <stop offset="100%" stop-color="#CBD5E1"/>
-                    </linearGradient>
-                </defs>
-                <g transform="translate(-2, -2)">
-                    <circle cx="14" cy="14" r="5.5" fill="url(#sun-grad-pcd)" stroke="#F59E0B" stroke-width="1"/>
-                    <g stroke="#F59E0B" stroke-width="1.75" stroke-linecap="round">
-                        <line x1="14" y1="3" x2="14" y2="5.5"/>
-                        <line x1="3" y1="14" x2="5.5" y2="14"/>
-                        <line x1="6.2" y1="6.2" x2="8" y2="8"/>
-                        <line x1="21.8" y1="6.2" x2="20" y2="8"/>
-                        <line x1="6.2" y1="21.8" x2="8" y2="20"/>
-                    </g>
-                </g>
-                <path d="M 12 28 C 9.2 28 7 25.8 7 23 C 7 20.5 8.8 18.5 11.2 18.1 C 12.2 14.5 15.5 12 19.5 12 C 24.2 12 28 15.8 28 20.5 C 28 20.8 28 21.1 27.9 21.4 C 29.7 22.1 31 23.9 31 26 C 31 28.8 28.8 31 26 31 L 12 31 Z" fill="url(#cloud-grad-pcd)" stroke="#94A3B8" stroke-width="1.2"/>
-            </svg>`;
-
-        case 'partly-cloudy-night':
-            return `
-            <svg class="w-10 h-10 shrink-0" viewBox="0 0 36 36" fill="none">
-                <defs>
-                    <linearGradient id="moon-grad-pcn" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#EEF2FF"/>
-                        <stop offset="100%" stop-color="#818CF8"/>
-                    </linearGradient>
-                    <linearGradient id="cloud-grad-pcn" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#94A3B8"/>
-                        <stop offset="100%" stop-color="#475569"/>
-                    </linearGradient>
-                </defs>
-                <path d="M 18 6 A 8 8 0 1 0 22 20 A 7.5 7.5 0 0 1 18 6 Z" fill="url(#moon-grad-pcn)" stroke="#6366F1" stroke-width="1"/>
-                <path d="M 12 28 C 9.2 28 7 25.8 7 23 C 7 20.5 8.8 18.5 11.2 18.1 C 12.2 14.5 15.5 12 19.5 12 C 24.2 12 28 15.8 28 20.5 C 28 20.8 28 21.1 27.9 21.4 C 29.7 22.1 31 23.9 31 26 C 31 28.8 28.8 31 26 31 L 12 31 Z" fill="url(#cloud-grad-pcn)" stroke="#64748B" stroke-width="1.2"/>
-            </svg>`;
-
-        case 'cloudy':
-            return `
-            <svg class="w-10 h-10 shrink-0" viewBox="0 0 36 36" fill="none">
-                <defs>
-                    <linearGradient id="cloud-back" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#CBD5E1"/>
-                        <stop offset="100%" stop-color="#94A3B8"/>
-                    </linearGradient>
-                    <linearGradient id="cloud-front" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#FFFFFF"/>
-                        <stop offset="100%" stop-color="#E2E8F0"/>
-                    </linearGradient>
-                </defs>
-                <path d="M 16 23 C 13.8 23 12 21.2 12 19 C 12 17 13.5 15.3 15.4 15 C 16.2 12.1 18.8 10 22 10 C 25.8 10 28.9 13.1 28.9 16.9 C 28.9 17.1 28.9 17.3 28.8 17.5 C 30.1 18.1 31 19.5 31 21 C 31 23.2 29.2 25 27 25 L 16 25 Z" fill="url(#cloud-back)" stroke="#64748B" stroke-width="1"/>
-                <path d="M 10 28 C 7.5 28 5.5 26 5.5 23.5 C 5.5 21.2 7.1 19.4 9.3 19 C 10.2 15.8 13.1 13.5 16.6 13.5 C 20.7 13.5 24.1 16.9 24.1 21 C 24.1 21.3 24.1 21.5 24 21.8 C 25.6 22.4 26.7 24 26.7 25.8 C 26.7 28.2 24.8 30.1 22.4 30.1 L 10 30.1 Z" fill="url(#cloud-front)" stroke="#94A3B8" stroke-width="1.2"/>
-            </svg>`;
-
-        case 'rain':
-            return `
-            <svg class="w-10 h-10 shrink-0" viewBox="0 0 36 36" fill="none">
-                <defs>
-                    <linearGradient id="cloud-rain" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#E2E8F0"/>
-                        <stop offset="100%" stop-color="#94A3B8"/>
-                    </linearGradient>
-                    <linearGradient id="rain-drop" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#38BDF8"/>
-                        <stop offset="100%" stop-color="#0284C7"/>
-                    </linearGradient>
-                </defs>
-                <path d="M 10 22 C 7.5 22 5.5 20 5.5 17.5 C 5.5 15.2 7.1 13.4 9.3 13 C 10.2 9.8 13.1 7.5 16.6 7.5 C 20.7 7.5 24.1 10.9 24.1 15 C 24.1 15.3 24.1 15.5 24 15.8 C 25.6 16.4 26.7 18 26.7 19.8 C 26.7 22.2 24.8 24.1 22.4 24.1 L 10 24.1 Z" fill="url(#cloud-rain)" stroke="#64748B" stroke-width="1.2"/>
-                <g stroke="url(#rain-drop)" stroke-width="2" stroke-linecap="round">
-                    <line x1="12" y1="26" x2="10" y2="31"/>
-                    <line x1="18" y1="26" x2="16" y2="31"/>
-                    <line x1="24" y1="26" x2="22" y2="31"/>
-                </g>
-            </svg>`;
-
-        case 'thunderstorm':
-            return `
-            <svg class="w-10 h-10 shrink-0" viewBox="0 0 36 36" fill="none">
-                <defs>
-                    <linearGradient id="cloud-storm" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#475569"/>
-                        <stop offset="100%" stop-color="#1E293B"/>
-                    </linearGradient>
-                    <linearGradient id="bolt-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#FFFBEB"/>
-                        <stop offset="50%" stop-color="#FBBF24"/>
-                        <stop offset="100%" stop-color="#F59E0B"/>
-                    </linearGradient>
-                    <filter id="bolt-glow" x="-20%" y="-20%" width="140%" height="140%">
-                        <feGaussianBlur stdDeviation="1" result="blur"/>
-                        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-                    </filter>
-                </defs>
-                <path d="M 10 21 C 7.5 21 5.5 19 5.5 16.5 C 5.5 14.2 7.1 12.4 9.3 12 C 10.2 8.8 13.1 6.5 16.6 6.5 C 20.7 6.5 24.1 9.9 24.1 14 C 24.1 14.3 24.1 14.5 24 14.8 C 25.6 15.4 26.7 17 26.7 18.8 C 26.7 21.2 24.8 23.1 22.4 23.1 L 10 23.1 Z" fill="url(#cloud-storm)" stroke="#334155" stroke-width="1.2"/>
-                <polygon points="18,18 13.5,25 17.5,25 15,32 23,23 19,23" fill="url(#bolt-grad)" stroke="#D97706" stroke-width="0.75" filter="url(#bolt-glow)"/>
-            </svg>`;
-
-        case 'snow':
-            return `
-            <svg class="w-10 h-10 shrink-0" viewBox="0 0 36 36" fill="none">
-                <defs>
-                    <linearGradient id="cloud-snow" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#FFFFFF"/>
-                        <stop offset="100%" stop-color="#CBD5E1"/>
-                    </linearGradient>
-                </defs>
-                <path d="M 10 22 C 7.5 22 5.5 20 5.5 17.5 C 5.5 15.2 7.1 13.4 9.3 13 C 10.2 9.8 13.1 7.5 16.6 7.5 C 20.7 7.5 24.1 10.9 24.1 15 C 24.1 15.3 24.1 15.5 24 15.8 C 25.6 16.4 26.7 18 26.7 19.8 C 26.7 22.2 24.8 24.1 22.4 24.1 L 10 24.1 Z" fill="url(#cloud-snow)" stroke="#94A3B8" stroke-width="1.2"/>
-                <g stroke="#38BDF8" stroke-width="1.5" stroke-linecap="round">
-                    <line x1="11" y1="26" x2="11" y2="30"/>
-                    <line x1="9" y1="28" x2="13" y2="28"/>
-                    <line x1="18" y1="26" x2="18" y2="30"/>
-                    <line x1="16" y1="28" x2="20" y2="28"/>
-                    <line x1="25" y1="26" x2="25" y2="30"/>
-                    <line x1="23" y1="28" x2="27" y2="28"/>
-                </g>
-            </svg>`;
-
-        case 'fog':
-            return `
-            <svg class="w-10 h-10 shrink-0" viewBox="0 0 36 36" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round">
-                <line x1="8" y1="12" x2="28" y2="12" opacity="0.6"/>
-                <line x1="5" y1="17" x2="31" y2="17" opacity="0.9"/>
-                <line x1="8" y1="22" x2="28" y2="22" opacity="0.75"/>
-                <line x1="11" y1="27" x2="25" y2="27" opacity="0.5"/>
-            </svg>`;
-
-        default:
-            return `
-            <svg class="w-10 h-10 shrink-0" viewBox="0 0 36 36" fill="none">
-                <circle cx="18" cy="18" r="7" fill="#FBBF24" stroke="#F59E0B" stroke-width="1.5"/>
-            </svg>`;
-    }
-}
-
-// --- DYNAMIC WEATHER THEME COLORS ---
-function getWeatherStyle(weatherCode, isDay, temp) {
-    const isFreezing = (temp <= 0);
-    let category = 'clear';
-    
-    if (weatherCode === 0 || weatherCode === 1) category = 'clear';
-    else if (weatherCode === 2) category = 'partly-cloudy';
-    else if (weatherCode === 3) category = 'overcast';
-    else if (weatherCode === 45 || weatherCode === 48) category = 'fog';
-    else if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(weatherCode)) category = 'rain';
-    else if ([56, 57, 66, 67, 71, 73, 75, 77, 85, 86].includes(weatherCode) || isFreezing) category = 'snow';
-    else if ([95, 96, 99].includes(weatherCode)) category = 'thunderstorm';
-
-    if (category === 'clear' && isDay) {
-        return {
-            classes: "bg-gradient-to-br from-sky-400/20 via-blue-200/25 to-amber-100/35 border-sky-300/60 shadow-sky-500/10 dark:from-[#0c2340]/90 dark:via-[#0a1b32]/85 dark:to-[#040e1b]/90 dark:border-sky-700/50 dark:shadow-sky-950/40",
-            glowColor: "bg-amber-400",
-            icon: "clear-day"
-        };
-    }
-    if (category === 'clear' && !isDay) {
-        return {
-            classes: "bg-gradient-to-br from-indigo-100/75 via-slate-100/75 to-purple-100/50 border-indigo-200/60 shadow-indigo-500/10 dark:from-[#0a0e20]/90 dark:via-[#101432]/85 dark:to-[#060814]/90 dark:border-indigo-900/50 dark:shadow-indigo-950/50",
-            glowColor: "bg-indigo-500",
-            icon: "clear-night"
-        };
-    }
-    if (category === 'partly-cloudy' && isDay) {
-        return {
-            classes: "bg-gradient-to-br from-sky-100/85 via-slate-100/75 to-amber-50/65 border-sky-200/70 shadow-blue-500/10 dark:from-[#0f172a]/85 dark:via-[#182338]/80 dark:to-[#0c121e]/90 dark:border-slate-700/50 dark:shadow-black/40",
-            glowColor: "bg-sky-400",
-            icon: "partly-cloudy-day"
-        };
-    }
-    if (category === 'partly-cloudy' && !isDay) {
-        return {
-            classes: "bg-gradient-to-br from-slate-200/75 via-indigo-50/75 to-slate-100/75 border-slate-300/60 shadow-slate-500/10 dark:from-[#0d1322]/90 dark:via-[#131b2e]/85 dark:to-[#080c14]/90 dark:border-slate-800/60 dark:shadow-black/50",
-            glowColor: "bg-indigo-600",
-            icon: "partly-cloudy-night"
-        };
-    }
-    if (category === 'overcast') {
-        return {
-            classes: "bg-gradient-to-br from-slate-200/85 via-gray-100/75 to-slate-200/65 border-slate-300/70 shadow-slate-400/10 dark:from-[#181d26]/90 dark:via-[#202632]/85 dark:to-[#12161d]/90 dark:border-slate-700/50 dark:shadow-black/50",
-            glowColor: "bg-slate-500",
-            icon: "cloudy"
-        };
-    }
-    if (category === 'rain') {
-        return {
-            classes: "bg-gradient-to-br from-blue-200/75 via-cyan-100/75 to-slate-200/65 border-blue-300/60 shadow-blue-500/10 dark:from-[#082034]/90 dark:via-[#0c2a44]/85 dark:to-[#051320]/90 dark:border-cyan-800/50 dark:shadow-cyan-950/40",
-            glowColor: "bg-cyan-500",
-            icon: "rain"
-        };
-    }
-    if (category === 'snow') {
-        return {
-            classes: "bg-gradient-to-br from-cyan-100/80 via-blue-50/85 to-slate-100/75 border-cyan-300/60 shadow-cyan-500/10 dark:from-[#07202d]/90 dark:via-[#0e2e3f]/85 dark:to-[#06141d]/90 dark:border-cyan-700/50 dark:shadow-cyan-950/50",
-            glowColor: "bg-cyan-400",
-            icon: "snow"
-        };
-    }
-    if (category === 'thunderstorm') {
-        return {
-            classes: "bg-gradient-to-br from-purple-200/75 via-slate-200/75 to-amber-100/55 border-purple-300/60 shadow-purple-500/10 dark:from-[#18102b]/90 dark:via-[#23153c]/85 dark:to-[#0f0a1b]/90 dark:border-purple-800/50 dark:shadow-purple-950/50",
-            glowColor: "bg-purple-600",
-            icon: "thunderstorm"
-        };
-    }
-    if (category === 'fog') {
-        return {
-            classes: "bg-gradient-to-br from-stone-200/75 via-neutral-100/75 to-stone-200/55 border-stone-300/60 shadow-stone-500/10 dark:from-[#1b1c20]/90 dark:via-[#23262a]/85 dark:to-[#131416]/90 dark:border-neutral-700/40 dark:shadow-black/50",
-            glowColor: "bg-neutral-500",
-            icon: "fog"
-        };
-    }
-
-    return {
-        classes: "bg-white/70 dark:bg-neutral-900/40 border-neutral-200/80 dark:border-neutral-800/60 shadow-lg shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/50",
-        glowColor: "bg-sky-400",
-        icon: "clear-day"
-    };
-}
-
-// --- WEATHER WARNINGS GENERATOR (IN ENGLISH) ---
-function generateWeatherWarnings(current, daily) {
-    const warnings = [];
-    const temp = current.temperature_2m;
-    const apparent = current.apparent_temperature;
-    const windSpeed = current.wind_speed_10m;
-    const windGusts = current.wind_gusts_10m;
-    const maxWindGusts = (daily && daily.wind_gusts_10m_max && daily.wind_gusts_10m_max[0]) ? daily.wind_gusts_10m_max[0] : windGusts;
-    const minTemp = (daily && daily.temperature_2m_min && daily.temperature_2m_min[0] !== undefined) ? daily.temperature_2m_min[0] : temp;
-    const weatherCode = current.weather_code;
-
-    // 1. Frost Warning
-    if (temp <= -10 || apparent <= -12) {
-        warnings.push({
-            type: 'frost-severe',
-            icon: '❄️',
-            badge: 'EXTREME FROST',
-            badgeBg: 'bg-blue-500/20 text-blue-600 dark:text-cyan-300 border-blue-500/30',
-            text: `Temperature ${temp.toFixed(1)}°C (feels like ${apparent.toFixed(1)}°C). Severe frostbite danger.`
-        });
-    } else if (temp <= 0 || minTemp <= 0 || apparent <= 0) {
-        warnings.push({
-            type: 'frost',
-            icon: '❄️',
-            badge: 'FROST WARNING',
-            badgeBg: 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-500/30',
-            text: temp <= 0 
-                ? `Freezing temp ${temp.toFixed(1)}°C (min ${minTemp.toFixed(1)}°C). Watch for frost on roads.`
-                : `Overnight frost expected with temperatures dropping to ${minTemp.toFixed(1)}°C.`
-        });
-    }
-
-    // 2. Black Ice / Freezing Rain
-    if ([56, 57, 66, 67].includes(weatherCode) || (current.precipitation > 0 && temp <= 0.5)) {
-        warnings.push({
-            type: 'ice',
-            icon: '🧊',
-            badge: 'BLACK ICE',
-            badgeBg: 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-500/30',
-            text: 'Danger of black ice and slippery road conditions due to freezing precipitation.'
-        });
-    }
-
-    // 3. High Wind / Gale Warning
-    if (windGusts >= 75 || maxWindGusts >= 80 || windSpeed >= 50) {
-        warnings.push({
-            type: 'gale',
-            icon: '🌪️',
-            badge: 'GALE WARNING',
-            badgeBg: 'bg-red-500/20 text-red-600 dark:text-red-300 border-red-500/30',
-            text: `Violent winds! Gusts up to ${Math.round(Math.max(windGusts, maxWindGusts))} km/h.`
-        });
-    } else if (windGusts >= 45 || maxWindGusts >= 50 || windSpeed >= 30) {
-        warnings.push({
-            type: 'wind',
-            icon: '💨',
-            badge: 'STRONG WIND',
-            badgeBg: 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30',
-            text: `High winds: gusts up to ${Math.round(Math.max(windGusts, maxWindGusts))} km/h (avg ${Math.round(windSpeed)} km/h).`
-        });
-    }
-
-    // 4. Thunderstorm
-    if ([95, 96, 99].includes(weatherCode)) {
-        warnings.push({
-            type: 'storm',
-            icon: '⚡',
-            badge: 'THUNDERSTORM',
-            badgeBg: 'bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30',
-            text: 'Lightning activity with potential for heavy downpours or hail.'
-        });
-    }
-
-    // 5. Heavy Rain
-    if ([65, 82].includes(weatherCode) || current.precipitation >= 5) {
-        warnings.push({
-            type: 'heavy-rain',
-            icon: '🌧️',
-            badge: 'HEAVY RAIN',
-            badgeBg: 'bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30',
-            text: `Heavy rain (${current.precipitation.toFixed(1)} mm/h). Reduced visibility.`
-        });
-    }
-
-    // 6. Excessive Heat
-    if (temp >= 32 || apparent >= 35) {
-        warnings.push({
-            type: 'heat',
-            icon: '🔥',
-            badge: 'HEAT WARNING',
-            badgeBg: 'bg-orange-500/20 text-orange-700 dark:text-orange-300 border-orange-500/30',
-            text: `High ambient temperature (${temp.toFixed(1)}°C, feels like ${apparent.toFixed(1)}°C).`
-        });
-    }
-
-    // 7. Heavy Snow
-    if ([73, 75, 85, 86].includes(weatherCode)) {
-        warnings.push({
-            type: 'snow-heavy',
-            icon: '🌨️',
-            badge: 'HEAVY SNOW',
-            badgeBg: 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-500/30',
-            text: 'Heavy snowfall with danger of snowdrift accumulation.'
-        });
-    }
-
-    return warnings;
-}
-
 // --- SOLAR ZENITH CALCULATION ---
 function isDaytime(lat, lng, now = new Date()) {
     const rad = Math.PI / 180;
@@ -868,20 +391,19 @@ function setWeatherTheme(mode, skipSave = false) {
     } else if (mode === 'dark') {
         isDark = true;
     } else if (mode === 'solar') {
-        if (window.weatherData && window.weatherData.current && window.weatherData.current.is_day !== undefined) {
-            isDark = (window.weatherData.current.is_day === 0);
-        } else {
-            const coordsRaw = localStorage.getItem('weather_coords') || localStorage.getItem('smart_theme_coords');
-            if (coordsRaw) {
-                try {
-                    const coords = JSON.parse(coordsRaw);
-                    isDark = !isDaytime(coords.lat, coords.lng, new Date());
-                } catch(e) {
-                    isDark = true;
-                }
-            } else {
-                isDark = true;
+        const coordsRaw = localStorage.getItem('weather_coords') || localStorage.getItem('smart_theme_coords');
+        if (coordsRaw) {
+            try {
+                const coords = JSON.parse(coordsRaw);
+                isDark = !isDaytime(coords.lat, coords.lng, new Date());
+            } catch(e) {
+                isDark = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : true;
             }
+        } else if (window.matchMedia) {
+            isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        } else {
+            const h = new Date().getHours();
+            isDark = (h < 6 || h >= 19);
         }
     }
 
@@ -901,9 +423,6 @@ function setWeatherTheme(mode, skipSave = false) {
         applyCardData(window.fullData);
     } else {
         resetCardUI();
-    }
-    if (window.weatherData) {
-        applyWeatherStyling(window.weatherData);
     }
 }
 
@@ -936,7 +455,7 @@ function updateThemeSegmentedUI() {
 
     if (solarLabel) {
         if (mode === 'solar') {
-            const isDay = window.weatherData?.current ? (window.weatherData.current.is_day === 1) : !isDark;
+            const isDay = !isDark;
             solarLabel.innerText = isDay ? "Auto Day" : "Auto Night";
             if (solarDot) {
                 solarDot.className = isDay 
@@ -972,288 +491,6 @@ function updateThemeSegmentedUI() {
 function toggleTheme() {
     const currentlyDark = isDarkMode();
     setWeatherTheme(currentlyDark ? 'light' : 'dark');
-}
-
-// --- REVERSE GEOCODING (IN ENGLISH) ---
-async function getCityNameFromCoords(lat, lng) {
-    try {
-        const controller = new AbortController();
-        const tId = setTimeout(() => controller.abort(), 2500);
-        const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`, { signal: controller.signal });
-        clearTimeout(tId);
-        if (res.ok) {
-            const data = await res.json();
-            const city = data.city || data.locality || data.principalSubdivision;
-            if (city) return city;
-        }
-    } catch(e) {}
-
-    try {
-        const controller = new AbortController();
-        const tId = setTimeout(() => controller.abort(), 2500);
-        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`, {
-            headers: { 'Accept-Language': 'en' },
-            signal: controller.signal
-        });
-        clearTimeout(tId);
-        if (res.ok) {
-            const data = await res.json();
-            const addr = data.address || {};
-            const city = addr.city || addr.town || addr.village || addr.municipality || addr.county;
-            if (city) return city;
-        }
-    } catch(e) {}
-
-    return "Current Location";
-}
-
-// --- APPLY WEATHER DATA TO UI ---
-function applyWeatherStyling(data) {
-    const widget = document.getElementById('weather-widget');
-    const glow = document.getElementById('weather-ambient-glow');
-    if (!widget || !data || !data.current) return;
-
-    const weatherCode = data.current.weather_code;
-    const isDay = (data.current.is_day === 1);
-    const temp = data.current.temperature_2m;
-    const style = getWeatherStyle(weatherCode, isDay, temp);
-
-    widget.className = `relative overflow-hidden p-4 md:p-5 rounded-2xl md:rounded-3xl border ${style.classes} backdrop-blur-xl transition-all duration-700 mb-3 select-none`;
-    if (glow) {
-        glow.className = `absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none opacity-30 transition-all duration-1000 ${style.glowColor}`;
-    }
-
-    const iconWrapper = document.getElementById('weather-icon-wrapper');
-    if (iconWrapper) {
-        iconWrapper.innerHTML = getWeatherIconSvg(style.icon);
-    }
-}
-
-async function renderWeatherData(data, cityName = null) {
-    window.weatherData = data;
-    try {
-        localStorage.setItem('cached_weather_data', JSON.stringify(data));
-    } catch(e) {}
-    const current = data.current;
-    const daily = data.daily;
-    if (!current) return;
-
-    const cond = WEATHER_CONDITIONS[current.weather_code] || { label: 'Cloudy', category: 'cloudy' };
-    const tempRounded = Math.round(current.temperature_2m);
-    const apparentRounded = Math.round(current.apparent_temperature);
-    const tempMax = (daily && daily.temperature_2m_max && daily.temperature_2m_max[0] !== undefined) ? Math.round(daily.temperature_2m_max[0]) : tempRounded;
-    const tempMin = (daily && daily.temperature_2m_min && daily.temperature_2m_min[0] !== undefined) ? Math.round(daily.temperature_2m_min[0]) : tempRounded;
-
-    if (cityName) {
-        const cityEl = document.getElementById('weather-city');
-        if (cityEl) {
-            cityEl.innerText = cityName;
-            cityEl.title = cityName;
-        }
-    }
-
-    const tempEl = document.getElementById('weather-temp');
-    if (tempEl) tempEl.innerHTML = `${tempRounded}°`;
-
-    const descEl = document.getElementById('weather-desc');
-    if (descEl) descEl.innerText = cond.label;
-
-    const rangeEl = document.getElementById('weather-temp-range');
-    if (rangeEl) rangeEl.innerText = `H: ${tempMax}° L: ${tempMin}°`;
-
-    const apparentInlineEl = document.getElementById('weather-apparent-inline');
-    if (apparentInlineEl) apparentInlineEl.innerText = `Feels like ${apparentRounded}°`;
-
-    // Render secondary metrics bar (Warnings or stats)
-    const warnings = generateWeatherWarnings(current, daily);
-    const secondaryBarEl = document.getElementById('weather-alerts-and-stats');
-    if (secondaryBarEl) {
-        if (warnings.length > 0) {
-            const w = warnings[0];
-            const extraCount = warnings.length > 1 ? ` (+${warnings.length - 1})` : '';
-            secondaryBarEl.innerHTML = `
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 w-full min-w-0">
-                    <div class="flex items-start sm:items-center gap-2 min-w-0 flex-1">
-                        <span class="px-2 py-0.5 rounded-lg text-[0.6rem] font-bold uppercase tracking-wider ${w.badgeBg} border shrink-0 flex items-center gap-1 mt-0.5 sm:mt-0">
-                            <span>${w.icon}</span>
-                            <span>${w.badge}${extraCount}</span>
-                        </span>
-                        <span class="text-xs text-neutral-700 dark:text-neutral-300 font-medium leading-snug break-words">
-                            ${w.text}
-                        </span>
-                    </div>
-                    <div class="text-xs text-neutral-500 dark:text-neutral-400 shrink-0 font-medium flex items-center gap-1 self-start sm:self-auto sm:ml-2">
-                        <span>💨</span> <span>${Math.round(current.wind_speed_10m)} km/h</span>
-                    </div>
-                </div>
-            `;
-        } else {
-            const srDate = daily?.sunrise?.[0] ? new Date(daily.sunrise[0]) : null;
-            const ssDate = daily?.sunset?.[0] ? new Date(daily.sunset[0]) : null;
-            const isDay = (current.is_day === 1);
-            const sunTime = isDay 
-                ? (ssDate && !isNaN(ssDate.getTime()) ? ssDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--')
-                : (srDate && !isNaN(srDate.getTime()) ? srDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--');
-            const sunIcon = isDay ? '🌙' : '☀️';
-            const sunLabel = isDay ? 'Sunset' : 'Sunrise';
-
-            secondaryBarEl.innerHTML = `
-                <div class="grid grid-cols-2 min-[420px]:grid-cols-4 gap-2 w-full text-xs text-neutral-600 dark:text-neutral-400">
-                    <div class="flex items-center gap-1.5 min-w-0">
-                        <span>💨</span> <span class="font-medium text-neutral-800 dark:text-neutral-200 truncate">${Math.round(current.wind_speed_10m)} km/h</span>
-                    </div>
-                    <div class="flex items-center gap-1.5 min-w-0">
-                        <span>💧</span> <span class="font-medium text-neutral-800 dark:text-neutral-200 truncate">${Math.round(current.relative_humidity_2m)}%</span>
-                    </div>
-                    <div class="flex items-center gap-1.5 min-w-0">
-                        <span>🌧️</span> <span class="font-medium text-neutral-800 dark:text-neutral-200 truncate">${current.precipitation.toFixed(1)} mm</span>
-                    </div>
-                    <div class="flex items-center gap-1.5 min-w-0">
-                        <span>${sunIcon}</span> <span class="font-medium text-neutral-800 dark:text-neutral-200 truncate">${sunLabel} ${sunTime}</span>
-                    </div>
-                </div>
-            `;
-        }
-    }
-
-    // Apply Apple Weather styling
-    applyWeatherStyling(data);
-
-    // If in solar mode, synchronize dark/light mode
-    if (window.currentThemeMode === 'solar') {
-        const isDark = (current.is_day === 0);
-        if (isDark) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-        localStorage.setItem('trading_theme', isDark ? 'dark' : 'light');
-        updateThemeSegmentedUI();
-        updateMacroButtonsUI(window.currentMacroView);
-        updateCoinButtonsUI(window.currentCoin);
-        updateSkeletonGrid();
-        if (window.fullData) {
-            updateChart(window.currentMacroView);
-            applyCardData(window.fullData);
-        }
-    }
-}
-
-// --- FETCH WEATHER FROM OPEN-METEO ---
-async function fetchWeatherData(lat, lng) {
-    try {
-        const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,wind_speed_10m_max,wind_gusts_10m_max,sunrise,sunset&timezone=auto&forecast_days=2`;
-        const res = await fetch(apiUrl);
-        if (!res.ok) throw new Error("Weather fetch failed");
-        const data = await res.json();
-        
-        const cachedCity = localStorage.getItem('weather_city');
-        let city = cachedCity;
-        if (!city || city === "Current Location" || city === "Moja poloha") {
-            city = await getCityNameFromCoords(lat, lng);
-            if (city) localStorage.setItem('weather_city', city);
-        }
-        
-        await renderWeatherData(data, city);
-        return data;
-    } catch(err) {
-        console.warn("Error fetching weather:", err);
-    }
-}
-
-// --- LOCATION MANAGEMENT & REFRESH ---
-async function refreshWeatherLocation(forcePrompt = false) {
-    const spinner = document.getElementById('weather-locate-spinner');
-    if (spinner) spinner.classList.add('animate-spin-reverse');
-
-    const handleCoordsSuccess = async (lat, lng, sourceCity = null) => {
-        localStorage.setItem('weather_coords', JSON.stringify({ lat, lng, time: Date.now() }));
-        localStorage.setItem('smart_theme_coords', JSON.stringify({ lat, lng, time: Date.now() }));
-        
-        let city = sourceCity;
-        if (!city) {
-            city = await getCityNameFromCoords(lat, lng);
-        }
-        if (city) {
-            localStorage.setItem('weather_city', city);
-            const cityEl = document.getElementById('weather-city');
-            if (cityEl) {
-                cityEl.innerText = city;
-                cityEl.title = city;
-            }
-        }
-
-        await fetchWeatherData(lat, lng);
-        if (spinner) spinner.classList.remove('animate-spin-reverse');
-    };
-
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            async (pos) => {
-                await handleCoordsSuccess(pos.coords.latitude, pos.coords.longitude);
-            },
-            async (err) => {
-                console.warn("Geolocation prompt error or denied, falling back to IP:", err);
-                try {
-                    const ipRes = await fetch("https://ipwho.is/");
-                    if (ipRes.ok) {
-                        const ipData = await ipRes.json();
-                        if (ipData && ipData.latitude && ipData.longitude) {
-                            await handleCoordsSuccess(ipData.latitude, ipData.longitude, ipData.city);
-                            return;
-                        }
-                    }
-                } catch(e) {}
-                if (spinner) spinner.classList.remove('animate-spin-reverse');
-            },
-            { timeout: 7000, enableHighAccuracy: forcePrompt }
-        );
-    } else {
-        try {
-            const ipRes = await fetch("https://ipwho.is/");
-            if (ipRes.ok) {
-                const ipData = await ipRes.json();
-                if (ipData && ipData.latitude && ipData.longitude) {
-                    await handleCoordsSuccess(ipData.latitude, ipData.longitude, ipData.city);
-                    return;
-                }
-            }
-        } catch(e) {}
-        if (spinner) spinner.classList.remove('animate-spin-reverse');
-    }
-}
-
-async function initWeatherWidget() {
-    updateThemeSegmentedUI();
-    const coordsRaw = localStorage.getItem('weather_coords') || localStorage.getItem('smart_theme_coords');
-    const cachedCity = localStorage.getItem('weather_city');
-
-    if (cachedCity) {
-        const cityEl = document.getElementById('weather-city');
-        if (cityEl) {
-            cityEl.innerText = cachedCity;
-            cityEl.title = cachedCity;
-        }
-    }
-
-    const cachedWeatherRaw = localStorage.getItem('cached_weather_data');
-    if (cachedWeatherRaw) {
-        try {
-            const cachedData = JSON.parse(cachedWeatherRaw);
-            if (cachedData) renderWeatherData(cachedData, cachedCity);
-        } catch(e) {}
-    }
-
-    if (coordsRaw) {
-        try {
-            const coords = JSON.parse(coordsRaw);
-            await fetchWeatherData(coords.lat, coords.lng);
-            return;
-        } catch(e) {}
-    }
-
-    // Auto-detect location seamlessly on first visit
-    await refreshWeatherLocation(false);
 }
 
 // --- DASHBOARD LOGIC ---
@@ -1745,7 +982,7 @@ function toggleDisclaimer(e) {
         box.style.maxHeight = box.offsetHeight + 'px';
         void box.offsetHeight;
         box.classList.remove('is-expanded');
-        box.style.maxHeight = '1.85rem';
+        box.style.maxHeight = '2.5rem';
         if (chevron) chevron.classList.remove('rotate-180');
         if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
     } else {
@@ -1761,8 +998,12 @@ function initDisclaimer() {
     const box = document.getElementById('disclaimer-box');
     if (!box) return;
     box.addEventListener('transitionend', (e) => {
-        if (e.propertyName === 'max-height' && box.classList.contains('is-expanded')) {
-            box.style.maxHeight = 'none';
+        if (e.propertyName === 'max-height') {
+            if (box.classList.contains('is-expanded')) {
+                box.style.maxHeight = 'none';
+            } else {
+                box.style.maxHeight = '';
+            }
         }
     });
 }
@@ -1777,7 +1018,6 @@ window.addEventListener('resize', () => {
 window.addEventListener('DOMContentLoaded', () => { 
     updateSkeletonGrid(); 
     initUI(); 
-    initWeatherWidget();
     triggerAnalysis(); 
     initDisclaimer();
 });
