@@ -30,14 +30,12 @@
             max-height: 2.5rem;
             overflow: hidden;
             transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
-            mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 1.25rem, transparent 1.25rem),
-                                linear-gradient(to right, #000 0%, #000 35%, transparent 80%);
-            mask-image: linear-gradient(to bottom, #000 0, #000 1.25rem, transparent 1.25rem),
-                        linear-gradient(to right, #000 0%, #000 35%, transparent 80%);
-            -webkit-mask-composite: source-over;
-            mask-composite: add;
+            -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
+            mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
+            text-align: justify;
+            text-justify: inter-word;
+            hyphens: auto;
+            -webkit-hyphens: auto;
             cursor: pointer;
         }
         #disclaimer-box:not(.is-expanded):hover {
@@ -282,8 +280,10 @@
             <!-- SECTION 4: DISCLAIMER (INSIDE CRYPTO WIDGET AT THE VERY BOTTOM) -->
             <div class="border-t border-black/5 dark:border-white/10 pt-3 mt-3 relative z-10 select-none">
                 <div id="disclaimer-box" 
+                     lang="en"
                      onclick="if (!this.classList.contains('is-expanded')) toggleDisclaimer(event);" 
-                     class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed text-left transition-colors duration-200" 
+                     class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed text-justify hyphens-auto transition-colors duration-200" 
+                     style="text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;"
                      title="Click to expand disclaimer">
                     <button type="button" 
                             id="disclaimer-toggle-btn" 
