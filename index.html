@@ -205,11 +205,11 @@
                     </div>
                     <div class="flex items-center gap-1.5">
                         <!-- CYCLE PHASE BADGE (HODL / DCA IN / DCA OUT) -->
-                        <div id="badge-phase" class="border border-neutral-200 dark:border-neutral-800/80 bg-neutral-100 dark:bg-neutral-800/50 px-2.5 h-8 flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-xs uppercase tracking-wider">
+                        <div id="badge-phase" class="border border-neutral-200 dark:border-neutral-800/80 bg-neutral-100 dark:bg-neutral-800/50 px-2.5 h-8 w-[4.5rem] flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-xs uppercase tracking-wider">
                             HODL
                         </div>
                         <!-- SCORE VALUE LARGE -->
-                        <div id="val-score-large" class="text-3xl font-bold tracking-tight leading-none text-neutral-900 dark:text-white transition-all duration-1000 whitespace-nowrap">
+                        <div id="val-score-large" class="text-3xl font-bold tracking-tight leading-none text-neutral-900 dark:text-white transition-all duration-1000 whitespace-nowrap w-[4.5rem] flex justify-end">
                             <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-lg px-1">00.0%</span>
                         </div>
                     </div>
@@ -241,7 +241,7 @@
                 <!-- CHART HEADER: DYNAMIC TITLE & TIMEFRAME BUTTONS -->
                 <div class="flex items-center justify-between mb-2.5 text-xs uppercase tracking-wider h-8 gap-2">
                     <div class="flex-1 flex items-center text-left min-w-0">
-                        <span id="dynamic-title" class="text-xs font-semibold uppercase tracking-wider px-2.5 h-8 flex items-center rounded-lg bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm transition-colors duration-500 whitespace-nowrap shrink-0">
+                        <span id="dynamic-title" class="text-xs font-semibold uppercase tracking-wider px-2.5 h-8 flex justify-center items-center rounded-lg bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm transition-colors duration-500 whitespace-nowrap shrink-0 w-12">
                             4Y
                         </span>
                     </div>
@@ -507,6 +507,13 @@ function initUI() {
     updateMacroButtonsUI(window.currentMacroView);
     updateCoinButtonsUI(window.currentCoin);
     updateThemeSegmentedUI();
+
+    const dTitle = document.getElementById('dynamic-title');
+    if (dTitle) dTitle.innerText = window.currentMacroView || '4Y';
+    const assetLabel = document.getElementById('price-asset-label');
+    if (assetLabel) assetLabel.innerText = (window.currentCoin === 'ZEC') ? 'Zcash Price' : 'Bitcoin Price';
+    const badgeName = document.getElementById('badge-name');
+    if (badgeName) badgeName.innerText = (window.currentCoin === 'ZEC') ? 'Zcash (ZEC)' : 'Bitcoin (BTC)';
 }
 
 function updateMacroButtonsUI(period) {
@@ -579,8 +586,8 @@ function resetCardUI() {
 
     let pBadge = document.getElementById("badge-phase");
     pBadge.className = isDark 
-        ? "border border-neutral-800/80 bg-neutral-800/50 px-3 h-8 flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-xs uppercase tracking-wider"
-        : "border border-neutral-200 bg-neutral-100 px-3 h-8 flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-xs uppercase tracking-wider";
+            ? "border border-neutral-800/80 bg-neutral-800/50 px-2.5 h-8 flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-xs uppercase tracking-wider w-[4.5rem]"
+            : "border border-neutral-200 bg-neutral-100 px-2.5 h-8 flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-xs uppercase tracking-wider w-[4.5rem]";
     pBadge.style.backgroundColor = "";
     pBadge.style.borderColor = "";
     pBadge.style.color = "";
@@ -862,7 +869,7 @@ function applyCardData(data) {
     }
     
     let pBadge = document.getElementById("badge-phase");
-    pBadge.className = "border px-2.5 h-8 flex items-center justify-center rounded-lg transition-all duration-1000 font-semibold whitespace-nowrap shrink-0 text-xs uppercase tracking-wider";
+    pBadge.className = "border px-2.5 h-8 flex items-center justify-center rounded-lg transition-all duration-1000 font-semibold whitespace-nowrap shrink-0 text-xs uppercase tracking-wider w-[4.5rem]";
     pBadge.style.backgroundColor = activeTier.bgBadge;
     pBadge.style.borderColor = activeTier.border;
     pBadge.style.color = activeTier.full;
