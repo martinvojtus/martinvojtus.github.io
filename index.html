@@ -108,69 +108,69 @@
     <div id="view-dashboard-container" class="animate-fade-in">
 
         <!-- WIDGET 1: THEME CONTROLS (DEDICATED TOP WIDGET) -->
-        <div id="theme-widget" class="relative overflow-hidden p-5 rounded-2xl border border-neutral-200/80 dark:border-neutral-800/60 bg-white/60 dark:bg-neutral-900/50 backdrop-blur-2xl shadow-xl shadow-neutral-200/20 dark:shadow-2xl dark:shadow-black/60 transition-all duration-700 mb-4 select-none flex items-center justify-between gap-3">
+        <div id="theme-widget" class="relative overflow-hidden p-6 rounded-[32px] border border-neutral-200/80 dark:border-neutral-800/60 bg-white/40 dark:bg-neutral-900/40 backdrop-blur-xl shadow-xl shadow-neutral-200/20 dark:shadow-2xl dark:shadow-black/60 transition-all duration-700 mb-5 select-none flex items-center justify-between gap-3">
             
             <!-- DYNAMIC AMBIENT THEME GLOW -->
             <div id="theme-ambient-glow" class="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl pointer-events-none transition-all duration-1000 opacity-20 bg-amber-400 dark:bg-indigo-500"></div>
 
             <!-- LEFT: THEME BRAND & ACTIVE STATUS -->
             <div class="flex items-center gap-2.5 md:gap-3 min-w-0 relative z-10">
-                <div id="theme-icon-box" class="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400/20 to-orange-500/10 dark:from-indigo-500/25 dark:to-purple-500/15 flex items-center justify-center shrink-0 text-amber-600 dark:text-indigo-400 border border-amber-400/30 dark:border-indigo-500/30 transition-all duration-500 shadow-sm">
-                    <svg id="theme-mode-svg" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div id="theme-icon-box" class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400/20 to-orange-500/10 dark:from-indigo-500/25 dark:to-purple-500/15 flex items-center justify-center shrink-0 text-amber-600 dark:text-indigo-400 border border-amber-400/30 dark:border-indigo-500/30 transition-all duration-500 shadow-sm">
+                    <svg id="theme-mode-svg" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                     </svg>
                 </div>
                 <div class="min-w-0 flex flex-col justify-center">
-                    <div class="flex items-center gap-1.5 leading-none">
-                        <span class="text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">Appearance</span>
+                    <div class="flex items-center gap-2 leading-none">
+                        <span class="text-sm font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">Appearance</span>
                         <span id="theme-live-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0 shadow-[0_0_5px_#10b981]"></span>
                     </div>
-                    <div class="mt-0.5 flex items-center gap-1.5 min-w-0">
-                        <span id="theme-status-text" class="text-xs font-semibold text-neutral-900 dark:text-white truncate tracking-tight">Solar Dynamic</span>
-                        <span id="theme-substatus" class="text-xs text-neutral-500 dark:text-neutral-400 font-medium truncate hidden min-[420px]:inline">• Daylight Active</span>
+                    <div class="mt-0.5 flex items-center gap-2 min-w-0">
+                        <span id="theme-status-text" class="text-sm font-semibold text-neutral-900 dark:text-white truncate tracking-tight">Solar Dynamic</span>
+                        <span id="theme-substatus" class="text-sm text-neutral-500 dark:text-neutral-400 font-medium truncate hidden min-[420px]:inline">• Daylight Active</span>
                     </div>
                 </div>
             </div>
 
             <!-- RIGHT: THEME SEGMENTED SELECTOR (AUTO / LIGHT / DARK) -->
-            <div id="theme-segmented-box" class="relative z-10 p-0.5 bg-black/5 dark:bg-white/10 rounded-xl border border-black/5 dark:border-white/10 flex items-center gap-0.5 backdrop-blur-sm text-xs whitespace-nowrap shrink-0">
-                <button type="button" id="theme-btn-solar" onclick="setWeatherTheme('solar'); this.blur();" title="Solar automatic mode based on daylight" class="h-7 px-3 rounded-lg transition-all duration-300 flex items-center gap-1.5 text-xs font-medium">
-                    <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div id="theme-segmented-box" class="relative z-10 p-1.5 bg-black/5 dark:bg-white/10 rounded-2xl border border-black/5 dark:border-white/10 flex items-center gap-2 backdrop-blur-sm text-sm whitespace-nowrap shrink-0">
+                <button type="button" id="theme-btn-solar" onclick="setWeatherTheme('solar'); this.blur();" title="Solar automatic mode based on daylight" class="h-9 px-5 rounded-xl transition-all duration-300 flex items-center gap-2 text-sm font-medium">
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 2l2.4 6.8 6.8 2.4-6.8 2.4L12 20.4l-2.4-6.8-6.8-2.4 6.8-2.4z"></path>
                     </svg>
-                    <span class="font-semibold uppercase tracking-wider text-xs">Auto</span>
+                    <span class="font-semibold uppercase tracking-wider text-sm">Auto</span>
                 </button>
-                <button type="button" id="theme-btn-light" onclick="setWeatherTheme('light'); this.blur();" title="Light mode" class="h-7 px-3 rounded-lg transition-all duration-300 flex items-center gap-1.5 text-xs font-medium">
-                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <button type="button" id="theme-btn-light" onclick="setWeatherTheme('light'); this.blur();" title="Light mode" class="h-9 px-5 rounded-xl transition-all duration-300 flex items-center gap-2 text-sm font-medium">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                         <circle cx="12" cy="12" r="4.5"></circle>
                         <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
                     </svg>
-                    <span class="font-semibold uppercase tracking-wider text-xs hidden min-[480px]:inline">Light</span>
+                    <span class="font-semibold uppercase tracking-wider text-sm hidden min-[480px]:inline">Light</span>
                 </button>
-                <button type="button" id="theme-btn-dark" onclick="setWeatherTheme('dark'); this.blur();" title="Dark mode" class="h-7 px-3 rounded-lg transition-all duration-300 flex items-center gap-1.5 text-xs font-medium">
-                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <button type="button" id="theme-btn-dark" onclick="setWeatherTheme('dark'); this.blur();" title="Dark mode" class="h-9 px-5 rounded-xl transition-all duration-300 flex items-center gap-2 text-sm font-medium">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
-                    <span class="font-semibold uppercase tracking-wider text-xs hidden min-[480px]:inline">Dark</span>
+                    <span class="font-semibold uppercase tracking-wider text-sm hidden min-[480px]:inline">Dark</span>
                 </button>
             </div>
 
         </div>
 
         <!-- WIDGET 2: QUANTITATIVE MODEL WITH INTEGRATED SCORE CHART -->
-        <div id="main-card" class="relative overflow-hidden p-5 rounded-2xl bg-white/60 dark:bg-neutral-900/50 backdrop-blur-2xl border border-neutral-200/80 dark:border-neutral-800/60 shadow-xl shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/60 transition-colors duration-1000 mb-4 select-none">
+        <div id="main-card" class="relative overflow-hidden p-6 rounded-[32px] bg-white/40 dark:bg-neutral-900/40 backdrop-blur-xl border border-neutral-200/80 dark:border-neutral-800/60 shadow-xl shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/60 transition-colors duration-1000 mb-5 select-none">
             
             <!-- DYNAMIC AMBIENT MODEL GLOW -->
             <div id="model-ambient-glow" class="absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none opacity-20 transition-all duration-1000"></div>
 
             <!-- ROW 1: COIN SELECTOR (LEFT) & REFRESH + INDICATOR BADGE (RIGHT) -->
-            <div class="flex justify-between items-center mb-4 text-xs uppercase tracking-wider gap-2 relative z-10">
+            <div class="flex justify-between items-center mb-5 text-sm uppercase tracking-wider gap-2 relative z-10">
                 <!-- COIN TOGGLE SELECTOR -->
-                <div id="coin-toggle-box" class="p-0.5 bg-black/5 dark:bg-white/10 rounded-xl border border-black/5 dark:border-white/10 flex items-center gap-0.5 backdrop-blur-sm whitespace-nowrap">
-                    <button id="coin-btn-BTC" onclick="switchCoin('BTC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="h-7 px-3 rounded-lg text-xs uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap">
+                <div id="coin-toggle-box" class="p-1.5 bg-black/5 dark:bg-white/10 rounded-2xl border border-black/5 dark:border-white/10 flex items-center gap-2 backdrop-blur-sm whitespace-nowrap">
+                    <button id="coin-btn-BTC" onclick="switchCoin('BTC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="h-9 px-5 rounded-xl text-sm uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap">
                         <span>BTC</span>
                     </button>
-                    <button id="coin-btn-ZEC" onclick="switchCoin('ZEC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="h-7 px-3 rounded-lg text-xs uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap">
+                    <button id="coin-btn-ZEC" onclick="switchCoin('ZEC'); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" class="h-9 px-5 rounded-xl text-sm uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap">
                         <span>ZEC</span>
                     </button>
                 </div>
@@ -178,14 +178,14 @@
                 <!-- RIGHT: REFRESH BUTTON & INDICATOR BADGE -->
                 <div class="flex items-center gap-2 shrink-0">
                     <!-- REFRESH BUTTON -->
-                    <button id="btn-refresh" onclick="refreshWindow(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" title="Refresh data" aria-label="Refresh" class="w-7 h-7 flex items-center justify-center rounded-xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/5 dark:border-white/10 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all active:scale-95 shrink-0">
-                        <svg id="btn-refresh-icon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <button id="btn-refresh" onclick="refreshWindow(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" title="Refresh data" aria-label="Refresh" class="w-9 h-9 flex items-center justify-center rounded-2xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/5 dark:border-white/10 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all active:scale-95 shrink-0">
+                        <svg id="btn-refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
                     </button>
 
                     <!-- INDICATOR BADGE -->
-                    <span class="text-xs font-semibold uppercase tracking-wider px-2.5 h-7 flex items-center rounded-lg bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm">
+                    <span class="text-sm font-semibold uppercase tracking-wider px-2.5 h-9 flex items-center rounded-xl bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm">
                         Indicator
                     </span>
                 </div>
@@ -193,36 +193,36 @@
             </div>
             
             <!-- SECTION 1: PRICE & 24H CHANGE -->
-            <div class="relative z-10 mb-4">
-                <div class="text-xs text-neutral-500 dark:text-neutral-400 font-medium uppercase tracking-wider mb-1 flex items-center justify-between">
+            <div class="relative z-10 mb-5">
+                <div class="text-sm text-neutral-500 dark:text-neutral-400 font-medium uppercase tracking-wider mb-1 flex items-center justify-between">
                     <span id="price-asset-label">Bitcoin Price</span>
-                    <span class="text-xs text-neutral-400 dark:text-neutral-500 font-normal">USD</span>
+                    <span class="text-sm text-neutral-400 dark:text-neutral-500 font-normal">USD</span>
                 </div>
                 <div class="flex items-baseline justify-between gap-3 flex-wrap">
-                    <div id="val-price" class="text-3xl font-bold tracking-tight leading-none text-neutral-900 dark:text-white transition-all duration-1000 whitespace-nowrap">
-                        <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-lg">$00,000.00</span>
+                    <div id="val-price" class="text-4xl font-bold tracking-tight leading-none text-neutral-900 dark:text-white transition-all duration-1000 whitespace-nowrap">
+                        <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-xl">$00,000.00</span>
                     </div>
-                    <div id="val-change" class="flex items-center gap-1.5 h-7 whitespace-nowrap text-xs font-medium">
+                    <div id="val-change" class="flex items-center gap-2 h-9 whitespace-nowrap text-sm font-medium">
                         <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-md px-1.5 inline-block h-4">+0.00%</span> 
-                        <span class="bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10 text-neutral-600 dark:text-neutral-300 px-2 h-7 rounded-lg font-semibold flex items-center justify-center text-xs uppercase tracking-wider shrink-0">24H</span>
+                        <span class="bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10 text-neutral-600 dark:text-neutral-300 px-2 h-9 rounded-xl font-semibold flex items-center justify-center text-sm uppercase tracking-wider shrink-0">24H</span>
                     </div>
                 </div>
             </div>
 
             <!-- SECTION 2: CYCLE SCORE (QUANTITATIVE CALCULATION) -->
-            <div class="border-t border-black/5 dark:border-white/10 pt-4 mb-4 relative z-10">
+            <div class="border-t border-black/5 dark:border-white/10 pt-5 mb-5 relative z-10">
                 <div class="flex justify-between items-center mb-2.5">
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-xs font-semibold uppercase tracking-wider text-neutral-700 dark:text-neutral-300">Cycle Score</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-semibold uppercase tracking-wider text-neutral-700 dark:text-neutral-300">Cycle Score</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <!-- CYCLE PHASE BADGE (HODL / DCA IN / DCA OUT) -->
-                        <div id="badge-phase" class="border border-neutral-200 dark:border-neutral-800/80 bg-neutral-100 dark:bg-neutral-800/50 px-2.5 h-7 flex items-center justify-center rounded-lg transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-xs uppercase tracking-wider">
+                        <div id="badge-phase" class="border border-neutral-200 dark:border-neutral-800/80 bg-neutral-100 dark:bg-neutral-800/50 px-2.5 h-9 flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-sm uppercase tracking-wider">
                             HODL
                         </div>
                         <!-- SCORE VALUE LARGE -->
-                        <div id="val-score-large" class="text-3xl font-bold tracking-tight leading-none text-neutral-900 dark:text-white transition-all duration-1000 whitespace-nowrap">
-                            <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-lg px-1">00.0%</span>
+                        <div id="val-score-large" class="text-4xl font-bold tracking-tight leading-none text-neutral-900 dark:text-white transition-all duration-1000 whitespace-nowrap">
+                            <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-xl px-1">00.0%</span>
                         </div>
                     </div>
                 </div>
@@ -232,16 +232,16 @@
                     <div id="animated-score-bar" class="h-full transition-all duration-[1500ms] ease-out rounded-full" style="width: 0%; background-color: transparent;"></div>
                 </div>
                 <!-- ZONES LABELS -->
-                <div class="flex items-center justify-between mt-2.5 px-0.5 text-xs uppercase tracking-wider text-neutral-500 dark:text-neutral-400 select-none whitespace-nowrap font-medium">
-                    <div class="flex items-center gap-1.5 shrink-0">
+                <div class="flex items-center justify-between mt-2.5 px-0.5 text-sm uppercase tracking-wider text-neutral-500 dark:text-neutral-400 select-none whitespace-nowrap font-medium">
+                    <div class="flex items-center gap-2 shrink-0">
                         <span class="w-1.5 h-1.5 rounded-full bg-[#A88468] inline-block shrink-0"></span>
                         <span>DCA IN</span>
                     </div>
-                    <div class="flex items-center gap-1.5 shrink-0">
+                    <div class="flex items-center gap-2 shrink-0">
                         <span class="w-1.5 h-1.5 rounded-full bg-[#F7931A] inline-block shrink-0"></span>
                         <span>HODL</span>
                     </div>
-                    <div class="flex items-center gap-1.5 shrink-0">
+                    <div class="flex items-center gap-2 shrink-0">
                         <span class="w-1.5 h-1.5 rounded-full bg-[#FF4500] inline-block shrink-0"></span>
                         <span>DCA OUT</span>
                     </div>
@@ -249,23 +249,23 @@
             </div>
 
             <!-- SECTION 3: INTEGRATED SCORE CHART SECTION -->
-            <div class="border-t border-black/5 dark:border-white/10 pt-4 relative z-10">
+            <div class="border-t border-black/5 dark:border-white/10 pt-5 relative z-10">
                 <!-- CHART HEADER: DYNAMIC TITLE & TIMEFRAME BUTTONS (ABSOLUTE CENTERED TO PREVENT JUMPING) -->
-                <div class="relative flex justify-between items-center mb-2.5 text-xs uppercase tracking-wider h-7">
-                    <div class="flex items-center gap-1.5 text-left shrink-0 z-10">
-                        <span class="text-xs font-semibold text-neutral-700 dark:text-neutral-300">History</span>
-                        <span id="dynamic-title" class="text-neutral-400 transition-colors duration-500 whitespace-nowrap font-medium text-xs">4Y</span>
+                <div class="relative flex justify-between items-center mb-2.5 text-sm uppercase tracking-wider h-9">
+                    <div class="flex items-center gap-2 text-left shrink-0 z-10">
+                        <span class="text-sm font-semibold text-neutral-700 dark:text-neutral-300">History</span>
+                        <span id="dynamic-title" class="text-neutral-400 transition-colors duration-500 whitespace-nowrap font-medium text-sm">4Y</span>
                     </div>
                     
                     <!-- ABSOLUTE CENTERED TO PREVENT ANY JUMPING ON NUMBER CHANGES -->
-                    <div id="macro-buttons" class="absolute left-1/2 -translate-x-1/2 flex gap-0.5 whitespace-nowrap p-0.5 bg-black/5 dark:bg-white/10 rounded-xl border border-black/5 dark:border-white/10 backdrop-blur-sm z-10">
-                        <button onclick="updateChart('1Y')" id="btn-1Y" class="h-7 px-3 rounded-lg transition-all duration-300 flex items-center justify-center text-xs uppercase tracking-wider font-semibold shrink-0">1Y</button>
-                        <button onclick="updateChart('2Y')" id="btn-2Y" class="h-7 px-3 rounded-lg transition-all duration-300 flex items-center justify-center text-xs uppercase tracking-wider font-semibold shrink-0">2Y</button>
-                        <button onclick="updateChart('4Y')" id="btn-4Y" class="h-7 px-3 rounded-lg transition-all duration-300 flex items-center justify-center text-xs uppercase tracking-wider font-semibold shrink-0">4Y</button>
+                    <div id="macro-buttons" class="absolute left-1/2 -translate-x-1/2 flex gap-2 whitespace-nowrap p-1.5 bg-black/5 dark:bg-white/10 rounded-2xl border border-black/5 dark:border-white/10 backdrop-blur-sm z-10">
+                        <button onclick="updateChart('1Y')" id="btn-1Y" class="h-9 px-5 rounded-xl transition-all duration-300 flex items-center justify-center text-sm uppercase tracking-wider font-semibold shrink-0">1Y</button>
+                        <button onclick="updateChart('2Y')" id="btn-2Y" class="h-9 px-5 rounded-xl transition-all duration-300 flex items-center justify-center text-sm uppercase tracking-wider font-semibold shrink-0">2Y</button>
+                        <button onclick="updateChart('4Y')" id="btn-4Y" class="h-9 px-5 rounded-xl transition-all duration-300 flex items-center justify-center text-sm uppercase tracking-wider font-semibold shrink-0">4Y</button>
                     </div>
 
                     <div class="flex items-center justify-end shrink-0 z-10">
-                        <div id="dynamic-score" class="transition-colors duration-500 flex items-center justify-center w-16 h-7 px-1 rounded-lg bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10 font-semibold text-xs tabular-nums whitespace-nowrap text-neutral-700 dark:text-neutral-300">
+                        <div id="dynamic-score" class="transition-colors duration-500 flex items-center justify-center w-16 h-9 px-1 rounded-xl bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10 font-semibold text-sm tabular-nums whitespace-nowrap text-neutral-700 dark:text-neutral-300">
                             <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-md px-1">00.0%</span>
                         </div>
                     </div>
@@ -294,11 +294,11 @@
             </div>
 
             <!-- SECTION 4: DISCLAIMER (INSIDE CRYPTO WIDGET AT THE VERY BOTTOM) -->
-            <div class="border-t border-black/5 dark:border-white/10 pt-4 mt-4 relative z-10 select-none">
+            <div class="border-t border-black/5 dark:border-white/10 pt-5 mt-5 relative z-10 select-none">
                 <div id="disclaimer-box" 
                      lang="en"
                      onclick="if (!this.classList.contains('is-expanded')) toggleDisclaimer(event);" 
-                     class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed text-justify hyphens-auto transition-colors duration-200" 
+                     class="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed text-justify hyphens-auto transition-colors duration-200" 
                      style="text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;"
                      title="Click to expand disclaimer">
                     <button type="button" 
@@ -315,7 +315,7 @@
                     <button type="button" 
                             id="disclaimer-collapse-btn" 
                             onclick="toggleDisclaimer(event); this.blur();" 
-                            class="ml-1.5 font-medium text-xs text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300 underline decoration-dotted underline-offset-2 cursor-pointer transition-colors focus:outline-none whitespace-nowrap">
+                            class="ml-1.5 font-medium text-sm text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300 underline decoration-dotted underline-offset-2 cursor-pointer transition-colors focus:outline-none whitespace-nowrap">
                         Show less
                     </button>
                 </div>
@@ -324,10 +324,10 @@
         </div>
 
         <!-- ERROR BOX -->
-        <div id="error-box" class="hidden mb-4 bg-[#FF2A6D]/10 border border-[#FF2A6D]/30 p-5 rounded-2xl text-[#FF2A6D] text-xs tracking-wider uppercase text-center font-medium">❌ CONNECTION FAILED. PLEASE TRY AGAIN.</div>
+        <div id="error-box" class="hidden mb-5 bg-[#FF2A6D]/10 border border-[#FF2A6D]/30 p-6 rounded-[32px] text-[#FF2A6D] text-sm tracking-wider uppercase text-center font-medium">❌ CONNECTION FAILED. PLEASE TRY AGAIN.</div>
 
         <!-- COPYRIGHT -->
-        <footer class="mt-4 mb-2 text-center text-xs leading-none uppercase tracking-wider text-neutral-500 dark:text-neutral-600 select-none whitespace-nowrap font-medium">
+        <footer class="mt-5 mb-2 text-center text-sm leading-none uppercase tracking-wider text-neutral-500 dark:text-neutral-600 select-none whitespace-nowrap font-medium">
             © 2026 MARTIN VOJTUŠ
         </footer>
 
@@ -450,11 +450,11 @@ function updateThemeSegmentedUI() {
     const btnSolar = document.getElementById('theme-btn-solar');
 
     const activeClass = isDark
-        ? "h-7 px-3 rounded-lg text-white bg-neutral-800/95 border border-neutral-700/80 shadow-sm font-semibold transition-all flex items-center gap-1.5 text-xs"
-        : "h-7 px-3 rounded-lg text-neutral-900 bg-white border border-neutral-200/90 shadow-sm font-semibold transition-all flex items-center gap-1.5 text-xs";
+        ? "h-9 px-5 rounded-xl text-white bg-neutral-800/95 border border-neutral-700/80 shadow-sm font-semibold transition-all flex items-center gap-2 text-sm"
+        : "h-9 px-5 rounded-xl text-neutral-900 bg-white border border-neutral-200/90 shadow-sm font-semibold transition-all flex items-center gap-2 text-sm";
     const inactiveClass = isDark
-        ? "h-7 px-3 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center gap-1.5 font-medium text-xs"
-        : "h-7 px-3 rounded-lg text-neutral-500 hover:text-neutral-900 transition-all flex items-center gap-1.5 font-medium text-xs";
+        ? "h-9 px-5 rounded-xl text-neutral-400 hover:text-white transition-all flex items-center gap-2 font-medium text-sm"
+        : "h-9 px-5 rounded-xl text-neutral-500 hover:text-neutral-900 transition-all flex items-center gap-2 font-medium text-sm";
 
     if (btnSolar) btnSolar.className = (mode === 'solar') ? activeClass : inactiveClass;
     if (btnLight) btnLight.className = (mode === 'light') ? activeClass : inactiveClass;
@@ -493,8 +493,8 @@ function updateThemeSegmentedUI() {
     }
     if (themeIconBox) {
         themeIconBox.className = isDark
-            ? "w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500/25 to-purple-500/15 flex items-center justify-center shrink-0 text-indigo-400 border border-indigo-500/30 transition-all duration-500 shadow-sm"
-            : "w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400/20 to-orange-500/15 flex items-center justify-center shrink-0 text-amber-600 border border-amber-400/30 transition-all duration-500 shadow-sm";
+            ? "w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500/25 to-purple-500/15 flex items-center justify-center shrink-0 text-indigo-400 border border-indigo-500/30 transition-all duration-500 shadow-sm"
+            : "w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400/20 to-orange-500/15 flex items-center justify-center shrink-0 text-amber-600 border border-amber-400/30 transition-all duration-500 shadow-sm";
     }
     if (themeSvg) {
         if (mode === 'solar') {
@@ -528,12 +528,12 @@ function updateMacroButtonsUI(period) {
         if(btn) {
             if (p === period) {
                 btn.className = isDark 
-                    ? "h-7 px-3 rounded-lg text-white bg-neutral-800/90 border border-neutral-700/60 shadow-sm transition-all font-semibold flex items-center justify-center text-xs uppercase tracking-wider whitespace-nowrap shrink-0" 
-                    : "h-7 px-3 rounded-lg text-neutral-900 bg-white border border-neutral-200/90 shadow-sm transition-all font-semibold flex items-center justify-center text-xs uppercase tracking-wider whitespace-nowrap shrink-0";
+                    ? "h-9 px-5 rounded-xl text-white bg-neutral-800/90 border border-neutral-700/60 shadow-sm transition-all font-semibold flex items-center justify-center text-sm uppercase tracking-wider whitespace-nowrap shrink-0" 
+                    : "h-9 px-5 rounded-xl text-neutral-900 bg-white border border-neutral-200/90 shadow-sm transition-all font-semibold flex items-center justify-center text-sm uppercase tracking-wider whitespace-nowrap shrink-0";
             } else {
                 btn.className = isDark 
-                    ? "h-7 px-3 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center justify-center text-xs uppercase tracking-wider font-medium whitespace-nowrap shrink-0" 
-                    : "h-7 px-3 rounded-lg text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center text-xs uppercase tracking-wider font-medium whitespace-nowrap shrink-0";
+                    ? "h-9 px-5 rounded-xl text-neutral-400 hover:text-white transition-all flex items-center justify-center text-sm uppercase tracking-wider font-medium whitespace-nowrap shrink-0" 
+                    : "h-9 px-5 rounded-xl text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center text-sm uppercase tracking-wider font-medium whitespace-nowrap shrink-0";
             }
         }
     });
@@ -546,12 +546,12 @@ function updateCoinButtonsUI(coin) {
         if (btn) {
             if (c === coin) {
                 btn.className = isDark
-                    ? "h-7 px-3 rounded-lg text-xs uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 text-white bg-neutral-800/90 border border-neutral-700/60 shadow-sm whitespace-nowrap"
-                    : "h-7 px-3 rounded-lg text-xs uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-900 bg-white border border-neutral-200/90 shadow-sm whitespace-nowrap";
+                    ? "h-9 px-5 rounded-xl text-sm uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-white bg-neutral-800/90 border border-neutral-700/60 shadow-sm whitespace-nowrap"
+                    : "h-9 px-5 rounded-xl text-sm uppercase tracking-wider font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-neutral-900 bg-white border border-neutral-200/90 shadow-sm whitespace-nowrap";
             } else {
                 btn.className = isDark
-                    ? "h-7 px-3 rounded-lg text-xs uppercase tracking-wider font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-400 hover:text-white whitespace-nowrap"
-                    : "h-7 px-3 rounded-lg text-xs uppercase tracking-wider font-medium transition-all duration-300 flex items-center justify-center gap-1.5 text-neutral-500 hover:text-neutral-900 whitespace-nowrap";
+                    ? "h-9 px-5 rounded-xl text-sm uppercase tracking-wider font-medium transition-all duration-300 flex items-center justify-center gap-2 text-neutral-400 hover:text-white whitespace-nowrap"
+                    : "h-9 px-5 rounded-xl text-sm uppercase tracking-wider font-medium transition-all duration-300 flex items-center justify-center gap-2 text-neutral-500 hover:text-neutral-900 whitespace-nowrap";
             }
         }
     });
@@ -591,27 +591,27 @@ function resetCardUI() {
 
     let pBadge = document.getElementById("badge-phase");
     pBadge.className = isDark 
-        ? "border border-neutral-800/80 bg-neutral-800/50 px-2.5 h-7 flex items-center justify-center rounded-lg transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-xs uppercase tracking-wider"
-        : "border border-neutral-200 bg-neutral-100 px-2.5 h-7 flex items-center justify-center rounded-lg transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-xs uppercase tracking-wider";
+        ? "border border-neutral-800/80 bg-neutral-800/50 px-2.5 h-9 flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-sm uppercase tracking-wider"
+        : "border border-neutral-200 bg-neutral-100 px-2.5 h-9 flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-sm uppercase tracking-wider";
     pBadge.style.backgroundColor = "";
     pBadge.style.borderColor = "";
     pBadge.style.color = "";
     pBadge.innerHTML = 'HODL';
 
-    document.getElementById("val-price").innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded-lg">$00,000.00</span>`;
+    document.getElementById("val-price").innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded-xl">$00,000.00</span>`;
     let vCh = document.getElementById("val-change");
-    vCh.className = "flex items-center gap-1.5 h-7 whitespace-nowrap text-xs font-medium";
+    vCh.className = "flex items-center gap-2 h-9 whitespace-nowrap text-sm font-medium";
     const badge24Class = isDark ? "text-neutral-400 bg-white/10 border-white/10" : "text-neutral-500 bg-black/5 border-black/5";
-    vCh.innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded-md px-1.5 inline-block h-4">+0.00%</span> <span class="${badge24Class} border px-2 h-7 rounded-lg font-semibold flex items-center justify-center text-xs uppercase tracking-wider shrink-0">24H</span>`;
+    vCh.innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded-md px-1.5 inline-block h-4">+0.00%</span> <span class="${badge24Class} border px-2 h-9 rounded-xl font-semibold flex items-center justify-center text-sm uppercase tracking-wider shrink-0">24H</span>`;
     
     const vScoreLarge = document.getElementById("val-score-large");
     vScoreLarge.style.transition = "none";
-    vScoreLarge.innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded-lg px-1">88.8%</span>`;
+    vScoreLarge.innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded-xl px-1">88.8%</span>`;
     vScoreLarge.style.color = "inherit";
     vScoreLarge.style.textShadow = "none";
     
     const mainCard = document.getElementById("main-card");
-    mainCard.className = "relative overflow-hidden p-5 rounded-2xl bg-white/60 dark:bg-neutral-900/50 backdrop-blur-2xl border border-neutral-200/80 dark:border-neutral-800/60 shadow-xl shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/60 transition-colors duration-1000 mb-4 select-none";
+    mainCard.className = "relative overflow-hidden p-6 rounded-[32px] bg-white/40 dark:bg-neutral-900/40 backdrop-blur-xl border border-neutral-200/80 dark:border-neutral-800/60 shadow-xl shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/60 transition-colors duration-1000 mb-5 select-none";
     mainCard.style.backgroundColor = "";
     mainCard.style.borderColor = "";
     
@@ -700,7 +700,7 @@ const customChartPlugin = {
           ctx.strokeStyle = currentTier.border;
           ctx.lineWidth = 1;
 
-          ctx.font = '500 9.6px "Inter", sans-serif'; 
+          ctx.font = '500 14px "Inter", sans-serif'; 
           let labelText = xLabel;
           if (pointPrice !== null) {
               const formattedPrice = '$' + Number(pointPrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -811,7 +811,7 @@ function updateChart(period) {
     const isDark = isDarkMode();
     Chart.defaults.color = isDark ? '#737373' : '#a3a3a3';
     Chart.defaults.font.family = "'Inter', sans-serif";
-    Chart.defaults.font.size = 9.6;
+    Chart.defaults.font.size = 14;
 
     let ctxScore = document.getElementById('scoreChart').getContext('2d');
     scoreChartInstance = new Chart(ctxScore, {
@@ -874,7 +874,7 @@ function applyCardData(data) {
     }
     
     let pBadge = document.getElementById("badge-phase");
-    pBadge.className = "border px-2.5 h-7 flex items-center justify-center rounded-lg transition-all duration-1000 font-semibold whitespace-nowrap shrink-0 text-xs uppercase tracking-wider";
+    pBadge.className = "border px-2.5 h-9 flex items-center justify-center rounded-xl transition-all duration-1000 font-semibold whitespace-nowrap shrink-0 text-sm uppercase tracking-wider";
     pBadge.style.backgroundColor = activeTier.bgBadge;
     pBadge.style.borderColor = activeTier.border;
     pBadge.style.color = activeTier.full;
@@ -895,9 +895,9 @@ function applyCardData(data) {
     const changeColor = data.change >= 0 
         ? (isDark ? 'text-[#00FF88]' : 'text-[#059669]') 
         : (isDark ? 'text-[#FF2A6D]' : 'text-[#DC2626]');
-    vCh.className = `flex items-center gap-1.5 h-7 whitespace-nowrap text-xs font-medium ${changeColor}`;
+    vCh.className = `flex items-center gap-2 h-9 whitespace-nowrap text-sm font-medium ${changeColor}`;
     const badge24Class = isDark ? "text-neutral-300 bg-white/10 border-white/10" : "text-neutral-600 bg-black/5 border-black/5";
-    vCh.innerHTML = `${data.change >= 0 ? '+':''}${data.change.toFixed(2)}% <span class="${badge24Class} border px-2 h-7 rounded-lg font-semibold flex items-center justify-center text-xs uppercase tracking-wider shrink-0">24H</span>`;
+    vCh.innerHTML = `${data.change >= 0 ? '+':''}${data.change.toFixed(2)}% <span class="${badge24Class} border px-2 h-9 rounded-xl font-semibold flex items-center justify-center text-sm uppercase tracking-wider shrink-0">24H</span>`;
 
     const vScoreLarge = document.getElementById("val-score-large");
     vScoreLarge.innerText = `${s.toFixed(1)}%`;
@@ -915,7 +915,7 @@ function applyCardData(data) {
     dTitle.style.textShadow = isDark ? `0 0 10px ${sHex}80` : `0 0 5px ${sHex}40`;
 
     const mainCard = document.getElementById("main-card");
-    mainCard.className = "relative overflow-hidden p-5 rounded-2xl bg-white/60 dark:bg-neutral-900/50 backdrop-blur-2xl border border-neutral-200/80 dark:border-neutral-800/60 shadow-xl shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/60 transition-colors duration-1000 mb-4 select-none";
+    mainCard.className = "relative overflow-hidden p-6 rounded-[32px] bg-white/40 dark:bg-neutral-900/40 backdrop-blur-xl border border-neutral-200/80 dark:border-neutral-800/60 shadow-xl shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/60 transition-colors duration-1000 mb-5 select-none";
     mainCard.style.backgroundColor = "";
     mainCard.style.borderColor = "";
 
