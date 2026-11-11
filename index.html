@@ -138,7 +138,7 @@
 
             <!-- RIGHT: THEME BADGE -->
             <div class="flex items-center gap-1.5 shrink-0 relative z-10">
-                <span class="text-xs font-semibold uppercase tracking-wider px-2.5 h-8 flex items-center rounded-lg bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm">
+                <span class="text-xs font-semibold uppercase tracking-wider px-4 h-10 flex items-center rounded-xl bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm">
                     Theme
                 </span>
             </div>
@@ -166,14 +166,14 @@
                 <!-- RIGHT: REFRESH BUTTON & INDICATOR BADGE -->
                 <div class="flex items-center gap-1.5 shrink-0">
                     <!-- REFRESH BUTTON -->
-                    <button id="btn-refresh" onclick="refreshWindow(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" title="Refresh data" aria-label="Refresh" class="w-8 h-8 flex items-center justify-center rounded-lg bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/5 dark:border-white/10 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all active:scale-95 shrink-0">
+                    <button id="btn-refresh" onclick="refreshWindow(); this.blur();" onpointerup="this.blur();" ontouchend="this.blur();" title="Refresh data" aria-label="Refresh" class="w-10 h-10 flex items-center justify-center rounded-xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 border border-black/5 dark:border-white/10 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all active:scale-95 shrink-0">
                         <svg id="btn-refresh-icon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
                     </button>
 
                     <!-- INDICATOR BADGE -->
-                    <span class="text-xs font-semibold uppercase tracking-wider px-2.5 h-8 flex items-center rounded-lg bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm">
+                    <span class="text-xs font-semibold uppercase tracking-wider px-4 h-10 flex items-center rounded-xl bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm">
                         Indicator
                     </span>
                 </div>
@@ -190,29 +190,34 @@
                     <div id="val-price" class="text-3xl font-bold tracking-tight leading-none text-neutral-900 dark:text-white transition-all duration-1000 whitespace-nowrap">
                         <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-lg">$00,000.00</span>
                     </div>
-                    <div id="val-change" class="flex items-center gap-1.5 h-8 whitespace-nowrap text-xs font-medium">
+                    <div id="val-change" class="flex items-center gap-2 h-10 whitespace-nowrap text-xs font-medium">
                         <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-md px-1.5 inline-block h-3.5">+0.00%</span> 
-                        <span class="bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10 text-neutral-600 dark:text-neutral-300 px-3 h-8 rounded-xl font-semibold flex items-center justify-center text-xs uppercase tracking-wider shrink-0">24H</span>
+                        <span class="bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10 text-neutral-600 dark:text-neutral-300 px-4 h-10 rounded-xl font-semibold flex items-center justify-center text-xs uppercase tracking-wider shrink-0">24H</span>
                     </div>
                 </div>
             </div>
 
             <!-- SECTION 2: CYCLE SCORE (QUANTITATIVE CALCULATION) -->
             <div class="border-t border-black/5 dark:border-white/10 pt-4 mb-4 relative z-10">
-                <div class="flex justify-between items-center mb-2.5">
-                    <div class="flex items-center gap-1.5">
+                <div class="flex items-center justify-between mb-2.5">
+                    <div class="flex-1 flex items-center text-left min-w-0">
                         <span class="text-xs font-semibold uppercase tracking-wider text-neutral-700 dark:text-neutral-300">Cycle Score</span>
                     </div>
-                    <div class="flex items-center gap-1.5">
+                    
+                    <div class="shrink-0 flex items-center justify-center">
                         <!-- CYCLE PHASE BADGE (HODL / DCA IN / DCA OUT) -->
-                        <div id="badge-phase" class="border border-neutral-200 dark:border-neutral-800/80 bg-neutral-100 dark:bg-neutral-800/50 px-2.5 h-8 w-[5.5rem] flex items-center justify-center rounded-lg transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-xs uppercase tracking-wider">
+                        <div id="badge-phase" class="border border-neutral-200 dark:border-neutral-800/80 bg-neutral-100 dark:bg-neutral-800/50 px-4 h-10 w-[5.5rem] flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-xs uppercase tracking-wider">
                             HODL
                         </div>
+                    </div>
+
+                    <div class="flex-1 flex items-center justify-end min-w-0">
                         <!-- SCORE VALUE LARGE -->
                         <div id="val-score-large" class="text-3xl font-bold tracking-tight leading-none text-neutral-900 dark:text-white transition-all duration-1000 whitespace-nowrap w-[5.5rem] flex justify-end">
                             <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-lg px-1">00.0%</span>
                         </div>
                     </div>
+                </div>
                 </div>
 
                 <!-- SCORE PROGRESS BAR -->
@@ -239,9 +244,9 @@
             <!-- SECTION 3: INTEGRATED SCORE CHART SECTION -->
             <div class="border-t border-black/5 dark:border-white/10 pt-4 relative z-10">
                 <!-- CHART HEADER: DYNAMIC TITLE & TIMEFRAME BUTTONS -->
-                <div class="flex items-center justify-between mb-2.5 text-xs uppercase tracking-wider h-8 gap-2">
+                <div class="flex items-center justify-between mb-2.5 text-xs uppercase tracking-wider h-10 gap-2">
                     <div class="flex-1 flex items-center text-left min-w-0">
-                        <span id="dynamic-title" class="text-xs font-semibold uppercase tracking-wider px-2.5 h-8 flex justify-center items-center rounded-lg bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm transition-colors duration-500 whitespace-nowrap shrink-0 w-12">
+                        <span id="dynamic-title" class="text-xs font-semibold uppercase tracking-wider px-4 h-10 flex justify-center items-center rounded-xl bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm transition-colors duration-500 whitespace-nowrap shrink-0 w-14">
                             4Y
                         </span>
                     </div>
@@ -253,7 +258,7 @@
                     </div>
 
                     <div class="flex-1 flex items-center justify-end min-w-0">
-                        <div id="dynamic-score" class="transition-colors duration-500 flex items-center justify-center w-16 h-8 px-1 rounded-lg bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10 font-semibold text-xs tabular-nums whitespace-nowrap text-neutral-700 dark:text-neutral-300 shrink-0">
+                        <div id="dynamic-score" class="transition-colors duration-500 flex items-center justify-center w-[4.5rem] h-10 px-1 rounded-xl bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10 font-semibold text-xs tabular-nums whitespace-nowrap text-neutral-700 dark:text-neutral-300 shrink-0">
                             <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-md px-1">00.0%</span>
                         </div>
                     </div>
@@ -586,8 +591,8 @@ function resetCardUI() {
 
     let pBadge = document.getElementById("badge-phase");
     pBadge.className = isDark 
-                ? "border border-neutral-800/80 bg-neutral-800/50 px-2.5 h-8 flex items-center justify-center rounded-lg transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-xs uppercase tracking-wider w-[5.5rem]"
-                : "border border-neutral-200 bg-neutral-100 px-2.5 h-8 flex items-center justify-center rounded-lg transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-xs uppercase tracking-wider w-[5.5rem]";
+                ? "border border-neutral-800/80 bg-neutral-800/50 px-4 h-10 flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-xs uppercase tracking-wider w-[5.5rem]"
+                : "border border-neutral-200 bg-neutral-100 px-4 h-10 flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-xs uppercase tracking-wider w-[5.5rem]";
     pBadge.style.backgroundColor = "";
     pBadge.style.borderColor = "";
     pBadge.style.color = "";
@@ -595,9 +600,9 @@ function resetCardUI() {
 
     document.getElementById("val-price").innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded-lg">$00,000.00</span>`;
     let vCh = document.getElementById("val-change");
-    vCh.className = "flex items-center gap-1.5 h-8 whitespace-nowrap text-xs font-medium";
+    vCh.className = "flex items-center gap-2 h-10 whitespace-nowrap text-xs font-medium";
     const badge24Class = isDark ? "text-neutral-400 bg-white/10 border-white/10" : "text-neutral-500 bg-black/5 border-black/5";
-    vCh.innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded-md px-1.5 inline-block h-3.5">+0.00%</span> <span class="${badge24Class} border px-3 h-8 rounded-xl font-semibold flex items-center justify-center text-xs uppercase tracking-wider shrink-0">24H</span>`;
+    vCh.innerHTML = `<span class="${spanBg} text-transparent animate-pulse rounded-md px-1.5 inline-block h-3.5">+0.00%</span> <span class="${badge24Class} border px-4 h-10 rounded-xl font-semibold flex items-center justify-center text-xs uppercase tracking-wider shrink-0">24H</span>`;
     
     const vScoreLarge = document.getElementById("val-score-large");
     vScoreLarge.style.transition = "none";
@@ -869,7 +874,7 @@ function applyCardData(data) {
     }
     
     let pBadge = document.getElementById("badge-phase");
-    pBadge.className = "border px-2.5 h-8 flex items-center justify-center rounded-lg transition-all duration-1000 font-semibold whitespace-nowrap shrink-0 text-xs uppercase tracking-wider w-[5.5rem]";
+    pBadge.className = "border px-4 h-10 flex items-center justify-center rounded-xl transition-all duration-1000 font-semibold whitespace-nowrap shrink-0 text-xs uppercase tracking-wider w-[5.5rem]";
     pBadge.style.backgroundColor = activeTier.bgBadge;
     pBadge.style.borderColor = activeTier.border;
     pBadge.style.color = activeTier.full;
@@ -890,9 +895,9 @@ function applyCardData(data) {
     const changeColor = data.change >= 0 
         ? (isDark ? 'text-[#00FF88]' : 'text-[#059669]') 
         : (isDark ? 'text-[#FF2A6D]' : 'text-[#DC2626]');
-    vCh.className = `flex items-center gap-1.5 h-8 whitespace-nowrap text-xs font-medium ${changeColor}`;
+    vCh.className = `flex items-center gap-2 h-10 whitespace-nowrap text-xs font-medium ${changeColor}`;
     const badge24Class = isDark ? "text-neutral-300 bg-white/10 border-white/10" : "text-neutral-600 bg-black/5 border-black/5";
-    vCh.innerHTML = `${data.change >= 0 ? '+':''}${data.change.toFixed(2)}% <span class="${badge24Class} border px-3 h-8 rounded-xl font-semibold flex items-center justify-center text-xs uppercase tracking-wider shrink-0">24H</span>`;
+    vCh.innerHTML = `${data.change >= 0 ? '+':''}${data.change.toFixed(2)}% <span class="${badge24Class} border px-4 h-10 rounded-xl font-semibold flex items-center justify-center text-xs uppercase tracking-wider shrink-0">24H</span>`;
 
     const vScoreLarge = document.getElementById("val-score-large");
     vScoreLarge.innerText = `${s.toFixed(1)}%`;
