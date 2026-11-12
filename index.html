@@ -199,22 +199,18 @@
 
             <!-- SECTION 2: CYCLE SCORE (QUANTITATIVE CALCULATION) -->
             <div class="border-t border-black/5 dark:border-white/10 pt-4 mb-4 relative z-10">
-                <div class="flex items-center justify-between mb-2.5">
-                    <div class="flex-1 flex items-center text-left min-w-0">
-                        <span class="text-xs font-semibold uppercase tracking-wider text-neutral-700 dark:text-neutral-300">Cycle Score</span>
+                <div class="text-xs text-neutral-500 dark:text-neutral-400 font-medium uppercase tracking-wider mb-1 flex items-center justify-between">
+                    <span>Cycle Score</span>
+                    <span class="text-xs text-neutral-400 dark:text-neutral-500 font-normal">%</span>
+                </div>
+                <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+                    <div id="val-score-large" class="text-3xl font-bold tracking-tight leading-none text-neutral-900 dark:text-white transition-all duration-1000 whitespace-nowrap">
+                        <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-lg">00.0%</span>
                     </div>
-                    
-                    <div class="shrink-0 flex items-center justify-center">
+                    <div class="flex items-center justify-end shrink-0">
                         <!-- CYCLE PHASE BADGE (HODL / DCA IN / DCA OUT) -->
                         <div id="badge-phase" class="border border-neutral-200 dark:border-neutral-800/80 bg-neutral-100 dark:bg-neutral-800/50 px-4 h-10 w-[5.5rem] flex items-center justify-center rounded-xl transition-all duration-1000 text-transparent animate-pulse whitespace-nowrap shrink-0 font-semibold text-xs uppercase tracking-wider">
                             HODL
-                        </div>
-                    </div>
-
-                    <div class="flex-1 flex items-center justify-end min-w-0">
-                        <!-- SCORE VALUE LARGE -->
-                        <div id="val-score-large" class="text-3xl font-bold tracking-tight leading-none text-neutral-900 dark:text-white transition-all duration-1000 whitespace-nowrap w-[5.5rem] flex justify-end">
-                            <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-lg px-1">00.0%</span>
                         </div>
                     </div>
                 </div>
@@ -242,21 +238,15 @@
 
             <!-- SECTION 3: INTEGRATED SCORE CHART SECTION -->
             <div class="border-t border-black/5 dark:border-white/10 pt-4 relative z-10">
-                <!-- CHART HEADER: DYNAMIC TITLE & TIMEFRAME BUTTONS -->
+                <!-- CHART HEADER: TIMEFRAME BUTTONS (LEFT) & DYNAMIC SCORE (RIGHT) -->
                 <div class="flex items-center justify-between mb-2.5 text-xs uppercase tracking-wider h-10 gap-2">
-                    <div class="flex-1 flex items-center text-left min-w-0">
-                        <span id="dynamic-title" class="text-xs font-semibold uppercase tracking-wider px-4 h-10 flex justify-center items-center rounded-xl bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/10 backdrop-blur-sm transition-colors duration-500 whitespace-nowrap shrink-0 w-14">
-                            4Y
-                        </span>
-                    </div>
-                    
                     <div id="macro-buttons" class="shrink-0 flex gap-1.5 whitespace-nowrap p-1 bg-black/5 dark:bg-white/10 rounded-xl border border-black/5 dark:border-white/10 backdrop-blur-sm z-10">
                         <button onclick="updateChart('1Y')" id="btn-1Y" class="h-8 px-4 rounded-lg transition-all duration-300 flex items-center justify-center text-xs uppercase tracking-wider font-semibold shrink-0">1Y</button>
                         <button onclick="updateChart('2Y')" id="btn-2Y" class="h-8 px-4 rounded-lg transition-all duration-300 flex items-center justify-center text-xs uppercase tracking-wider font-semibold shrink-0">2Y</button>
-                        <button onclick="updateChart('4Y')" id="btn-4Y" class="h-8 px-4 rounded-lg transition-all duration-300 flex items-center justify-center text-xs uppercase tracking-wider font-semibold shrink-0">4Y</button>
+                        <button onclick="updateChart('5Y')" id="btn-5Y" class="h-8 px-4 rounded-lg transition-all duration-300 flex items-center justify-center text-xs uppercase tracking-wider font-semibold shrink-0">5Y</button>
                     </div>
 
-                    <div class="flex-1 flex items-center justify-end min-w-0">
+                    <div class="flex items-center justify-end shrink-0">
                         <div id="dynamic-score" class="transition-colors duration-500 flex items-center justify-center w-[4.5rem] h-10 px-1 rounded-xl bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10 font-semibold text-xs tabular-nums whitespace-nowrap text-neutral-700 dark:text-neutral-300 shrink-0">
                             <span class="bg-neutral-200 dark:bg-neutral-800 text-transparent animate-pulse rounded-md px-1">00.0%</span>
                         </div>
@@ -279,7 +269,7 @@
                         <div class="w-full h-[1px] opacity-5"></div>
                     </div>
                     
-                    <div class="absolute inset-0 pointer-events-none">
+                    <div class="absolute -left-2 -right-2 inset-y-0 pointer-events-none">
                         <canvas id="scoreChart" class="opacity-0 transition-opacity duration-1000 pointer-events-auto"></canvas>
                     </div>
                 </div>
@@ -333,7 +323,7 @@ let scoreChartInstance = null;
 window.currentScoreData = { score: 0, colorClass: "" };
 window.fullData = null;
 const savedView = localStorage.getItem('trading_macro_view');
-window.currentMacroView = (savedView === '1Y' || savedView === '2Y' || savedView === '4Y') ? savedView : '4Y';
+window.currentMacroView = (savedView === '1Y' || savedView === '2Y' || savedView === '5Y') ? savedView : '5Y';
 const savedCoin = localStorage.getItem('trading_coin');
 window.currentCoin = (savedCoin === 'BTC' || savedCoin === 'ZEC') ? savedCoin : 'BTC';
 window.currentThemeMode = localStorage.getItem('weather_theme_mode') || 'solar';
@@ -512,8 +502,6 @@ function initUI() {
     updateCoinButtonsUI(window.currentCoin);
     updateThemeSegmentedUI();
 
-    const dTitle = document.getElementById('dynamic-title');
-    if (dTitle) dTitle.innerText = window.currentMacroView || '4Y';
     const assetLabel = document.getElementById('price-asset-label');
     if (assetLabel) assetLabel.innerText = (window.currentCoin === 'ZEC') ? 'Zcash Price' : 'Bitcoin Price';
     const badgeName = document.getElementById('badge-name');
@@ -522,17 +510,17 @@ function initUI() {
 
 function updateMacroButtonsUI(period) {
     const isDark = isDarkMode();
-    ['1Y', '2Y', '4Y'].forEach(p => {
+    ['1Y', '2Y', '5Y'].forEach(p => {
         const btn = document.getElementById(`btn-${p}`);
         if(btn) {
             if (p === period) {
                 btn.className = isDark 
                     ? "h-8 px-4 rounded-lg text-white bg-neutral-800/90 border border-neutral-700/60 shadow-sm transition-all font-semibold flex items-center justify-center text-xs uppercase tracking-wider whitespace-nowrap shrink-0"
-                                        : "h-8 px-4 rounded-lg text-neutral-900 bg-white border border-neutral-200/90 shadow-sm transition-all font-semibold flex items-center justify-center text-xs uppercase tracking-wider whitespace-nowrap shrink-0";
-                                } else {
-                                    btn.className = isDark
-                                        ? "h-8 px-4 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center justify-center text-xs uppercase tracking-wider font-medium whitespace-nowrap shrink-0"
-                                        : "h-8 px-4 rounded-lg text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center text-xs uppercase tracking-wider font-medium whitespace-nowrap shrink-0";
+                    : "h-8 px-4 rounded-lg text-neutral-900 bg-white border border-neutral-200/90 shadow-sm transition-all font-semibold flex items-center justify-center text-xs uppercase tracking-wider whitespace-nowrap shrink-0";
+            } else {
+                btn.className = isDark
+                    ? "h-8 px-4 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center justify-center text-xs uppercase tracking-wider font-medium whitespace-nowrap shrink-0"
+                    : "h-8 px-4 rounded-lg text-neutral-500 hover:text-neutral-900 transition-all flex items-center justify-center text-xs uppercase tracking-wider font-medium whitespace-nowrap shrink-0";
             }
         }
     });
@@ -617,17 +605,12 @@ function resetCardUI() {
     const bar = document.getElementById("animated-score-bar");
     if(bar) { bar.style.width = "0%"; bar.style.backgroundColor = "transparent"; bar.style.boxShadow = "none"; }
 
-    const dTitle = document.getElementById("dynamic-title");
-    dTitle.style.transition = "none";
-    dTitle.style.color = "#737373";
-    dTitle.style.textShadow = "none";
     dScore.style.color = "#737373";
     dScore.style.textShadow = "none";
     
     void dScore.offsetWidth;
     dScore.style.transition = "";
     vScoreLarge.style.transition = "";
-    dTitle.style.transition = "";
     
     document.getElementById("error-box").classList.add("hidden");
 }
@@ -729,8 +712,6 @@ const customChartPlugin = {
       document.getElementById('dynamic-score').innerText = val.toFixed(1) + '%';
       document.getElementById('dynamic-score').style.color = sHex;
       document.getElementById('dynamic-score').style.textShadow = isDark ? `0 0 10px ${sHex}80` : `0 0 5px ${sHex}40`;
-      document.getElementById('dynamic-title').style.color = sHex;
-      document.getElementById('dynamic-title').style.textShadow = isDark ? `0 0 10px ${sHex}80` : `0 0 5px ${sHex}40`;
 
       ctx.restore();
     } else {
@@ -772,12 +753,6 @@ function resetDynamicHover() {
         dScore.style.color = sHex;
         dScore.style.textShadow = isDark ? `0 0 10px ${sHex}80` : `0 0 5px ${sHex}40`;
     }
-    const dTitle = document.getElementById('dynamic-title');
-    if (dTitle) {
-        dTitle.innerText = window.currentMacroView || "4Y";
-        dTitle.style.color = sHex;
-        dTitle.style.textShadow = isDark ? `0 0 10px ${sHex}80` : `0 0 5px ${sHex}40`;
-    }
 }
 
 function updateChart(period) {
@@ -786,13 +761,10 @@ function updateChart(period) {
     localStorage.setItem('trading_macro_view', period);
     updateMacroButtonsUI(period);
 
-    const dTitle = document.getElementById('dynamic-title');
-    if (dTitle) dTitle.innerText = period;
-
-    let points = 208;
+    let points = 260;
     if (period === '1Y') points = 52;
     if (period === '2Y') points = 104;
-    if (period === '4Y') points = 208;
+    if (period === '5Y') points = 260;
 
     const actualPts = Math.min(points, window.fullData.chart_dates.length);
     const chartDates = window.fullData.chart_dates.slice(-actualPts).map(ts => {
@@ -837,7 +809,7 @@ function updateChart(period) {
             responsive: true, maintainAspectRatio: false,
             animation: { duration: 1000, easing: 'easeOutQuart' },
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            layout: { padding: { left: 10, right: 10, top: 10, bottom: 26 } },
+            layout: { padding: { left: 8, right: 8, top: 10, bottom: 26 } },
             interaction: { mode: 'index', intersect: false },
             scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } },
             onHover: (event, activeElements) => {
@@ -907,11 +879,6 @@ function applyCardData(data) {
     dScore.innerText = `${s.toFixed(1)}%`;
     dScore.style.color = sHex;
     dScore.style.textShadow = isDark ? `0 0 10px ${sHex}80` : `0 0 5px ${sHex}40`;
-    
-    const dTitle = document.getElementById("dynamic-title");
-    dTitle.innerText = window.currentMacroView || "4Y";
-    dTitle.style.color = sHex;
-    dTitle.style.textShadow = isDark ? `0 0 10px ${sHex}80` : `0 0 5px ${sHex}40`;
 
     const mainCard = document.getElementById("main-card");
     mainCard.className = "relative overflow-hidden p-5 rounded-[32px] bg-white/40 dark:bg-neutral-900/40 backdrop-blur-xl border border-neutral-200/80 dark:border-neutral-800/60 shadow-xl shadow-neutral-200/30 dark:shadow-2xl dark:shadow-black/60 transition-colors duration-1000 mb-4 select-none";
