@@ -676,7 +676,7 @@
                     signature = resp.signature || resp;
                 } else if (window.solanaWeb3) {
                     // Solana Web3 Native Micro-Swap / On-Chain Trade verification
-                    const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
+                    const connection = new solanaWeb3.Connection("https://solana-rpc.publicnode.com", "confirmed");
                     const { blockhash } = await connection.getLatestBlockhash();
                     const pubKey = new solanaWeb3.PublicKey(State.wallet.address);
                     
@@ -932,7 +932,9 @@
                 
                 if (!provider) {
                     if (isMobile) {
-                        const dappUrl = encodeURIComponent(window.location.href);
+                        const targetUrl = new URL(window.location.href);
+                        targetUrl.searchParams.set('autoConnect', 'phantom');
+                        const dappUrl = encodeURIComponent(targetUrl.toString());
                         const refUrl = encodeURIComponent(window.location.origin);
                         window.location.href = `https://phantom.app/ul/browse/${dappUrl}?ref=${refUrl}`;
                         return;
@@ -957,8 +959,9 @@
                 
                 if (!provider) {
                     if (isMobile) {
-                        // Priamo otvorí mobilnú aplikáciu Solflare bez presmerovania na web login!
-                        const dappUrl = encodeURIComponent(window.location.href);
+                        const targetUrl = new URL(window.location.href);
+                        targetUrl.searchParams.set('autoConnect', 'solflare');
+                        const dappUrl = encodeURIComponent(targetUrl.toString());
                         window.location.href = `https://solflare.com/ul/v1/browse/${dappUrl}`;
                         return;
                     } else {
@@ -980,7 +983,10 @@
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                 if (!window.ethereum) {
                     if (isMobile) {
-                        window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+                        const targetUrl = new URL(window.location.href);
+                        targetUrl.searchParams.set('autoConnect', 'metamask');
+                        const dappUrl = targetUrl.host + targetUrl.pathname + targetUrl.search;
+                        window.location.href = `https://metamask.app.link/dapp/${dappUrl}`;
                         return;
                     } else {
                         window.open('https://metamask.io/download/', '_blank');
@@ -1001,7 +1007,7 @@
 
         async function fetchSolBalance(pubkey) {
             try {
-                const res = await fetch("https://api.mainnet-beta.solana.com", {
+                const res = await fetch("https://solana-rpc.publicnode.com", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -1216,8 +1222,28 @@
         // --- INIT ---
         window.addEventListener('DOMContentLoaded', () => {
             updateModeUI();
-            if (State.wallet) {
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const autoConnect = urlParams.get('autoConnect');
+            
+            if (autoConnect === 'phantom') {
+                window.history.replaceState({}, document.title, window.location.pathname);
+                setTimeout(connectPhantom, 500);
+            } else if (autoConnect === 'solflare') {
+                window.history.replaceState({}, document.title, window.location.pathname);
+                setTimeout(connectSolflare, 500);
+            } else if (autoConnect === 'metamask') {
+                window.history.replaceState({}, document.title, window.location.pathname);
+                setTimeout(connectMetaMask, 500);
+            } else if (State.wallet) {
                 setConnectedWallet(State.wallet.address, State.wallet.balance, State.wallet.chain, State.wallet.icon || '👛');
+                if (State.wallet.chain === 'SOL') {
+                    fetchSolBalance(State.wallet.address).then(b => {
+                        if (b !== State.wallet.balance && b !== "0.000") {
+                            setConnectedWallet(State.wallet.address, b, 'SOL', State.wallet.icon);
+                        }
+                    });
+                }
             }
             fetchMarketData();
             setInterval(fetchMarketData, 4000);
