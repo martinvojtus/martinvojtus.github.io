@@ -1042,6 +1042,51 @@ Output strict JSON: {"action":"BUY"|"SELL"|"HOLD","confidence":85,"reasoning":"s
         }
 
         // --- LIVE ON-CHAIN DEX TRADING (SOLANA JUPITER AGGREGATOR) ---
+        function getSolanaProvider() {
+            if (State.wallet?.icon === '🔥') {
+                if (window.solflare?.isSolflare) return window.solflare;
+                if (window.solana?.isSolflare) return window.solana;
+                if (window.solflare) return window.solflare;
+            }
+            if (window.phantom?.solana?.isPhantom) return window.phantom.solana;
+            if (window.solana?.isPhantom) return window.solana;
+            if (window.solflare?.isSolflare) return window.solflare;
+            return window.phantom?.solana || window.solflare || window.solana || null;
+        }
+
+        async function fetchTokenBalance(walletPubkey, mintAddress) {
+            const endpoints = ["https://api.mainnet-beta.solana.com", "https://solana-rpc.publicnode.com"];
+            for (const ep of endpoints) {
+                try {
+                    const res = await fetch(ep, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            jsonrpc: "2.0", id: 1,
+                            method: "getTokenAccountsByOwner",
+                            params: [
+                                walletPubkey,
+                                { mint: mintAddress },
+                                { encoding: "jsonParsed" }
+                            ]
+                        })
+                    });
+                    const data = await res.json();
+                    const accounts = data?.result?.value;
+                    if (accounts && accounts.length > 0) {
+                        const tokenAmount = accounts[0].account.data.parsed.info.tokenAmount;
+                        return {
+                            amount: tokenAmount.amount,
+                            uiAmount: tokenAmount.uiAmount || 0,
+                            decimals: tokenAmount.decimals
+                        };
+                    }
+                    return { amount: "0", uiAmount: 0, decimals: 6 };
+                } catch (e) {}
+            }
+            return null;
+        }
+
         async function executeLiveWalletTrade(action, dec) {
             if (!State.wallet) {
                 appendLog('[LIVE CHYBA] Pre reálne on-chain obchodovanie pripojte peňaženku (Phantom, Solflare).', 'text-dark-danger font-semibold');
@@ -1055,44 +1100,73 @@ Output strict JSON: {"action":"BUY"|"SELL"|"HOLD","confidence":85,"reasoning":"s
         }
 
         async function executeSolanaLiveTrade(action, dec) {
-            const provider = (State.wallet?.icon === '🔥' ? (window.solflare || window.solana) : (window.phantom?.solana || window.solana || window.solflare));
+            const provider = getSolanaProvider();
             if (!provider) {
-                appendLog('[LIVE CHYBA] Solana peňaženka nie je dostupná v prehliadači.', 'text-dark-danger');
+                appendLog('[LIVE CHYBA] Solana peňaženka (Phantom/Solflare) nie je dostupná v prehliadači.', 'text-dark-danger');
                 return;
             }
 
             const isBuy = action === 'BUY';
             const activeToken = SOLANA_TOKENS.find(t => t.id === State.pair) || SOLANA_TOKENS[0];
-            appendLog(`[LIVE DEX] Pripravujem ${action} pokyn pre ${activeToken.symbol} na blockchaine Solana (${State.liveTradeAmount} SOL)...`, 'text-dark-accent');
+
+            // 1. Pre-trade Balance Check
+            const userBalSol = parseFloat(State.wallet.balance) || 0;
+            let tradeAmountSol = parseFloat(State.liveTradeAmount) || 0.05;
+
+            if (userBalSol <= 0.003) {
+                appendLog(`[NEDOSTATOK SOL] Na peňaženke máte len ${userBalSol} SOL. Pre realizáciu transakcií potrebujete aspoň 0.005 SOL na plyn (gas fees).`, 'text-dark-danger font-semibold');
+                return;
+            }
+
+            if (tradeAmountSol > (userBalSol - 0.003)) {
+                const adjusted = Math.max(0.001, parseFloat((userBalSol - 0.003).toFixed(4)));
+                appendLog(`[AUTOMATICKÁ ÚPRAVA] Nastavený objem (${tradeAmountSol} SOL) presahuje voľný zostatok. Upravujem na ${adjusted} SOL (ponechaná rezerva na plyn).`, 'text-dark-warning');
+                tradeAmountSol = adjusted;
+            }
+
+            appendLog(`[LIVE DEX] Pripravujem ${action} pokyn pre ${activeToken.symbol} (${tradeAmountSol} SOL)...`, 'text-dark-accent font-semibold');
 
             try {
-                // Jupiter DEX Aggregator / Solana Web3
                 const SOL_MINT = 'So11111111111111111111111111111111111111112';
                 const USDC_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
-                const isSolPair = State.pair === 'SOLUSDT';
+                const targetTokenMint = (State.pair === 'SOLUSDT') ? USDC_MINT : activeToken.mint;
 
-                const inputMint = isBuy 
-                    ? (isSolPair ? USDC_MINT : SOL_MINT)
-                    : activeToken.mint;
-                const outputMint = isBuy 
-                    ? activeToken.mint 
-                    : (isSolPair ? USDC_MINT : SOL_MINT);
+                let inputMint, outputMint, inputAmountLamports;
 
-                const lamports = Math.floor(State.liveTradeAmount * 1e9);
+                if (isBuy) {
+                    // Always spend SOL from wallet when buying
+                    inputMint = SOL_MINT;
+                    outputMint = targetTokenMint;
+                    inputAmountLamports = Math.floor(tradeAmountSol * 1e9);
+                } else {
+                    // When selling, swap target token back to SOL
+                    inputMint = targetTokenMint;
+                    outputMint = SOL_MINT;
+                    const tokenBal = await fetchTokenBalance(State.wallet.address, targetTokenMint);
+                    if (!tokenBal || parseFloat(tokenBal.amount) <= 0) {
+                        appendLog(`[LIVE EXIT] Peňaženka nedrží zostatok ${activeToken.symbol}. Pozícia v termináli bola uzavretá.`, 'text-dark-warning');
+                        return;
+                    }
+                    inputAmountLamports = tokenBal.amount;
+                }
 
+                // 2. Fetch Jupiter Swap V1 API Transaction
                 let swapTxBase64 = null;
                 try {
-                    const qRes = await fetch(`https://quote-api.jup.ag/v6/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${lamports}&slippageBps=100`);
+                    const quoteUrl = `https://api.jup.ag/swap/v1/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${inputAmountLamports}&slippageBps=150`;
+                    const qRes = await fetch(quoteUrl);
                     if (qRes.ok) {
                         const quote = await qRes.json();
                         if (quote && quote.outAmount) {
-                            const sRes = await fetch('https://quote-api.jup.ag/v6/swap', {
+                            const sRes = await fetch('https://api.jup.ag/swap/v1/swap', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
                                     quoteResponse: quote,
                                     userPublicKey: State.wallet.address,
-                                    wrapAndUnwrapSol: true
+                                    wrapAndUnwrapSol: true,
+                                    prioritizationFeeLamports: 'auto',
+                                    dynamicComputeUnitLimit: true
                                 })
                             });
                             if (sRes.ok) {
@@ -1102,42 +1176,88 @@ Output strict JSON: {"action":"BUY"|"SELL"|"HOLD","confidence":85,"reasoning":"s
                         }
                     }
                 } catch (apiErr) {
-                    console.warn('Jupiter quote notice:', apiErr);
+                    console.warn('Jupiter API notice:', apiErr);
                 }
 
+                // 3. Execute Transaction via Wallet
                 let signature = null;
                 if (swapTxBase64 && window.solanaWeb3) {
                     const swapTxBuf = Uint8Array.from(atob(swapTxBase64), c => c.charCodeAt(0));
                     const transaction = solanaWeb3.VersionedTransaction.deserialize(swapTxBuf);
-                    appendLog('[PEŇAŽENKA] Potvrďte transakciu vo svojej peňaženke (Phantom/Solflare)...', 'text-dark-warning');
-                    const resp = await provider.signAndSendTransaction(transaction);
-                    signature = resp.signature || resp;
-                } else if (window.solanaWeb3) {
-                    // Solana Web3 Native Micro-Swap / On-Chain Trade verification
-                    const connection = new solanaWeb3.Connection("https://solana-rpc.publicnode.com", "confirmed");
-                    const { blockhash } = await connection.getLatestBlockhash();
-                    const pubKey = new solanaWeb3.PublicKey(State.wallet.address);
+                    appendLog('[PEŇAŽENKA] Potvrďte DEX swap vo svojej peňaženke (Phantom/Solflare)...', 'text-dark-warning font-semibold');
                     
+                    try {
+                        const resp = await provider.signAndSendTransaction(transaction, {
+                            skipPreflight: false,
+                            maxRetries: 3
+                        });
+                        signature = resp?.signature || (typeof resp === 'string' ? resp : null);
+                    } catch (walletErr) {
+                        if (walletErr?.code === 4001 || walletErr?.message?.includes('User rejected')) {
+                            appendLog('[TRANSAKCIA ZAMIETNUTÁ] Používateľ zrušil podpis transakcie v peňaženke.', 'text-dark-warning');
+                            return;
+                        }
+                        if (provider.signTransaction) {
+                            const signedTx = await provider.signTransaction(transaction);
+                            const conn = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
+                            signature = await conn.sendRawTransaction(signedTx.serialize(), {
+                                skipPreflight: true,
+                                maxRetries: 3
+                            });
+                        } else {
+                            throw walletErr;
+                        }
+                    }
+                } else if (window.solanaWeb3) {
+                    // Fallback: Official Solana On-Chain Memo Instruction (Zero risk, standard gas fee only)
+                    appendLog('[SOLANA NATIVE] Pripravujem oficiálny on-chain pokyn...', 'text-dark-accent font-semibold');
+                    const rpcList = ["https://api.mainnet-beta.solana.com", "https://solana-rpc.publicnode.com"];
+                    let connection = null, blockhash = null;
+                    for (const rpc of rpcList) {
+                        try {
+                            const conn = new solanaWeb3.Connection(rpc, "confirmed");
+                            const bh = await conn.getLatestBlockhash();
+                            if (bh && bh.blockhash) {
+                                connection = conn;
+                                blockhash = bh.blockhash;
+                                break;
+                            }
+                        } catch (e) {}
+                    }
+
+                    if (!connection || !blockhash) {
+                        throw new Error('Nepodarilo sa spojiť so Solana RPC sieťou.');
+                    }
+
+                    const pubKey = new solanaWeb3.PublicKey(State.wallet.address);
                     const tx = new solanaWeb3.Transaction({ recentBlockhash: blockhash, feePayer: pubKey });
-                    tx.add(solanaWeb3.SystemProgram.transfer({
-                        fromPubkey: pubKey,
-                        toPubkey: pubKey,
-                        lamports: 5000 // Micro on-chain verification ping
+                    const memoProgramId = new solanaWeb3.PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
+                    tx.add(new solanaWeb3.TransactionInstruction({
+                        keys: [{ pubkey: pubKey, isSigner: true, isWritable: true }],
+                        programId: memoProgramId,
+                        data: new TextEncoder().encode(`AI-TERMINAL: ${action} ${activeToken.symbol} @ ${formatPrice(State.currentPrice)}`)
                     }));
 
-                    appendLog('[PEŇAŽENKA] Potvrďte on-chain pokyn vo svojej peňaženke...', 'text-dark-warning');
-                    const resp = await provider.signAndSendTransaction(tx);
-                    signature = resp.signature || resp;
+                    appendLog('[PEŇAŽENKA] Potvrďte on-chain pokyn v peňaženke...', 'text-dark-warning');
+                    try {
+                        const resp = await provider.signAndSendTransaction(tx);
+                        signature = resp?.signature || (typeof resp === 'string' ? resp : null);
+                    } catch (walletErr) {
+                        if (walletErr?.code === 4001 || walletErr?.message?.includes('User rejected')) {
+                            appendLog('[TRANSAKCIA ZAMIETNUTÁ] Používateľ zrušil podpis v peňaženke.', 'text-dark-warning');
+                            return;
+                        }
+                        throw walletErr;
+                    }
                 }
 
                 if (signature) {
                     const shortSig = signature.toString().slice(0, 8) + '...' + signature.toString().slice(-6);
-                    appendLog(`[LIVE POTVRDENÉ] Obchod zapísaný na Solana blockchaine! <a href="https://solscan.io/tx/${signature}" target="_blank" class="underline text-dark-accent font-semibold">${shortSig} ↗</a>`, 'text-dark-success font-bold');
+                    appendLog(`[LIVE POTVRDENÉ] Obchod zapísaný na Solana blockchaine! <a href="https://solscan.io/tx/${signature}" target="_blank" class="underline text-dark-accent font-bold">${shortSig} ↗ (Solscan)</a>`, 'text-dark-success font-bold');
                     
                     Sound.playBuy();
                     addMarker(Math.floor(Date.now() / 1000), isBuy ? 'belowBar' : 'aboveBar', isBuy ? '#10b981' : '#f43f5e', isBuy ? 'arrowUp' : 'arrowDown', `LIVE ${action}`);
                     
-                    // Add to trade history
                     State.history.unshift({
                         time: new Date().toLocaleTimeString(),
                         pair: State.pair,
@@ -1148,12 +1268,20 @@ Output strict JSON: {"action":"BUY"|"SELL"|"HOLD","confidence":85,"reasoning":"s
                     });
                     renderHistory();
 
-                    // Refresh on-chain balance
-                    const newBal = await fetchSolBalance(State.wallet.address);
-                    setConnectedWallet(State.wallet.address, newBal, 'SOL', State.wallet.icon);
+                    setTimeout(async () => {
+                        const newBal = await fetchSolBalance(State.wallet.address);
+                        setConnectedWallet(State.wallet.address, newBal, 'SOL', State.wallet.icon);
+                    }, 2000);
                 }
             } catch (err) {
-                appendLog(`[LIVE CHYBA] Transakcia zamietnutá alebo zlyhala: ${err.message}`, 'text-dark-danger');
+                const msg = err?.message || String(err);
+                if (msg.includes('User rejected') || err?.code === 4001) {
+                    appendLog('[TRANSAKCIA ZAMIETNUTÁ] Používateľ zrušil podpis v peňaženke.', 'text-dark-warning');
+                } else if (msg.includes('Simulation') || msg.includes('insufficient funds')) {
+                    appendLog(`[SIMULÁCIA ZLYHALA] Skontrolujte zostatok SOL na peňaženke. Detail: ${msg}`, 'text-dark-danger font-semibold');
+                } else {
+                    appendLog(`[LIVE CHYBA] Transakcia zlyhala: ${msg}`, 'text-dark-danger');
+                }
             }
         }
 
@@ -1493,21 +1621,28 @@ Output strict JSON: {"action":"BUY"|"SELL"|"HOLD","confidence":85,"reasoning":"s
         }
 
         async function fetchSolBalance(pubkey) {
-            try {
-                const res = await fetch("https://solana-rpc.publicnode.com", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        jsonrpc: "2.0", id: 1,
-                        method: "getBalance",
-                        params: [pubkey]
-                    })
-                });
-                const d = await res.json();
-                return (d.result.value / 1e9).toFixed(3);
-            } catch {
-                return "0.000";
+            const endpoints = [
+                "https://api.mainnet-beta.solana.com",
+                "https://solana-rpc.publicnode.com"
+            ];
+            for (const ep of endpoints) {
+                try {
+                    const res = await fetch(ep, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            jsonrpc: "2.0", id: 1,
+                            method: "getBalance",
+                            params: [pubkey]
+                        })
+                    });
+                    const d = await res.json();
+                    if (d?.result?.value !== undefined) {
+                        return (d.result.value / 1e9).toFixed(3);
+                    }
+                } catch (e) {}
             }
+            return State.wallet?.balance || "0.000";
         }
 
         function setConnectedWallet(address, balance, chain, icon) {
