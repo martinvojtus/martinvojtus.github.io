@@ -22,24 +22,29 @@ Aplikácia je kompletne navrhnutá tak, aby fungovala **100% v cloude priamo cez
 
 V termináli môžeš prepínať medzi dvoma režimami:
 1. **`PAPER TRADING` (Predvolený - Bez rizika):**
-   - Simuluje obchody s virtuálnym kapitálom $10,000 USDT.
+   - Simuluje obchody s virtuálnym kapitálom $10,000 USDC v páre **SOL/USDC**.
    - Presné sledovanie P&L, dynamické Stop-Loss a Take-Profit úrovne s vizuálnym indikátorom.
    - Ideálne na sledovanie a testovanie úspešnosti AI stratégií bez rizika.
 
-2. **`LIVE ON-CHAIN TRADING` (Reálne obchody cez peňaženku):**
+2. **`LIVE ON-CHAIN TRADING` (Reálne mikroobchody v páre SOL/USDC):**
    - Po kliknutí na **`👛 Peňaženka`** pripojíš svoju peňaženku:
      - 👻 **Phantom** (Solana)
      - 🔥 **Solflare** (Solana)
-   - Prepnite v hornej lište tlačidlo z `PAPER` na `LIVE ON-CHAIN`.
-   - V nastaveniach (⚙️) si vieš nastaviť veľkosť jedného obchodu (napr. `0.05 SOL`) a vybrať preferovanú stratégiu (Ultra Micro Scalp, Standard Solana Scalp, Momentum Breakout).
-   - Keď AI vygeneruje signál, bot automaticky pripraví on-chain DEX transakciu (Solana Jupiter DEX Aggregator / Web3) a požiada tvoju peňaženku o podpis.
-   - Po potvrdení sa transakcia okamžite zapíše na blockchain a terminál ti vypíše priamy odkaz na **Solscan**.
+   - **Zobrazenie zostatkov:** Terminál zobrazuje zostatok **SOL** aj **USDC** v reálnom čase.
+   - **Ochrana rezervy na poplatky (Gas fees):** Terminál striktne chráni minimálnu rezervu SOL na poplatky (predvolene `0.02 SOL`, nastaviteľné v ⚙️). Predaj SOL za USDC nikdy nesiahne do tejto rezervy, aby peňaženka nikdy neostala zablokovaná bez plynu na transakcie.
+   - **Mikroobchody v páre SOL/USDC:**
+     - Pri signáli `BUY`: bot nakupuje SOL za USDC cez Jupiter DEX Aggregator.
+     - Pri signáli `SELL`: bot realizuje zisk predajom voľného SOL do USDC so zachovaním rezervy na poplatky.
+     - K dispozícii je aj funkcia **Rýchly mikro-swap** priamo v peňaženke pre jednoduchú konverziu medzi SOL a USDC.
+   - Po každom obchode sa transakcia okamžite zapíše na blockchain a terminál ti vypíše priamy odkaz na **Solscan**.
 
 ---
 
 ## 🛠️ Funkcie systému
 
-- **Živý Binance WebSocket Stream:** Sub-sekundové real-time sviečky a pulzujúci cenový feed pre Solana tokeny (`SOL`, `JUP`, `RAY`, `WIF`, `BONK`).
+- **Živý Binance WebSocket Stream:** Sub-sekundové real-time sviečky a pulzujúci cenový feed pre Solana USDC páry (`SOL/USDC`, `JUP/USDC`, `RAY/USDC`, `WIF/USDC`, `BONK/USDC`).
+- **Ochrana dostatku SOL na fees:** Automatická kontrola a zachovanie minimálnej rezervy SOL na poplatky siete pred každým obchodom.
+- **Duálne zobrazenie SOL & USDC:** Okamžitý prehľad o voľných aj rezervovaných prostriedkoch na peňaženke.
 - **TradingView Lightweight Charts:** Interaktívny sviečkový graf s časovými rámcami (`1m`, `5m`, `15m`), vykresľovaním trendových kriviek **EMA(9)** a **EMA(21)** priamo v grafe a nákupnými/predajnými signálmi (`BUY` / `EXIT`).
 - **Technické indikátory v JS:** RSI(14), EMA(9), EMA(21) a vyhodnocovanie trendových crossoverov počítané v reálnom čase priamo v prehliadači.
 - **Web Audio Sound Effects:** Zvukové notifikácie pre vstupy do obchodov, úspešné Take-Profit obchody a Stop-Loss výstupy (s možnosťou stíšenia 🔊/🔇).

@@ -51,13 +51,16 @@ class TradingEngineState:
         self.history = []
         self.current_price = 0.0
         self.wallet_balance = 0.0
+        self.wallet_sol_balance = 0.0
+        self.wallet_usdc_balance = 0.0
+        self.sol_fee_reserve = 0.02
         
 engine_state = TradingEngineState()
 connected_websockets = []
 
 class AIDecision(BaseModel):
     action: str = Field(description="BUY, SELL, or HOLD")
-    pair: str = Field(description="Trading pair, e.g., BTC/USDT")
+    pair: str = Field(description="Trading pair, e.g., SOL/USDC")
     amount_pct: float = Field(description="Percentage of portfolio to use (0-100)")
     stop_loss: float = Field(description="Stop loss price")
     take_profit: float = Field(description="Take profit price")
@@ -82,7 +85,7 @@ async def broadcast_ws(message: dict):
 
 async def fetch_market_data(exchange):
     try:
-        ohlcv = await exchange.fetch_ohlcv('BTC/USDT', timeframe='1m', limit=100)
+        ohlcv = await exchange.fetch_ohlcv('SOL/USDC', timeframe='1m', limit=100)
         df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
         df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
         
@@ -118,7 +121,7 @@ async def trading_loop():
     
     w3 = Web3(Web3.HTTPProvider(RPC_URL))
     
-    await broadcast_log("Bot started. Initializing connections...")
+    await broadcast_log("Bot spustený. Sledujem pár SOL/USDC...")
     
     while engine_state.is_running:
         try:
@@ -139,22 +142,28 @@ async def trading_loop():
                 except Exception:
                     pass
 
-            await broadcast_log(f"Analyzujem BTC/USDT... Cena: {price:.2f}$, RSI: {rsi:.1f}")
+            await broadcast_log(f"Analyzujem SOL/USDC... Cena: {price:.2f}$, RSI: {rsi:.1f}")
             
             # 3. AI Decision
             if not ai_client:
                 await broadcast_log("Gemini API Key missing. Skipping AI decision.")
             else:
                 prompt = f"""
-                You are a crypto trading AI. Current market state for BTC/USDT:
+                You are a crypto scalping AI trading SOL/USDC on Solana. Current market state:
+                Pair: SOL/USDC
                 Price: {price}
                 RSI (14): {rsi}
                 MACD: {market_data['macd']}
                 EMA (20): {market_data['ema']}
                 
-                Portfolio: {engine_state.paper_balance} USDT
+                Portfolio: {engine_state.paper_balance} USDC
                 Open Positions: {len(engine_state.positions)}
                 
+                Rules:
+                - Target micro-scalps between SOL and USDC.
+                - When buying: Spend USDC to buy SOL.
+                - When selling: Sell SOL for USDC.
+                - Maintain mandatory SOL reserve for gas fees.
                 Decide the next action (BUY, SELL, HOLD). Limit risk to max 2% per trade.
                 """
                 
@@ -237,9 +246,13 @@ async def trading_loop():
                 "type": "state",
                 "data": {
                     "price": price,
+                    "pair": "SOL/USDC",
                     "paper_balance": engine_state.paper_balance,
                     "total_balance": total_balance,
                     "wallet_balance": float(engine_state.wallet_balance),
+                    "wallet_sol_balance": float(engine_state.wallet_sol_balance),
+                    "wallet_usdc_balance": float(engine_state.wallet_usdc_balance),
+                    "sol_fee_reserve": float(engine_state.sol_fee_reserve),
                     "open_positions": len(engine_state.positions),
                     "total_pnl": total_pnl,
                     "open_pnl": open_pnl,
