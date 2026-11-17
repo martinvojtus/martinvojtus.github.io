@@ -5,3 +5,8 @@ pandas
 numpy
 pydantic
 python-dotenv
+ccxt
+web3
+google-genai
+websockets
+pandas-ta
