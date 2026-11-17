@@ -138,7 +138,7 @@
             <div class="bg-dark-card p-3 rounded-xl border border-dark-border">
                 <div class="text-[11px] text-gray-400 font-mono flex justify-between items-center">
                     <span>ZOSTATOK</span>
-                    <span class="text-dark-accent text-[10px]">PAPER</span>
+                    <span id="kpi-balance-type" class="text-dark-accent text-[10px]">PAPER</span>
                 </div>
                 <div class="text-lg md:text-xl font-bold font-mono text-white mt-1" id="kpi-balance">$10,000.00</div>
             </div>
@@ -748,9 +748,21 @@
         function updateDashboard() {
             let openPnl = 0, invested = 0;
             State.positions.forEach(p => { openPnl += p.pnl; invested += p.cost; });
-            const total = State.paperBalance + invested + openPnl;
+            
+            const balTypeEl = document.getElementById('kpi-balance-type');
+            const balEl = document.getElementById('kpi-balance');
+            
+            if (State.tradingMode === 'LIVE' && State.wallet) {
+                balTypeEl.innerText = 'LIVE (SOL)';
+                balTypeEl.className = 'text-dark-danger font-bold text-[10px]';
+                balEl.innerText = `${State.wallet.balance} SOL`;
+            } else {
+                const total = State.paperBalance + invested + openPnl;
+                balTypeEl.innerText = 'PAPER';
+                balTypeEl.className = 'text-dark-accent text-[10px]';
+                balEl.innerText = `$${total.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+            }
 
-            document.getElementById('kpi-balance').innerText = `$${total.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
             const pnlEl = document.getElementById('kpi-pnl');
             pnlEl.innerText = `${openPnl >= 0 ? '+' : ''}$${openPnl.toFixed(2)}`;
             pnlEl.className = `text-lg md:text-xl font-bold font-mono mt-1 ${openPnl >= 0 ? 'text-dark-success' : 'text-dark-danger'}`;
