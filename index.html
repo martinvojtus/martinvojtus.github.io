@@ -22,9 +22,9 @@
                             card: '#12141c',
                             cardSub: '#181b26',
                             border: '#222638',
-                            accent: '#00f2fe',
-                            accentHover: '#00c3d9',
-                            success: '#10b981',
+                            accent: '#00d084',
+                            accentHover: '#00b371',
+                            success: '#00d084',
                             danger: '#f43f5e',
                             warning: '#f59e0b',
                             textMuted: '#94a3b8'
@@ -73,56 +73,70 @@
             border-radius: 4px;
         }
         .glow-accent {
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+            box-shadow: 0 0 15px rgba(0, 208, 132, 0.25);
         }
         .glow-danger {
-            box-shadow: 0 0 15px rgba(244, 63, 94, 0.2);
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.25);
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col bg-dark-bg text-gray-200">
+<body class="min-h-screen flex flex-col bg-dark-bg text-gray-200 overflow-x-hidden w-full">
 
     <!-- MINIMALIST NAVIGATION BAR -->
-    <header class="sticky top-0 z-40 bg-dark-bg/90 backdrop-blur-md border-b border-dark-border px-4 py-3 flex items-center justify-between">
-        <!-- Logo & Coin Selector -->
-        <div class="flex items-center gap-3">
-            <div class="flex items-center gap-2">
+    <header class="sticky top-0 z-40 bg-dark-bg/95 backdrop-blur-md border-b border-dark-border">
+        <!-- Main Top Bar -->
+        <div class="px-3.5 py-2.5 flex items-center justify-between gap-2 max-w-7xl mx-auto w-full">
+            <!-- Brand -->
+            <div class="flex items-center gap-2 shrink-0">
                 <div class="w-2.5 h-2.5 rounded-full bg-dark-accent animate-pulse"></div>
                 <span class="font-bold tracking-tight text-white text-base">AI<span class="text-dark-accent">TERMINAL</span></span>
             </div>
 
-            <!-- Coin Toggle -->
-            <div class="flex items-center bg-dark-card rounded-lg p-0.5 border border-dark-border text-xs font-mono">
-                <button onclick="changePair('BTCUSDT')" id="pair-btn-BTCUSDT" class="px-2.5 py-1 rounded-md text-white bg-dark-cardSub font-semibold transition-all">BTC</button>
-                <button onclick="changePair('ETHUSDT')" id="pair-btn-ETHUSDT" class="px-2.5 py-1 rounded-md text-gray-400 hover:text-white transition-all">ETH</button>
-                <button onclick="changePair('SOLUSDT')" id="pair-btn-SOLUSDT" class="px-2.5 py-1 rounded-md text-gray-400 hover:text-white transition-all">SOL</button>
+            <!-- Desktop Coin Toggle (hidden on mobile, shown on md+) -->
+            <div class="hidden md:flex items-center bg-dark-card rounded-lg p-0.5 border border-dark-border text-xs font-mono">
+                <button onclick="changePair('BTCUSDT')" id="pair-btn-BTCUSDT-d" class="px-2.5 py-1 rounded-md text-white bg-dark-cardSub font-semibold transition-all">BTC</button>
+                <button onclick="changePair('ETHUSDT')" id="pair-btn-ETHUSDT-d" class="px-2.5 py-1 rounded-md text-gray-400 hover:text-white transition-all">ETH</button>
+                <button onclick="changePair('SOLUSDT')" id="pair-btn-SOLUSDT-d" class="px-2.5 py-1 rounded-md text-gray-400 hover:text-white transition-all">SOL</button>
+            </div>
+
+            <!-- Controls: Setup, Mode, Bot Toggle & Connect Wallet -->
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <!-- Mode Toggle -->
+                <button onclick="toggleTradingMode()" id="btn-mode-toggle" class="px-2 py-1.5 rounded-lg bg-dark-card border border-dark-border text-xs font-mono transition-all flex items-center gap-1.5" title="Prepnúť Paper / Live On-Chain režim">
+                    <span id="mode-dot" class="w-2 h-2 rounded-full bg-dark-accent"></span>
+                    <span id="mode-label" class="text-[11px] font-semibold text-dark-accent">PAPER</span>
+                </button>
+
+                <!-- Settings Modal Trigger -->
+                <button onclick="openSettingsModal()" class="p-2 rounded-lg bg-dark-card border border-dark-border hover:border-gray-500 text-gray-300 hover:text-white transition-all" title="API Kľúč & Nastavenia">
+                    <svg class="w-4 h-4 text-dark-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
+
+                <!-- START / STOP BOT Toggle -->
+                <button id="btn-bot-toggle" onclick="toggleBot()" class="px-2.5 sm:px-3 py-1.5 bg-dark-accent text-black font-semibold rounded-lg text-xs font-mono hover:bg-dark-accentHover transition-all flex items-center gap-1 glow-accent">
+                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                    <span id="btn-bot-text">START</span>
+                </button>
+
+                <!-- Connect Wallet (Phantom, Solflare, MetaMask) -->
+                <button id="btn-wallet" onclick="openWalletModal()" class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-dark-card border border-dark-border hover:border-gray-500 text-gray-200 text-xs font-mono transition-all flex items-center gap-1.5">
+                    <span id="wallet-icon">👛</span>
+                    <span id="wallet-btn-label" class="hidden sm:inline">Peňaženka</span>
+                </button>
             </div>
         </div>
 
-        <!-- Controls: Setup, Mode, Bot Toggle & Connect Wallet -->
-        <div class="flex items-center gap-2">
-            <!-- Mode Toggle: Paper vs Live -->
-            <button onclick="toggleTradingMode()" id="btn-mode-toggle" class="px-2.5 py-1.5 rounded-lg bg-dark-card border border-dark-border hover:border-gray-500 text-gray-200 text-xs font-mono transition-all flex items-center gap-1.5" title="Prepnúť Paper / Live On-Chain režim">
-                <span id="mode-dot" class="w-2 h-2 rounded-full bg-cyan-400"></span>
-                <span id="mode-label">PAPER</span>
-            </button>
-
-            <!-- Settings Modal Trigger -->
-            <button onclick="openSettingsModal()" class="p-2 rounded-lg bg-dark-card border border-dark-border hover:border-gray-500 text-gray-300 hover:text-white transition-all" title="API Kľúč & Nastavenia">
-                <svg class="w-4 h-4 text-dark-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-            </button>
-
-            <!-- START / STOP BOT Toggle -->
-            <button id="btn-bot-toggle" onclick="toggleBot()" class="px-3 py-1.5 bg-dark-accent text-black font-semibold rounded-lg text-xs font-mono hover:bg-dark-accentHover transition-all flex items-center gap-1.5 glow-accent">
-                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
-                <span id="btn-bot-text">START</span>
-            </button>
-
-            <!-- Connect Wallet (Phantom, Solflare, MetaMask) -->
-            <button id="btn-wallet" onclick="openWalletModal()" class="px-3 py-1.5 rounded-lg bg-dark-card border border-dark-border hover:border-gray-500 text-gray-200 text-xs font-mono transition-all flex items-center gap-1.5">
-                <span id="wallet-icon">👛</span>
-                <span id="wallet-btn-label">Peňaženka</span>
-            </button>
+        <!-- Mobile Coin Sub-bar (compact, full width, responsive) -->
+        <div class="md:hidden px-3.5 py-1.5 border-t border-dark-border/60 flex items-center justify-between gap-2 bg-dark-cardSub/40">
+            <div class="flex items-center bg-dark-card rounded-lg p-0.5 border border-dark-border text-xs font-mono flex-1">
+                <button onclick="changePair('BTCUSDT')" id="pair-btn-BTCUSDT-m" class="px-2.5 py-1 rounded-md text-white bg-dark-cardSub font-semibold transition-all flex-1 text-center">BTC</button>
+                <button onclick="changePair('ETHUSDT')" id="pair-btn-ETHUSDT-m" class="px-2.5 py-1 rounded-md text-gray-400 hover:text-white transition-all flex-1 text-center">ETH</button>
+                <button onclick="changePair('SOLUSDT')" id="pair-btn-SOLUSDT-m" class="px-2.5 py-1 rounded-md text-gray-400 hover:text-white transition-all flex-1 text-center">SOL</button>
+            </div>
+            <div class="flex items-center gap-1 text-xs font-mono text-right pl-2 shrink-0">
+                <span id="mobile-top-price" class="font-bold text-white text-xs">$0.00</span>
+                <span id="mobile-top-change" class="text-dark-success font-semibold text-[10px]">+0.00%</span>
+            </div>
         </div>
     </header>
 
@@ -417,9 +431,9 @@
         });
 
         const candleSeries = chart.addCandlestickSeries({
-            upColor: '#10b981', downColor: '#f43f5e',
-            borderUpColor: '#10b981', borderDownColor: '#f43f5e',
-            wickUpColor: '#10b981', wickDownColor: '#f43f5e'
+            upColor: '#00d084', downColor: '#f43f5e',
+            borderUpColor: '#00d084', borderDownColor: '#f43f5e',
+            wickUpColor: '#00d084', wickDownColor: '#f43f5e'
         });
 
         new ResizeObserver(() => {
@@ -447,15 +461,25 @@
                 State.currentPrice = lastCandle.close;
 
                 // UI updates
-                document.getElementById('chart-price-text').innerText = `$${State.currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                const formattedPrice = `$${State.currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                document.getElementById('chart-price-text').innerText = formattedPrice;
+                const mobPrice = document.getElementById('mobile-top-price');
+                if (mobPrice) mobPrice.innerText = formattedPrice;
 
                 const tickRes = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${State.pair}`);
                 if (tickRes.ok) {
                     const tick = await tickRes.json();
                     const chg = parseFloat(tick.priceChangePercent);
+                    const chgStr = `${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%`;
                     const chgEl = document.getElementById('chart-change-text');
-                    chgEl.innerText = `${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%`;
+                    chgEl.innerText = chgStr;
                     chgEl.className = chg >= 0 ? 'text-xs font-mono text-dark-success font-semibold' : 'text-xs font-mono text-dark-danger font-semibold';
+                    
+                    const mobChg = document.getElementById('mobile-top-change');
+                    if (mobChg) {
+                        mobChg.innerText = chgStr;
+                        mobChg.className = chg >= 0 ? 'text-dark-success font-semibold text-[10px]' : 'text-dark-danger font-semibold text-[10px]';
+                    }
                 }
 
                 computeIndicators();
@@ -1015,8 +1039,14 @@
         function changePair(p) {
             State.pair = p;
             ['BTCUSDT', 'ETHUSDT', 'SOLUSDT'].forEach(c => {
-                const b = document.getElementById(`pair-btn-${c}`);
-                b.className = c === p ? 'px-2.5 py-1 rounded-md text-white bg-dark-cardSub font-semibold transition-all' : 'px-2.5 py-1 rounded-md text-gray-400 hover:text-white transition-all';
+                ['-d', '-m'].forEach(sfx => {
+                    const b = document.getElementById(`pair-btn-${c}${sfx}`);
+                    if (b) {
+                        b.className = c === p 
+                            ? 'px-2.5 py-1 rounded-md text-white bg-dark-cardSub font-semibold transition-all' + (sfx === '-m' ? ' flex-1 text-center' : '')
+                            : 'px-2.5 py-1 rounded-md text-gray-400 hover:text-white transition-all' + (sfx === '-m' ? ' flex-1 text-center' : '');
+                    }
+                });
             });
             document.getElementById('chart-pair-text').innerText = `${p.replace('USDT', '')}/USDT`;
             State.chartMarkers = [];
@@ -1085,9 +1115,9 @@
                 lbl.className = 'text-dark-danger font-bold';
                 btn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-mono font-semibold transition-all flex items-center gap-1.5 border border-dark-danger/60 bg-dark-danger/10 glow-danger';
             } else {
-                dot.className = 'w-2 h-2 rounded-full bg-cyan-400';
+                dot.className = 'w-2 h-2 rounded-full bg-dark-accent';
                 lbl.innerText = 'PAPER';
-                lbl.className = 'text-cyan-400 font-semibold';
+                lbl.className = 'text-dark-accent font-semibold';
                 btn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-mono font-semibold transition-all flex items-center gap-1.5 border border-dark-border bg-dark-card hover:border-gray-500';
             }
         }
