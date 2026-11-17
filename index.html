@@ -221,6 +221,26 @@
             <div id="chart-container" class="w-full h-[280px] md:h-[360px] relative bg-[#090a0f]"></div>
         </section>
 
+        <!-- QUICK TRADING ACTION BAR -->
+        <section class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 font-mono text-xs">
+            <button onclick="manualQuickBuy()" class="p-2.5 rounded-xl bg-dark-success/15 hover:bg-dark-success/25 border border-dark-success/40 text-dark-success font-bold flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-dark-success/10 active:scale-95" title="Okamžite otvoriť scalping pozíciu na aktuálnom tokene">
+                <span class="text-sm">⚡</span>
+                <span>RÝCHLY SCALP</span>
+            </button>
+            <button onclick="closeAllPositions('Manuálny výstup')" class="p-2.5 rounded-xl bg-dark-danger/15 hover:bg-dark-danger/25 border border-dark-danger/40 text-dark-danger font-bold flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-dark-danger/10 active:scale-95" title="Zavrieť všetky otvorené pozície">
+                <span class="text-sm">🛑</span>
+                <span>ZAVRIEŤ VŠETKO</span>
+            </button>
+            <button onclick="forceScanTrade()" class="p-2.5 rounded-xl bg-dark-card hover:bg-dark-cardSub border border-dark-border hover:border-gray-500 text-white font-semibold flex items-center justify-center gap-1.5 transition-all active:scale-95" title="Vynútiť AI skenovanie grafu ihneď">
+                <span class="text-sm">🎯</span>
+                <span>SKENOVAŤ TRH</span>
+            </button>
+            <div class="p-2.5 rounded-xl bg-dark-card border border-dark-border flex items-center justify-between px-3 text-[11px]">
+                <span class="text-gray-400">PROFIL:</span>
+                <span id="active-strat-badge" class="font-bold text-dark-accent truncate">Standard (+1.5%/-1.0%)</span>
+            </div>
+        </section>
+
         <!-- TWO COLUMN SECTION: AI LIVE TERMINAL & ACTIVE POSITIONS -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             
@@ -516,6 +536,7 @@
             timeframe: '1m',
             currentPrice: 0,
             previousPrice: 0,
+            tokenPrices: {}, // Real-time prices per token: { 'SOLUSDT': 74.0, 'JUPUSDT': 0.26, ... }
             candleData: [],
             tradingMode: localStorage.getItem('terminal_mode') || 'PAPER', // 'PAPER' | 'LIVE'
             strategy: localStorage.getItem('terminal_strategy') || 'STANDARD',
@@ -580,6 +601,7 @@
             const oldPrice = State.currentPrice;
             State.previousPrice = oldPrice;
             State.currentPrice = newPrice;
+            if (State.pair) State.tokenPrices[State.pair] = newPrice;
 
             const formatted = formatPrice(newPrice);
             const pEl = document.getElementById('chart-price-text');
@@ -815,7 +837,7 @@
             if (chartPairEl) chartPairEl.innerText = `${tokenObj.symbol}/USDT`;
         }
 
-        // --- AI DECISION ENGINE ---
+        // --- AI SCALPING ENGINE (CONFLUENCE CALCULATIONS) ---
         async function runAIEngine() {
             if (!State.botRunning) return;
             const indicators = computeIndicators() || { rsi: 50, ema9: State.currentPrice, ema21: State.currentPrice };
@@ -827,10 +849,31 @@
 
             let decision = null;
 
-            // 1. Direct Gemini API
+            // 1. Direct Gemini AI API (with aggressive scalping directions)
             if (State.geminiKey && State.geminiKey.length > 10) {
                 try {
-                    const prompt = `Solana crypto trading analysis for ${State.pair}. Current Price: ${price}, RSI: ${rsi.toFixed(1)}, EMA9: ${ema9.toFixed(4)}, EMA21: ${ema21.toFixed(4)}, Strategy: ${strat.name} (TP: +${strat.tpPct}%, SL: -${strat.slPct}%), Open Positions: ${State.positions.length}. You are an elite Solana scalper bot targeting micro-profits. Look for EMA9/EMA21 momentum crossovers and oversold RSI bounces. Respond in JSON only: {"action":"BUY"|"SELL"|"HOLD","confidence":85,"reasoning":"short slovak rationale"}`;
+                    const prompt = `You are an active high-frequency Solana scalping bot executing 1-minute trades.
+Asset: ${State.pair}
+Price: ${price}
+RSI(14): ${rsi.toFixed(1)}
+EMA(9): ${ema9.toFixed(4)}
+EMA(21): ${ema21.toFixed(4)}
+Trend: ${ema9 >= ema21 ? 'BULLISH (EMA9 >= EMA21)' : 'BEARISH (EMA9 < EMA21)'}
+Strategy: ${strat.name} (Take-Profit: +${strat.tpPct}%, Stop-Loss: -${strat.slPct}%)
+Active Positions: ${State.positions.length}
+
+SCALPING RULES:
+- If Active Positions < 2 and no position on ${State.pair}:
+  * If Trend is BULLISH and RSI is between 42 and 68: You MUST signal "BUY" to ride momentum towards +${strat.tpPct}%.
+  * If RSI <= 38 and price is bouncing: Signal "BUY" (oversold dip scalp).
+  * If RSI >= 72: Signal "HOLD" (overbought zone).
+  * If Trend is BEARISH with RSI < 42: Signal "HOLD" (downtrend).
+- If has open position on ${State.pair}:
+  * If RSI > 72 or EMA trend flipped BEARISH: Signal "SELL" to lock in profit.
+  * Else: Signal "HOLD".
+
+Output strict JSON: {"action":"BUY"|"SELL"|"HOLD","confidence":85,"reasoning":"stručný dôvod v slovenčine"}`;
+
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${State.geminiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -848,39 +891,72 @@
                 }
             }
 
-            // 2. High-Frequency Algorithmic Fallback (EMA9/EMA21 Cross & RSI)
+            // 2. High-Frequency Quantitative Algorithmic Engine (Triple Confluence)
             if (!decision) {
-                const emaBullish = ema9 > ema21;
+                const emaBullish = ema9 >= ema21;
                 const emaBearish = ema9 < ema21;
+                const currentCandle = State.candleData.length > 0 ? State.candleData[State.candleData.length - 1] : null;
+                const isGreenCandle = currentCandle ? (currentCandle.close >= currentCandle.open) : true;
+                const alreadyOpenOnPair = State.positions.some(p => p.pair === State.pair);
 
-                if (State.positions.length === 0) {
-                    if ((rsi < 45 && emaBullish) || rsi <= 32) {
+                if (!alreadyOpenOnPair && State.positions.length < 2) {
+                    // Trigger 1: Trend Momentum Scalp (EMA9 >= EMA21, RSI 44-68, price holding near/above EMA21)
+                    if (emaBullish && rsi >= 44 && rsi <= 68 && price >= ema21 * 0.998) {
+                        decision = {
+                            action: "BUY",
+                            confidence: 88,
+                            reasoning: `Trend Momentum Scalp: Býčie EMA9 > EMA21, RSI (${rsi.toFixed(1)}) v pásme rastu. Cielime na +${strat.tpPct}% TP.`
+                        };
+                    }
+                    // Trigger 2: Oversold Dip Rebound (RSI <= 38 with green bouncing candle or RSI <= 30)
+                    else if ((rsi <= 38 && isGreenCandle) || rsi <= 30) {
+                        decision = {
+                            action: "BUY",
+                            confidence: 90,
+                            reasoning: `Oversold Rebound Scalp: Prepredaný trh RSI (${rsi.toFixed(1)}) + odraz nahor. Cielime na +${strat.tpPct}% TP.`
+                        };
+                    }
+                    // Trigger 3: Breakout / Micro-Golden Cross (Price above EMA9 in bullish trend)
+                    else if (emaBullish && rsi >= 40 && rsi < 65 && price > ema9) {
                         decision = {
                             action: "BUY",
                             confidence: 85,
-                            reasoning: `Scalp nákup: RSI (${rsi.toFixed(1)}), ${emaBullish ? 'EMA9 preťala EMA21 nahor (býčí trend)' : 'prepredané pásmo'}. Cieľ: +${strat.tpPct}% TP.`
+                            reasoning: `EMA Breakout Scalp: Cena nad EMA9 ($${formatPrice(ema9)}), rastový setup pre mikro-profit.`
                         };
                     } else {
                         decision = {
                             action: "HOLD",
                             confidence: 70,
-                            reasoning: `Konsolidácia (${State.pair}). RSI: ${rsi.toFixed(1)}, EMA: ${emaBullish ? 'býčí' : 'medvedí'}.`
+                            reasoning: `Čakanie na signál (${State.pair}). RSI: ${rsi.toFixed(1)}, Trend: ${emaBullish ? 'býčí' : 'medvedí'}.`
                         };
                     }
-                } else {
-                    if (rsi > 65 || (emaBearish && rsi > 52)) {
+                } else if (alreadyOpenOnPair) {
+                    // Exit check for open position
+                    if (rsi > 72) {
+                        decision = {
+                            action: "SELL",
+                            confidence: 85,
+                            reasoning: `Exhaustion exit: RSI (${rsi.toFixed(1)}) dosiahlo prekúpené pásmo. Zabezpečenie zisku.`
+                        };
+                    } else if (emaBearish && rsi < 44) {
                         decision = {
                             action: "SELL",
                             confidence: 80,
-                            reasoning: `Scalp výstup: RSI (${rsi.toFixed(1)}), ${emaBearish ? 'EMA obrat nadol' : 'prekúpené pásmo'}. Zabezpečenie zisku.`
+                            reasoning: `Trend reversal exit: EMA obrat nadol, prevencia straty.`
                         };
                     } else {
                         decision = {
                             action: "HOLD",
                             confidence: 75,
-                            reasoning: `Pozícia aktívna. Sledovanie cieľa TP (+${strat.tpPct}%) / SL (-${strat.slPct}%).`
+                            reasoning: `Pozícia ${State.pair} aktívna. Sledovanie TP (+${strat.tpPct}%) / Trailing SL.`
                         };
                     }
+                } else {
+                    decision = {
+                        action: "HOLD",
+                        confidence: 70,
+                        reasoning: `Dosiahnutý limit 2 otvorených pozícií. Spravujem aktívne obchody.`
+                    };
                 }
             }
 
@@ -902,7 +978,9 @@
 
             // 2. SIMULATED PAPER TRADING MODE
             const strat = STRATEGY_CONFIGS[State.strategy] || STRATEGY_CONFIGS.STANDARD;
-            if (dec.action === 'BUY' && State.positions.length === 0) {
+            const alreadyOpenOnPair = State.positions.some(p => p.pair === State.pair);
+
+            if (dec.action === 'BUY' && !alreadyOpenOnPair && State.positions.length < 2) {
                 const cost = State.paperBalance * (State.riskPct / 100);
                 const slPrice = State.currentPrice * (1 - strat.slPct / 100);
                 const tpPrice = State.currentPrice * (1 + strat.tpPct / 100);
@@ -924,12 +1002,43 @@
                 State.paperBalance -= cost;
                 saveState();
                 Sound.playBuy();
-                addMarker(Math.floor(Date.now() / 1000), 'belowBar', '#00d084', 'arrowUp', `BUY`);
+                addMarker(Math.floor(Date.now() / 1000), 'belowBar', '#00d084', 'arrowUp', `BUY ${State.pair.replace('USDT', '')}`);
                 renderPositions();
+                updateDashboard();
                 appendLog(`[OBCHOD] Otvorená LONG pozícia $${cost.toFixed(2)} @ ${formatPrice(State.currentPrice)} (TP: ${formatPrice(tpPrice)}, SL: ${formatPrice(slPrice)})`, 'text-dark-success font-semibold');
             } else if (dec.action === 'SELL' && State.positions.length > 0) {
-                closeAllPositions(`AI signál: ${dec.reasoning}`);
+                const idx = State.positions.findIndex(p => p.pair === State.pair);
+                if (idx !== -1) {
+                    closePosition(idx, `AI signál: ${dec.reasoning}`);
+                } else {
+                    closeAllPositions(`AI signál: ${dec.reasoning}`);
+                }
             }
+        }
+
+        // --- MANUAL TRADING SHORTCUTS ---
+        function manualQuickBuy() {
+            if (State.currentPrice <= 0) {
+                appendLog('[CHYBA] Trhové dáta sa načítavajú, chvíľu počkajte...', 'text-dark-danger');
+                return;
+            }
+            const alreadyOpenOnPair = State.positions.some(p => p.pair === State.pair);
+            if (alreadyOpenOnPair) {
+                appendLog(`[UPOZORNENIE] Pre pár ${State.pair} už máte otvorenú pozíciu.`, 'text-dark-warning');
+                return;
+            }
+            const strat = STRATEGY_CONFIGS[State.strategy] || STRATEGY_CONFIGS.STANDARD;
+            const dec = {
+                action: "BUY",
+                confidence: 99,
+                reasoning: `Manuálny rýchly scalp vstup @ ${formatPrice(State.currentPrice)} (${strat.name})`
+            };
+            processDecision(dec);
+        }
+
+        function forceScanTrade() {
+            appendLog('[AI SCAN] Okamžité vyvolanie trhovej analýzy...', 'text-dark-accent font-semibold');
+            runAIEngine();
         }
 
         // --- LIVE ON-CHAIN DEX TRADING (SOLANA JUPITER AGGREGATOR) ---
@@ -1048,18 +1157,35 @@
             }
         }
 
-        // --- POSITIONS MANAGEMENT ---
+        // --- POSITIONS MANAGEMENT & TRAILING STOP LOSS ---
         function evaluatePositionsPnL() {
             for (let i = State.positions.length - 1; i >= 0; i--) {
                 const p = State.positions[i];
-                p.current = State.currentPrice;
-                p.pnl = (State.currentPrice - p.entry) * p.amount;
+                // Use token-specific price if available to prevent cross-pair contamination
+                const livePrice = (p.pair === State.pair) 
+                    ? State.currentPrice 
+                    : (State.tokenPrices[p.pair] || p.current);
 
-                if (State.currentPrice <= p.sl) {
-                    appendLog(`[STOP LOSS] Pozícia uzavretá pri ${formatPrice(State.currentPrice)} (Loss: -$${Math.abs(p.pnl).toFixed(2)})`, 'text-dark-danger font-semibold');
+                p.current = livePrice;
+                p.pnl = (livePrice - p.entry) * p.amount;
+                const pnlPct = p.cost > 0 ? (p.pnl / p.cost) * 100 : 0;
+
+                // Trailing Stop Loss Stage 1: At +0.4% profit, move SL to breakeven +0.1% to guarantee zero risk
+                if (pnlPct >= 0.4 && p.sl < p.entry * 1.001) {
+                    p.sl = p.entry * 1.001;
+                    appendLog(`[TRAILING STOP] ${p.pair}: Stop-Loss posunutý na Break-Even (+0.1%)! Zisk je chránený.`, 'text-dark-accent font-semibold');
+                }
+                // Trailing Stop Loss Stage 2: At +0.8% profit, lock in +0.4% profit minimum
+                if (pnlPct >= 0.8 && p.sl < p.entry * 1.004) {
+                    p.sl = p.entry * 1.004;
+                    appendLog(`[TRAILING STOP] ${p.pair}: Stop-Loss posunutý na +0.4% profit lock!`, 'text-dark-success font-semibold');
+                }
+
+                if (livePrice <= p.sl) {
+                    appendLog(`[STOP LOSS] ${p.pair} uzavretá pri ${formatPrice(livePrice)} (Loss: -$${Math.abs(p.pnl).toFixed(2)})`, 'text-dark-danger font-semibold');
                     closePosition(i, 'Stop Loss');
-                } else if (State.currentPrice >= p.tp) {
-                    appendLog(`[TAKE PROFIT] Pozícia uzavretá pri ${formatPrice(State.currentPrice)} (Zisk: +$${p.pnl.toFixed(2)})`, 'text-dark-success font-bold');
+                } else if (livePrice >= p.tp) {
+                    appendLog(`[TAKE PROFIT] ${p.pair} uzavretá pri ${formatPrice(livePrice)} (Zisk: +$${p.pnl.toFixed(2)})`, 'text-dark-success font-bold');
                     closePosition(i, 'Take Profit');
                 }
             }
@@ -1069,14 +1195,15 @@
         function closePosition(idx, reason = 'Manuálne') {
             if (idx < 0 || idx >= State.positions.length) return;
             const p = State.positions[idx];
-            const pnl = (State.currentPrice - p.entry) * p.amount;
+            const livePrice = (p.pair === State.pair) ? State.currentPrice : (State.tokenPrices[p.pair] || p.current);
+            const pnl = (livePrice - p.entry) * p.amount;
 
             State.paperBalance += (p.cost + pnl);
             State.history.unshift({
                 time: new Date().toLocaleTimeString(),
                 pair: p.pair,
                 entry: p.entry,
-                exit: State.currentPrice,
+                exit: livePrice,
                 pnl: pnl,
                 reason: reason
             });
@@ -1136,6 +1263,13 @@
             if (State.history.length > 0) {
                 const wins = State.history.filter(h => h.pnl > 0).length;
                 document.getElementById('kpi-winrate').innerText = `${((wins / State.history.length) * 100).toFixed(1)}%`;
+            }
+
+            // Update strategy badge in quick bar
+            const stratBadge = document.getElementById('active-strat-badge');
+            if (stratBadge) {
+                const strat = STRATEGY_CONFIGS[State.strategy] || STRATEGY_CONFIGS.STANDARD;
+                stratBadge.innerText = `${strat.name} (+${strat.tpPct}% / -${strat.slPct}%)`;
             }
         }
 
@@ -1422,9 +1556,9 @@
             if (State.botRunning) {
                 btn.className = 'px-2.5 sm:px-3 py-1 sm:py-1.5 bg-dark-card border border-dark-danger text-dark-danger font-semibold rounded-lg text-xs font-mono hover:bg-dark-danger/10 transition-all flex items-center gap-1 glow-danger shrink-0';
                 txt.innerText = 'STOP';
-                appendLog('[SYSTEM] AI Bot spustený v režime autonómneho tradingu.', 'text-dark-success font-semibold');
+                appendLog('[SYSTEM] AI Scalper spustený (cyklus 6s). Hľadám vstupné príležitosti...', 'text-dark-success font-semibold');
                 runAIEngine();
-                State.timerId = setInterval(runAIEngine, 12000);
+                State.timerId = setInterval(runAIEngine, 6000);
             } else {
                 btn.className = 'px-2.5 sm:px-3 py-1 sm:py-1.5 bg-dark-accent text-black font-semibold rounded-lg text-xs font-mono hover:bg-dark-accentHover transition-all flex items-center gap-1 glow-accent shrink-0';
                 txt.innerText = 'START';
@@ -1555,6 +1689,7 @@
 
             closeSettingsModal();
             const strat = STRATEGY_CONFIGS[State.strategy] || STRATEGY_CONFIGS.STANDARD;
+            updateDashboard();
             appendLog(`[NASTAVENIA] Uložené. Režim: ${State.tradingMode}, Profil: ${strat.name}, Live Objem: ${State.liveTradeAmount} SOL`, 'text-dark-accent font-semibold');
         }
 
