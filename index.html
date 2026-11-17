@@ -48,9 +48,7 @@
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <!-- Solana Web3.js for Phantom & Solflare -->
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
-    <!-- Ethers.js for EVM Wallets -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.1/ethers.umd.min.js"></script>
-
+    
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -92,12 +90,7 @@
                 <span class="font-bold tracking-tight text-white text-xs sm:text-base">AI<span class="text-dark-accent">TERMINAL</span></span>
             </div>
 
-            <!-- Desktop Coin Toggle (hidden on mobile, shown on md+) -->
-            <div class="hidden md:flex items-center bg-dark-card rounded-lg p-0.5 border border-dark-border text-xs font-mono">
-                <button onclick="changePair('BTCUSDT')" id="pair-btn-BTCUSDT-d" class="px-2.5 py-1 rounded-md text-white bg-dark-cardSub font-semibold transition-all">BTC</button>
-                <button onclick="changePair('ETHUSDT')" id="pair-btn-ETHUSDT-d" class="px-2.5 py-1 rounded-md text-gray-400 hover:text-white transition-all">ETH</button>
-                <button onclick="changePair('SOLUSDT')" id="pair-btn-SOLUSDT-d" class="px-2.5 py-1 rounded-md text-gray-400 hover:text-white transition-all">SOL</button>
-            </div>
+            
 
             <!-- Controls: Setup, Mode, Bot Toggle & Connect Wallet -->
             <div class="flex items-center gap-1 sm:gap-2 shrink-0">
@@ -118,7 +111,7 @@
                     <span id="btn-bot-text">START</span>
                 </button>
 
-                <!-- Connect Wallet (Phantom, Solflare, MetaMask) -->
+                <!-- Connect Wallet (Phantom, Solflare) -->
                 <button id="btn-wallet" onclick="openWalletModal()" class="px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg bg-dark-card border border-dark-border hover:border-gray-500 text-gray-200 text-xs font-mono transition-all flex items-center gap-1 shrink-0">
                     <span id="wallet-icon">👛</span>
                     <span id="wallet-btn-label" class="hidden sm:inline">Peňaženka</span>
@@ -128,11 +121,7 @@
 
         <!-- Mobile Coin Sub-bar (compact, full width, responsive) -->
         <div class="md:hidden px-2.5 py-1 border-t border-dark-border/60 flex items-center justify-between gap-1 bg-dark-cardSub/40 w-full">
-            <div class="flex items-center bg-dark-card rounded-lg p-0.5 border border-dark-border text-xs font-mono flex-1">
-                <button onclick="changePair('BTCUSDT')" id="pair-btn-BTCUSDT-m" class="px-2 py-0.5 rounded-md text-white bg-dark-cardSub font-semibold transition-all flex-1 text-center text-[11px]">BTC</button>
-                <button onclick="changePair('ETHUSDT')" id="pair-btn-ETHUSDT-m" class="px-2 py-0.5 rounded-md text-gray-400 hover:text-white transition-all flex-1 text-center text-[11px]">ETH</button>
-                <button onclick="changePair('SOLUSDT')" id="pair-btn-SOLUSDT-m" class="px-2 py-0.5 rounded-md text-gray-400 hover:text-white transition-all flex-1 text-center text-[11px]">SOL</button>
-            </div>
+            <div class="flex-1 text-white font-bold text-xs tracking-widest pl-2">SOLANA NETWORK</div>
             <div class="flex items-center gap-1 text-xs font-mono text-right pl-1.5 shrink-0">
                 <span id="mobile-top-price" class="font-bold text-white text-[11px]">$0.00</span>
                 <span id="mobile-top-change" class="text-dark-success font-semibold text-[10px]">+0.00%</span>
@@ -187,7 +176,7 @@
             <!-- Header bar of chart -->
             <div class="p-3 border-b border-dark-border flex flex-wrap items-center justify-between gap-2 bg-dark-cardSub/40">
                 <div class="flex items-center gap-3">
-                    <span class="font-bold text-white font-mono text-sm" id="chart-pair-text">BTC/USDT</span>
+                    <span class="font-bold text-white font-mono text-sm" id="chart-pair-text">SOL/USDT</span>
                     <span class="font-bold text-white font-mono text-sm" id="chart-price-text">$0.00</span>
                     <span id="chart-change-text" class="text-xs font-mono text-dark-success font-semibold">+0.00%</span>
                 </div>
@@ -227,7 +216,7 @@
 
                 <div id="terminal-logs" class="flex-1 p-3 overflow-y-auto font-mono text-[11px] space-y-1.5 leading-relaxed bg-[#06070a] text-gray-300">
                     <div class="text-gray-500">[SYSTEM] Inicializovaný minimalistický terminál.</div>
-                    <div class="text-gray-500">[FEED] Pripojený na živý trhový stream (BTC, ETH, SOL)...</div>
+                    <div class="text-gray-500">[FEED] Pripojený na živý trhový stream (SOL)...</div>
                     <div class="text-dark-accent">[AI-CORE] Pripravený na autonómne obchodovanie. Klikni na START pre spustenie.</div>
                 </div>
             </div>
@@ -320,17 +309,7 @@
                     <span id="tag-solflare" class="text-[10px] font-mono px-2 py-0.5 rounded bg-dark-border text-gray-300">Pripojiť</span>
                 </button>
 
-                <!-- MetaMask / EVM -->
-                <button onclick="connectMetaMask()" class="w-full p-3 rounded-xl bg-dark-cardSub hover:bg-dark-border/60 border border-dark-border flex items-center justify-between transition-all group">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-[#f6851b]/20 flex items-center justify-center text-lg">🦊</div>
-                        <div class="text-left font-mono">
-                            <div class="text-xs font-bold text-white group-hover:text-dark-accent transition-colors">MetaMask / Web3</div>
-                            <div class="text-[10px] text-gray-400">Ethereum, EVM</div>
-                        </div>
-                    </div>
-                    <span id="tag-metamask" class="text-[10px] font-mono px-2 py-0.5 rounded bg-dark-border text-gray-300">Pripojiť</span>
-                </button>
+                
             </div>
             
             <p class="text-[11px] text-gray-500 font-mono text-center">Podporuje mobilné aj desktopové krypto peňaženky.</p>
@@ -363,7 +342,7 @@
                         <input id="input-risk" type="number" value="2.0" step="0.5" max="5.0" class="w-full bg-dark-bg border border-dark-border rounded-lg p-2.5 text-white focus:outline-none focus:border-dark-accent">
                     </div>
                     <div>
-                        <label class="text-gray-300 font-semibold block mb-1">Live Obchod (SOL/ETH)</label>
+                        <label class="text-gray-300 font-semibold block mb-1">Live Obchod (SOL)</label>
                         <input id="input-live-amount" type="number" value="0.05" step="0.01" min="0.001" class="w-full bg-dark-bg border border-dark-border rounded-lg p-2.5 text-white focus:outline-none focus:border-dark-accent">
                     </div>
                 </div>
@@ -397,7 +376,7 @@
         // --- STATE ---
         const State = {
             botRunning: false,
-            pair: 'BTCUSDT',
+            pair: 'SOLUSDT',
             timeframe: '1m',
             currentPrice: 0,
             candleData: [],
@@ -537,7 +516,7 @@
             // Direct Gemini API
             if (State.geminiKey && State.geminiKey.length > 10) {
                 try {
-                    const prompt = `Crypto AI analysis for ${State.pair}. Price: ${price}, RSI: ${rsi.toFixed(1)}, EMA: ${ema.toFixed(1)}, Positions: ${State.positions.length}. Return JSON: {"action":"BUY"|"SELL"|"HOLD","confidence":85,"reasoning":"short reason in slovak"}`;
+                    const prompt = `Crypto AI analysis for ${State.pair}. Price: ${price}, RSI: ${rsi.toFixed(1)}, EMA: ${ema.toFixed(1)}, Positions: ${State.positions.length}. You are a high-frequency scalping bot targeting Solana meme coins and SOL tokens. Target 0.5% - 1.5% micro-profits per trade. Keep risk tight. Return JSON: {"action":"BUY"|"SELL"|"HOLD","confidence":85,"reasoning":"short reason in slovak"}`;
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${State.geminiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -557,10 +536,10 @@
 
             // Algorithmic Fallback
             if (!decision) {
-                if (rsi < 35) {
-                    decision = { action: "BUY", confidence: 85, reasoning: `Oversold RSI (${rsi.toFixed(1)}). Býčí odraz.` };
-                } else if (rsi > 65 && State.positions.length > 0) {
-                    decision = { action: "SELL", confidence: 80, reasoning: `Overbought RSI (${rsi.toFixed(1)}). Zabezpečenie zisku.` };
+                if (rsi < 45 && ema < price) {
+                    decision = { action: "BUY", confidence: 85, reasoning: `Rýchly scalping: RSI (${rsi.toFixed(1)}), cena nad EMA. Cielime na 0.5% zisk.` };
+                } else if (rsi > 60 && State.positions.length > 0) {
+                    decision = { action: "SELL", confidence: 80, reasoning: `Scalp exit: RSI (${rsi.toFixed(1)}). Zabezpečenie rýchleho zisku.` };
                 } else {
                     decision = { action: "HOLD", confidence: 70, reasoning: `Konsolidácia v neutrálnej zóne (${rsi.toFixed(1)}).` };
                 }
@@ -593,8 +572,8 @@
                     current: State.currentPrice,
                     cost: cost,
                     amount: cost / State.currentPrice,
-                    sl: State.currentPrice * 0.98,
-                    tp: State.currentPrice * 1.04,
+                    sl: State.currentPrice * 0.99, // 1% SL
+                    tp: State.currentPrice * 1.015, // 1.5% TP
                     pnl: 0,
                     time: new Date().toLocaleTimeString()
                 };
@@ -612,15 +591,13 @@
         // --- LIVE ON-CHAIN DEX TRADING (SOLANA & EVM) ---
         async function executeLiveWalletTrade(action, dec) {
             if (!State.wallet) {
-                appendLog('[LIVE CHYBA] Pre reálne on-chain obchodovanie pripojte peňaženku (Phantom, Solflare, MetaMask).', 'text-dark-danger font-semibold');
+                appendLog('[LIVE CHYBA] Pre reálne on-chain obchodovanie pripojte peňaženku (Phantom, Solflare).', 'text-dark-danger font-semibold');
                 openWalletModal();
                 return;
             }
 
             if (State.wallet.chain === 'SOL') {
                 await executeSolanaLiveTrade(action, dec);
-            } else {
-                await executeEVMLiveTrade(action, dec);
             }
         }
 
@@ -715,35 +692,6 @@
                 }
             } catch (err) {
                 appendLog(`[LIVE CHYBA] Transakcia zamietnutá alebo zlyhala: ${err.message}`, 'text-dark-danger');
-            }
-        }
-
-        async function executeEVMLiveTrade(action, dec) {
-            try {
-                if (!window.ethereum) {
-                    appendLog('[LIVE CHYBA] MetaMask peňaženka nie je dostupná.', 'text-dark-danger');
-                    return;
-                }
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const signer = await provider.getSigner();
-                appendLog(`[LIVE EVM] Pripravujem ${action} pokyn na Ethereum/EVM...`, 'text-dark-accent');
-                
-                appendLog('[PEŇAŽENKA] Potvrďte transakciu v MetaMask...', 'text-dark-warning');
-                const tx = await signer.sendTransaction({
-                    to: State.wallet.address,
-                    value: ethers.parseEther(State.liveTradeAmount.toString())
-                });
-                
-                const shortHash = tx.hash.slice(0, 10) + '...';
-                appendLog(`[LIVE EVM POTVRDENÉ] Obchod zapísaný! <a href="https://etherscan.io/tx/${tx.hash}" target="_blank" class="underline text-dark-accent font-semibold">${shortHash} ↗</a>`, 'text-dark-success font-bold');
-                
-                addMarker(Math.floor(Date.now() / 1000), action === 'BUY' ? 'belowBar' : 'aboveBar', action === 'BUY' ? '#10b981' : '#f43f5e', action === 'BUY' ? 'arrowUp' : 'arrowDown', `LIVE ${action}`);
-                
-                const balWei = await provider.getBalance(State.wallet.address);
-                const balEth = parseFloat(ethers.formatEther(balWei)).toFixed(4);
-                setConnectedWallet(State.wallet.address, balEth, 'ETH', State.wallet.icon);
-            } catch (err) {
-                appendLog(`[LIVE EVM CHYBA] ${err.message}`, 'text-dark-danger');
             }
         }
 
@@ -919,10 +867,7 @@
             const tagSf = document.getElementById('tag-solflare');
             if (tagSf) tagSf.innerText = hasSolflare ? 'Pripojiť' : (isMobile ? 'Otvoriť App' : 'Inštalovať');
 
-            // MetaMask
-            const hasMetaMask = !!window.ethereum;
-            const tagMm = document.getElementById('tag-metamask');
-            if (tagMm) tagMm.innerText = hasMetaMask ? 'Pripojiť' : (isMobile ? 'Otvoriť App' : 'Inštalovať');
+            
         }
 
         async function connectPhantom() {
@@ -978,33 +923,7 @@
             }
         }
 
-        async function connectMetaMask() {
-            try {
-                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                if (!window.ethereum) {
-                    if (isMobile) {
-                        const targetUrl = new URL(window.location.href);
-                        targetUrl.searchParams.set('autoConnect', 'metamask');
-                        const dappUrl = targetUrl.host + targetUrl.pathname + targetUrl.search;
-                        window.location.href = `https://metamask.app.link/dapp/${dappUrl}`;
-                        return;
-                    } else {
-                        window.open('https://metamask.io/download/', '_blank');
-                        return;
-                    }
-                }
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const accounts = await provider.send("eth_requestAccounts", []);
-                const signer = await provider.getSigner();
-                const address = await signer.getAddress();
-                const balanceWei = await provider.getBalance(address);
-                const balEth = parseFloat(ethers.formatEther(balanceWei)).toFixed(4);
-                setConnectedWallet(address, balEth, 'ETH', '🦊');
-            } catch (err) {
-                appendLog(`[WALLET] Chyba pripojenia MetaMask: ${err.message}`, 'text-dark-danger');
-            }
-        }
-
+        
         async function fetchSolBalance(pubkey) {
             try {
                 const res = await fetch("https://solana-rpc.publicnode.com", {
@@ -1078,22 +997,7 @@
             }
         }
 
-        function changePair(p) {
-            State.pair = p;
-            ['BTCUSDT', 'ETHUSDT', 'SOLUSDT'].forEach(c => {
-                ['-d', '-m'].forEach(sfx => {
-                    const b = document.getElementById(`pair-btn-${c}${sfx}`);
-                    if (b) {
-                        b.className = c === p 
-                            ? 'px-2.5 py-1 rounded-md text-white bg-dark-cardSub font-semibold transition-all' + (sfx === '-m' ? ' flex-1 text-center' : '')
-                            : 'px-2.5 py-1 rounded-md text-gray-400 hover:text-white transition-all' + (sfx === '-m' ? ' flex-1 text-center' : '');
-                    }
-                });
-            });
-            document.getElementById('chart-pair-text').innerText = `${p.replace('USDT', '')}/USDT`;
-            State.chartMarkers = [];
-            fetchMarketData();
-        }
+        
 
         function setTimeframe(tf) {
             State.timeframe = tf;
@@ -1129,7 +1033,7 @@
             if (State.tradingMode === 'PAPER') {
                 if (!State.wallet) {
                     openWalletModal();
-                    appendLog('[LIVE REŽIM] Najprv pripojte peňaženku (Phantom, Solflare, MetaMask).', 'text-dark-warning');
+                    appendLog('[LIVE REŽIM] Najprv pripojte peňaženku (Phantom, Solflare).', 'text-dark-warning');
                     return;
                 }
                 if (confirm(`UPOZORNENIE: Chcete prepnúť na REÁLNE ON-CHAIN obchodovanie cez peňaženku (${State.wallet.address.slice(0, 6)}...)? Každý obchod bude skutočná on-chain transakcia s veľkosťou ${State.liveTradeAmount} ${State.wallet.chain}.`)) {
@@ -1232,9 +1136,6 @@
             } else if (autoConnect === 'solflare') {
                 window.history.replaceState({}, document.title, window.location.pathname);
                 setTimeout(connectSolflare, 500);
-            } else if (autoConnect === 'metamask') {
-                window.history.replaceState({}, document.title, window.location.pathname);
-                setTimeout(connectMetaMask, 500);
             } else if (State.wallet) {
                 setConnectedWallet(State.wallet.address, State.wallet.balance, State.wallet.chain, State.wallet.icon || '👛');
                 if (State.wallet.chain === 'SOL') {
