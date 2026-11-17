@@ -1,9 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="sk" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Crypto Trading Terminal</title>
+    <title>AI Crypto Trading Terminal | Martin Vojtuš</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -12,316 +18,1079 @@
                 extend: {
                     colors: {
                         cyber: {
-                            bg: '#0a0a0c',
-                            card: '#121216',
-                            border: '#2a2a35',
+                            bg: '#08080a',
+                            panel: '#0e0f14',
+                            card: '#14161f',
+                            border: '#1f2333',
                             accent: '#00ffcc',
-                            danger: '#ff2a6d',
-                            success: '#05d590'
+                            accentHover: '#00e6b8',
+                            danger: '#ff3366',
+                            dangerHover: '#e62454',
+                            success: '#00e676',
+                            warning: '#ffb300',
+                            textMuted: '#6b7280'
                         }
                     },
                     fontFamily: {
-                        mono: ['"Fira Code"', 'monospace'],
-                        sans: ['Inter', 'sans-serif']
+                        mono: ['"Fira Code"', 'SFMono-Regular', 'Menlo', 'monospace'],
+                        sans: ['Inter', 'system-ui', 'sans-serif']
                     }
                 }
             }
         }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lightweight Charts (TradingView) -->
+    <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+    <!-- Ethers.js for Web3 Wallet -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.1/ethers.umd.min.js"></script>
+
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0a0a0c; color: #e2e8f0; }
-        .terminal-log { font-family: 'Fira Code', monospace; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #121216; }
-        ::-webkit-scrollbar-thumb { background: #2a2a35; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3f3f50; }
-        .glass-panel { background: rgba(18, 18, 22, 0.7); backdrop-filter: blur(10px); border: 1px solid #2a2a35; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #08080a;
+            color: #f3f4f6;
+            overflow: hidden;
+        }
+        .terminal-code {
+            font-family: 'Fira Code', monospace;
+        }
+        /* Custom sleek scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0e0f14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2333;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #323850;
+        }
+        .glow-accent {
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.25);
+        }
+        .glow-danger {
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.25);
+        }
+        .glass-panel {
+            background: rgba(14, 15, 20, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid #1f2333;
+        }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden">
+<body class="h-screen flex flex-col bg-cyber-bg text-gray-200 select-none">
 
-    <!-- Top Navigation Bar -->
-    <header class="glass-panel h-16 flex items-center justify-between px-6 shrink-0 z-10 relative">
+    <!-- TOP NAVIGATION & STATUS BAR -->
+    <header class="glass-panel h-14 flex items-center justify-between px-5 shrink-0 z-30 border-b border-cyber-border">
+        
+        <!-- Left: Logo & Network Badges -->
         <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2">
-                <div class="w-3 h-3 rounded-full bg-cyber-accent animate-pulse"></div>
-                <h1 class="text-xl font-semibold tracking-tight text-white">AI<span class="text-cyber-accent">TERMINAL</span></h1>
+            <div class="flex items-center gap-2.5">
+                <div class="relative flex items-center justify-center">
+                    <div class="w-3 h-3 rounded-full bg-cyber-accent"></div>
+                    <div class="absolute w-5 h-5 rounded-full bg-cyber-accent opacity-40 animate-ping"></div>
+                </div>
+                <div class="flex items-baseline gap-1">
+                    <span class="text-base font-bold tracking-tight text-white">AI<span class="text-cyber-accent">TERMINAL</span></span>
+                    <span class="text-[10px] text-gray-400 font-mono">v2.5 PRO</span>
+                </div>
             </div>
-            <div class="h-6 w-px bg-cyber-border mx-2"></div>
-            <div class="flex gap-3 text-xs font-mono">
-                <span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-cyber-success"></div>EXCHANGE</span>
-                <span class="flex items-center gap-1" id="wallet-status"><div class="w-2 h-2 rounded-full bg-cyber-danger"></div>WALLET</span>
-                <span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-cyber-success"></div>GEMINI AI</span>
+
+            <div class="h-5 w-px bg-cyber-border mx-1"></div>
+
+            <!-- Real-time Status Badges -->
+            <div class="flex items-center gap-2 text-xs font-mono">
+                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-cyber-card border border-cyber-border" title="Binance Public Market Feed">
+                    <div id="status-feed-dot" class="w-2 h-2 rounded-full bg-cyber-success animate-pulse"></div>
+                    <span class="text-gray-300">BINANCE</span>
+                </div>
+                
+                <div id="gemini-status-badge" onclick="openSettingsModal()" class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-cyber-card border border-cyber-border cursor-pointer hover:border-cyber-accent transition-colors" title="Klikni pre zadanie Gemini API kľúča">
+                    <div id="status-ai-dot" class="w-2 h-2 rounded-full bg-cyber-warning"></div>
+                    <span id="status-ai-text" class="text-gray-300">GEMINI AI</span>
+                </div>
+
+                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-cyber-card border border-cyber-border">
+                    <div class="w-2 h-2 rounded-full bg-cyan-400"></div>
+                    <span id="mode-badge" class="text-cyan-400 font-semibold">PAPER TRADING</span>
+                </div>
             </div>
         </div>
 
-        <div class="flex items-center gap-4">
-            <div class="px-3 py-1.5 rounded bg-cyber-card border border-cyber-border text-xs font-mono text-cyber-accent flex items-center gap-2">
-                <span id="mode-indicator" class="uppercase">PAPER TRADING</span>
+        <!-- Center: Quick Pair Selector & Stats -->
+        <div class="hidden lg:flex items-center gap-4 text-xs font-mono">
+            <div class="flex items-center gap-2 bg-cyber-card px-3 py-1 rounded border border-cyber-border">
+                <span class="text-gray-400">PAIR:</span>
+                <select id="pair-select" onchange="changePair(this.value)" class="bg-transparent text-white font-semibold focus:outline-none cursor-pointer">
+                    <option value="BTCUSDT" class="bg-cyber-panel text-white">BTC/USDT</option>
+                    <option value="ETHUSDT" class="bg-cyber-panel text-white">ETH/USDT</option>
+                    <option value="SOLUSDT" class="bg-cyber-panel text-white">SOL/USDT</option>
+                </select>
             </div>
-            
-            <button id="btn-start" onclick="startBot()" class="px-4 py-2 bg-cyber-accent text-black font-semibold rounded text-sm hover:bg-teal-400 transition-colors">START BOT</button>
-            <button id="btn-stop" onclick="stopBot()" class="px-4 py-2 bg-cyber-card border border-cyber-danger text-cyber-danger font-semibold rounded text-sm hover:bg-cyber-danger/10 transition-colors hidden">STOP BOT</button>
-            <button class="px-4 py-2 bg-cyber-card border border-cyber-border text-white rounded text-sm hover:bg-white/5 transition-colors">Connect Wallet</button>
+            <div class="flex items-center gap-2">
+                <span class="text-gray-400">CENA:</span>
+                <span id="top-price" class="text-white font-bold text-sm">$0.00</span>
+            </div>
+            <div class="flex items-center gap-1">
+                <span class="text-gray-400">24H:</span>
+                <span id="top-change" class="text-cyber-success font-semibold">+0.00%</span>
+            </div>
+        </div>
+
+        <!-- Right: Actions (Settings, Start/Stop, Wallet) -->
+        <div class="flex items-center gap-3">
+            <button onclick="openSettingsModal()" class="p-2 rounded bg-cyber-card border border-cyber-border hover:border-gray-500 text-gray-300 hover:text-white transition-all flex items-center gap-1.5 text-xs font-mono" title="Nastavenia a API kľúč">
+                <svg class="w-4 h-4 text-cyber-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span class="hidden sm:inline">API & SETUP</span>
+            </button>
+
+            <button id="btn-bot-toggle" onclick="toggleBot()" class="px-4 py-1.5 bg-cyber-accent text-black font-semibold rounded text-xs tracking-wider font-mono hover:bg-cyber-accentHover transition-all flex items-center gap-1.5 glow-accent">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                <span id="btn-bot-text">START BOT</span>
+            </button>
+
+            <button id="btn-wallet" onclick="connectWallet()" class="px-3 py-1.5 rounded bg-cyber-card border border-cyber-border hover:border-gray-500 text-gray-200 text-xs font-mono transition-all flex items-center gap-2">
+                <div id="wallet-dot" class="w-2 h-2 rounded-full bg-gray-500"></div>
+                <span id="wallet-btn-text">Connect Wallet</span>
+            </button>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-1 flex gap-4 p-4 overflow-hidden relative z-0">
+    <!-- KPI STATS CARDS -->
+    <section class="grid grid-cols-2 md:grid-cols-5 gap-3 p-3 shrink-0">
+        <!-- Card 1: Balance -->
+        <div class="glass-panel p-3 rounded-lg border border-cyber-border flex flex-col justify-between">
+            <div class="flex items-center justify-between text-[11px] text-gray-400 font-mono">
+                <span>PORTFOLIO BALANCE</span>
+                <span class="text-cyber-accent">USDT</span>
+            </div>
+            <div class="text-xl font-bold font-mono text-white mt-1" id="stat-balance">$10,000.00</div>
+            <div class="text-[10px] text-gray-500 font-mono mt-0.5">Virtual Paper Account</div>
+        </div>
+
+        <!-- Card 2: 24h P&L -->
+        <div class="glass-panel p-3 rounded-lg border border-cyber-border flex flex-col justify-between">
+            <div class="flex items-center justify-between text-[11px] text-gray-400 font-mono">
+                <span>OPEN P&L</span>
+                <span id="stat-pnl-percent" class="text-cyber-success font-semibold">+0.00%</span>
+            </div>
+            <div class="text-xl font-bold font-mono text-cyber-success mt-1" id="stat-open-pnl">+$0.00</div>
+            <div class="text-[10px] text-gray-500 font-mono mt-0.5">Unrealized position profit</div>
+        </div>
+
+        <!-- Card 3: Total Realized P&L -->
+        <div class="glass-panel p-3 rounded-lg border border-cyber-border flex flex-col justify-between">
+            <div class="flex items-center justify-between text-[11px] text-gray-400 font-mono">
+                <span>REALIZED P&L</span>
+                <span class="text-gray-400">Total</span>
+            </div>
+            <div class="text-xl font-bold font-mono text-white mt-1" id="stat-realized-pnl">$0.00</div>
+            <div class="text-[10px] text-gray-500 font-mono mt-0.5" id="stat-closed-count">0 Closed trades</div>
+        </div>
+
+        <!-- Card 4: Win Rate -->
+        <div class="glass-panel p-3 rounded-lg border border-cyber-border flex flex-col justify-between">
+            <div class="flex items-center justify-between text-[11px] text-gray-400 font-mono">
+                <span>AI WIN RATE</span>
+                <span class="text-cyber-accent font-semibold">TARGET 70%+</span>
+            </div>
+            <div class="text-xl font-bold font-mono text-white mt-1" id="stat-winrate">100.0%</div>
+            <div class="text-[10px] text-gray-500 font-mono mt-0.5">Automated Risk Filter (Max 2%)</div>
+        </div>
+
+        <!-- Card 5: Web3 Wallet On-Chain Balance -->
+        <div class="glass-panel p-3 rounded-lg border border-cyber-border flex flex-col justify-between col-span-2 md:col-span-1">
+            <div class="flex items-center justify-between text-[11px] text-gray-400 font-mono">
+                <span>ON-CHAIN WALLET</span>
+                <span class="text-indigo-400">WEB3</span>
+            </div>
+            <div class="text-xl font-bold font-mono text-white mt-1" id="stat-wallet-bal">0.0000 ETH</div>
+            <div class="text-[10px] text-gray-500 font-mono truncate" id="stat-wallet-addr">Not connected</div>
+        </div>
+    </section>
+
+    <!-- MAIN TERMINAL WORKSPACE -->
+    <main class="flex-1 flex flex-col lg:flex-row gap-3 px-3 pb-3 overflow-hidden min-h-0">
         
-        <!-- Left Column: Chart & Positions -->
-        <div class="flex-1 flex flex-col gap-4 min-w-0">
+        <!-- LEFT: CHART & POSITIONS PANEL -->
+        <div class="flex-1 flex flex-col gap-3 min-w-0 h-full overflow-hidden">
             
-            <!-- KPI Cards -->
-            <div class="grid grid-cols-4 gap-4 shrink-0">
-                <div class="glass-panel rounded-xl p-4 flex flex-col justify-center">
-                    <span class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-semibold">Total Balance</span>
-                    <div class="text-2xl font-bold text-white font-mono" id="kpi-balance">$0.00</div>
+            <!-- Trading Chart Container -->
+            <div class="glass-panel rounded-lg flex-1 flex flex-col overflow-hidden min-h-[300px] border border-cyber-border relative">
+                
+                <!-- Chart Toolbar -->
+                <div class="h-10 px-4 border-b border-cyber-border flex items-center justify-between bg-cyber-card/60 shrink-0">
+                    <div class="flex items-center gap-3">
+                        <span class="font-bold text-white font-mono text-sm" id="chart-pair-label">BTC/USDT</span>
+                        <div class="flex items-center gap-1 text-xs font-mono">
+                            <button onclick="setTimeframe('1m')" id="tf-1m" class="px-2 py-0.5 rounded bg-cyber-border text-cyber-accent font-semibold">1m</button>
+                            <button onclick="setTimeframe('5m')" id="tf-5m" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">5m</button>
+                            <button onclick="setTimeframe('15m')" id="tf-15m" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">15m</button>
+                            <button onclick="setTimeframe('1h')" id="tf-1h" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">1h</button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4 text-xs font-mono text-gray-400">
+                        <div>RSI(14): <span id="ind-rsi" class="text-white font-bold">--</span></div>
+                        <div>EMA(20): <span id="ind-ema" class="text-white font-bold">--</span></div>
+                        <div>MACD: <span id="ind-macd" class="text-white font-bold">--</span></div>
+                    </div>
                 </div>
-                <div class="glass-panel rounded-xl p-4 flex flex-col justify-center">
-                    <span class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-semibold">Open P&L</span>
-                    <div class="text-2xl font-bold font-mono text-cyber-success" id="kpi-pnl">$0.00</div>
-                </div>
-                <div class="glass-panel rounded-xl p-4 flex flex-col justify-center">
-                    <span class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-semibold">Total P&L</span>
-                    <div class="text-2xl font-bold text-white font-mono" id="kpi-total-pnl">$0.00</div>
-                </div>
-                <div class="glass-panel rounded-xl p-4 flex flex-col justify-center">
-                    <span class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-semibold">Active Positions</span>
-                    <div class="text-2xl font-bold text-white font-mono" id="kpi-positions">0</div>
-                </div>
+
+                <!-- Lightweight Chart Canvas -->
+                <div id="tv-chart" class="flex-1 w-full relative"></div>
             </div>
 
-            <!-- Chart Area -->
-            <div class="glass-panel rounded-xl flex-1 flex flex-col min-h-0 relative">
-                <div class="p-4 border-b border-cyber-border flex justify-between items-center shrink-0">
-                    <h2 class="text-sm font-semibold text-white">BTC/USDT <span class="text-xs text-gray-400 font-mono ml-2">1M Timeframe</span></h2>
-                    <div class="text-lg font-mono font-bold text-white" id="current-price">Loading...</div>
-                </div>
-                <div id="chart-container" class="flex-1 w-full relative"></div>
-            </div>
+            <!-- Bottom Positions & History Table -->
+            <div class="glass-panel rounded-lg h-44 shrink-0 flex flex-col overflow-hidden border border-cyber-border">
+                
+                <!-- Tabs -->
+                <div class="h-9 px-4 border-b border-cyber-border flex items-center justify-between bg-cyber-card/80 shrink-0">
+                    <div class="flex items-center gap-4 text-xs font-mono">
+                        <button onclick="switchTab('positions')" id="tab-btn-positions" class="font-semibold text-cyber-accent border-b-2 border-cyber-accent h-9 flex items-center">
+                            AKTÍVNE POZÍCIE (<span id="active-positions-count">0</span>)
+                        </button>
+                        <button onclick="switchTab('history')" id="tab-btn-history" class="font-medium text-gray-400 hover:text-white h-9 flex items-center">
+                            HISTÓRIA OBCHODOV
+                        </button>
+                    </div>
 
-            <!-- Positions Table -->
-            <div class="glass-panel rounded-xl h-48 shrink-0 flex flex-col overflow-hidden">
-                <div class="p-3 border-b border-cyber-border flex justify-between items-center bg-cyber-card/50">
-                    <h2 class="text-sm font-semibold text-white">Active Positions</h2>
-                    <button onclick="closeAll()" class="text-xs text-cyber-danger hover:underline">Close All</button>
+                    <button onclick="closeAllPositions()" class="text-[11px] font-mono text-cyber-danger hover:underline">
+                        UZATVORIŤ VŠETKO
+                    </button>
                 </div>
+
+                <!-- Table Content -->
                 <div class="flex-1 overflow-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead class="text-gray-400 font-mono sticky top-0 bg-cyber-card border-b border-cyber-border">
+                    <!-- Positions Table -->
+                    <table id="table-positions" class="w-full text-left text-xs font-mono">
+                        <thead class="text-gray-400 bg-cyber-card/40 sticky top-0 border-b border-cyber-border">
                             <tr>
-                                <th class="p-3">Pair</th>
-                                <th class="p-3">Type</th>
-                                <th class="p-3">Entry</th>
-                                <th class="p-3">Size</th>
-                                <th class="p-3">P&L</th>
-                                <th class="p-3 text-right">Action</th>
+                                <th class="p-2.5">Pár</th>
+                                <th class="p-2.5">Typ</th>
+                                <th class="p-2.5">Vstupná cena</th>
+                                <th class="p-2.5">Aktuálna cena</th>
+                                <th class="p-2.5">Objem (USDT)</th>
+                                <th class="p-2.5">Stop Loss</th>
+                                <th class="p-2.5">Take Profit</th>
+                                <th class="p-2.5">Nerealizované P&L</th>
+                                <th class="p-2.5 text-right">Akcia</th>
                             </tr>
                         </thead>
-                        <tbody id="positions-tbody" class="font-mono divide-y divide-cyber-border/50">
-                            <!-- Dynamic Content -->
+                        <tbody id="positions-tbody" class="divide-y divide-cyber-border/40">
+                            <tr>
+                                <td colspan="9" class="p-5 text-center text-gray-500">Žiadne aktívne pozície. Spusťte bota pre automatické obchodovanie.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- History Table (Hidden by default) -->
+                    <table id="table-history" class="w-full text-left text-xs font-mono hidden">
+                        <thead class="text-gray-400 bg-cyber-card/40 sticky top-0 border-b border-cyber-border">
+                            <tr>
+                                <th class="p-2.5">Čas</th>
+                                <th class="p-2.5">Pár</th>
+                                <th class="p-2.5">Typ</th>
+                                <th class="p-2.5">Vstup</th>
+                                <th class="p-2.5">Výstup</th>
+                                <th class="p-2.5">Výsledok P&L</th>
+                                <th class="p-2.5 text-right">Dôvod uzavretia</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody" class="divide-y divide-cyber-border/40">
+                            <tr>
+                                <td colspan="7" class="p-5 text-center text-gray-500">História obchodov je zatiaľ prázdna.</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT: LIVE AI LOG TERMINAL -->
+        <div class="w-full lg:w-[420px] flex flex-col h-full shrink-0">
+            <div class="glass-panel rounded-lg flex-1 flex flex-col overflow-hidden border border-cyber-border">
+                
+                <!-- Terminal Header -->
+                <div class="h-10 px-4 border-b border-cyber-border bg-[#050608] flex items-center justify-between shrink-0">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2.5 h-2.5 rounded-full bg-cyber-accent animate-pulse"></div>
+                        <span class="text-xs font-mono font-bold tracking-wider text-white">AI-CORE REASONING ENGINE</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-[10px] font-mono text-gray-400">
+                        <span id="ai-model-tag" class="px-2 py-0.5 rounded bg-cyber-card border border-cyber-border text-cyber-accent">GEMINI 2.5 FLASH</span>
+                        <button onclick="clearTerminalLogs()" title="Vyčistiť log" class="hover:text-white">CLEAR</button>
+                    </div>
+                </div>
+
+                <!-- Log Stream Window -->
+                <div id="ai-terminal-log" class="flex-1 p-3.5 overflow-y-auto bg-[#040406] text-gray-300 text-[11px] leading-relaxed terminal-code space-y-1.5">
+                    <div class="text-gray-500">[SYSTEM] Inicializujem Crypto Trading Terminal...</div>
+                    <div class="text-gray-500">[FEED] Pripájanie na Binance Public Stream (BTC/USDT)...</div>
+                    <div class="text-cyber-accent">[AI-CORE] Pripravený na autonómne vykonávanie stratégií.</div>
+                </div>
+
+                <!-- Terminal Command & Status Footer -->
+                <div class="p-2.5 border-t border-cyber-border bg-[#090a0f] flex items-center justify-between text-xs font-mono">
+                    <div class="flex items-center gap-2 text-gray-400 text-[11px]">
+                        <span>RISK LIMIT:</span>
+                        <span class="text-cyber-accent font-semibold">2.0% / OBCHOD</span>
+                    </div>
+                    <div class="text-[11px] text-gray-400">
+                        INTERVAL: <span class="text-white font-semibold">15s</span>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-        <!-- Right Column: AI Terminal Log -->
-        <div class="w-96 flex flex-col shrink-0">
-            <div class="glass-panel rounded-xl flex-1 flex flex-col overflow-hidden border-t-2 border-t-cyber-accent">
-                <div class="p-3 border-b border-cyber-border bg-[#050505] flex items-center justify-between shrink-0">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-cyber-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M4 17h16a2 2 0 002-2V5a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                        <h2 class="text-sm font-semibold text-white font-mono tracking-wider">AI-CORE TERMINAL</h2>
-                    </div>
-                    <div class="flex gap-1.5">
-                        <div class="w-2.5 h-2.5 rounded-full bg-cyber-border"></div>
-                        <div class="w-2.5 h-2.5 rounded-full bg-cyber-border"></div>
-                        <div class="w-2.5 h-2.5 rounded-full bg-cyber-accent animate-pulse"></div>
-                    </div>
-                </div>
-                <div id="ai-logs" class="flex-1 p-4 overflow-y-auto bg-[#000000] text-gray-300 text-[11px] leading-relaxed terminal-log space-y-1">
-                    <div class="text-gray-500">Initializing Gemini Trading Protocol...</div>
-                    <div class="text-gray-500">Waiting for connection...</div>
-                </div>
-            </div>
-        </div>
     </main>
 
+    <!-- SETTINGS / API KEY MODAL -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="glass-panel bg-cyber-panel border border-cyber-border rounded-xl w-full max-w-lg overflow-hidden shadow-2xl">
+            
+            <div class="p-4 border-b border-cyber-border flex items-center justify-between bg-cyber-card/60">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-cyber-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <h3 class="text-sm font-bold text-white font-mono uppercase tracking-wider">Konfigurácia & Gemini API Kľúč</h3>
+                </div>
+                <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-white text-lg font-mono">&times;</button>
+            </div>
+
+            <div class="p-5 space-y-4 text-xs font-mono">
+                <!-- Gemini API Key -->
+                <div>
+                    <label class="block text-gray-300 mb-1.5 font-semibold flex items-center justify-between">
+                        <span>GOOGLE GEMINI API KEY</span>
+                        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-cyber-accent hover:underline text-[11px]">Získať bezplatný kľúč &rarr;</a>
+                    </label>
+                    <div class="relative">
+                        <input id="input-gemini-key" type="password" placeholder="AIzaSy..." class="w-full bg-[#08080a] border border-cyber-border rounded px-3 py-2 text-white focus:outline-none focus:border-cyber-accent">
+                        <button type="button" onclick="togglePasswordVisibility('input-gemini-key')" class="absolute right-3 top-2.5 text-gray-400 hover:text-white text-xs">ZOBRAZIŤ</button>
+                    </div>
+                    <p class="text-[10px] text-gray-500 mt-1">Kľúč sa ukladá bezpečne v pamäti tvojho prehliadača (localStorage). Nikdy neopúšťa tvoj počítač a smeruje priamo do Google AI Studio.</p>
+                </div>
+
+                <!-- Virtual Balance -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-gray-300 mb-1 font-semibold">ŠTARTOVACÍ KAPITÁL (USDT)</label>
+                        <input id="input-balance" type="number" value="10000" class="w-full bg-[#08080a] border border-cyber-border rounded px-3 py-2 text-white focus:outline-none focus:border-cyber-accent">
+                    </div>
+                    <div>
+                        <label class="block text-gray-300 mb-1 font-semibold">MAX RISK NA OBCHOD (%)</label>
+                        <input id="input-risk" type="number" value="2.0" step="0.5" max="5.0" class="w-full bg-[#08080a] border border-cyber-border rounded px-3 py-2 text-white focus:outline-none focus:border-cyber-accent">
+                    </div>
+                </div>
+
+                <!-- Interval -->
+                <div>
+                    <label class="block text-gray-300 mb-1 font-semibold">ROZHODOVACÍ INTERVAL AI</label>
+                    <select id="input-interval" class="w-full bg-[#08080a] border border-cyber-border rounded px-3 py-2 text-white focus:outline-none focus:border-cyber-accent">
+                        <option value="15">Každých 15 sekúnd (Odporúčané pre Scalp)</option>
+                        <option value="30">Každých 30 sekúnd</option>
+                        <option value="60">Každú 1 minútu</option>
+                    </select>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="pt-2 border-t border-cyber-border flex justify-between items-center">
+                    <button type="button" onclick="resetPaperAccount()" class="text-cyber-danger hover:underline text-[11px]">Resetovať simulovaný zostatok na 10,000 USDT</button>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-cyber-border bg-cyber-card/40 flex justify-end gap-3 font-mono text-xs">
+                <button onclick="closeSettingsModal()" class="px-4 py-2 rounded bg-cyber-card border border-cyber-border text-gray-300 hover:text-white">Zrušiť</button>
+                <button onclick="saveSettings()" class="px-5 py-2 rounded bg-cyber-accent text-black font-bold hover:bg-cyber-accentHover">ULOŽIŤ A POUŽIŤ</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CORE LOGIC JAVASCRIPT -->
     <script>
-        // Chart Initialization
-        const chartContainer = document.getElementById('chart-container');
+        // --- STATE MANAGEMENT ---
+        const State = {
+            botRunning: false,
+            pair: 'BTCUSDT',
+            timeframe: '1m',
+            currentPrice: 0,
+            candleData: [],
+            paperBalance: parseFloat(localStorage.getItem('ai_paper_balance')) || 10000.0,
+            initialBalance: 10000.0,
+            positions: JSON.parse(localStorage.getItem('ai_positions')) || [],
+            history: JSON.parse(localStorage.getItem('ai_history')) || [],
+            geminiApiKey: localStorage.getItem('gemini_api_key') || '',
+            riskPct: parseFloat(localStorage.getItem('ai_risk_pct')) || 2.0,
+            intervalSec: parseInt(localStorage.getItem('ai_interval_sec')) || 15,
+            walletAddress: null,
+            timerId: null,
+            chartMarkers: []
+        };
+
+        // --- CHART SETUP (Lightweight Charts) ---
+        const chartContainer = document.getElementById('tv-chart');
         const chart = LightweightCharts.createChart(chartContainer, {
-            layout: { background: { color: 'transparent' }, textColor: '#A3A3A3', fontFamily: 'Inter' },
-            grid: { vertLines: { color: 'rgba(42, 42, 53, 0.5)' }, horzLines: { color: 'rgba(42, 42, 53, 0.5)' } },
-            timeScale: { timeVisible: true, secondsVisible: false, borderColor: '#2a2a35' },
-            rightPriceScale: { borderColor: '#2a2a35' },
-            crosshair: { mode: LightweightCharts.CrosshairMode.Normal }
+            layout: {
+                background: { color: '#0b0c11' },
+                textColor: '#9ca3af',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: 11
+            },
+            grid: {
+                vertLines: { color: '#161924' },
+                horzLines: { color: '#161924' }
+            },
+            crosshair: {
+                mode: LightweightCharts.CrosshairMode.Normal,
+                vertLine: { color: '#374151', width: 1, style: 2 },
+                horzLine: { color: '#374151', width: 1, style: 2 }
+            },
+            rightPriceScale: {
+                borderColor: '#1f2333',
+                scaleMargins: { top: 0.1, bottom: 0.1 }
+            },
+            timeScale: {
+                borderColor: '#1f2333',
+                timeVisible: true,
+                secondsVisible: false
+            }
         });
 
-        const lineSeries = chart.addLineSeries({
-            color: '#00ffcc',
-            lineWidth: 2,
-            crosshairMarkerRadius: 4,
+        const candleSeries = chart.addCandlestickSeries({
+            upColor: '#00e676',
+            downColor: '#ff3366',
+            borderUpColor: '#00e676',
+            borderDownColor: '#ff3366',
+            wickUpColor: '#00e676',
+            wickDownColor: '#ff3366'
         });
 
         new ResizeObserver(() => {
-            chart.applyOptions({ width: chartContainer.clientWidth, height: chartContainer.clientHeight });
+            chart.applyOptions({
+                width: chartContainer.clientWidth,
+                height: chartContainer.clientHeight
+            });
         }).observe(chartContainer);
 
-        // WebSocket & App Logic
-        let ws;
-        
-        // Use relative path matching FastAPI setup
-        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//${window.location.host}/ws`;
-            
-        function connectWS() {
-            ws = new WebSocket(wsUrl);
-            
-            ws.onopen = () => {
-                appendLog("WebSocket connection established.", "text-cyber-success");
-            };
-            
-            ws.onmessage = (event) => {
-                const msg = JSON.parse(event.data);
+        // --- BINANCE PUBLIC MARKET DATA ---
+        async function fetchMarketData() {
+            try {
+                const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${State.pair}&interval=${State.timeframe}&limit=100`);
+                if (!res.ok) throw new Error('Chyba spojenia s burzou');
+                const raw = await res.json();
                 
-                if (msg.type === 'log') {
-                    appendLog(msg.data);
-                } else if (msg.type === 'init') {
-                    updateStatusUI(msg.data.is_running);
-                    document.getElementById('mode-indicator').innerText = msg.data.mode + ' TRADING';
-                } else if (msg.type === 'state') {
-                    updateDashboard(msg.data);
-                }
-            };
-            
-            ws.onclose = () => {
-                appendLog("WebSocket connection lost. Reconnecting...", "text-cyber-danger");
-                setTimeout(connectWS, 3000);
-            };
-        }
-
-        function appendLog(text, colorClass = "") {
-            const logs = document.getElementById('ai-logs');
-            const div = document.createElement('div');
-            
-            let formattedText = text;
-            if (text.includes("BUY")) formattedText = text.replace("BUY", "<span class='text-cyber-success font-bold'>BUY</span>");
-            if (text.includes("SELL")) formattedText = text.replace("SELL", "<span class='text-cyber-danger font-bold'>SELL</span>");
-            
-            div.innerHTML = `<span class="${colorClass}">${formattedText}</span>`;
-            logs.appendChild(div);
-            
-            if (logs.children.length > 200) logs.removeChild(logs.firstChild);
-            logs.scrollTop = logs.scrollHeight;
-        }
-
-        function updateDashboard(data) {
-            document.getElementById('kpi-balance').innerText = '$' + data.total_balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits:2});
-            document.getElementById('kpi-total-pnl').innerText = '$' + data.total_pnl.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits:2});
-            document.getElementById('kpi-positions').innerText = data.open_positions;
-            document.getElementById('current-price').innerText = '$' + data.price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits:2});
-            
-            const pnlEl = document.getElementById('kpi-pnl');
-            pnlEl.innerText = '$' + data.open_pnl.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits:2});
-            pnlEl.className = `text-2xl font-bold font-mono ${data.open_pnl >= 0 ? 'text-cyber-success' : 'text-cyber-danger'}`;
-
-            const totalPnlEl = document.getElementById('kpi-total-pnl');
-            totalPnlEl.className = `text-2xl font-bold font-mono ${data.total_pnl >= 0 ? 'text-cyber-success' : 'text-cyber-danger'}`;
-
-            if (data.chart_data && data.chart_data.length > 0) {
-                const formatted = data.chart_data.map(d => ({
-                    time: d.timestamp / 1000,
-                    value: d.close
+                State.candleData = raw.map(k => ({
+                    time: Math.floor(k[0] / 1000),
+                    open: parseFloat(k[1]),
+                    high: parseFloat(k[2]),
+                    low: parseFloat(k[3]),
+                    close: parseFloat(k[4]),
+                    volume: parseFloat(k[5])
                 }));
-                lineSeries.setData(formatted);
-            } else {
-                lineSeries.update({
-                    time: Math.floor(Date.now() / 1000),
-                    value: data.price
-                });
+
+                candleSeries.setData(State.candleData);
+                
+                const lastCandle = State.candleData[State.candleData.length - 1];
+                State.currentPrice = lastCandle.close;
+
+                // Update UI Prices
+                document.getElementById('top-price').innerText = `$${State.currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+
+                // Fetch 24h ticker info
+                const tickRes = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${State.pair}`);
+                if (tickRes.ok) {
+                    const tickData = await tickRes.json();
+                    const change = parseFloat(tickData.priceChangePercent);
+                    const changeEl = document.getElementById('top-change');
+                    changeEl.innerText = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+                    changeEl.className = change >= 0 ? 'text-cyber-success font-semibold' : 'text-cyber-danger font-semibold';
+                }
+
+                // Compute Indicators
+                calculateAndRenderIndicators();
+                updateOpenPositionsPnL();
+                updateDashboardKPIs();
+
+            } catch (err) {
+                appendLog(`[VAROVANIE] Problém so sťahovaním dát z Binance: ${err.message}`, 'text-cyber-danger');
+            }
+        }
+
+        // --- TECHNICAL INDICATORS (JS Engine) ---
+        function calculateAndRenderIndicators() {
+            if (State.candleData.length < 20) return;
+            const closes = State.candleData.map(c => c.close);
+
+            // RSI(14)
+            const rsi = calculateRSI(closes, 14);
+            const rsiEl = document.getElementById('ind-rsi');
+            rsiEl.innerText = rsi.toFixed(1);
+            if (rsi <= 30) rsiEl.className = 'text-cyber-success font-bold';
+            else if (rsi >= 70) rsiEl.className = 'text-cyber-danger font-bold';
+            else rsiEl.className = 'text-white font-bold';
+
+            // EMA(20)
+            const ema20 = calculateEMA(closes, 20);
+            document.getElementById('ind-ema').innerText = `$${ema20.toFixed(2)}`;
+
+            // MACD (12, 26, 9)
+            const macd = calculateMACD(closes);
+            const macdEl = document.getElementById('ind-macd');
+            macdEl.innerText = macd.histogram.toFixed(2);
+            macdEl.className = macd.histogram >= 0 ? 'text-cyber-success font-bold' : 'text-cyber-danger font-bold';
+        }
+
+        function calculateRSI(closes, period = 14) {
+            let gains = 0, losses = 0;
+            for (let i = 1; i <= period; i++) {
+                const diff = closes[i] - closes[i - 1];
+                if (diff >= 0) gains += diff;
+                else losses -= diff;
+            }
+            let avgGain = gains / period;
+            let avgLoss = losses / period;
+
+            for (let i = period + 1; i < closes.length; i++) {
+                const diff = closes[i] - closes[i - 1];
+                if (diff >= 0) {
+                    avgGain = (avgGain * (period - 1) + diff) / period;
+                    avgLoss = (avgLoss * (period - 1)) / period;
+                } else {
+                    avgGain = (avgGain * (period - 1)) / period;
+                    avgLoss = (avgLoss * (period - 1) - diff) / period;
+                }
+            }
+            if (avgLoss === 0) return 100;
+            const rs = avgGain / avgLoss;
+            return 100 - (100 / (1 + rs));
+        }
+
+        function calculateEMA(closes, period) {
+            const k = 2 / (period + 1);
+            let ema = closes[0];
+            for (let i = 1; i < closes.length; i++) {
+                ema = (closes[i] * k) + (ema * (1 - k));
+            }
+            return ema;
+        }
+
+        function calculateMACD(closes) {
+            const ema12 = calculateEMA(closes, 12);
+            const ema26 = calculateEMA(closes, 26);
+            const macdLine = ema12 - ema26;
+            const signalLine = macdLine * 0.2; // Approximation for responsive browser display
+            return {
+                macd: macdLine,
+                signal: signalLine,
+                histogram: macdLine - signalLine
+            };
+        }
+
+        // --- GEMINI AI & TRADING DECISION MODULE ---
+        async function runAIDecisionCycle() {
+            if (!State.botRunning) return;
+
+            const closes = State.candleData.map(c => c.close);
+            const rsi = calculateRSI(closes, 14);
+            const ema20 = calculateEMA(closes, 20);
+            const macd = calculateMACD(closes);
+            const currentPrice = State.currentPrice;
+
+            appendLog(`[SCAN] ${State.pair} @ $${currentPrice.toFixed(2)} | RSI: ${rsi.toFixed(1)} | MACD: ${macd.histogram.toFixed(2)}`, 'text-gray-400');
+
+            let decision = null;
+
+            if (State.geminiApiKey && State.geminiApiKey.trim().length > 10) {
+                // Call Google Gemini API directly from browser
+                try {
+                    const prompt = `You are a Quantitative Crypto Trading AI analyzing ${State.pair}.
+Market Conditions:
+- Price: ${currentPrice}
+- RSI(14): ${rsi.toFixed(2)}
+- EMA(20): ${ema20.toFixed(2)}
+- MACD Histogram: ${macd.histogram.toFixed(2)}
+- Portfolio Balance: ${State.paperBalance} USDT
+- Active Positions: ${State.positions.length}
+
+Make a trading decision. You MUST return ONLY a JSON object formatted as follows:
+{
+  "action": "BUY" | "SELL" | "HOLD",
+  "confidence": <integer 0-100>,
+  "reasoning": "<short explanation in Slovak or English max 1 sentence>",
+  "stop_loss_pct": 2.0,
+  "take_profit_pct": 4.0
+}`;
+
+                    const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${State.geminiApiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: {
+                                responseMimeType: "application/json",
+                                temperature: 0.1
+                            }
+                        })
+                    });
+
+                    if (geminiRes.ok) {
+                        const jsonRes = await geminiRes.json();
+                        const rawText = jsonRes.candidates[0].content.parts[0].text;
+                        decision = JSON.parse(rawText);
+                    } else {
+                        const errBody = await geminiRes.text();
+                        appendLog(`[GEMINI API CHYBA] ${errBody.slice(0, 100)}... Používam kvantitatívny engine`, 'text-cyber-danger');
+                    }
+                } catch (e) {
+                    appendLog(`[GEMINI FALLBACK] ${e.message}`, 'text-cyber-warning');
+                }
             }
 
-            const tbody = document.getElementById('positions-tbody');
-            tbody.innerHTML = '';
+            // Fallback Quantitative Heuristic Engine if no API key or error
+            if (!decision) {
+                if (!State.geminiApiKey) {
+                    appendLog(`[INFO] Gemini API kľúč nie je zadaný. Pre skutočné AI klikni hore na [API & SETUP]. Beží kvantitatívny algoritmus...`, 'text-cyber-accent');
+                }
+                
+                if (rsi < 35 && macd.histogram > -5) {
+                    decision = {
+                        action: "BUY",
+                        confidence: 86,
+                        reasoning: `Oversold RSI (${rsi.toFixed(1)}) a nábeh býčieho momenta nad EMA(20).`,
+                        stop_loss_pct: 2.0,
+                        take_profit_pct: 4.0
+                    };
+                } else if (rsi > 68 && State.positions.length > 0) {
+                    decision = {
+                        action: "SELL",
+                        confidence: 84,
+                        reasoning: `Overbought RSI (${rsi.toFixed(1)}). Realizácia zisku pred korekciou.`,
+                        stop_loss_pct: 2.0,
+                        take_profit_pct: 4.0
+                    };
+                } else {
+                    decision = {
+                        action: "HOLD",
+                        confidence: 72,
+                        reasoning: `Trh konsoliduje. RSI v neutrálnej zóne (${rsi.toFixed(1)}). Čakám na potvrdený setup.`,
+                        stop_loss_pct: 2.0,
+                        take_profit_pct: 4.0
+                    };
+                }
+            }
+
+            // Process Decision
+            handleAIDecision(decision, currentPrice);
+        }
+
+        function handleAIDecision(decision, currentPrice) {
+            const time = new Date().toLocaleTimeString();
+            let actionColor = 'text-gray-300';
+            if (decision.action === 'BUY') actionColor = 'text-cyber-success font-bold';
+            if (decision.action === 'SELL') actionColor = 'text-cyber-danger font-bold';
+            if (decision.action === 'HOLD') actionColor = 'text-cyber-warning font-semibold';
+
+            appendLog(`[${time}] [AI-CORE] Rozhodnutie: <span class="${actionColor}">${decision.action}</span> (Istota: ${decision.confidence}%) - Dôvod: ${decision.reasoning}`);
+
+            // EXECUTE PAPER BUY
+            if (decision.action === 'BUY' && State.positions.length === 0) {
+                const riskUsdt = State.paperBalance * (State.riskPct / 100);
+                const slPrice = currentPrice * (1 - (decision.stop_loss_pct / 100));
+                const tpPrice = currentPrice * (1 + (decision.take_profit_pct / 100));
+
+                const position = {
+                    id: 'POS-' + Date.now().toString().slice(-6),
+                    pair: State.pair,
+                    type: 'LONG',
+                    entryPrice: currentPrice,
+                    currentPrice: currentPrice,
+                    costUsdt: riskUsdt,
+                    amount: riskUsdt / currentPrice,
+                    stopLoss: slPrice,
+                    takeProfit: tpPrice,
+                    pnl: 0,
+                    openTime: new Date().toLocaleTimeString()
+                };
+
+                State.positions.push(position);
+                State.paperBalance -= riskUsdt;
+                saveTerminalState();
+
+                appendLog(`[EXEKÚCIA] Otvorená pozícia LONG ${State.pair} za $${riskUsdt.toFixed(2)} pri cene $${currentPrice.toFixed(2)}. SL: $${slPrice.toFixed(2)}, TP: $${tpPrice.toFixed(2)}`, 'text-cyber-success');
+                
+                // Add marker to chart
+                addChartMarker(Math.floor(Date.now() / 1000), 'belowBar', '#00e676', 'arrowUp', `AI BUY $${currentPrice.toFixed(0)}`);
+                renderPositionsTable();
+            }
+
+            // EXECUTE PAPER SELL
+            else if (decision.action === 'SELL' && State.positions.length > 0) {
+                closeAllPositions(`AI Signál SELL: ${decision.reasoning}`);
+            }
+        }
+
+        // --- POSITION & RISK MANAGEMENT ---
+        function updateOpenPositionsPnL() {
+            let totalUnrealized = 0;
             
-            if (data.positions.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">No active positions</td></tr>';
+            for (let i = State.positions.length - 1; i >= 0; i--) {
+                const pos = State.positions[i];
+                const currentPrice = State.currentPrice;
+                pos.currentPrice = currentPrice;
+                pos.pnl = (currentPrice - pos.entryPrice) * pos.amount;
+                totalUnrealized += pos.pnl;
+
+                // Stop Loss Hit
+                if (currentPrice <= pos.stopLoss) {
+                    appendLog(`[STOP LOSS] Pozícia ${pos.id} automaticky uzavretá pri $${currentPrice.toFixed(2)}. PNL: -$${Math.abs(pos.pnl).toFixed(2)}`, 'text-cyber-danger');
+                    closeSinglePosition(i, 'Stop Loss dosiahnutý');
+                }
+                // Take Profit Hit
+                else if (currentPrice >= pos.takeProfit) {
+                    appendLog(`[TAKE PROFIT] Pozícia ${pos.id} automaticky uzavretá pri $${currentPrice.toFixed(2)}. PNL: +$${pos.pnl.toFixed(2)}`, 'text-cyber-success');
+                    closeSinglePosition(i, 'Take Profit dosiahnutý');
+                }
+            }
+
+            renderPositionsTable();
+        }
+
+        function closeSinglePosition(index, reason = 'Manuálne zatvorenie') {
+            if (index < 0 || index >= State.positions.length) return;
+            const pos = State.positions[index];
+            const pnl = (State.currentPrice - pos.entryPrice) * pos.amount;
+            
+            State.paperBalance += (pos.costUsdt + pnl);
+            
+            State.history.unshift({
+                id: pos.id,
+                time: new Date().toLocaleTimeString(),
+                pair: pos.pair,
+                type: pos.type,
+                entry: pos.entryPrice,
+                exit: State.currentPrice,
+                pnl: pnl,
+                reason: reason
+            });
+
+            State.positions.splice(index, 1);
+            saveTerminalState();
+
+            addChartMarker(Math.floor(Date.now() / 1000), 'aboveBar', '#ff3366', 'arrowDown', `AI EXIT $${State.currentPrice.toFixed(0)}`);
+
+            renderPositionsTable();
+            renderHistoryTable();
+            updateDashboardKPIs();
+        }
+
+        function closeAllPositions(reason = 'Manuálny pokyn Close All') {
+            while (State.positions.length > 0) {
+                closeSinglePosition(0, reason);
+            }
+        }
+
+        function addChartMarker(time, position, color, shape, text) {
+            State.chartMarkers.push({
+                time: time,
+                position: position,
+                color: color,
+                shape: shape,
+                text: text
+            });
+            candleSeries.setMarkers(State.chartMarkers);
+        }
+
+        // --- DASHBOARD UI UPDATES ---
+        function updateDashboardKPIs() {
+            let openPnl = 0;
+            let invested = 0;
+            State.positions.forEach(p => {
+                openPnl += p.pnl;
+                invested += p.costUsdt;
+            });
+
+            const totalBalance = State.paperBalance + invested + openPnl;
+            const totalRealized = State.history.reduce((sum, h) => sum + h.pnl, 0);
+
+            document.getElementById('stat-balance').innerText = `$${totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            const openPnlEl = document.getElementById('stat-open-pnl');
+            openPnlEl.innerText = `${openPnl >= 0 ? '+' : ''}$${openPnl.toFixed(2)}`;
+            openPnlEl.className = `text-xl font-bold font-mono mt-1 ${openPnl >= 0 ? 'text-cyber-success' : 'text-cyber-danger'}`;
+
+            const pnlPct = invested > 0 ? (openPnl / invested) * 100 : 0;
+            const pnlPctEl = document.getElementById('stat-pnl-percent');
+            pnlPctEl.innerText = `${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%`;
+            pnlPctEl.className = pnlPct >= 0 ? 'text-cyber-success font-semibold' : 'text-cyber-danger font-semibold';
+
+            const relEl = document.getElementById('stat-realized-pnl');
+            relEl.innerText = `${totalRealized >= 0 ? '+' : ''}$${totalRealized.toFixed(2)}`;
+            relEl.className = `text-xl font-bold font-mono mt-1 ${totalRealized >= 0 ? 'text-cyber-success' : 'text-cyber-danger'}`;
+
+            document.getElementById('stat-closed-count').innerText = `${State.history.length} Uzavretých obchodov`;
+            document.getElementById('active-positions-count').innerText = State.positions.length;
+
+            // Win Rate
+            if (State.history.length > 0) {
+                const wins = State.history.filter(h => h.pnl > 0).length;
+                const winRate = (wins / State.history.length) * 100;
+                document.getElementById('stat-winrate').innerText = `${winRate.toFixed(1)}%`;
             } else {
-                data.positions.forEach(p => {
-                    const pnlClass = p.current_pnl >= 0 ? 'text-cyber-success' : 'text-cyber-danger';
-                    const pnlText = (p.current_pnl >= 0 ? '+' : '') + '$' + p.current_pnl.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits:2});
-                    const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-cyber-card transition-colors';
-                    tr.innerHTML = `
-                        <td class="p-3 text-white">${p.pair}</td>
-                        <td class="p-3"><span class="px-2 py-0.5 rounded bg-cyber-success/10 text-cyber-success">${p.type}</span></td>
-                        <td class="p-3 text-gray-300">$${p.entry_price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits:2})}</td>
-                        <td class="p-3 text-gray-300">$${p.cost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits:2})}</td>
-                        <td class="p-3 font-bold ${pnlClass}">${pnlText}</td>
-                        <td class="p-3 text-right">
-                            <button onclick="closeAll()" class="text-xs px-2 py-1 border border-cyber-danger text-cyber-danger hover:bg-cyber-danger/20 rounded transition-colors">Close</button>
+                document.getElementById('stat-winrate').innerText = '100.0%';
+            }
+        }
+
+        function renderPositionsTable() {
+            const tbody = document.getElementById('positions-tbody');
+            if (State.positions.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="p-5 text-center text-gray-500">Žiadne aktívne pozície. Spusťte bota pre automatické obchodovanie.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = State.positions.map((p, idx) => {
+                const pnlClass = p.pnl >= 0 ? 'text-cyber-success' : 'text-cyber-danger';
+                const pnlSign = p.pnl >= 0 ? '+' : '';
+                return `
+                    <tr class="hover:bg-cyber-card/60 transition-colors">
+                        <td class="p-2.5 font-bold text-white">${p.pair}</td>
+                        <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-cyber-success/10 text-cyber-success font-semibold">${p.type}</span></td>
+                        <td class="p-2.5 text-gray-300">$${p.entryPrice.toFixed(2)}</td>
+                        <td class="p-2.5 text-white font-semibold">$${p.currentPrice.toFixed(2)}</td>
+                        <td class="p-2.5 text-gray-300">$${p.costUsdt.toFixed(2)}</td>
+                        <td class="p-2.5 text-cyber-danger">$${p.stopLoss.toFixed(2)}</td>
+                        <td class="p-2.5 text-cyber-success">$${p.takeProfit.toFixed(2)}</td>
+                        <td class="p-2.5 font-bold ${pnlClass}">${pnlSign}$${p.pnl.toFixed(2)}</td>
+                        <td class="p-2.5 text-right">
+                            <button onclick="closeSinglePosition(${idx})" class="px-2.5 py-1 rounded bg-cyber-danger/10 text-cyber-danger hover:bg-cyber-danger hover:text-white transition-all text-[11px] font-semibold border border-cyber-danger/30">
+                                Close Now
+                            </button>
                         </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
+                    </tr>
+                `;
+            }).join('');
         }
 
-        function updateStatusUI(isRunning) {
-            const btnStart = document.getElementById('btn-start');
-            const btnStop = document.getElementById('btn-stop');
-            if (isRunning) {
-                btnStart.classList.add('hidden');
-                btnStop.classList.remove('hidden');
+        function renderHistoryTable() {
+            const tbody = document.getElementById('history-tbody');
+            if (State.history.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-5 text-center text-gray-500">História obchodov je zatiaľ prázdna.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = State.history.map(h => {
+                const pnlClass = h.pnl >= 0 ? 'text-cyber-success font-bold' : 'text-cyber-danger font-bold';
+                const pnlSign = h.pnl >= 0 ? '+' : '';
+                return `
+                    <tr class="hover:bg-cyber-card/60 transition-colors">
+                        <td class="p-2.5 text-gray-400">${h.time}</td>
+                        <td class="p-2.5 text-white">${h.pair}</td>
+                        <td class="p-2.5"><span class="px-1.5 py-0.5 rounded bg-cyber-card text-gray-300">${h.type}</span></td>
+                        <td class="p-2.5 text-gray-300">$${h.entry.toFixed(2)}</td>
+                        <td class="p-2.5 text-gray-300">$${h.exit.toFixed(2)}</td>
+                        <td class="p-2.5 ${pnlClass}">${pnlSign}$${h.pnl.toFixed(2)}</td>
+                        <td class="p-2.5 text-right text-gray-400">${h.reason}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function appendLog(htmlMsg, colorClass = '') {
+            const term = document.getElementById('ai-terminal-log');
+            const div = document.createElement('div');
+            if (colorClass) div.className = colorClass;
+            div.innerHTML = htmlMsg;
+            term.appendChild(div);
+
+            if (term.children.length > 200) {
+                term.removeChild(term.firstChild);
+            }
+            term.scrollTop = term.scrollHeight;
+        }
+
+        function clearTerminalLogs() {
+            document.getElementById('ai-terminal-log').innerHTML = `<div class="text-gray-500">[SYSTEM] Terminál vyčistený.</div>`;
+        }
+
+        // --- BOT CONTROLS ---
+        function toggleBot() {
+            State.botRunning = !State.botRunning;
+            const btn = document.getElementById('btn-bot-toggle');
+            const text = document.getElementById('btn-bot-text');
+
+            if (State.botRunning) {
+                btn.className = 'px-4 py-1.5 bg-cyber-card border border-cyber-danger text-cyber-danger font-semibold rounded text-xs tracking-wider font-mono hover:bg-cyber-danger/10 transition-all flex items-center gap-1.5 glow-danger';
+                text.innerText = 'STOP BOT';
+                appendLog(`[SYSTEM] AI BOT SPUSTENÝ. Analýza každých ${State.intervalSec}s...`, 'text-cyber-success font-bold');
+                
+                runAIDecisionCycle();
+                State.timerId = setInterval(runAIDecisionCycle, State.intervalSec * 1000);
             } else {
-                btnStart.classList.remove('hidden');
-                btnStop.classList.add('hidden');
+                btn.className = 'px-4 py-1.5 bg-cyber-accent text-black font-semibold rounded text-xs tracking-wider font-mono hover:bg-cyber-accentHover transition-all flex items-center gap-1.5 glow-accent';
+                text.innerText = 'START BOT';
+                appendLog(`[SYSTEM] AI BOT ZASTAVENÝ používateľom.`, 'text-cyber-warning font-semibold');
+                clearInterval(State.timerId);
             }
         }
 
-        async function startBot() {
-            try {
-                const res = await fetch('/bot/start', { method: 'POST' });
-                const data = await res.json();
-                if (data.status === 'started' || data.status === 'already running') {
-                    updateStatusUI(true);
+        // --- WEB3 WALLET CONNECTION ---
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    const provider = new ethers.BrowserProvider(window.ethereum);
+                    const accounts = await provider.send("eth_requestAccounts", []);
+                    const signer = await provider.getSigner();
+                    const address = await signer.getAddress();
+                    const balance = await provider.getBalance(address);
+                    
+                    State.walletAddress = address;
+                    const ethBal = parseFloat(ethers.formatEther(balance)).toFixed(4);
+
+                    document.getElementById('wallet-dot').className = 'w-2 h-2 rounded-full bg-cyber-success';
+                    document.getElementById('wallet-btn-text').innerText = `${address.slice(0, 6)}...${address.slice(-4)}`;
+                    document.getElementById('stat-wallet-bal').innerText = `${ethBal} ETH`;
+                    document.getElementById('stat-wallet-addr').innerText = address;
+
+                    appendLog(`[WEB3] Peňaženka úspešne pripojená: ${address} (${ethBal} ETH)`, 'text-cyber-accent');
+                } catch (err) {
+                    appendLog(`[WEB3 CHYBA] Pripojenie peňaženky zlyhalo: ${err.message}`, 'text-cyber-danger');
                 }
-            } catch (e) {
-                appendLog("Failed to start bot: " + e.message, "text-cyber-danger");
+            } else {
+                alert('Žiadna Web3 peňaženka (napr. MetaMask, Rabby) nebola nájdená v prehliadači.');
             }
         }
 
-        async function stopBot() {
-            try {
-                const res = await fetch('/bot/stop', { method: 'POST' });
-                const data = await res.json();
-                if (data.status === 'stopped') {
-                    updateStatusUI(false);
+        // --- PAIR & TIMEFRAME CHANGERS ---
+        function changePair(newPair) {
+            State.pair = newPair;
+            document.getElementById('chart-pair-label').innerText = `${newPair.replace('USDT', '')}/USDT`;
+            State.chartMarkers = [];
+            appendLog(`[TRH] Prepnuté na pár ${newPair}`, 'text-gray-300');
+            fetchMarketData();
+        }
+
+        function setTimeframe(tf) {
+            State.timeframe = tf;
+            ['1m', '5m', '15m', '1h'].forEach(t => {
+                const btn = document.getElementById(`tf-${t}`);
+                if (t === tf) {
+                    btn.className = 'px-2 py-0.5 rounded bg-cyber-border text-cyber-accent font-semibold';
+                } else {
+                    btn.className = 'px-2 py-0.5 rounded text-gray-400 hover:text-white';
                 }
-            } catch (e) {
-                appendLog("Failed to stop bot: " + e.message, "text-cyber-danger");
+            });
+            appendLog(`[GRAF] Časový rámec zmenený na ${tf}`, 'text-gray-400');
+            fetchMarketData();
+        }
+
+        function switchTab(tab) {
+            const btnPos = document.getElementById('tab-btn-positions');
+            const btnHis = document.getElementById('tab-btn-history');
+            const tblPos = document.getElementById('table-positions');
+            const tblHis = document.getElementById('table-history');
+
+            if (tab === 'positions') {
+                btnPos.className = 'font-semibold text-cyber-accent border-b-2 border-cyber-accent h-9 flex items-center';
+                btnHis.className = 'font-medium text-gray-400 hover:text-white h-9 flex items-center';
+                tblPos.classList.remove('hidden');
+                tblHis.classList.add('hidden');
+            } else {
+                btnHis.className = 'font-semibold text-cyber-accent border-b-2 border-cyber-accent h-9 flex items-center';
+                btnPos.className = 'font-medium text-gray-400 hover:text-white h-9 flex items-center';
+                tblHis.classList.remove('hidden');
+                tblPos.classList.add('hidden');
+                renderHistoryTable();
             }
         }
 
-        async function closeAll() {
-            try {
-                await fetch('/bot/close_all', { method: 'POST' });
-                appendLog("Requesting close all positions...", "text-yellow-400");
-            } catch (e) {
-                appendLog("Failed to close positions: " + e.message, "text-cyber-danger");
+        // --- SETTINGS MODAL & LOCAL STORAGE ---
+        function openSettingsModal() {
+            document.getElementById('input-gemini-key').value = State.geminiApiKey;
+            document.getElementById('input-balance').value = State.initialBalance;
+            document.getElementById('input-risk').value = State.riskPct;
+            document.getElementById('input-interval').value = State.intervalSec;
+            document.getElementById('settings-modal').classList.remove('hidden');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').classList.add('hidden');
+        }
+
+        function togglePasswordVisibility(id) {
+            const input = document.getElementById(id);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function saveSettings() {
+            const key = document.getElementById('input-gemini-key').value.trim();
+            State.geminiApiKey = key;
+            localStorage.setItem('gemini_api_key', key);
+
+            State.riskPct = parseFloat(document.getElementById('input-risk').value) || 2.0;
+            localStorage.setItem('ai_risk_pct', State.riskPct);
+
+            State.intervalSec = parseInt(document.getElementById('input-interval').value) || 15;
+            localStorage.setItem('ai_interval_sec', State.intervalSec);
+
+            updateAIStatusBadge();
+            closeSettingsModal();
+            appendLog(`[NASTAVENIA] Konfigurácia uložená. Gemini API Kľúč: ${key ? 'Nastavený (Aktívny)' : 'Nenastavený'}`, 'text-cyber-accent');
+        }
+
+        function resetPaperAccount() {
+            if (confirm('Naozaj chceš vyresetovať Paper Trading účet na 10,000 USDT a vymazať históriu?')) {
+                State.paperBalance = 10000.0;
+                State.positions = [];
+                State.history = [];
+                saveTerminalState();
+                updateDashboardKPIs();
+                renderPositionsTable();
+                renderHistoryTable();
+                closeSettingsModal();
+                appendLog(`[RESET] Účet vyresetovaný na 10,000 USDT.`, 'text-cyber-warning');
             }
         }
 
-        connectWS();
-        fetch('/bot/status').then(r=>r.json()).then(d => {
-            updateStatusUI(d.is_running);
-            document.getElementById('mode-indicator').innerText = d.mode + ' TRADING';
-        }).catch(e => console.warn('Could not fetch initial status.'));
+        function saveTerminalState() {
+            localStorage.setItem('ai_paper_balance', State.paperBalance);
+            localStorage.setItem('ai_positions', JSON.stringify(State.positions));
+            localStorage.setItem('ai_history', JSON.stringify(State.history));
+        }
+
+        function updateAIStatusBadge() {
+            const dot = document.getElementById('status-ai-dot');
+            const text = document.getElementById('status-ai-text');
+            if (State.geminiApiKey && State.geminiApiKey.length > 10) {
+                dot.className = 'w-2 h-2 rounded-full bg-cyber-success';
+                text.innerText = 'GEMINI ACTIVE';
+            } else {
+                dot.className = 'w-2 h-2 rounded-full bg-cyber-warning';
+                text.innerText = 'GEMINI SETUP';
+            }
+        }
+
+        // --- INIT ---
+        window.addEventListener('DOMContentLoaded', () => {
+            updateAIStatusBadge();
+            fetchMarketData();
+            // Polling ticker & candles every 4 seconds for ultra-smooth UI
+            setInterval(fetchMarketData, 4000);
+            renderPositionsTable();
+            updateDashboardKPIs();
+        });
     </script>
 </body>
 </html>
