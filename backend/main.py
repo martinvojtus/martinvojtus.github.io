@@ -1,27 +1,23 @@
 import os
-import json
-import asyncio
 import logging
-from datetime import datetime
-from pydantic import BaseModel, Field
-from dotenv import load_dotenv
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse
-from fastapi.middleware.cors import CORSMiddleware
-import ccxt.async_support as ccxt
-from web3 import Web3
+import requests
+import numpy as np
 import pandas as pd
-import pandas_ta as ta
-from google import genai
-from google.genai import types
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from dotenv import load_dotenv
 
 load_dotenv()
 
-# Setup
+# --- CONFIG & LOGGING ---
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+
 app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -30,306 +26,307 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Config
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-EXCHANGE_ID = os.getenv("EXCHANGE_ID", "binance")
-TRADING_MODE = os.getenv("TRADING_MODE", "PAPER")
-RPC_URL = os.getenv("RPC_URL", "https://cloudflare-eth.com")
-WALLET_ADDRESS = os.getenv("WALLET_ADDRESS", "") # Optional config
-
-if GEMINI_API_KEY:
-    ai_client = genai.Client(api_key=GEMINI_API_KEY)
-else:
-    ai_client = None
-
-# Global State
-class TradingEngineState:
-    def __init__(self):
-        self.is_running = False
-        self.paper_balance = 10000.0
-        self.positions = []
-        self.history = []
-        self.current_price = 0.0
-        self.wallet_balance = 0.0
-        self.wallet_sol_balance = 0.0
-        self.wallet_usdc_balance = 0.0
-        self.sol_fee_reserve = 0.02
-        
-engine_state = TradingEngineState()
-connected_websockets = []
-
-class AIDecision(BaseModel):
-    action: str = Field(description="BUY, SELL, or HOLD")
-    pair: str = Field(description="Trading pair, e.g., SOL/USDC")
-    amount_pct: float = Field(description="Percentage of portfolio to use (0-100)")
-    stop_loss: float = Field(description="Stop loss price")
-    take_profit: float = Field(description="Take profit price")
-    confidence: int = Field(description="Confidence level (0-100)")
-    reasoning: str = Field(description="Reasoning behind the decision")
-
-async def broadcast_log(msg: str):
-    timestamp = datetime.now().strftime("%H:%M:%S")
-    log_msg = f"[{timestamp}] [AI-CORE] {msg}"
-    logger.info(log_msg)
-    await broadcast_ws({"type": "log", "data": log_msg})
-
-async def broadcast_ws(message: dict):
-    disconnected = []
-    for ws in connected_websockets:
-        try:
-            await ws.send_json(message)
-        except Exception:
-            disconnected.append(ws)
-    for ws in disconnected:
-        connected_websockets.remove(ws)
-
-async def fetch_market_data(exchange):
-    try:
-        ohlcv = await exchange.fetch_ohlcv('SOL/USDC', timeframe='1m', limit=100)
-        df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
-        df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
-        
-        # Indicators
-        df.ta.rsi(length=14, append=True)
-        df.ta.macd(append=True)
-        df.ta.ema(length=20, append=True)
-        
-        current_price = df.iloc[-1]['close']
-        engine_state.current_price = current_price
-        
-        rsi = df.iloc[-1]['RSI_14']
-        macd = df.iloc[-1]['MACD_12_26_9']
-        ema = df.iloc[-1]['EMA_20']
-        
-        # Also return last 50 candles for the frontend chart if needed
-        chart_data = df.tail(50)[['timestamp', 'close']].to_dict(orient='records')
-        
-        return {
-            "price": current_price,
-            "rsi": rsi,
-            "macd": macd,
-            "ema": ema,
-            "chart_data": chart_data
-        }
-    except Exception as e:
-        await broadcast_log(f"Market data fetch error: {str(e)}")
-        return None
-
-async def trading_loop():
-    exchange_class = getattr(ccxt, EXCHANGE_ID)
-    exchange = exchange_class({'enableRateLimit': True})
-    
-    w3 = Web3(Web3.HTTPProvider(RPC_URL))
-    
-    await broadcast_log("Bot spustený. Sledujem pár SOL/USDC...")
-    
-    while engine_state.is_running:
-        try:
-            # 1. Fetch Market Data
-            market_data = await fetch_market_data(exchange)
-            if not market_data:
-                await asyncio.sleep(10)
-                continue
-                
-            price = market_data["price"]
-            rsi = market_data["rsi"]
-            
-            # 2. Fetch Wallet Data
-            if WALLET_ADDRESS and w3.is_connected():
-                try:
-                    bal_wei = w3.eth.get_balance(WALLET_ADDRESS)
-                    engine_state.wallet_balance = w3.from_wei(bal_wei, 'ether')
-                except Exception:
-                    pass
-
-            await broadcast_log(f"Analyzujem SOL/USDC... Cena: {price:.2f}$, RSI: {rsi:.1f}")
-            
-            # 3. AI Decision
-            if not ai_client:
-                await broadcast_log("Gemini API Key missing. Skipping AI decision.")
-            else:
-                prompt = f"""
-                You are a crypto scalping AI trading SOL/USDC on Solana. Current market state:
-                Pair: SOL/USDC
-                Price: {price}
-                RSI (14): {rsi}
-                MACD: {market_data['macd']}
-                EMA (20): {market_data['ema']}
-                
-                Portfolio: {engine_state.paper_balance} USDC
-                Open Positions: {len(engine_state.positions)}
-                
-                Rules:
-                - Target micro-scalps between SOL and USDC.
-                - When buying: Spend USDC to buy SOL.
-                - When selling: Sell SOL for USDC.
-                - Maintain mandatory SOL reserve for gas fees.
-                Decide the next action (BUY, SELL, HOLD). Limit risk to max 2% per trade.
-                """
-                
-                try:
-                    response = ai_client.models.generate_content(
-                        model='gemini-2.5-flash',
-                        contents=prompt,
-                        config=types.GenerateContentConfig(
-                            response_mime_type="application/json",
-                            response_schema=AIDecision,
-                            temperature=0.2,
-                        ),
-                    )
-                    
-                    decision_dict = json.loads(response.text)
-                    decision = AIDecision(**decision_dict)
-                    
-                    log_reason = f"Rozhodnutie: {decision.action} (Istota: {decision.confidence}%) - Dôvod: {decision.reasoning}"
-                    await broadcast_log(log_reason)
-                    
-                    # 4. Execute Trade (Paper Trading)
-                    if decision.action == "BUY" and len(engine_state.positions) == 0:
-                        risk_amount = engine_state.paper_balance * (decision.amount_pct / 100.0)
-                        if risk_amount > engine_state.paper_balance * 0.02:
-                            risk_amount = engine_state.paper_balance * 0.02 # Max 2%
-                            
-                        if risk_amount > 0:
-                            position = {
-                                "id": str(datetime.now().timestamp()),
-                                "pair": decision.pair,
-                                "type": "LONG",
-                                "entry_price": price,
-                                "amount": risk_amount / price,
-                                "cost": risk_amount,
-                                "stop_loss": decision.stop_loss or (price * 0.98),
-                                "take_profit": decision.take_profit or (price * 1.05)
-                            }
-                            engine_state.positions.append(position)
-                            engine_state.paper_balance -= risk_amount
-                            await broadcast_log(f"Otvorená pozícia BUY na {price:.2f}$. Veľkosť: {risk_amount:.2f}$")
-                            
-                    elif decision.action == "SELL" and len(engine_state.positions) > 0:
-                        for p in list(engine_state.positions):
-                            if p['pair'] == decision.pair:
-                                pnl = (price - p['entry_price']) * p['amount']
-                                engine_state.paper_balance += (p['cost'] + pnl)
-                                engine_state.history.append({"id": p['id'], "pnl": pnl})
-                                engine_state.positions.remove(p)
-                                await broadcast_log(f"Zatvorená pozícia SELL na {price:.2f}$. PNL: {pnl:.2f}$")
-                except Exception as ai_e:
-                    await broadcast_log(f"Chyba AI modulu: {str(ai_e)}")
-
-            # Evaluate Stop Loss / Take Profit
-            for p in list(engine_state.positions):
-                if price <= p['stop_loss']:
-                    pnl = (price - p['entry_price']) * p['amount']
-                    engine_state.paper_balance += (p['cost'] + pnl)
-                    engine_state.positions.remove(p)
-                    engine_state.history.append({"id": p['id'], "pnl": pnl})
-                    await broadcast_log(f"STOP LOSS hit pre pozíciu. PNL: {pnl:.2f}$")
-                elif price >= p['take_profit']:
-                    pnl = (price - p['entry_price']) * p['amount']
-                    engine_state.paper_balance += (p['cost'] + pnl)
-                    engine_state.positions.remove(p)
-                    engine_state.history.append({"id": p['id'], "pnl": pnl})
-                    await broadcast_log(f"TAKE PROFIT hit pre pozíciu. PNL: {pnl:.2f}$")
-
-            # Broadcast State
-            total_pnl = sum([h['pnl'] for h in engine_state.history])
-            
-            # current pnl for open positions
-            open_pnl = 0
-            for p in engine_state.positions:
-                open_pnl += (price - p['entry_price']) * p['amount']
-                p['current_pnl'] = (price - p['entry_price']) * p['amount']
-
-            total_balance = engine_state.paper_balance + sum([p['cost'] for p in engine_state.positions]) + open_pnl
-
-            await broadcast_ws({
-                "type": "state",
-                "data": {
-                    "price": price,
-                    "pair": "SOL/USDC",
-                    "paper_balance": engine_state.paper_balance,
-                    "total_balance": total_balance,
-                    "wallet_balance": float(engine_state.wallet_balance),
-                    "wallet_sol_balance": float(engine_state.wallet_sol_balance),
-                    "wallet_usdc_balance": float(engine_state.wallet_usdc_balance),
-                    "sol_fee_reserve": float(engine_state.sol_fee_reserve),
-                    "open_positions": len(engine_state.positions),
-                    "total_pnl": total_pnl,
-                    "open_pnl": open_pnl,
-                    "positions": engine_state.positions,
-                    "mode": TRADING_MODE,
-                    "chart_data": market_data["chart_data"]
-                }
-            })
-            
-        except Exception as e:
-            await broadcast_log(f"Chyba v trading loope: {str(e)}")
-            
-        await asyncio.sleep(15) # run every 15 seconds for live feel
-        
-    await exchange.close()
-    await broadcast_log("Bot stopped.")
-
-bot_task = None
+class AnalyzeRequest(BaseModel):
+    mode: str = "MACRO"
+    interval: str = "1w"
+    coin: str = "BTC"
 
 @app.get("/")
-async def serve_index():
-    index_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "index.html")
-    return FileResponse(index_path)
+def keep_alive():
+    return {"status": "Trading Engine - Bot Active!"}
 
-@app.post("/bot/start")
-async def start_bot():
-    global bot_task
-    if engine_state.is_running:
-        return {"status": "already running"}
-    engine_state.is_running = True
-    bot_task = asyncio.create_task(trading_loop())
-    return {"status": "started"}
+def _fetch_from_binance_url(url):
+    r = requests.get(url, headers=HEADERS, timeout=8)
+    r.raise_for_status()
+    df = pd.DataFrame(r.json(), columns=['Time', 'Open', 'High', 'Low', 'Close', 'Vol', 'CloseTime', 'QuoteVol', 'Trades', 'TakerBuyVol', 'TakerBuyQuoteVol', 'Ignore'])
+    for col in ['Open', 'High', 'Low', 'Close', 'Vol']:
+        df[col] = df[col].astype(float)
+    df['Time'] = pd.to_datetime(df['Time'], unit='ms')
+    df = df.set_index('Time')
+    if len(df) >= 200:
+        return df
+    raise ValueError(f"Insufficient candles: {len(df)}")
 
-@app.post("/bot/stop")
-async def stop_bot():
-    engine_state.is_running = False
-    return {"status": "stopped"}
+def _fetch_from_gateio(pair="BTC_USDT", interval="7d"):
+    url = f"https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair={pair}&interval={interval}&limit=1000"
+    r = requests.get(url, headers=HEADERS, timeout=8)
+    r.raise_for_status()
+    raw = r.json()
+    if not isinstance(raw, list) or len(raw) < 200:
+        raise ValueError("Invalid or insufficient Gate.io candles")
+    df = pd.DataFrame(raw, columns=['Time', 'QuoteVol', 'Close', 'High', 'Low', 'Open', 'Vol', 'WindowEnd'])
+    for col in ['Open', 'High', 'Low', 'Close', 'Vol']:
+        df[col] = df[col].astype(float)
+    df['Time'] = pd.to_datetime(df['Time'].astype(int), unit='s')
+    return df.set_index('Time').sort_index()
 
-@app.post("/bot/close_all")
-async def close_all():
-    if len(engine_state.positions) > 0:
-        price = engine_state.current_price
-        for p in list(engine_state.positions):
-            pnl = (price - p['entry_price']) * p['amount']
-            engine_state.paper_balance += (p['cost'] + pnl)
-            engine_state.history.append({"id": p['id'], "pnl": pnl})
-            engine_state.positions.remove(p)
-            await broadcast_log(f"Manuálne zatvorená pozícia na {price:.2f}$. PNL: {pnl:.2f}$")
-    return {"status": "closed"}
+def _fetch_from_bybit(symbol="BTCUSDT", interval="W"):
+    url = f"https://api.bybit.com/v5/market/kline?category=spot&symbol={symbol}&interval={interval}&limit=1000"
+    r = requests.get(url, headers=HEADERS, timeout=8)
+    r.raise_for_status()
+    raw = r.json().get('result', {}).get('list', [])
+    if not isinstance(raw, list) or len(raw) < 200:
+        raise ValueError("Invalid or insufficient Bybit candles")
+    df = pd.DataFrame(raw, columns=['Time', 'Open', 'High', 'Low', 'Close', 'Vol', 'Turnover'])
+    for col in ['Open', 'High', 'Low', 'Close', 'Vol']:
+        df[col] = df[col].astype(float)
+    df['Time'] = pd.to_datetime(df['Time'].astype(int), unit='ms')
+    return df.set_index('Time').sort_index()
 
-@app.get("/bot/status")
-async def get_status():
+def _fetch_from_kraken(pair="XBTUSDT", interval=10080):
+    url = f"https://api.kraken.com/0/public/OHLC?pair={pair}&interval={interval}"
+    r = requests.get(url, headers=HEADERS, timeout=8)
+    r.raise_for_status()
+    res = r.json().get('result', {})
+    key = [k for k in res.keys() if k != 'last'][0]
+    raw = res[key]
+    if not isinstance(raw, list) or len(raw) < 200:
+        raise ValueError("Invalid or insufficient Kraken candles")
+    df = pd.DataFrame(raw, columns=['Time', 'Open', 'High', 'Low', 'Close', 'Vwap', 'Vol', 'Count'])
+    for col in ['Open', 'High', 'Low', 'Close', 'Vol']:
+        df[col] = df[col].astype(float)
+    df['Time'] = pd.to_datetime(df['Time'].astype(int), unit='s')
+    return df.set_index('Time').sort_index()
+
+def get_crypto_data(symbol="BTCUSDT", interval="1w"):
+    is_zec = "ZEC" in symbol.upper()
+    gate_pair = "ZEC_USDT" if is_zec else "BTC_USDT"
+    kraken_pair = "ZECUSD" if is_zec else "XBTUSDT"
+    bybit_sym = "ZECUSDT" if is_zec else "BTCUSDT"
+
+    sources = [
+        ("Binance Vision", lambda: _fetch_from_binance_url(f"https://data-api.binance.vision/api/v3/klines?symbol={symbol}&interval={interval}&limit=1000")),
+        ("Binance Official", lambda: _fetch_from_binance_url(f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit=1000")),
+        ("Gate.io", lambda: _fetch_from_gateio(pair=gate_pair, interval="7d")),
+        ("Bybit", lambda: _fetch_from_bybit(symbol=bybit_sym, interval="W")),
+        ("Binance US", lambda: _fetch_from_binance_url(f"https://api.binance.us/api/v3/klines?symbol={symbol}&interval={interval}&limit=1000")),
+        ("Kraken", lambda: _fetch_from_kraken(pair=kraken_pair, interval=10080)),
+    ]
+    for name, fetch_func in sources:
+        try:
+            df = fetch_func()
+            if not df.empty:
+                logger.info(f"Successfully fetched {len(df)} candles from {name} for {symbol}")
+                return df
+        except Exception as e:
+            logger.warning(f"Data Fetch from {name} for {symbol} failed: {e}")
+
+    logger.error(f"All crypto data sources failed for {symbol}.")
+    return pd.DataFrame()
+
+def get_24h_change(symbol="BTCUSDT"):
+    is_zec = "ZEC" in symbol.upper()
+    gate_pair = "ZEC_USDT" if is_zec else "BTC_USDT"
+    kraken_pair = "ZECUSD" if is_zec else "XBTUSDT"
+    bybit_sym = "ZECUSDT" if is_zec else "BTCUSDT"
+
+    sources = [
+        ("Binance Vision", f"https://data-api.binance.vision/api/v3/ticker/24hr?symbol={symbol}", lambda r: float(r.json()['priceChangePercent'])),
+        ("Binance Official", f"https://api.binance.com/api/v3/ticker/24hr?symbol={symbol}", lambda r: float(r.json()['priceChangePercent'])),
+        ("Gate.io", f"https://api.gateio.ws/api/v4/spot/tickers?currency_pair={gate_pair}", lambda r: float(r.json()[0]['change_percentage'])),
+        ("Bybit", f"https://api.bybit.com/v5/market/tickers?category=spot&symbol={bybit_sym}", lambda r: float(r.json()['result']['list'][0]['price24hPcnt']) * 100.0),
+        ("Binance US", f"https://api.binance.us/api/v3/ticker/24hr?symbol={symbol}", lambda r: float(r.json()['priceChangePercent'])),
+        ("Kraken", f"https://api.kraken.com/0/public/Ticker?pair={kraken_pair}", lambda r: ((float(r.json()['result'][next(iter(r.json()['result']))]['c'][0]) - float(r.json()['result'][next(iter(r.json()['result']))]['o'])) / float(r.json()['result'][next(iter(r.json()['result']))]['o'])) * 100.0),
+    ]
+    for name, url, parser in sources:
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=5)
+            if r.status_code == 200:
+                return float(parser(r))
+        except Exception as e:
+            logger.warning(f"Ticker Fetch from {name} failed: {e}")
+    return 0.0
+
+def calculate_rsi(series, window=14):
+    delta = series.diff()
+    up = delta.clip(lower=0)
+    down = -1 * delta.clip(upper=0)
+    ema_up = up.ewm(com=window-1, adjust=False).mean()
+    ema_down = down.ewm(com=window-1, adjust=False).mean()
+    rs = ema_up / ema_down
+    return 100 - (100 / (1 + rs))
+
+def calculate_stoch_rsi(rsi, window=14, smooth_k=3, smooth_d=3):
+    min_rsi = rsi.rolling(window=window).min()
+    max_rsi = rsi.rolling(window=window).max()
+    stoch = ((rsi - min_rsi) / (max_rsi - min_rsi + 1e-8)) * 100
+    k = stoch.rolling(window=smooth_k).mean()
+    d = k.rolling(window=smooth_d).mean()
+    return k, d
+
+def calculate_macro_score(prices):
+    if len(prices) < 200: return pd.Series([50]*len(prices), index=prices.index)
+    
+    rsi = calculate_rsi(prices, 14)
+    stoch_k, _ = calculate_stoch_rsi(rsi, 14, 3, 3)
+    ma200 = prices.rolling(200, min_periods=10).mean().bfill()
+    ma50 = prices.rolling(50, min_periods=10).mean().bfill() 
+    rolling_ath = prices.cummax()
+    drawdown = ((prices - rolling_ath) / rolling_ath) * 100
+
+    log_ratio = np.log(prices / ma200).clip(lower=0)
+    log_norm = (log_ratio / 1.3 * 100).clip(0, 100) 
+    dd_norm = ((drawdown - (-75)) / (0 - (-75)) * 100).clip(0, 100)
+    rsi_norm = ((rsi - 30) / (85 - 30) * 100).clip(0, 100)
+    stoch_norm = stoch_k.fillna(50).clip(0, 100)
+    base_score = (0.35 * log_norm) + (0.35 * rsi_norm) + (0.15 * dd_norm) + (0.15 * stoch_norm)
+    
+    final_scores = []
+    ath_streak = 0 
+    weeks_since_bottom = 0 
+    
+    for i in range(len(prices)):
+        if i < 150:
+            final_scores.append(base_score.iloc[i])
+            continue
+            
+        p_curr = prices.iloc[i]; r_curr = rsi.iloc[i]; r_prev = rsi.iloc[i-1]; r_prev2 = rsi.iloc[i-2]; k_curr = stoch_k.iloc[i]
+        score = base_score.iloc[i]
+        rule_d_active = False 
+
+        p_104w = prices.iloc[i-104:i+1]
+        r_104w = rsi.iloc[i-104:i+1]
+        p_52w = prices.iloc[i-52:i+1]
+        p_26w = prices.iloc[i-26:i+1]
+
+        fib_slice = prices.iloc[i-150:i-26]
+        if not fib_slice.empty:
+            f_max = fib_slice.max(); f_min = fib_slice.min()
+            if p_curr >= f_max + ((f_max - f_min) * 1.618): score += (100 - score) * 0.20
+            elif p_curr >= f_max + ((f_max - f_min) * 0.08): score += (100 - score) * 0.08
+
+        if p_curr > ma200.iloc[i] and drawdown.iloc[i] <= -20 and k_curr < 20: score *= 0.60 
+
+        recent_low = p_26w.min()
+        if p_curr < ma200.iloc[i] and ((p_curr - recent_low) / recent_low) * 100 >= 20 and k_curr > 80: score += (100 - score) * 0.40
+
+        if p_curr <= p_52w.min() * 1.05: weeks_since_bottom = 0; score *= 0.6  
+        else: weeks_since_bottom += 1
+
+        if p_curr >= p_104w.max() * 0.95:
+            if (p_104w.iloc[52:].max() > p_104w.iloc[:52].max()) and (r_104w.iloc[52:].max() < r_104w.iloc[:52].max()) and r_curr > 65 and p_curr > ma200.iloc[i] * 2.0:
+                score += (100 - score) * 0.6; rule_d_active = True 
+                
+        if p_curr > ma50.iloc[i] * 1.8 and r_curr > 75: score += (100 - score) * 0.5
+
+        p_prev_max = rolling_ath.iloc[i-1] if i > 0 else rolling_ath.iloc[0]
+        if p_curr >= p_prev_max: ath_streak += 1
+        else: ath_streak = 0
+        
+        if ath_streak > 0:
+            pr = min((0.112 + (ath_streak - 20) * 0.02) if ath_streak > 20 else ((0.016 + (ath_streak - 8) * 0.008) if ath_streak > 8 else ath_streak * 0.002), 0.30)
+            score += (100 - score) * pr
+
+        if weeks_since_bottom > 100 and p_curr > (ma200.iloc[i] * 1.25): score += (100 - score) * (min(weeks_since_bottom - 100, 70) * 0.0025)
+
+        if p_curr >= p_26w.max() * 0.90 and (r_prev < 70) and (r_curr < r_prev) and (r_prev > r_prev2) and score > 79 and not rule_d_active: score *= 0.85  
+
+        final_scores.append(max(0.0, min(100.0, score)))
+
+    return pd.Series(final_scores, index=prices.index).bfill().fillna(50)
+
+def calculate_zec_macro_score(prices):
+    if len(prices) < 150: return pd.Series([50]*len(prices), index=prices.index)
+    rsi = calculate_rsi(prices, 14)
+    stoch_k, _ = calculate_stoch_rsi(rsi, 14, 3, 3)
+    ma200 = prices.rolling(200, min_periods=10).mean().bfill()
+    ma50 = prices.rolling(50, min_periods=10).mean().bfill() 
+    
+    peak_156w = prices.rolling(156, min_periods=20).max()
+    dd_156w = ((prices - peak_156w) / peak_156w) * 100
+
+    peak_52w = prices.rolling(52, min_periods=10).max()
+    dd_52w = ((prices - peak_52w) / peak_52w) * 100
+
+    # Dual trend baseline: blend of 200W MA (65%) and 50W MA (35%)
+    trend_baseline = (0.65 * ma200) + (0.35 * ma50)
+    log_ratio = np.log(prices / trend_baseline).clip(lower=0)
+    log_norm = (log_ratio / 1.8 * 100).clip(0, 100) 
+    dd_norm = ((dd_156w - (-90)) / (0 - (-90)) * 100).clip(0, 100)
+    rsi_norm = ((rsi - 25) / (85 - 25) * 100).clip(0, 100)
+    stoch_norm = stoch_k.fillna(50).clip(0, 100)
+
+    base_score = (0.15 * log_norm) + (0.35 * rsi_norm) + (0.30 * dd_norm) + (0.20 * stoch_norm)
+    
+    final_scores = []
+    weeks_since_bottom = 0 
+    
+    for i in range(len(prices)):
+        if i < 100:
+            final_scores.append(base_score.iloc[i])
+            continue
+            
+        p_curr = prices.iloc[i]; r_curr = rsi.iloc[i]; k_curr = stoch_k.iloc[i]
+        score = base_score.iloc[i]
+
+        p_52w = prices.iloc[max(0, i-52):i+1]
+        dd52_curr = dd_52w.iloc[i]
+
+        if p_curr <= p_52w.min() * 1.05: 
+            weeks_since_bottom = 0
+            score *= 0.6  
+        else: 
+            weeks_since_bottom += 1
+
+        # Smooth, continuous mid-cycle dip discount (no harsh step thresholds)
+        if dd52_curr < -25:
+            dd_progress = min(1.0, max(0.0, (-dd52_curr - 25.0) / 25.0)) # 0.0 at -25%, 1.0 at -50%
+            rsi_factor = min(1.0, max(0.55, (65.0 - r_curr) / 25.0))
+            discount = 1.0 - (0.68 * dd_progress * rsi_factor)
+            score *= discount
+
+        # Deep macro bear discount (smooth proportional reduction based on drawdown depth)
+        if p_curr < ma200.iloc[i] and dd_156w.iloc[i] <= -70:
+            bear_depth = min(1.0, max(0.0, (-dd_156w.iloc[i] - 70.0) / 20.0))
+            score *= (0.65 - 0.20 * bear_depth)
+
+        # Bull run parabolic blow-off booster (price > 1.8x 50W MA and RSI > 75)
+        if p_curr > ma50.iloc[i] * 1.8 and r_curr > 75: 
+            score += (100 - score) * 0.45
+
+        final_scores.append(max(0.0, min(100.0, score)))
+
+    return pd.Series(final_scores, index=prices.index).bfill().fillna(50)
+
+@app.post("/analyze")
+def analyze(req: AnalyzeRequest = None):
+    requested_coin = "BTC"
+    if req and hasattr(req, 'coin') and req.coin:
+        requested_coin = req.coin.upper()
+
+    if requested_coin == "ZEC":
+        symbol = "ZECUSDT"
+        name = "Zcash"
+        ticker = "ZEC"
+        calc_fn = calculate_zec_macro_score
+    else:
+        symbol = "BTCUSDT"
+        name = "Bitcoin"
+        ticker = "BTC"
+        calc_fn = calculate_macro_score
+
+    interval = "1w"
+    df = get_crypto_data(symbol, interval)
+    if df.empty:
+        return {"error": f"API Error: All market data sources unreachable for {ticker}."}
+
+    score_series = calc_fn(df['Close'])
+    curr_score = round(float(score_series.iloc[-1]), 1)
+
     return {
-        "is_running": engine_state.is_running,
-        "mode": TRADING_MODE
+        "price": float(df['Close'].iloc[-1]),
+        "change": round(get_24h_change(symbol), 2),
+        "analysis": "MACRO (1W)",
+        "name": name,
+        "ticker": ticker,
+        "chart_dates": [int(d.timestamp() * 1000) for d in df.index],
+        "chart_prices": [round(float(p), 2) for p in df['Close']],
+        "chart_score": score_series.values.tolist(),
+        "cycle_score": curr_score,
+        "phase": "DCA IN" if curr_score <= 20 else ("HODL" if curr_score <= 79 else "DCA OUT")
     }
-
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    connected_websockets.append(websocket)
-    # Send initial state
-    await websocket.send_json({
-        "type": "init",
-        "data": {
-            "mode": TRADING_MODE,
-            "is_running": engine_state.is_running
-        }
-    })
-    try:
-        while True:
-            await websocket.receive_text()
-    except WebSocketDisconnect:
-        if websocket in connected_websockets:
-            connected_websockets.remove(websocket)
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", 10000))
+    port = int(os.environ.get("PORT", 10000))
     uvicorn.run(app, host="0.0.0.0", port=port)
