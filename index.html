@@ -47,7 +47,8 @@
     <!-- Lightweight Charts (TradingView) -->
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
     <!-- Solana Web3.js for Phantom & Solflare -->
-    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <script>if (!window.solanaWeb3) document.write('<script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"><\/script>');</script>
     
     <style>
         body {
@@ -377,7 +378,7 @@
                 </div>
 
                 <div class="flex gap-2">
-                    <button onclick="refreshWalletBalances()" class="flex-1 py-2 rounded-xl bg-dark-cardSub text-gray-300 hover:text-white border border-dark-border text-xs transition-all">
+                    <button onclick="refreshWalletBalances(true)" class="flex-1 py-2 rounded-xl bg-dark-cardSub text-gray-300 hover:text-white border border-dark-border text-xs transition-all">
                         🔄 Obnoviť
                     </button>
                     <button onclick="disconnectWallet()" class="flex-1 py-2 rounded-xl bg-dark-danger/20 text-dark-danger border border-dark-danger/30 hover:bg-dark-danger hover:text-white transition-all text-xs font-semibold">
@@ -1154,43 +1155,92 @@ Output strict JSON: {"action":"BUY"|"SELL"|"HOLD","confidence":85,"reasoning":"s
             return window.phantom?.solana || window.solflare || window.solana || null;
         }
 
-        async function fetchTokenBalance(walletPubkey, mintAddress) {
-            const endpoints = ["https://api.mainnet-beta.solana.com", "https://solana-rpc.publicnode.com"];
-            for (const ep of endpoints) {
-                try {
-                    const res = await fetch(ep, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            jsonrpc: "2.0", id: 1,
-                            method: "getTokenAccountsByOwner",
-                            params: [
-                                walletPubkey,
-                                { mint: mintAddress },
-                                { encoding: "jsonParsed" }
-                            ]
-                        })
-                    });
-                    const data = await res.json();
-                    const accounts = data?.result?.value;
-                    if (accounts && accounts.length > 0) {
-                        let sum = 0;
-                        for (const acc of accounts) {
-                            const info = acc.account?.data?.parsed?.info?.tokenAmount;
-                            if (info && info.uiAmount !== null && info.uiAmount !== undefined) {
-                                sum += Number(info.uiAmount);
-                            }
-                        }
-                        return {
-                            amount: String(accounts[0].account?.data?.parsed?.info?.tokenAmount?.amount || "0"),
-                            uiAmount: sum,
-                            decimals: 6
-                        };
-                    }
-                    return { amount: "0", uiAmount: 0, decimals: 6 };
-                } catch (e) {}
+        async function waitForSolanaWeb3(timeoutMs = 4000) {
+            if (window.solanaWeb3) return window.solanaWeb3;
+            const start = Date.now();
+            while (!window.solanaWeb3 && (Date.now() - start < timeoutMs)) {
+                await new Promise(r => setTimeout(r, 80));
+            }
+            return window.solanaWeb3 || null;
+        }
+
+        async function getAssociatedTokenAddress(ownerStr, mintStr, programIdStr = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA') {
+            const sWeb3 = await waitForSolanaWeb3();
+            if (!sWeb3) return null;
+            try {
+                const owner = new sWeb3.PublicKey(ownerStr);
+                const mint = new sWeb3.PublicKey(mintStr);
+                const tokenProgram = new sWeb3.PublicKey(programIdStr);
+                const ataProgram = new sWeb3.PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
+
+                const ownerBytes = owner.toBytes ? owner.toBytes() : owner.toBuffer();
+                const tokenProgramBytes = tokenProgram.toBytes ? tokenProgram.toBytes() : tokenProgram.toBuffer();
+                const mintBytes = mint.toBytes ? mint.toBytes() : mint.toBuffer();
+
+                const seeds = [ownerBytes, tokenProgramBytes, mintBytes];
+                if (sWeb3.PublicKey.findProgramAddressSync) {
+                    const [ata] = sWeb3.PublicKey.findProgramAddressSync(seeds, ataProgram);
+                    return ata.toBase58();
+                } else if (sWeb3.PublicKey.findProgramAddress) {
+                    const [ata] = await sWeb3.PublicKey.findProgramAddress(seeds, ataProgram);
+                    return ata.toBase58();
+                }
+            } catch (err) {
+                console.warn('ATA derivation error:', err);
             }
             return null;
+        }
+
+        async function fetchTokenBalance(walletPubkey, mintAddress) {
+            try {
+                const sWeb3 = await waitForSolanaWeb3();
+                if (!sWeb3) return { amount: "0", uiAmount: 0, decimals: 6 };
+
+                const programs = [
+                    'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA', // Standard SPL Token
+                    'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'  // Token-2022
+                ];
+
+                for (const prog of programs) {
+                    const ata = await getAssociatedTokenAddress(walletPubkey, mintAddress, prog);
+                    if (!ata) continue;
+
+                    try {
+                        const res = await fetch('https://solana-rpc.publicnode.com', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                jsonrpc: '2.0',
+                                id: 1,
+                                method: 'getAccountInfo',
+                                params: [ata, { encoding: 'jsonParsed' }]
+                            })
+                        });
+                        if (res.ok) {
+                            const d = await res.json();
+                            const info = d?.result?.value?.data?.parsed?.info?.tokenAmount;
+                            if (info) {
+                                let amt = 0;
+                                if (typeof info.uiAmount === 'number') {
+                                    amt = info.uiAmount;
+                                } else if (info.uiAmountString) {
+                                    amt = parseFloat(info.uiAmountString) || 0;
+                                } else if (info.amount) {
+                                    amt = Number(BigInt(info.amount)) / Math.pow(10, info.decimals || 6);
+                                }
+                                return {
+                                    amount: String(info.amount || "0"),
+                                    uiAmount: amt,
+                                    decimals: info.decimals !== undefined ? info.decimals : 6
+                                };
+                            }
+                        }
+                    } catch (e) {}
+                }
+                return { amount: "0", uiAmount: 0, decimals: 6 };
+            } catch (err) {
+                return { amount: "0", uiAmount: 0, decimals: 6 };
+            }
         }
 
         async function executeLiveWalletTrade(action, dec) {
@@ -1667,8 +1717,24 @@ Output strict JSON: {"action":"BUY"|"SELL"|"HOLD","confidence":85,"reasoning":"s
             if (State.wallet) {
                 document.getElementById('wallet-connected-view').classList.remove('hidden');
                 document.getElementById('wallet-selection-view').classList.add('hidden');
-                document.getElementById('modal-wallet-addr').innerText = State.wallet.address;
-                document.getElementById('modal-wallet-bal').innerText = `${State.wallet.balance} ${State.wallet.chain}`;
+
+                const sol = State.wallet.solBalance || State.wallet.balance || "0.0000";
+                const usdc = State.wallet.usdcBalance || "0.00";
+                const reserve = State.solFeeReserve || 0.02;
+                const freeSol = Math.max(0, parseFloat(sol) - reserve).toFixed(3);
+
+                const modalAddr = document.getElementById('modal-wallet-addr');
+                if (modalAddr) modalAddr.innerText = State.wallet.address;
+                const modalSol = document.getElementById('modal-wallet-sol');
+                if (modalSol) modalSol.innerText = `${parseFloat(sol).toFixed(4)} SOL`;
+                const modalUsdc = document.getElementById('modal-wallet-usdc');
+                if (modalUsdc) modalUsdc.innerText = `${parseFloat(usdc).toFixed(2)} USDC`;
+                const modalReserve = document.getElementById('modal-wallet-reserve');
+                if (modalReserve) modalReserve.innerText = `${reserve.toFixed(3)} SOL`;
+                const modalFree = document.getElementById('modal-wallet-free');
+                if (modalFree) modalFree.innerText = `${freeSol} SOL + ${parseFloat(usdc).toFixed(2)} USDC`;
+
+                refreshWalletBalances();
             } else {
                 document.getElementById('wallet-connected-view').classList.add('hidden');
                 document.getElementById('wallet-selection-view').classList.remove('hidden');
@@ -1779,52 +1845,26 @@ Output strict JSON: {"action":"BUY"|"SELL"|"HOLD","confidence":85,"reasoning":"s
         }
 
         async function fetchUsdcBalance(pubkey) {
-            const endpoints = [
-                "https://api.mainnet-beta.solana.com",
-                "https://solana-rpc.publicnode.com"
-            ];
             const USDC_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
-            for (const ep of endpoints) {
-                try {
-                    const res = await fetch(ep, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            jsonrpc: "2.0", id: 1,
-                            method: "getTokenAccountsByOwner",
-                            params: [
-                                pubkey,
-                                { mint: USDC_MINT },
-                                { encoding: "jsonParsed" }
-                            ]
-                        })
-                    });
-                    const d = await res.json();
-                    const accounts = d?.result?.value;
-                    if (accounts && accounts.length > 0) {
-                        let sum = 0;
-                        for (const acc of accounts) {
-                            const info = acc.account?.data?.parsed?.info?.tokenAmount;
-                            if (info && info.uiAmount !== null && info.uiAmount !== undefined) {
-                                sum += Number(info.uiAmount);
-                            }
-                        }
-                        return sum.toFixed(2);
-                    }
-                    return "0.00";
-                } catch (e) {}
+            const bal = await fetchTokenBalance(pubkey, USDC_MINT);
+            if (bal && bal.uiAmount !== undefined && bal.uiAmount !== null) {
+                return bal.uiAmount.toFixed(2);
             }
             return State.wallet?.usdcBalance || "0.00";
         }
 
-        async function refreshWalletBalances() {
+        async function refreshWalletBalances(logNotice = false) {
             if (!State.wallet?.address) return;
+            const prevSol = State.wallet.solBalance;
+            const prevUsdc = State.wallet.usdcBalance;
             const [solBal, usdcBal] = await Promise.all([
                 fetchSolBalance(State.wallet.address),
                 fetchUsdcBalance(State.wallet.address)
             ]);
             setConnectedWallet(State.wallet.address, solBal, usdcBal, State.wallet.chain || 'SOL', State.wallet.icon || '👛');
-            appendLog(`[ZOSTATKY OBNOVENÉ] SOL: ${solBal} SOL | USDC: ${usdcBal} USDC`, 'text-dark-accent font-semibold');
+            if (logNotice || (prevSol && prevSol !== solBal) || (prevUsdc && prevUsdc !== usdcBal)) {
+                appendLog(`[ZOSTATKY OBNOVENÉ] SOL: ${solBal} SOL | USDC: ${usdcBal} USDC`, 'text-dark-accent font-semibold');
+            }
         }
 
         function setConnectedWallet(address, solBalance, usdcBalance, chain, icon) {
